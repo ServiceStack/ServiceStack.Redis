@@ -4,7 +4,7 @@
 It is similar to memcached but the dataset is not volatile, and values can either be strings lists, sets, sorted sets or hashes.
 
 [ServiceStackRedis ServiceStack.Redis] is an Open Source C# Redis client based on [Miguel de Icaza](http://twitter.com/migueldeicaza) previous efforts with [redis-sharp](http://github.com/migueldeicaza/redis-sharp).
-
+ 
 There are a number of different APIs available which are all a friendly drop-in with your local IOC:
 The `ServiceStack.Redis.RedisClient` class below implements the following interfaces:
  * [Caching ICacheClient] - If you are using Redis solely as a cache, you should bind to the [Caching ServiceStack's common interface] as there already are In-Memory an Memcached implementations available in ServiceStack, allowing you to easily switch providers in-future.
