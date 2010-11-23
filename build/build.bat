@@ -12,5 +12,6 @@ SET PROJ_LIBS=%PROJ_LIBS% ..\lib\ServiceStack.Messaging.dll
 SET PROJ_LIBS=%PROJ_LIBS% ..\src\ServiceStack.Redis\bin\%BUILD%\ServiceStack.Redis.dll
 
 ILMerge.exe /ndebug /t:library /out:ServiceStack.Redis.dll %PROJ_LIBS%
-
 COPY *.dll %DEPLOY_PATH%
+COPY ..\src\ServiceStack.Redis\bin\%BUILD%\ServiceStack.Redis.dll C:\src\ServiceStack\release\lib
+COPY ..\src\ServiceStack.Redis\bin\%BUILD%\ServiceStack.Redis.pdb C:\src\ServiceStack\release\lib
