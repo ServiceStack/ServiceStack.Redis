@@ -3,7 +3,7 @@
 [Redis](http://code.google.com/p/redis/) is one of the fastest and feature-rich key-value stores to come from the [NoSQL](http://en.wikipedia.org/wiki/NoSQL) movement.
 It is similar to memcached but the dataset is not volatile, and values can either be strings lists, sets, sorted sets or hashes.
 
-[ServiceStackRedis ServiceStack.Redis] is an Open Source C# Redis client based on [Miguel de Icaza](http://twitter.com/migueldeicaza) previous efforts with [redis-sharp](http://github.com/migueldeicaza/redis-sharp).
+[ServiceStack's C# Redis Client](https://github.com/mythz/ServiceStack.Redis) is an Open Source C# Redis client based on [Miguel de Icaza](http://twitter.com/migueldeicaza) previous efforts with [redis-sharp](http://github.com/migueldeicaza/redis-sharp).
  
 There are a number of different APIs available which are all a friendly drop-in with your local IOC:
 The `ServiceStack.Redis.RedisClient` class below implements the following interfaces:
