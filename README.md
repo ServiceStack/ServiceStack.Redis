@@ -8,7 +8,7 @@ It is similar to memcached but the dataset is not volatile, and values can eithe
 There are a number of different APIs available which are all a friendly drop-in with your local IOC:
 The `ServiceStack.Redis.RedisClient` class below implements the following interfaces:
 
- * [ICacheClient](https://github.com/mythz/ServiceStack.Redis/wiki/Caching) - If you are using Redis solely as a cache, you should bind to the [ServiceStack's common interface](https://github.com/mythz/ServiceStack.Redis/wiki/Caching) as there already are In-Memory an Memcached implementations available in ServiceStack, allowing you to easily switch providers in-future.
+ * [ICacheClient](https://github.com/mythz/ServiceStack/wiki/Caching) - If you are using Redis solely as a cache, you should bind to the [ServiceStack's common interface](https://github.com/mythz/ServiceStack.Redis/wiki/Caching) as there already are In-Memory an Memcached implementations available in ServiceStack, allowing you to easily switch providers in-future.
  * [IRedisNativeClient](https://github.com/mythz/ServiceStack.Redis/wiki/IRedisNativeClient) - For those wanting a low-level raw byte access (where you can control your own serialization/deserialization) that map 1:1 with Redis operations of the same name.
 
 For most cases if you require access to Redis-specific functionality you would want to bind to the interface below:
