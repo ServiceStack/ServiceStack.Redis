@@ -158,7 +158,7 @@ More examples are available in the [RedisExamples Redis examples page] and in th
 ## Speed
 One of the best things about Redis is the speed - it is quick.
 
-[This example](http://code.google.com/p/servicestack/source/browse/trunk/Common/ServiceStack.Redis/ServiceStack.Redis.Tests/Generic/RedisClientTests.cs)
+[This example](https://github.com/mythz/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/RedisClientTests.cs)
 below stores and gets the entire [Northwind database](http://code.google.com/p/servicestack/source/browse/trunk/Common/Northwind.Benchmarks/Northwind.Common/DataModel/NorthwindData.cs) (3202 records) in less *1.2 secs* - we've never had it so quick!
 
 _(Running inside a VS.NET/R# unit test on a 3 year old iMac)_
