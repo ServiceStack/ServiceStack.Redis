@@ -29,7 +29,7 @@ For multi-threaded applications you can choose from our different client connect
 [View the release notes](https://github.com/mythz/ServiceStack.Redis/wiki/RedisClientReleaseNotes).
 
 ### Redis Server builds for Windows
-Downloads for Redis Server Windows builds [https://github.com/mythz/ServiceStack.Redis/wiki/RedisWindowsDownload can be found here].
+Downloads for Redis Server Windows builds [can be found here](https://github.com/mythz/ServiceStack.Redis/wiki/RedisWindowsDownload).
 
 # How to design a NoSQL database
 
