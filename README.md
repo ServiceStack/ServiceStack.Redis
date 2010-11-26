@@ -7,17 +7,17 @@ It is similar to memcached but the dataset is not volatile, and values can eithe
  
 There are a number of different APIs available which are all a friendly drop-in with your local IOC:
 The `ServiceStack.Redis.RedisClient` class below implements the following interfaces:
- * [Caching ICacheClient] - If you are using Redis solely as a cache, you should bind to the [Caching ServiceStack's common interface] as there already are In-Memory an Memcached implementations available in ServiceStack, allowing you to easily switch providers in-future.
- * [IRedisNativeClient] - For those wanting a low-level raw byte access (where you can control your own serialization/deserialization) that map 1:1 with Redis operations of the same name.
+ * [ICacheClient](Caching) - If you are using Redis solely as a cache, you should bind to the [ServiceStack's common interface](Caching) as there already are In-Memory an Memcached implementations available in ServiceStack, allowing you to easily switch providers in-future.
+ * [IRedisNativeClient](IRedisNativeClient) - For those wanting a low-level raw byte access (where you can control your own serialization/deserialization) that map 1:1 with Redis operations of the same name.
 
 For most cases if you require access to Redis-specific functionality you would want to bind to the interface below:
-  * [IRedisClient] - Provides a friendlier, more descriptive API that lets you store values as strings (UTF8 encoding).
-  * [IRedisTypedClient] - created with `IRedisClient.GetTypedClient<T>()` - it returns a 'strongly-typed client' that provides a typed-interface for all redis value operations that works against any C#/.NET POCO type.
+  * [IRedisClient](IRedisClient) - Provides a friendlier, more descriptive API that lets you store values as strings (UTF8 encoding).
+  * [IRedisTypedClient](IRedisTypedClient) - created with `IRedisClient.GetTypedClient<T>()` - it returns a 'strongly-typed client' that provides a typed-interface for all redis value operations that works against any C#/.NET POCO type.
 
-= Thread-safe client managers =
+# Thread-safe client managers
 For multi-threaded applications you can choose from our different client connection managers:
- * [BasicRedisClientManager] - a load-balance (master-write and read-slaves) client manager that returns a new [IRedisClient] connection with the defaults specified (faster when accessing a redis-server instance on the same host).
- * [PooledRedisClientManager] - a load-balanced (master-write and read-slaves) client manager that utilizes a pool of redis client connections (faster when accessing a redis-server instance over the network).
+ * [BasicRedisClientManager](BasicRedisClientManager) - a load-balance (master-write and read-slaves) client manager that returns a new [IRedisClient](IRedisClient) connection with the defaults specified (faster when accessing a redis-server instance on the same host).
+ * [PooledRedisClientManager](PooledRedisClientManager) - a load-balanced (master-write and read-slaves) client manager that utilizes a pool of redis client connections (faster when accessing a redis-server instance over the network).
 
 # Download
 
@@ -26,7 +26,7 @@ For multi-threaded applications you can choose from our different client connect
   * Alternatively it is available as a separate standalone [ServiceStack.Redis.zip](https://github.com/downloads/mythz/ServiceStack.Redis/ServiceStack.Redis.zip)
   * For those interested in having a GUI admin tool to visualize your Redis data should check out the [Redis Admin UI](http://www.servicestack.net/mythz_blog/?p=381)
 
-[RedisClientReleaseNotes View the release notes].
+[View the release notes](RedisClientReleaseNotes).
 
 ### Redis Server builds for Windows
 Downloads for Redis Server Windows builds [RedisWindowsDownload can be found here].
@@ -34,21 +34,21 @@ Downloads for Redis Server Windows builds [RedisWindowsDownload can be found her
 # How to design a NoSQL database
 
 Developers who would like to know how to approach building a sample Blog application using Redis should check out:
-  * *[DesigningNoSqlDatabase How to design a NoSql Database]*
-  * *[MigrationsUsingSchemalessNoSql Painless data migrations with schema-less NoSQL datastores and Redis]*
+  * *[How to design a NoSql Database](DesigningNoSqlDatabase)*
+  * *[Painless data migrations with schema-less NoSQL datastores and Redis](MigrationsUsingSchemalessNoSql)*
 It provides good examples illustrating how to make effective use of the advanced features of the Redis client to solve real world scenarios.
 
-It follows in tandem with Oren Eini's (from the popular .NET blog [http://ayende.com/Blog/ ayende.com/Blog/]) series of blog posts illustrating his approach to designing a NoSQL database with a RavenDB back end.
+It follows in tandem with Oren Eini's (from the popular .NET blog [ayende.com/Blog/](http://ayende.com/Blog/)) series of blog posts illustrating his approach to designing a NoSQL database with a RavenDB back end.
 
 # Specific Examples
-  * [RedisTransactions Using Transactions in Redis (i.e. MULTI/EXEC/DISCARD)]
-  * [RedisPubSub Using Redis's built-in Publsih/Subscribe pattern for high performance network notifications]
-  * [RedisLocks Using Redis to create high performance *distributed locks* spannable across multiple app servers]
+  * [Using Transactions in Redis (i.e. MULTI/EXEC/DISCARD)](RedisTransactions)
+  * [Using Redis's built-in Publsih/Subscribe pattern for high performance network notifications](RedisPubSub)
+  * [Using Redis to create high performance *distributed locks* spannable across multiple app servers](RedisLocks)
 
 # Simple example using Redis Lists
 
 Below is a simple example to give you a flavour of how easy it is to use some of Redis's advanced data structures - in this case Redis Lists:
-_Full source code of this example is [viewable online](http://code.google.com/p/servicestack/source/browse/trunk/Common/ServiceStack.Redis/ServiceStack.Redis.Tests/ShippersExample.cs)_
+_Full source code of this example is [viewable online](https://github.com/mythz/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/ShippersExample.cs)_
 
     using (var redisClient = new RedisClient())
     {
@@ -152,7 +152,7 @@ _Full source code of this example is [viewable online](http://code.google.com/p/
     */
 
 More examples are available in the [RedisExamples Redis examples page] and in the comprehensive
-[test suite](http://code.google.com/p/servicestack/source/browse/#svn/trunk/Common/ServiceStack.Redis/ServiceStack.Redis.Tests)
+[test suite](https://github.com/mythz/ServiceStack.Redis/tree/master/tests/ServiceStack.Redis.Tests)
 
 
 ## Speed
