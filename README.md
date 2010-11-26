@@ -16,7 +16,8 @@ For most cases if you require access to Redis-specific functionality you would w
 
 # Thread-safe client managers
 For multi-threaded applications you can choose from our different client connection managers:
-  * BasicRedisClientManager  - a load-balance (master-write and read-slaves) client manager that returns a new [IRedisClient](https://github.com/mythz/ServiceStack.Redis/wiki/IRedisClient) connection with the defaults specified (faster when accessing a redis-server instance on the same host).
+
+  * BasicRedisClientManager - a load-balance (master-write and read-slaves) client manager that returns a new [IRedisClient](https://github.com/mythz/ServiceStack.Redis/wiki/IRedisClient) connection with the defaults specified (faster when accessing a redis-server instance on the same host).
   * PooledRedisClientManager - a load-balanced (master-write and read-slaves) client manager that utilizes a pool of redis client connections (faster when accessing a redis-server instance over the network).
 
 # Download
