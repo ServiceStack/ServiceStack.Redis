@@ -7,17 +7,17 @@ It is similar to memcached but the dataset is not volatile, and values can eithe
  
 There are a number of different APIs available which are all a friendly drop-in with your local IOC:
 The `ServiceStack.Redis.RedisClient` class below implements the following interfaces:
- * [ICacheClient](wiki/Caching) - If you are using Redis solely as a cache, you should bind to the [ServiceStack's common interface](Caching) as there already are In-Memory an Memcached implementations available in ServiceStack, allowing you to easily switch providers in-future.
- * [IRedisNativeClient](IRedisNativeClient) - For those wanting a low-level raw byte access (where you can control your own serialization/deserialization) that map 1:1 with Redis operations of the same name.
+ * [ICacheClient](https://github.com/mythz/ServiceStack.Redis/wiki/Caching) - If you are using Redis solely as a cache, you should bind to the [ServiceStack's common interface](https://github.com/mythz/ServiceStack.Redis/wiki/Caching) as there already are In-Memory an Memcached implementations available in ServiceStack, allowing you to easily switch providers in-future.
+ * [IRedisNativeClient](https://github.com/mythz/ServiceStack.Redis/wiki/IRedisNativeClient) - For those wanting a low-level raw byte access (where you can control your own serialization/deserialization) that map 1:1 with Redis operations of the same name.
 
 For most cases if you require access to Redis-specific functionality you would want to bind to the interface below:
-  * [IRedisClient](IRedisClient) - Provides a friendlier, more descriptive API that lets you store values as strings (UTF8 encoding).
-  * [IRedisTypedClient](IRedisTypedClient) - created with `IRedisClient.GetTypedClient<T>()` - it returns a 'strongly-typed client' that provides a typed-interface for all redis value operations that works against any C#/.NET POCO type.
+  * [IRedisClient](https://github.com/mythz/ServiceStack.Redis/wiki/IRedisClient) - Provides a friendlier, more descriptive API that lets you store values as strings (UTF8 encoding).
+  * [IRedisTypedClient](https://github.com/mythz/ServiceStack.Redis/wiki/IRedisTypedClient) - created with `IRedisClient.GetTypedClient<T>()` - it returns a 'strongly-typed client' that provides a typed-interface for all redis value operations that works against any C#/.NET POCO type.
 
 # Thread-safe client managers
 For multi-threaded applications you can choose from our different client connection managers:
- * [BasicRedisClientManager](BasicRedisClientManager) - a load-balance (master-write and read-slaves) client manager that returns a new [IRedisClient](IRedisClient) connection with the defaults specified (faster when accessing a redis-server instance on the same host).
- * [PooledRedisClientManager](PooledRedisClientManager) - a load-balanced (master-write and read-slaves) client manager that utilizes a pool of redis client connections (faster when accessing a redis-server instance over the network).
+ * [BasicRedisClientManager](https://github.com/mythz/ServiceStack.Redis/wiki/BasicRedisClientManager) - a load-balance (master-write and read-slaves) client manager that returns a new [IRedisClient](IRedisClient) connection with the defaults specified (faster when accessing a redis-server instance on the same host).
+ * [PooledRedisClientManager](https://github.com/mythz/ServiceStack.Redis/wiki/PooledRedisClientManager) - a load-balanced (master-write and read-slaves) client manager that utilizes a pool of redis client connections (faster when accessing a redis-server instance over the network).
 
 # Download
 
@@ -26,24 +26,24 @@ For multi-threaded applications you can choose from our different client connect
   * Alternatively it is available as a separate standalone [ServiceStack.Redis.zip](https://github.com/downloads/mythz/ServiceStack.Redis/ServiceStack.Redis.zip)
   * For those interested in having a GUI admin tool to visualize your Redis data should check out the [Redis Admin UI](http://www.servicestack.net/mythz_blog/?p=381)
 
-[View the release notes](RedisClientReleaseNotes).
+[View the release notes](https://github.com/mythz/ServiceStack.Redis/wiki/RedisClientReleaseNotes).
 
 ### Redis Server builds for Windows
-Downloads for Redis Server Windows builds [RedisWindowsDownload can be found here].
+Downloads for Redis Server Windows builds [https://github.com/mythz/ServiceStack.Redis/wiki/RedisWindowsDownload can be found here].
 
 # How to design a NoSQL database
 
 Developers who would like to know how to approach building a sample Blog application using Redis should check out:
-  * *[How to design a NoSql Database](DesigningNoSqlDatabase)*
-  * *[Painless data migrations with schema-less NoSQL datastores and Redis](MigrationsUsingSchemalessNoSql)*
+  * *[How to design a NoSql Database](https://github.com/mythz/ServiceStack.Redis/wiki/DesigningNoSqlDatabase)*
+  * *[Painless data migrations with schema-less NoSQL datastores and Redis](https://github.com/mythz/ServiceStack.Redis/wiki/MigrationsUsingSchemalessNoSql)*
 It provides good examples illustrating how to make effective use of the advanced features of the Redis client to solve real world scenarios.
 
 It follows in tandem with Oren Eini's (from the popular .NET blog [ayende.com/Blog/](http://ayende.com/Blog/)) series of blog posts illustrating his approach to designing a NoSQL database with a RavenDB back end.
 
 # Specific Examples
-  * [Using Transactions in Redis (i.e. MULTI/EXEC/DISCARD)](RedisTransactions)
-  * [Using Redis's built-in Publsih/Subscribe pattern for high performance network notifications](RedisPubSub)
-  * [Using Redis to create high performance *distributed locks* spannable across multiple app servers](RedisLocks)
+  * [Using Transactions in Redis (i.e. MULTI/EXEC/DISCARD)](https://github.com/mythz/ServiceStack.Redis/wiki/RedisTransactions)
+  * [Using Redis's built-in Publsih/Subscribe pattern for high performance network notifications](https://github.com/mythz/ServiceStack.Redis/wiki/RedisPubSub)
+  * [Using Redis to create high performance *distributed locks* spannable across multiple app servers](https://github.com/mythz/ServiceStack.Redis/wiki/RedisLocks)
 
 # Simple example using Redis Lists
 
