@@ -34,14 +34,9 @@ For multi-threaded applications you can choose from our different client connect
 ### Redis Server builds for Windows
 Downloads for Redis Server Windows builds [can be found here](https://github.com/mythz/ServiceStack.Redis/wiki/RedisWindowsDownload).
 
-# How to design a NoSQL database
+# Getting Started with the C# Redis client
 
-Developers who would like to know how to approach building a sample Blog application using Redis should check out:
-  * *[How to design a NoSql Database](https://github.com/mythz/ServiceStack.Redis/wiki/DesigningNoSqlDatabase)*
-  * *[Painless data migrations with schema-less NoSQL datastores and Redis](https://github.com/mythz/ServiceStack.Redis/wiki/MigrationsUsingSchemalessNoSql)*
-It provides good examples illustrating how to make effective use of the advanced features of the Redis client to solve real world scenarios.
-
-It follows in tandem with Oren Eini's (from the popular .NET blog [ayende.com/Blog/](http://ayende.com/Blog/)) series of blog posts illustrating his approach to designing a NoSQL database with a RavenDB back end.
+Head over to the [C# Redis Client wiki](https://github.com/mythz/ServiceStack.Redis/wiki) for all the resources you need to get you up to speed with common operations and the latest features.
 
 # Specific Examples
   * [Using Transactions in Redis (i.e. MULTI/EXEC/DISCARD)](https://github.com/mythz/ServiceStack.Redis/wiki/RedisTransactions)
