@@ -26,6 +26,10 @@ namespace ServiceStack.Redis
 		void QueueCommand(Func<IRedisClient, int> command, Action<int> onSuccessCallback);
 		void QueueCommand(Func<IRedisClient, int> command, Action<int> onSuccessCallback, Action<Exception> onErrorCallback);
 
+		void QueueCommand(Func<IRedisClient, long> command);
+		void QueueCommand(Func<IRedisClient, long> command, Action<long> onSuccessCallback);
+		void QueueCommand(Func<IRedisClient, long> command, Action<long> onSuccessCallback, Action<Exception> onErrorCallback);
+
 		void QueueCommand(Func<IRedisClient, bool> command);
 		void QueueCommand(Func<IRedisClient, bool> command, Action<bool> onSuccessCallback);
 		void QueueCommand(Func<IRedisClient, bool> command, Action<bool> onSuccessCallback, Action<Exception> onErrorCallback);

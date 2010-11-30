@@ -11,6 +11,7 @@ namespace ServiceStack.Redis
 
 		public Action VoidReadCommand { get; set; }
 		public Func<int> IntReadCommand { get; set; }
+		public Func<long> LongReadCommand { get; set; }
 		public Func<bool> BoolReadCommand { get; set; }
 		public Func<byte[]> BytesReadCommand { get; set; }
 		public Func<byte[][]> MultiBytesReadCommand { get; set; }
@@ -20,6 +21,7 @@ namespace ServiceStack.Redis
 
 		public Action OnSuccessVoidCallback { get; set; }
 		public Action<int> OnSuccessIntCallback { get; set; }
+		public Action<long> OnSuccessLongCallback { get; set; }
 		public Action<bool> OnSuccessBoolCallback { get; set; }
 		public Action<byte[]> OnSuccessBytesCallback { get; set; }
 		public Action<byte[][]> OnSuccessMultiBytesCallback { get; set; }
@@ -50,6 +52,27 @@ namespace ServiceStack.Redis
 					if (OnSuccessIntCallback != null)
 					{
 						OnSuccessIntCallback(result);
+					}
+					if (OnSuccessLongCallback != null)
+					{
+						OnSuccessLongCallback(result);
+					}
+					if (OnSuccessBoolCallback != null)
+					{
+						var success = result == RedisNativeClient.Success;
+						OnSuccessBoolCallback(success);
+					}
+					if (OnSuccessVoidCallback != null)
+					{
+						OnSuccessVoidCallback();
+					}
+				}
+				else if (LongReadCommand != null)
+				{
+					var result = LongReadCommand();
+					if (OnSuccessLongCallback != null)
+					{
+						OnSuccessLongCallback(result);
 					}
 					if (OnSuccessBoolCallback != null)
 					{

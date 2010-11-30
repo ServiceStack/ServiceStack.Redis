@@ -26,6 +26,10 @@ namespace ServiceStack.Redis.Generic
 		void QueueCommand(Func<IRedisTypedClient<T>, int> command, Action<int> onSuccessCallback);
 		void QueueCommand(Func<IRedisTypedClient<T>, int> command, Action<int> onSuccessCallback, Action<Exception> onErrorCallback);
 
+		void QueueCommand(Func<IRedisTypedClient<T>, long> command);
+		void QueueCommand(Func<IRedisTypedClient<T>, long> command, Action<long> onSuccessCallback);
+		void QueueCommand(Func<IRedisTypedClient<T>, long> command, Action<long> onSuccessCallback, Action<Exception> onErrorCallback);
+
 		void QueueCommand(Func<IRedisTypedClient<T>, bool> command);
 		void QueueCommand(Func<IRedisTypedClient<T>, bool> command, Action<bool> onSuccessCallback);
 		void QueueCommand(Func<IRedisTypedClient<T>, bool> command, Action<bool> onSuccessCallback, Action<Exception> onErrorCallback);

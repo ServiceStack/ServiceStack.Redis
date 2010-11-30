@@ -97,7 +97,6 @@
     <Compile Include="Generic\RedisClientSortedSet.Generic.cs" />
     <Compile Include="IRedisQueableTransaction.cs" />
     <Compile Include="IRedisSubscription.cs" />
-    <Compile Include="Pipelining\RedisNativeClient_Pipline.cs" />
     <Compile Include="QueuedRedisOperation.cs" />
     <Compile Include="RedisClientHash.cs" />
     <Compile Include="Generic\IRedisSortedSet.Generic.cs" />
@@ -115,7 +114,7 @@
     <Compile Include="Messaging\RedisTransientMessageService.cs" />
     <Compile Include="RedisException.cs" />
     <Compile Include="RedisLock.cs" />
-    <Compile Include="Pipelining\RedisPipeline.cs" />
+    <Compile Include="RedisPipelineCommand.cs" />
     <Compile Include="RedisSubscription.cs" />
     <Compile Include="RedisTransaction.cs" />
     <Compile Include="RedisClientFactory.cs" />
@@ -155,6 +154,9 @@
     </Compile>
     <Compile Include="Support\OrderedDictionary.cs" />
     <Compile Include="UtilExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Pipelining\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

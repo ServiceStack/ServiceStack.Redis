@@ -8,10 +8,10 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 		List<User> GetAllUsers();
 
 		void StoreBlogs(User user, params Blog[] users);
-		List<Blog> GetBlogs(IEnumerable<int> blogIds);
+		List<Blog> GetBlogs(IEnumerable<long> blogIds);
 		List<Blog> GetAllBlogs();
 
-		List<BlogPost> GetBlogPosts(IEnumerable<int> blogPostIds);
+		List<BlogPost> GetBlogPosts(IEnumerable<long> blogPostIds);
 		void StoreNewBlogPosts(Blog blog, params BlogPost[] blogPosts);
 
 		List<BlogPost> GetRecentBlogPosts();

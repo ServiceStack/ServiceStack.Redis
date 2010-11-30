@@ -41,10 +41,10 @@ namespace ServiceStack.Redis
 		byte[] Get(string key);
 		byte[] GetSet(string key, byte[] value);
 		int Del(string key);
-		int Incr(string key);
-		int IncrBy(string key, int count);
-		int Decr(string key);
-		int DecrBy(string key, int count);
+		long Incr(string key);
+		long IncrBy(string key, int count);
+		long Decr(string key);
+		long DecrBy(string key, int count);
 		int Append(string key, byte[] value);
 		byte[] Substr(string key, int fromIndex, int toIndex);
 

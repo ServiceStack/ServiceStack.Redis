@@ -22,6 +22,15 @@ namespace ServiceStack.Redis.Tests
 	public class ShippersExample
 	{
 
+		public class Shipper
+		{
+			public long Id { get; set; }
+			public string CompanyName { get; set; }
+			public DateTime DateCreated { get; set; }
+			public ShipperType ShipperType { get; set; }
+			public Guid UniqueRef { get; set; }
+		}
+
 		static void Dump<T>(string message, T entity)
 		{
 			var text = TypeSerializer.SerializeToString(entity);

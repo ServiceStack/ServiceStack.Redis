@@ -139,22 +139,22 @@ namespace ServiceStack.Redis
 			return Del(keys) == Success;
 		}
 
-		public int IncrementValue(string key)
+		public long IncrementValue(string key)
 		{
 			return Incr(key);
 		}
 
-		public int IncrementValueBy(string key, int count)
+		public long IncrementValueBy(string key, int count)
 		{
 			return IncrBy(key, count);
 		}
 
-		public int DecrementValue(string key)
+		public long DecrementValue(string key)
 		{
 			return Decr(key);
 		}
 
-		public int DecrementValueBy(string key, int count)
+		public long DecrementValueBy(string key, int count)
 		{
 			return DecrBy(key, count);
 		}

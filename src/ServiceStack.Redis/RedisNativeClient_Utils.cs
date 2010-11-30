@@ -23,7 +23,8 @@ namespace ServiceStack.Redis
 	{
 		private void Connect()
 		{
-			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp) {
+			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
+			{
 				SendTimeout = SendTimeout
 			};
 			try
@@ -264,6 +265,20 @@ namespace ServiceStack.Redis
 			return ReadInt();
 		}
 
+		private long SendExpectLong(params byte[][] cmdWithBinaryArgs)
+		{
+			if (!SendCommand(cmdWithBinaryArgs))
+				throw CreateConnectionError();
+
+			if (this.CurrentTransaction != null)
+			{
+				this.CurrentTransaction.CompleteIntQueuedCommand(ReadInt);
+				ExpectQueued();
+				return default(long);
+			}
+			return ReadLong();
+		}
+
 		private byte[] SendExpectData(params byte[][] cmdWithBinaryArgs)
 		{
 			if (!SendCommand(cmdWithBinaryArgs))
@@ -283,19 +298,21 @@ namespace ServiceStack.Redis
 			var bytes = SendExpectData(cmdWithBinaryArgs);
 			return bytes.FromUtf8Bytes();
 		}
+
 		private double SendExpectDouble(params byte[][] cmdWithBinaryArgs)
 		{
-			return parseDouble( SendExpectData(cmdWithBinaryArgs) );
+			return ParseDouble(SendExpectData(cmdWithBinaryArgs));
 		}
-        private double parseDouble(byte[] doubleBytes)
-        {
-            var doubleString = Encoding.UTF8.GetString(doubleBytes);
 
-            double d;
-            double.TryParse(doubleString, out d);
+		private static double ParseDouble(byte[] doubleBytes)
+		{
+			var doubleString = Encoding.UTF8.GetString(doubleBytes);
 
-            return d;
-        }
+			double d;
+			double.TryParse(doubleString, out d);
+
+			return d;
+		}
 
 		private string SendExpectCode(params byte[][] cmdWithBinaryArgs)
 		{
@@ -426,6 +443,28 @@ namespace ServiceStack.Redis
 			{
 				int i;
 				if (int.TryParse(s, out i))
+					return i;
+			}
+			throw CreateResponseError("Unknown reply on integer response: " + c + s);
+		}
+
+		public long ReadLong()
+		{
+			int c = SafeReadByte();
+			if (c == -1)
+				throw CreateResponseError("No more data");
+
+			var s = ReadLine();
+
+			Log("R: " + s);
+
+			if (c == '-')
+				throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
+
+			if (c == ':' || c == '$')//really strange why ZRANK needs the '$' here
+			{
+				long i;
+				if (long.TryParse(s, out i))
 					return i;
 			}
 			throw CreateResponseError("Unknown reply on integer response: " + c + s);

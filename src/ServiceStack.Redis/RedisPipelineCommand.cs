@@ -4,10 +4,10 @@ using System.Linq;
 
 namespace ServiceStack.Redis
 {
-	public class RedisPipelineCommand 
+	public class RedisPipelineCommand
 	{
 		private readonly RedisNativeClient client;
-        private Queue<RedisNativeClient.ExpectIntCommand> commands = new Queue<RedisNativeClient.ExpectIntCommand>();
+		private int cmdCount;
 
 		public RedisPipelineCommand(RedisNativeClient client)
 		{
@@ -16,21 +16,18 @@ namespace ServiceStack.Redis
 
 		public void WriteCommand(params byte[][] cmdWithBinaryArgs)
 		{
-            RedisNativeClient.ExpectIntCommand cmd = new RedisNativeClient.ExpectIntCommand(client);
-            cmd.init(cmdWithBinaryArgs);
-            cmd.execute();
-            commands.Enqueue(cmd);
+			client.WriteAllToSendBuffer(cmdWithBinaryArgs);
+			cmdCount++;
 		}
 
 		public List<int> ReadAllAsInts()
 		{
 			var results = new List<int>();
-            if (commands.Count() == 0)
-                return results;
-            while (commands.Count() > 0)
-            {
-                results.Add(commands.Dequeue().getInt());
-            }
+			while (cmdCount-- > 0)
+			{
+				results.Add(client.ReadInt());
+			}
+
 			return results;
 		}
 

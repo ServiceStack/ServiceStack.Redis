@@ -188,22 +188,22 @@ namespace ServiceStack.Redis.Generic
 			return success;
 		}
 
-		public int IncrementValue(string key)
+		public long IncrementValue(string key)
 		{
 			return client.Incr(key);
 		}
 
-		public int IncrementValueBy(string key, int count)
+		public long IncrementValueBy(string key, int count)
 		{
 			return client.IncrBy(key, count);
 		}
 
-		public int DecrementValue(string key)
+		public long DecrementValue(string key)
 		{
 			return client.Decr(key);
 		}
 
-		public int DecrementValueBy(string key, int count)
+		public long DecrementValueBy(string key, int count)
 		{
 			return client.DecrBy(key, count);
 		}
@@ -215,7 +215,7 @@ namespace ServiceStack.Redis.Generic
 			client.GetSet(SequenceKey, Encoding.UTF8.GetBytes(value.ToString()));
 		}
 
-		public int GetNextSequence()
+		public long GetNextSequence()
 		{
 			return IncrementValue(SequenceKey);
 		}

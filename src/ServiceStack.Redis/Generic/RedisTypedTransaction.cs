@@ -76,6 +76,14 @@ namespace ServiceStack.Redis.Generic
 			AddCurrentQueuedOperation();
 		}
 
+		public void CompleteLongQueuedCommand(Func<long> longReadCommand)
+		{
+			AssertCurrentOperation();
+
+			currentQueuedOperation.LongReadCommand = longReadCommand;
+			AddCurrentQueuedOperation();
+		}
+
 		public void CompleteBytesQueuedCommand(Func<byte[]> bytesReadCommand)
 		{
 			AssertCurrentOperation();
@@ -151,10 +159,31 @@ namespace ServiceStack.Redis.Generic
 		public void QueueCommand(Func<IRedisTypedClient<T>, int> command, Action<int> onSuccessCallback, Action<Exception> onErrorCallback)
 		{
 			BeginQueuedCommand(new QueuedRedisOperation
-               	{
-               		OnSuccessIntCallback = onSuccessCallback,
-               		OnErrorCallback = onErrorCallback
-               	});
+           	{
+           		OnSuccessIntCallback = onSuccessCallback,
+           		OnErrorCallback = onErrorCallback
+           	});
+			command(redisClient);
+		}
+
+
+		public void QueueCommand(Func<IRedisTypedClient<T>, long> command)
+		{
+			QueueCommand(command, null, null);
+		}
+
+		public void QueueCommand(Func<IRedisTypedClient<T>, long> command, Action<long> onSuccessCallback)
+		{
+			QueueCommand(command, onSuccessCallback, null);
+		}
+
+		public void QueueCommand(Func<IRedisTypedClient<T>, long> command, Action<long> onSuccessCallback, Action<Exception> onErrorCallback)
+		{
+			BeginQueuedCommand(new QueuedRedisOperation
+			{
+				OnSuccessLongCallback = onSuccessCallback,
+				OnErrorCallback = onErrorCallback
+			});
 			command(redisClient);
 		}
 

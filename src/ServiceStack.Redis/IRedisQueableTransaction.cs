@@ -7,6 +7,7 @@ namespace ServiceStack.Redis
 	{
 		void CompleteVoidQueuedCommand(Action voidReadCommand);
 		void CompleteIntQueuedCommand(Func<int> intReadCommand);
+		void CompleteLongQueuedCommand(Func<long> longReadCommand);
 		void CompleteBytesQueuedCommand(Func<byte[]> bytesReadCommand);
 		void CompleteMultiBytesQueuedCommand(Func<byte[][]> multiBytesReadCommand);
 		void CompleteStringQueuedCommand(Func<string> stringReadCommand);

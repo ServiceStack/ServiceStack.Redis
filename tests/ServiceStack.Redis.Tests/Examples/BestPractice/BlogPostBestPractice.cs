@@ -22,12 +22,12 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 
 		public User()
 		{
-			this.BlogIds = new List<int>();
+			this.BlogIds = new List<long>();
 		}
 
-		public int Id { get; set; }
+		public long Id { get; set; }
 		public string Name { get; set; }
-		public List<int> BlogIds { get; set; }
+		public List<long> BlogIds { get; set; }
 
 		public List<Blog> GetBlogs()
 		{
@@ -50,14 +50,14 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 		public Blog()
 		{
 			this.Tags = new List<string>();
-			this.BlogPostIds = new List<int>();
+			this.BlogPostIds = new List<long>();
 		}
 
-		public int Id { get; set; }
-		public int UserId { get; set; }
+		public long Id { get; set; }
+		public long UserId { get; set; }
 		public string UserName { get; set; }
 		public List<string> Tags { get; set; }
-		public List<int> BlogPostIds { get; set; }
+		public List<long> BlogPostIds { get; set; }
 
 		public List<BlogPost> GetBlogPosts()
 		{
@@ -79,8 +79,8 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 			this.Comments = new List<BlogPostComment>();
 		}
 
-		public int Id { get; set; }
-		public int BlogId { get; set; }
+		public long Id { get; set; }
+		public long BlogId { get; set; }
 		public string Title { get; set; }
 		public string Content { get; set; }
 		public List<string> Categories { get; set; }
@@ -163,7 +163,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 			}
 		}
 
-		public List<Blog> GetBlogs(IEnumerable<int> blogIds)
+		public List<Blog> GetBlogs(IEnumerable<long> blogIds)
 		{
 			using (var redisBlogs = redisClient.GetTypedClient<Blog>())
 			{
@@ -180,7 +180,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 			}
 		}
 
-		public List<BlogPost> GetBlogPosts(IEnumerable<int> blogPostIds)
+		public List<BlogPost> GetBlogPosts(IEnumerable<long> blogPostIds)
 		{
 			using (var redisBlogPosts = redisClient.GetTypedClient<BlogPost>())
 			{

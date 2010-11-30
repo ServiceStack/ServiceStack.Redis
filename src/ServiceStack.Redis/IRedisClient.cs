@@ -59,10 +59,10 @@ namespace ServiceStack.Redis
 
 		bool ContainsKey(string key);
 		bool RemoveEntry(params string[] args);
-		int IncrementValue(string key);
-		int IncrementValueBy(string key, int count);
-		int DecrementValue(string key);
-		int DecrementValueBy(string key, int count);
+		long IncrementValue(string key);
+		long IncrementValueBy(string key, int count);
+		long DecrementValue(string key);
+		long DecrementValueBy(string key, int count);
 		List<string> SearchKeys(string pattern);
 
 		RedisKeyType GetEntryType(string key);

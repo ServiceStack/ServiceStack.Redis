@@ -37,7 +37,7 @@ namespace ServiceStack.Redis.Generic
 
 		string SequenceKey { get; set; }
 		void SetSequence(int value);
-		int GetNextSequence();
+		long GetNextSequence();
 		RedisKeyType GetEntryType(string key);
 		string GetRandomKey();
 
@@ -50,10 +50,10 @@ namespace ServiceStack.Redis.Generic
 		bool RemoveEntry(string key);
 		bool RemoveEntry(params string[] args);
 		bool RemoveEntry(params IHasStringId[] entities);
-		int IncrementValue(string key);
-		int IncrementValueBy(string key, int count);
-		int DecrementValue(string key);
-		int DecrementValueBy(string key, int count);
+		long IncrementValue(string key);
+		long IncrementValueBy(string key, int count);
+		long DecrementValue(string key);
+		long DecrementValueBy(string key, int count);
 		bool ExpireEntryIn(string key, TimeSpan expiresAt);
 		bool ExpireEntryAt(string key, DateTime dateTime);
 		TimeSpan GetTimeToLive(string key);

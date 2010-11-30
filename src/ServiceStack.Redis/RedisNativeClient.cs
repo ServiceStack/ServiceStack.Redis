@@ -315,36 +315,36 @@ namespace ServiceStack.Redis
 			return SendExpectInt(cmdWithArgs);
 		}
 
-		public int Incr(string key)
+		public long Incr(string key)
 		{
 			if (key == null)
 				throw new ArgumentNullException("key");
 
-			return SendExpectInt(Commands.Incr, key.ToUtf8Bytes());
+			return SendExpectLong(Commands.Incr, key.ToUtf8Bytes());
 		}
 
-		public int IncrBy(string key, int count)
+		public long IncrBy(string key, int count)
 		{
 			if (key == null)
 				throw new ArgumentNullException("key");
 
-			return SendExpectInt(Commands.IncrBy, key.ToUtf8Bytes(), count.ToUtf8Bytes());
+			return SendExpectLong(Commands.IncrBy, key.ToUtf8Bytes(), count.ToUtf8Bytes());
 		}
 
-		public int Decr(string key)
+		public long Decr(string key)
 		{
 			if (key == null)
 				throw new ArgumentNullException("key");
 
-			return SendExpectInt(Commands.Decr, key.ToUtf8Bytes());
+			return SendExpectLong(Commands.Decr, key.ToUtf8Bytes());
 		}
 
-		public int DecrBy(string key, int count)
+		public long DecrBy(string key, int count)
 		{
 			if (key == null)
 				throw new ArgumentNullException("key");
 
-			return SendExpectInt(Commands.DecrBy, key.ToUtf8Bytes(), count.ToUtf8Bytes());
+			return SendExpectLong(Commands.DecrBy, key.ToUtf8Bytes(), count.ToUtf8Bytes());
 		}
 
 		public int Append(string key, byte[] value)

@@ -116,7 +116,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		[Test]
 		public void Supports_different_operation_types_in_same_transaction()
 		{
-			var incrementResults = new List<int>();
+			var incrementResults = new List<long>();
 			var collectionCounts = new List<int>();
 			var containsItem = false;
 

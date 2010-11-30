@@ -77,7 +77,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_call_single_operation_with_callback_3_Times_in_transaction()
 		{
-			var results = new List<int>();
+			var results = new List<long>();
 			Assert.That(Redis.GetValue(Key), Is.Null);
 			using (var trans = Redis.CreateTransaction())
 			{
@@ -89,13 +89,13 @@ namespace ServiceStack.Redis.Tests
 			}
 
 			Assert.That(Redis.GetValue(Key), Is.EqualTo("3"));
-			Assert.That(results, Is.EquivalentTo(new List<int> { 1, 2, 3 }));
+			Assert.That(results, Is.EquivalentTo(new List<long> { 1, 2, 3 }));
 		}
 
 		[Test]
 		public void Supports_different_operation_types_in_same_transaction()
 		{
-			var incrementResults = new List<int>();
+			var incrementResults = new List<long>();
 			var collectionCounts = new List<int>();
 			var containsItem = false;
 
@@ -120,7 +120,7 @@ namespace ServiceStack.Redis.Tests
 
 			Assert.That(containsItem, Is.True);
 			Assert.That(Redis.GetValue(Key), Is.EqualTo("2"));
-			Assert.That(incrementResults, Is.EquivalentTo(new List<int> { 1, 2 }));
+			Assert.That(incrementResults, Is.EquivalentTo(new List<long> { 1, 2 }));
 			Assert.That(collectionCounts, Is.EquivalentTo(new List<int> { 2, 1, 3 }));
 			Assert.That(Redis.GetAllItemsFromList(ListKey), Is.EquivalentTo(new List<string> { "listitem1", "listitem2" }));
 			Assert.That(Redis.GetAllItemsFromSet(SetKey), Is.EquivalentTo(new List<string> { "setitem" }));
