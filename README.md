@@ -16,7 +16,7 @@ For most cases if you require access to Redis-specific functionality you would w
   * [IRedisClient](https://github.com/mythz/ServiceStack.Redis/wiki/IRedisClient) - Provides a friendlier, more descriptive API that lets you store values as strings (UTF8 encoding).
   * [IRedisTypedClient](https://github.com/mythz/ServiceStack.Redis/wiki/IRedisTypedClient) - created with `IRedisClient.GetTypedClient<T>()` - it returns a 'strongly-typed client' that provides a typed-interface for all redis value operations that works against any C#/.NET POCO type.
 
-# Thread-safe client managers
+### Thread-safe client managers
 For multi-threaded applications you can choose from our different client connection managers:
 
   * BasicRedisClientManager - a load-balance (master-write and read-slaves) client manager that returns a new [IRedisClient](https://github.com/mythz/ServiceStack.Redis/wiki/IRedisClient) connection with the defaults specified (faster when accessing a redis-server instance on the same host).
@@ -24,10 +24,12 @@ For multi-threaded applications you can choose from our different client connect
 
 # Download
 
-### Redis Client releases
-  * The latest version of the Redis client is included as part of [ServiceStack.zip](https://github.com/downloads/mythz/ServiceStack/ServiceStack.zip)
-  * Alternatively it is available as a separate standalone [ServiceStack.Redis.zip](https://github.com/downloads/mythz/ServiceStack.Redis/ServiceStack.Redis.zip)
-  * For those interested in having a GUI admin tool to visualize your Redis data should check out the [Redis Admin UI](http://www.servicestack.net/mythz_blog/?p=381)
+You can download the Redis Client in any one of the following ways:
+
+* Packaged by default in [ServiceStack.zip](https://github.com/downloads/mythz/ServiceStack/ServiceStack.zip) 
+* Available to download separately as a stand-alone [ServiceStack.Redis.dll](https://github.com/downloads/mythz/ServiceStack.Redis/ServiceStack.Redis.zip).
+* As Source Code via Git: `git clone git://github.com/mythz/ServiceStack.Redis.git`
+* For those interested in having a GUI admin tool to visualize your Redis data should check out the [Redis Admin UI](http://www.servicestack.net/mythz_blog/?p=381)
 
 [View the release notes](https://github.com/mythz/ServiceStack.Redis/wiki/RedisClientReleaseNotes).
 
