@@ -132,6 +132,9 @@
     <Compile Include="Generic\RedisClientHashTestsModels.cs" />
     <Compile Include="Generic\RedisClientHashTestsBase.cs" />
     <Compile Include="Generic\RedisTypedTransactionTests.cs" />
+    <Compile Include="RedisBenchmarkTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="RedisClientHashTests.cs" />
     <Compile Include="RedisClientSortedSetTests.cs" />
     <Compile Include="Generic\RedisClientSetTestsModels.cs" />
