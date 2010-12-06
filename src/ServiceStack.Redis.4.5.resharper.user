@@ -10,10 +10,90 @@
     <NAntPath value="" />
   </NAntValidationSettings>
   <RecentFiles>
-    <RecentFiles />
-    <RecentEdits />
+    <RecentFiles>
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:IRedisClient.cs" caret="2022" fromTop="31" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/d:Generic/f:IRedisTypedClient.cs" caret="1552" fromTop="19" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:RedisNativeClient_Utils.cs" caret="6434" fromTop="15" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:IRedisNativeClient.cs" caret="1174" fromTop="17" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:RedisPipelineCommand.cs" caret="860" fromTop="41" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:RedisClient_List.cs" caret="1896" fromTop="10" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:IRedisQueableTransaction.cs" caret="313" fromTop="9" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/d:Generic/f:IRedisTransaction.cs" caret="1326" fromTop="30" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/d:Generic/f:RedisTypedTransaction.cs" caret="5328" fromTop="22" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/d:Generic/f:RedisTypedClient.cs" caret="5165" fromTop="18" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/f:ShippersExample.cs" caret="767" fromTop="0" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/f:SimpleExamples.cs" caret="2023" fromTop="20" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/d:BestPractice/f:BlogPostBestPractice.cs" caret="1812" fromTop="11" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Generic/f:RedisTypedTransactionTests.cs" caret="5372" fromTop="12" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:IRedisTransaction.cs" caret="1041" fromTop="16" />
+      <File id="d:Miscellaneous Files/f:StringExtensions.cs/l:C!?Projects?servicestack?Common?ServiceStack.Text?ServiceStack.Text?StringExtensions.cs" caret="6177" fromTop="23" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:RedisNativeClient.cs" caret="7585" fromTop="28" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:RedisClient.cs" caret="3103" fromTop="25" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/f:RedisTransactionTests.cs" caret="2440" fromTop="26" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:RedisTransaction.cs" caret="9254" fromTop="35" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:QueuedRedisOperation.cs" caret="2428" fromTop="30" />
+      <File id="38F69F8F-9303-4BAF-B081-D28339163E07/f:build.bat/l:C!?src?ServiceStack.Redis?build?build.bat" caret="711" fromTop="15" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Messaging/f:RedisTransientMessagingHostTests.cs" caret="630" fromTop="22" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/f:BlogPostExample.cs" caret="2431" fromTop="13" />
+    </RecentFiles>
+    <RecentEdits>
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/d:Generic/f:RedisTypedTransaction.cs" caret="5345" fromTop="37" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/d:Generic/f:RedisTypedClient.cs" caret="5166" fromTop="18" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/f:ShippersExample.cs" caret="767" fromTop="15" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/f:ShippersExample.cs" caret="767" fromTop="12" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/f:BlogPostExample.cs" caret="1121" fromTop="33" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/f:BlogPostExample.cs" caret="526" fromTop="16" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/f:BlogPostExample.cs" caret="422" fromTop="11" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/f:BlogPostExample.cs" caret="856" fromTop="31" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/f:BlogPostExample.cs" caret="669" fromTop="24" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/f:RedisTransactionTests.cs" caret="2127" fromTop="16" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/f:RedisTransactionTests.cs" caret="2724" fromTop="22" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/d:BestPractice/f:BlogPostBestPractice.cs" caret="678" fromTop="18" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/d:BestPractice/f:BlogPostBestPractice.cs" caret="575" fromTop="13" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/d:BestPractice/f:BlogPostBestPractice.cs" caret="770" fromTop="22" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/d:BestPractice/f:BlogPostBestPractice.cs" caret="1305" fromTop="27" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/d:BestPractice/f:BlogPostBestPractice.cs" caret="1178" fromTop="24" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/d:BestPractice/f:BlogPostBestPractice.cs" caret="1405" fromTop="31" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/d:BestPractice/f:BlogPostBestPractice.cs" caret="1812" fromTop="20" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Generic/f:RedisTypedTransactionTests.cs" caret="3451" fromTop="9" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/f:RedisTransactionTests.cs" caret="2573" fromTop="30" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/f:RedisTransactionTests.cs" caret="4152" fromTop="28" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:QueuedRedisOperation.cs" caret="2678" fromTop="40" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:QueuedRedisOperation.cs" caret="2355" fromTop="26" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:QueuedRedisOperation.cs" caret="1811" fromTop="18" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:QueuedRedisOperation.cs" caret="1999" fromTop="22" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:QueuedRedisOperation.cs" caret="1980" fromTop="11" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:QueuedRedisOperation.cs" caret="2428" fromTop="30" />
+      <File id="AF99F19B-4C04-4F58-81EF-B092F1FCC540/f:QueuedRedisOperation.cs" caret="2428" fromTop="30" />
+      <File id="38F69F8F-9303-4BAF-B081-D28339163E07/f:build.bat/l:C!?src?ServiceStack.Redis?build?build.bat" caret="679" fromTop="15" />
+      <File id="951D28EE-5D22-4C62-AC0F-1661A8CEEC5A/d:Examples/f:BlogPostExample.cs" caret="2114" fromTop="28" />
+    </RecentEdits>
   </RecentFiles>
   <UnitTestRunner>
     <Providers />
   </UnitTestRunner>
+  <CompletionStatisticsManager>
+    <ItemStatistics item="Default">
+      <Item value="public" priority="0" />
+      <Item value="class" priority="0" />
+      <Item value="long" priority="0" />
+      <Item value="string" priority="0" />
+      <Item value="ShipperType" priority="0" />
+      <Item value="DateTime" priority="0" />
+      <Item value="redisUsers" priority="1" />
+      <Item value="u" priority="0" />
+      <Item value="userToUpdate" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:ServiceStack.Redis.Generic.IRedisTypedClient`1">
+      <Item value="GetAll" priority="0" />
+      <Item value="Store" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.IList`1">
+      <Item value="Where" priority="0" />
+      <Item value="First" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:ServiceStack.Redis.Tests.Examples.User">
+      <Item value="Name" priority="1" />
+    </ItemStatistics>
+  </CompletionStatisticsManager>
 </Configuration>
