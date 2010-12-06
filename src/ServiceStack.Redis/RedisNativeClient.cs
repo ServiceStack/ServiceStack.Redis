@@ -47,6 +47,7 @@ namespace ServiceStack.Redis
 		protected Socket socket;
 		protected BufferedStream Bstream;
 
+	    private Dictionary<string, string> _info;
 		/// <summary>
 		/// Used to manage connection pooling
 		/// </summary>
@@ -127,18 +128,21 @@ namespace ServiceStack.Redis
 		{
 			get
 			{
-				var lines = SendExpectString(Commands.Info);
-				var dict = new Dictionary<string, string>();
+                if (_info == null)
+                {
+                    var lines = SendExpectString(Commands.Info);
+                    _info = new Dictionary<string, string>();
 
-				foreach (var line in lines
-					.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries))
-				{
-					var p = line.IndexOf(':');
-					if (p == -1) continue;
+                    foreach (var line in lines
+                        .Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        var p = line.IndexOf(':');
+                        if (p == -1) continue;
 
-					dict.Add(line.Substring(0, p), line.Substring(p + 1));
-				}
-				return dict;
+                        _info.Add(line.Substring(0, p), line.Substring(p + 1));
+                    }
+                }
+			    return _info;
 			}
 		}
 
