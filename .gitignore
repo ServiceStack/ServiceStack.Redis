@@ -1,5 +1,6 @@
 
 .idea/
+*.resharper.user
 # Defaults
 #
 #ignore thumbnails created by windows
