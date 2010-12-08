@@ -65,6 +65,7 @@ namespace ServiceStack.Redis
 			finally
 			{
 				RedisClient.CurrentTransaction = null;
+			    RedisClient.CurrentPipeline = null;
 				RedisClient.AddTypeIdsRegisteredDuringTransaction();
 			}
 		}
