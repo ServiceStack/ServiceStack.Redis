@@ -47,6 +47,9 @@ namespace ServiceStack.Redis
 		protected Socket socket;
 		protected BufferedStream Bstream;
 
+        private IRedisTransactionBase _currentTransaction;
+	    private IRedisPipelineBase _currentPipeline;
+
 	    private Dictionary<string, string> _info;
 		/// <summary>
 		/// Used to manage connection pooling
@@ -66,9 +69,35 @@ namespace ServiceStack.Redis
 		public int SendTimeout { get; set; }
 		public string Password { get; set; }
 
-		internal IRedisTransactionBase CurrentTransaction { get; set; }
 
-        internal IRedisPipelineBase CurrentPipeline { get; set; }
+        internal IRedisTransactionBase CurrentTransaction
+        {
+            get
+            {
+                return _currentTransaction;
+            }
+            set
+            {
+                if (value != null)
+                    AssertConnectedSocket();
+                _currentTransaction = value;
+            }
+        }
+
+        
+	    internal IRedisPipelineBase CurrentPipeline
+	    {
+	        get
+	        {
+	            return _currentPipeline;
+	        }
+            set
+            {
+                if (value != null)
+                    AssertConnectedSocket();
+                _currentPipeline = value;
+            }
+	    }
 
 		public RedisNativeClient(string host)
 			: this(host, DefaultPort)
@@ -479,6 +508,9 @@ namespace ServiceStack.Redis
 
 		internal void Multi()
 		{
+            //make sure socket is connected. Otherwise, fetch of server info will interfere
+            //with pipeline
+		    AssertConnectedSocket();
 			if (!SendCommand(Commands.Multi))
 				throw CreateConnectionError();
 		}
