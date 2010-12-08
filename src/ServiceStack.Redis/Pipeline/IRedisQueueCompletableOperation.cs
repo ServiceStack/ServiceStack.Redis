@@ -3,7 +3,10 @@ using System.Collections.Generic;
 
 namespace ServiceStack.Redis
 {
-	public interface IRedisQueableTransaction
+    /// <summary>
+    /// Interface to operations that allow queued commands to be completed
+    /// </summary>
+	public interface IRedisQueueCompletableOperation
 	{
 		void CompleteVoidQueuedCommand(Action voidReadCommand);
 		void CompleteIntQueuedCommand(Func<int> intReadCommand);

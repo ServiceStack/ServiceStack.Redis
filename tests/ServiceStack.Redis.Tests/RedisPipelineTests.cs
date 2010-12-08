@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace ServiceStack.Redis.Tests
 {
 	[TestFixture]
-	public class RedisTransactionTests
+	public class RedisPipelineTests
 		: RedisClientTestsBase
 	{
 		private const string Key = "multitest";
@@ -17,13 +17,13 @@ namespace ServiceStack.Redis.Tests
 		public void Can_call_single_operation_in_transaction()
 		{
 			Assert.That(Redis.GetValue(Key), Is.Null);
-			using (var trans = Redis.CreateTransaction())
+			using (var trans = Redis.CreatePipeline())
 			{
 				trans.QueueCommand(r => r.IncrementValue(Key));
 				var map = new Dictionary<string, int>();
 				trans.QueueCommand(r => r.Get<int>(Key), y => map[Key] = y);
 
-				trans.Commit();
+				trans.Flush();
 			}
 
 			Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));
@@ -33,7 +33,7 @@ namespace ServiceStack.Redis.Tests
 		public void No_commit_of_atomic_transactions_discards_all_commands()
 		{
 			Assert.That(Redis.GetValue(Key), Is.Null);
-			using (var trans = Redis.CreateTransaction())
+			using (var trans = Redis.CreatePipeline())
 			{
 				trans.QueueCommand(r => r.IncrementValue(Key));
 			}
@@ -46,7 +46,7 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(Redis.GetValue(Key), Is.Null);
 			try
 			{
-				using (var trans = Redis.CreateTransaction())
+				using (var trans = Redis.CreatePipeline())
 				{
 					trans.QueueCommand(r => r.IncrementValue(Key));
 					throw new NotSupportedException();
@@ -62,13 +62,13 @@ namespace ServiceStack.Redis.Tests
 		public void Can_call_single_operation_3_Times_in_transaction()
 		{
 			Assert.That(Redis.GetValue(Key), Is.Null);
-			using (var trans = Redis.CreateTransaction())
+			using (var trans = Redis.CreatePipeline())
 			{
 				trans.QueueCommand(r => r.IncrementValue(Key));
 				trans.QueueCommand(r => r.IncrementValue(Key));
 				trans.QueueCommand(r => r.IncrementValue(Key));
 
-				trans.Commit();
+				trans.Flush();
 			}
 
 			Assert.That(Redis.GetValue(Key), Is.EqualTo("3"));
@@ -79,13 +79,13 @@ namespace ServiceStack.Redis.Tests
 		{
 			var results = new List<long>();
 			Assert.That(Redis.GetValue(Key), Is.Null);
-			using (var trans = Redis.CreateTransaction())
+			using (var trans = Redis.CreatePipeline())
 			{
 				trans.QueueCommand(r => r.IncrementValue(Key), results.Add);
 				trans.QueueCommand(r => r.IncrementValue(Key), results.Add);
 				trans.QueueCommand(r => r.IncrementValue(Key), results.Add);
 
-				trans.Commit();
+				trans.Flush();
 			}
 
 			Assert.That(Redis.GetValue(Key), Is.EqualTo("3"));
@@ -100,7 +100,7 @@ namespace ServiceStack.Redis.Tests
 			var containsItem = false;
 
 			Assert.That(Redis.GetValue(Key), Is.Null);
-			using (var trans = Redis.CreateTransaction())
+			using (var trans = Redis.CreatePipeline())
 			{
 				trans.QueueCommand(r => r.IncrementValue(Key), intResult => incrementResults.Add(intResult));
 				trans.QueueCommand(r => r.AddItemToList(ListKey, "listitem1"));
@@ -115,7 +115,7 @@ namespace ServiceStack.Redis.Tests
 				trans.QueueCommand(r => r.GetSortedSetCount(SortedSetKey), intResult => collectionCounts.Add(intResult));
 				trans.QueueCommand(r => r.IncrementValue(Key), intResult => incrementResults.Add(intResult));
 
-				trans.Commit();
+				trans.Flush();
 			}
 
 			Assert.That(containsItem, Is.True);
@@ -135,7 +135,7 @@ namespace ServiceStack.Redis.Tests
 
 			var results = new List<string>();
 			Assert.That(Redis.GetListCount(ListKey), Is.EqualTo(0));
-			using (var trans = Redis.CreateTransaction())
+			using (var trans = Redis.CreatePipeline())
 			{
 				trans.QueueCommand(r => r.AddItemToList(ListKey, "listitem1"));
 				trans.QueueCommand(r => r.AddItemToList(ListKey, "listitem2"));
@@ -144,7 +144,7 @@ namespace ServiceStack.Redis.Tests
 				trans.QueueCommand(r => r.GetItemFromList(ListKey, 0), x => item1 = x);
 				trans.QueueCommand(r => r.GetItemFromList(ListKey, 4), x => item4 = x);
 
-				trans.Commit();
+				trans.Flush();
 			}
 
 			Assert.That(Redis.GetListCount(ListKey), Is.EqualTo(3));
@@ -158,10 +158,10 @@ namespace ServiceStack.Redis.Tests
         public void Can_call_operation_not_supported_on_older_servers_in_transaction()
         {
             var temp = new byte[1];
-            using (var trans = Redis.CreateTransaction())
+            using (var trans = Redis.CreatePipeline())
             {
                 trans.QueueCommand(r => ((RedisNativeClient)r).SetEx("key",5,temp));
-                trans.Commit();
+                trans.Flush();
             }
         }
 

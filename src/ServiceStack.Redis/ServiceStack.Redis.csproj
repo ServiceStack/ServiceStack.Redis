@@ -88,6 +88,15 @@
     <Compile Include="BasicRedisClientManager.cs" />
     <Compile Include="BasicRedisClientManager.ICacheClient.cs" />
     <Compile Include="Commands.cs" />
+    <Compile Include="Generic\IRedisTypedPipeline.cs" />
+    <Compile Include="Generic\IRedisTypedQueueableOperation.cs" />
+    <Compile Include="Generic\RedisTypedPipeline.cs" />
+    <Compile Include="Generic\RedisTypedCommandQueue.cs" />
+    <Compile Include="IRedisTransactionBase.cs" />
+    <Compile Include="Pipeline\IRedisPipelineBase.cs" />
+    <Compile Include="Pipeline\IRedisQueueableOperation.cs" />
+    <Compile Include="Pipeline\IRedisPipeline.cs" />
+    <Compile Include="Pipeline\RedisAllPurposePipeline.cs" />
     <Compile Include="Generic\IRedisTransaction.cs" />
     <Compile Include="Generic\RedisClientHash.Generic.cs" />
     <Compile Include="Generic\RedisTypedTransaction.cs" />
@@ -95,8 +104,9 @@
     <Compile Include="Generic\IRedisHash.Generic.cs" />
     <Compile Include="Generic\RedisTypedClient_SortedSet.cs" />
     <Compile Include="Generic\RedisClientSortedSet.Generic.cs" />
-    <Compile Include="IRedisQueableTransaction.cs" />
+    <Compile Include="Pipeline\IRedisQueueCompletableOperation.cs" />
     <Compile Include="IRedisSubscription.cs" />
+    <Compile Include="Pipeline\RedisQueueCompletableOperation.cs" />
     <Compile Include="QueuedRedisOperation.cs" />
     <Compile Include="RedisClientHash.cs" />
     <Compile Include="Generic\IRedisSortedSet.Generic.cs" />
@@ -112,6 +122,7 @@
     <Compile Include="Messaging\RedisMessageProducer.cs" />
     <Compile Include="Messaging\RedisMessageQueueClient.cs" />
     <Compile Include="Messaging\RedisTransientMessageService.cs" />
+    <Compile Include="Pipeline\RedisCommandQueue.cs" />
     <Compile Include="RedisException.cs" />
     <Compile Include="RedisLock.cs" />
     <Compile Include="RedisPipelineCommand.cs" />
@@ -154,9 +165,6 @@
     </Compile>
     <Compile Include="Support\OrderedDictionary.cs" />
     <Compile Include="UtilExtensions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Pipelining\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

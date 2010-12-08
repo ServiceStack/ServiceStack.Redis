@@ -14,8 +14,8 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Text;
 using ServiceStack.Logging;
+using ServiceStack.Redis;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis
@@ -66,7 +66,9 @@ namespace ServiceStack.Redis
 		public int SendTimeout { get; set; }
 		public string Password { get; set; }
 
-		internal IRedisQueableTransaction CurrentTransaction { get; set; }
+		internal IRedisTransactionBase CurrentTransaction { get; set; }
+
+        internal IRedisPipelineBase CurrentPipeline { get; set; }
 
 		public RedisNativeClient(string host)
 			: this(host, DefaultPort)
@@ -479,20 +481,17 @@ namespace ServiceStack.Redis
 		{
 			if (!SendCommand(Commands.Multi))
 				throw CreateConnectionError();
-			
-			ExpectOk();
 		}
 
 		/// <summary>
 		/// Requires custom result parsing
 		/// </summary>
 		/// <returns>Number of results</returns>
-		internal int Exec()
+		internal void Exec()
 		{
 			if (!SendCommand(Commands.Exec))
 				throw CreateConnectionError();
 
-			return this.ReadMultiDataResultCount();
 		}
 
 		internal void Discard()
