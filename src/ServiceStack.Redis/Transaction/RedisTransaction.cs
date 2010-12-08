@@ -95,8 +95,9 @@ namespace ServiceStack.Redis
             base.Dispose();
             if (RedisClient.CurrentTransaction == null) return;
 		    Rollback();
-		}
+        }
 
+        #region Overrides of RedisQueueCompletableOperation methods
 
         public override void CompleteVoidQueuedCommand(Action voidReadCommand)
         {
@@ -138,5 +139,6 @@ namespace ServiceStack.Redis
             base.CompleteDoubleQueuedCommand(doubleReadCommand);
             QueueExpectQueued();
         }
-	}
+        #endregion
+    }
 }

@@ -12,9 +12,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using ServiceStack.Logging;
-using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Generic
 {
@@ -103,6 +100,7 @@ namespace ServiceStack.Redis.Generic
             Rollback();
         }
 
+        #region Overrides of RedisQueueCompletableOperation methods
 
         public override void CompleteVoidQueuedCommand(Action voidReadCommand)
         {
@@ -144,5 +142,6 @@ namespace ServiceStack.Redis.Generic
             base.CompleteDoubleQueuedCommand(doubleReadCommand);
             QueueExpectQueued();
         }
-	}
+        #endregion
+    }
 }

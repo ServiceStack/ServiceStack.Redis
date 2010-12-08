@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ServiceStack.Redis
+﻿namespace ServiceStack.Redis
 {
     /// <summary>
     /// Interface to redis pipeline

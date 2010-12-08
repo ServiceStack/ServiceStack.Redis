@@ -11,15 +11,15 @@
 //
 
 using System;
-using System.Collections.Generic;
 
 namespace ServiceStack.Redis
 {
+    /// <summary>
+    /// Interface to redis transaction
+    /// </summary>
 	public interface IRedisTransaction
         : IRedisTransactionBase, IRedisQueueableOperation, IDisposable
 	{
-
-
 		void Commit();
 		void Rollback();
 	}
