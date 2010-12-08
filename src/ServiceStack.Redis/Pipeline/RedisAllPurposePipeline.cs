@@ -17,16 +17,7 @@ namespace ServiceStack.Redis
 
 			redisClient.CurrentPipeline = this;
 		}
-        /// <summary>
-        /// Put "QUEUED" messages at back of queue
-        /// </summary>
-        /// <param name="queued"></param>
-        public void QueueExpectQueued()
-        {
-            var op = new QueuedRedisOperation();
-            op.VoidReadCommand = RedisClient.ExpectQueued;
-            QueuedCommands.Insert(0, op);
-        }
+
       
         /// <summary>
         /// Flush send buffer, and read responses

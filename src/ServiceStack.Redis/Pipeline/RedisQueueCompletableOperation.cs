@@ -34,7 +34,7 @@ namespace ServiceStack.Redis
             CurrentQueuedOperation = null;
         }
 
-        public void CompleteVoidQueuedCommand(Action voidReadCommand)
+        public virtual void CompleteVoidQueuedCommand(Action voidReadCommand)
         {
             AssertCurrentOperation();
 
@@ -42,7 +42,7 @@ namespace ServiceStack.Redis
             AddCurrentQueuedOperation();
         }
 
-        public void CompleteIntQueuedCommand(Func<int> intReadCommand)
+        public virtual  void CompleteIntQueuedCommand(Func<int> intReadCommand)
         {
             AssertCurrentOperation();
 
@@ -50,7 +50,7 @@ namespace ServiceStack.Redis
             AddCurrentQueuedOperation();
         }
 
-        public void CompleteLongQueuedCommand(Func<long> longReadCommand)
+        public virtual void CompleteLongQueuedCommand(Func<long> longReadCommand)
         {
             AssertCurrentOperation();
 
@@ -58,7 +58,7 @@ namespace ServiceStack.Redis
             AddCurrentQueuedOperation();
         }
 
-        public void CompleteBytesQueuedCommand(Func<byte[]> bytesReadCommand)
+        public virtual void CompleteBytesQueuedCommand(Func<byte[]> bytesReadCommand)
         {
             AssertCurrentOperation();
 
@@ -66,7 +66,7 @@ namespace ServiceStack.Redis
             AddCurrentQueuedOperation();
         }
 
-        public void CompleteMultiBytesQueuedCommand(Func<byte[][]> multiBytesReadCommand)
+        public virtual void CompleteMultiBytesQueuedCommand(Func<byte[][]> multiBytesReadCommand)
         {
             AssertCurrentOperation();
 
@@ -74,7 +74,7 @@ namespace ServiceStack.Redis
             AddCurrentQueuedOperation();
         }
 
-        public void CompleteStringQueuedCommand(Func<string> stringReadCommand)
+        public virtual void CompleteStringQueuedCommand(Func<string> stringReadCommand)
         {
             AssertCurrentOperation();
 
@@ -82,7 +82,7 @@ namespace ServiceStack.Redis
             AddCurrentQueuedOperation();
         }
 
-        public void CompleteMultiStringQueuedCommand(Func<List<string>> multiStringReadCommand)
+        public virtual void CompleteMultiStringQueuedCommand(Func<List<string>> multiStringReadCommand)
         {
             AssertCurrentOperation();
 
@@ -90,7 +90,7 @@ namespace ServiceStack.Redis
             AddCurrentQueuedOperation();
         }
 
-        public void CompleteDoubleQueuedCommand(Func<double> doubleReadCommand)
+        public virtual void CompleteDoubleQueuedCommand(Func<double> doubleReadCommand)
         {
             AssertCurrentOperation();
 

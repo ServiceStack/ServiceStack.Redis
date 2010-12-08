@@ -5,9 +5,5 @@
     /// </summary>
     public interface IRedisTransactionBase : IRedisQueueCompletableOperation
     {
-        /// <summary>
-        /// Queue up Action to read "QUEUED" response from MULTI/EXEC commands
-        /// </summary>
-        void QueueExpectQueued();
     }
 }

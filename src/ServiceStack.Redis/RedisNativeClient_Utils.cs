@@ -254,8 +254,6 @@ namespace ServiceStack.Redis
             if (CurrentPipeline != null)
             {
                 CurrentPipeline.CompleteVoidQueuedCommand(ExpectSuccess);
-                if (CurrentTransaction != null)
-                    CurrentTransaction.QueueExpectQueued();
                 return;
             }
 			ExpectSuccess();
@@ -269,8 +267,6 @@ namespace ServiceStack.Redis
             if (CurrentPipeline != null)
             {
                 CurrentPipeline.CompleteIntQueuedCommand(ReadInt);
-                if (CurrentTransaction != null)
-                    CurrentTransaction.QueueExpectQueued();
                 return default(int);
             }
 			return ReadInt();
@@ -284,8 +280,6 @@ namespace ServiceStack.Redis
 			if (CurrentPipeline != null)
 			{
                 CurrentPipeline.CompleteIntQueuedCommand(ReadInt);
-                if (CurrentTransaction != null)
-                    CurrentTransaction.QueueExpectQueued();
 				return default(long);
 			}
 			return ReadLong();
@@ -299,8 +293,6 @@ namespace ServiceStack.Redis
 			if (CurrentPipeline != null)
 			{
 				CurrentPipeline.CompleteBytesQueuedCommand(ReadData);
-                if (CurrentTransaction != null)
-                    CurrentTransaction.QueueExpectQueued();
 				return null;
 			}
 			return ReadData();
@@ -335,8 +327,6 @@ namespace ServiceStack.Redis
             if (CurrentPipeline != null)
 			{
                 CurrentPipeline.CompleteBytesQueuedCommand(ReadData);
-                if (CurrentTransaction != null)
-                    CurrentTransaction.QueueExpectQueued();
 				return null;
 			}
 
@@ -351,8 +341,6 @@ namespace ServiceStack.Redis
             if (CurrentPipeline != null)
 			{
                 CurrentPipeline.CompleteMultiBytesQueuedCommand(ReadMultiData);
-                if (CurrentTransaction != null)
-                    CurrentTransaction.QueueExpectQueued();
 				return new byte[0][];
 			}
 			return ReadMultiData();

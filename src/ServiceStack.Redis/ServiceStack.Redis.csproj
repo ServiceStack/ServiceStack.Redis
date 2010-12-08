@@ -92,7 +92,7 @@
     <Compile Include="Generic\IRedisTypedQueueableOperation.cs" />
     <Compile Include="Generic\RedisTypedPipeline.cs" />
     <Compile Include="Generic\RedisTypedCommandQueue.cs" />
-    <Compile Include="IRedisTransactionBase.cs" />
+    <Compile Include="Transaction\IRedisTransactionBase.cs" />
     <Compile Include="Pipeline\IRedisPipelineBase.cs" />
     <Compile Include="Pipeline\IRedisQueueableOperation.cs" />
     <Compile Include="Pipeline\IRedisPipeline.cs" />
@@ -107,7 +107,7 @@
     <Compile Include="Pipeline\IRedisQueueCompletableOperation.cs" />
     <Compile Include="IRedisSubscription.cs" />
     <Compile Include="Pipeline\RedisQueueCompletableOperation.cs" />
-    <Compile Include="QueuedRedisOperation.cs" />
+    <Compile Include="Pipeline\QueuedRedisOperation.cs" />
     <Compile Include="RedisClientHash.cs" />
     <Compile Include="Generic\IRedisSortedSet.Generic.cs" />
     <Compile Include="Generic\RedisTypedClient_Set.cs" />
@@ -115,7 +115,7 @@
     <Compile Include="IRedisHash.cs" />
     <Compile Include="RedisClientSortedSet.cs" />
     <Compile Include="IRedisSortedSet.cs" />
-    <Compile Include="IRedisTransaction.cs" />
+    <Compile Include="Transaction\IRedisTransaction.cs" />
     <Compile Include="IRedisSet.cs" />
     <Compile Include="IRedisList.cs" />
     <Compile Include="Messaging\RedisTransientMessageFactory.cs" />
@@ -125,9 +125,9 @@
     <Compile Include="Pipeline\RedisCommandQueue.cs" />
     <Compile Include="RedisException.cs" />
     <Compile Include="RedisLock.cs" />
-    <Compile Include="RedisPipelineCommand.cs" />
+    <Compile Include="Pipeline\RedisPipelineCommand.cs" />
     <Compile Include="RedisSubscription.cs" />
-    <Compile Include="RedisTransaction.cs" />
+    <Compile Include="Transaction\RedisTransaction.cs" />
     <Compile Include="RedisClientFactory.cs" />
     <Compile Include="Generic\IRedisList.Generic.cs" />
     <Compile Include="Generic\IRedisSet.Generic.cs" />
