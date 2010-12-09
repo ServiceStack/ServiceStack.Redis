@@ -208,7 +208,10 @@ namespace ServiceStack.Redis
 		{
 			return new RedisTransaction(this);
 		}
-
+        public IRedisPipeline CreatePipeline()
+        {
+            return new RedisAllPurposePipeline(this);
+        }
 		public List<string> SearchKeys(string pattern)
 		{
 			var hasBug = IsPreVersion1_26;

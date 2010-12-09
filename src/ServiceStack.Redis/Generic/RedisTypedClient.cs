@@ -60,6 +60,10 @@ namespace ServiceStack.Redis.Generic
 			return new RedisTypedTransaction<T>(this);
 		}
 
+        public IRedisTypedPipeline<T> CreatePipeline()
+        {
+            return new RedisTypedPipeline<T>(this);
+        }
 		public IDisposable AcquireLock()
 		{
 			return client.AcquireLock(this.TypeLockKey);
@@ -70,7 +74,7 @@ namespace ServiceStack.Redis.Generic
 			return client.AcquireLock(this.TypeLockKey, timeOut);
 		}
 
-		public IRedisQueableTransaction CurrentTransaction
+		public IRedisTransactionBase CurrentTransaction
 		{
 			get
 			{
@@ -81,7 +85,17 @@ namespace ServiceStack.Redis.Generic
 				client.CurrentTransaction = value;
 			}
 		}
-
+        public IRedisPipelineBase CurrentPipeline
+        {
+            get
+            {
+                return client.CurrentPipeline;
+            }
+            set
+            {
+                client.CurrentPipeline = value;
+            }
+        }
 		public void Multi()
 		{
 			this.client.Multi();
@@ -92,9 +106,9 @@ namespace ServiceStack.Redis.Generic
 			this.client.Discard();
 		}
 
-		public int Exec()
+		public void Exec()
 		{
-			return this.client.Exec();
+			client.Exec();
 		}
 
 		internal void AddTypeIdsRegisteredDuringTransaction()
@@ -379,6 +393,27 @@ namespace ServiceStack.Redis.Generic
 
 		#endregion
 
-		public void Dispose() {}
+        internal void ExpectQueued()
+        {
+            client.ExpectQueued();
+        }
+        internal void ExpectOk()
+        {
+            client.ExpectOk();
+        }
+        internal int ReadMultiDataResultCount()
+        {
+            return client.ReadMultiDataResultCount();
+        }
+        public void FlushSendBuffer()
+        {
+            client.FlushSendBuffer();
+        }
+        public void ResetSendBuffer()
+        {
+            client.ResetSendBuffer();
+        }
+
+	    public void Dispose() {}
 	}
 }

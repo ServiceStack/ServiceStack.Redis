@@ -187,7 +187,9 @@ namespace ServiceStack.Redis
 				//Total command lines count
 				WriteAllToSendBuffer(cmdWithBinaryArgs);
 
-				FlushSendBuffer();
+                //pipeline will handle flush, if pipelining is turned on
+                if (CurrentPipeline == null)
+                    FlushSendBuffer();
 			}
 			catch (SocketException ex)
 			{
@@ -231,6 +233,13 @@ namespace ServiceStack.Redis
 			socket.Send(cmdBuffer, cmdBufferIndex, SocketFlags.None);
 			cmdBufferIndex = 0;
 		}
+        /// <summary>
+        /// reset buffer index in send buffer
+        /// </summary>
+        public void ResetSendBuffer()
+        {
+            cmdBufferIndex = 0;
+        }
 
 		private int SafeReadByte()
 		{
@@ -242,12 +251,13 @@ namespace ServiceStack.Redis
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
 
-			if (this.CurrentTransaction != null)
-			{
-				this.CurrentTransaction.CompleteVoidQueuedCommand(ExpectSuccess);
-				ExpectQueued();
-				return;
-			}
+            if (CurrentPipeline != null)
+            {
+                CurrentPipeline.CompleteVoidQueuedCommand(ExpectSuccess);
+                if (CurrentTransaction != null)
+                    CurrentTransaction.QueueExpectQueued();
+                return;
+            }
 			ExpectSuccess();
 		}
 
@@ -256,12 +266,13 @@ namespace ServiceStack.Redis
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
 
-			if (this.CurrentTransaction != null)
-			{
-				this.CurrentTransaction.CompleteIntQueuedCommand(ReadInt);
-				ExpectQueued();
-				return default(int);
-			}
+            if (CurrentPipeline != null)
+            {
+                CurrentPipeline.CompleteIntQueuedCommand(ReadInt);
+                if (CurrentTransaction != null)
+                    CurrentTransaction.QueueExpectQueued();
+                return default(int);
+            }
 			return ReadInt();
 		}
 
@@ -270,10 +281,11 @@ namespace ServiceStack.Redis
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
 
-			if (this.CurrentTransaction != null)
+			if (CurrentPipeline != null)
 			{
-				this.CurrentTransaction.CompleteIntQueuedCommand(ReadInt);
-				ExpectQueued();
+                CurrentPipeline.CompleteIntQueuedCommand(ReadInt);
+                if (CurrentTransaction != null)
+                    CurrentTransaction.QueueExpectQueued();
 				return default(long);
 			}
 			return ReadLong();
@@ -284,10 +296,11 @@ namespace ServiceStack.Redis
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
 
-			if (this.CurrentTransaction != null)
+			if (CurrentPipeline != null)
 			{
-				this.CurrentTransaction.CompleteBytesQueuedCommand(ReadData);
-				ExpectQueued();
+				CurrentPipeline.CompleteBytesQueuedCommand(ReadData);
+                if (CurrentTransaction != null)
+                    CurrentTransaction.QueueExpectQueued();
 				return null;
 			}
 			return ReadData();
@@ -319,10 +332,11 @@ namespace ServiceStack.Redis
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
 
-			if (this.CurrentTransaction != null)
+            if (CurrentPipeline != null)
 			{
-				this.CurrentTransaction.CompleteBytesQueuedCommand(ReadData);
-				ExpectQueued();
+                CurrentPipeline.CompleteBytesQueuedCommand(ReadData);
+                if (CurrentTransaction != null)
+                    CurrentTransaction.QueueExpectQueued();
 				return null;
 			}
 
@@ -334,10 +348,11 @@ namespace ServiceStack.Redis
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
 
-			if (this.CurrentTransaction != null)
+            if (CurrentPipeline != null)
 			{
-				this.CurrentTransaction.CompleteMultiBytesQueuedCommand(ReadMultiData);
-				ExpectQueued();
+                CurrentPipeline.CompleteMultiBytesQueuedCommand(ReadMultiData);
+                if (CurrentTransaction != null)
+                    CurrentTransaction.QueueExpectQueued();
 				return new byte[0][];
 			}
 			return ReadMultiData();
@@ -416,12 +431,12 @@ namespace ServiceStack.Redis
 			return s;
 		}
 
-		protected void ExpectOk()
+		internal void ExpectOk()
 		{
 			ExpectWord("OK");
 		}
 
-		protected void ExpectQueued()
+		internal void ExpectQueued()
 		{
 			ExpectWord("QUEUED");
 		}
@@ -551,7 +566,7 @@ namespace ServiceStack.Redis
 			throw CreateResponseError("Unknown reply on multi-request: " + c + s);
 		}
 
-		private int ReadMultiDataResultCount()
+		internal int ReadMultiDataResultCount()
 		{
 			int c = SafeReadByte();
 			if (c == -1)
@@ -655,6 +670,6 @@ namespace ServiceStack.Redis
 			}
 			return keyBytes;
 		}
-
 	}
+
 }
