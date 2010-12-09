@@ -164,6 +164,11 @@ namespace ServiceStack.Redis
 			return base.Append(key, value.ToUtf8Bytes());
 		}
 
+		public void RenameKey(string fromName, string toName)
+		{
+			base.Rename(fromName, toName);
+		}
+
 		public string GetSubstring(string key, int fromIndex, int toIndex)
 		{
 			return base.Substr(key, fromIndex, toIndex).FromUtf8Bytes();

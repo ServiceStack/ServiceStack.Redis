@@ -55,6 +55,7 @@ namespace ServiceStack.Redis
 		Dictionary<string, string> GetValuesMap(List<string> keys);
 		Dictionary<string, T> GetValuesMap<T>(List<string> keys);
 		int AppendToValue(string key, string value);
+		void RenameKey(string fromName, string toName);
 		string GetSubstring(string key, int fromIndex, int toIndex);
 
 		bool ContainsKey(string key);
