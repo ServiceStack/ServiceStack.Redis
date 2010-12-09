@@ -658,6 +658,6 @@ namespace ServiceStack.Redis
 			}
 			return keyBytes;
 		}
-
 	}
+
 }
