@@ -26,8 +26,8 @@ For multi-threaded applications you can choose from our different client connect
 
 You can download the Redis Client in any one of the following ways:
 
-* Packaged by default in [ServiceStack.zip](https://github.com/downloads/mythz/ServiceStack/ServiceStack.zip) 
-* Available to download separately as a stand-alone [ServiceStack.Redis.dll](https://github.com/downloads/mythz/ServiceStack.Redis/ServiceStack.Redis-v1.64.zip).
+* Packaged by default in [ServiceStack-v1.64.zip](https://github.com/downloads/mythz/ServiceStack/ServiceStack-v1.64.zip) 
+* Available to download separately as a stand-alone [ServiceStack.Redis-v1.64.zip](https://github.com/downloads/mythz/ServiceStack.Redis/ServiceStack.Redis-v1.64.zip).
 * As Source Code via Git: `git clone git://github.com/mythz/ServiceStack.Redis.git`
 * For those interested in having a GUI admin tool to visualize your Redis data should check out the [Redis Admin UI](http://www.servicestack.net/mythz_blog/?p=381)
 
