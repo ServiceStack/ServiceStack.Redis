@@ -47,8 +47,8 @@ namespace ServiceStack.Redis
         protected Socket socket;
         protected BufferedStream Bstream;
 
-        private IRedisTransactionBase _currentTransaction;
-        private IRedisPipelineBase _currentPipeline;
+        private IRedisTransactionBase _transaction;
+        private IRedisPipelineBase _pipeline;
 
         private Dictionary<string, string> info;
         /// <summary>
@@ -70,33 +70,38 @@ namespace ServiceStack.Redis
         public string Password { get; set; }
 
 
-        internal IRedisTransactionBase CurrentTransaction
+        internal IRedisTransactionBase Transaction
         {
             get
             {
-                return _currentTransaction;
+                return _transaction;
             }
             set
             {
                 if (value != null)
                     AssertConnectedSocket();
-                _currentTransaction = value;
+                _transaction = value;
             }
         }
 
 
-        internal IRedisPipelineBase CurrentPipeline
+        internal IRedisPipelineBase Pipeline
         {
             get
             {
-                return _currentPipeline;
+                return _pipeline;
             }
             set
             {
                 if (value != null)
                     AssertConnectedSocket();
-                _currentPipeline = value;
+                _pipeline = value;
             }
+        }
+
+        private IRedisPipelineBase ActivePipeline()
+        {
+            return (_transaction != null) ? _transaction : _pipeline;
         }
 
         public RedisNativeClient(string host)

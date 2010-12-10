@@ -357,7 +357,7 @@ namespace ServiceStack.Redis
 			var typeIdsSetKey = GetTypeIdsSetKey<T>();
 			var id = value.GetId().ToString();
 
-			if (this.CurrentTransaction != null)
+			if (this.Transaction != null)
 			{
 				var registeredTypeIdsWithinTransaction = GetRegisteredTypeIdsWithinTransaction(typeIdsSetKey);
 				registeredTypeIdsWithinTransaction.Add(id);
@@ -373,7 +373,7 @@ namespace ServiceStack.Redis
 			var typeIdsSetKey = GetTypeIdsSetKey<T>();
 			var ids = values.ConvertAll(x => x.GetId().ToString());
 
-			if (this.CurrentTransaction != null)
+			if (this.Transaction != null)
 			{
 				var registeredTypeIdsWithinTransaction = GetRegisteredTypeIdsWithinTransaction(typeIdsSetKey);
 				ids.ForEach(x => registeredTypeIdsWithinTransaction.Add(x));
@@ -387,7 +387,7 @@ namespace ServiceStack.Redis
 		internal void RemoveTypeIds<T>(params string[] ids)
 		{
 			var typeIdsSetKey = GetTypeIdsSetKey<T>();
-			if (this.CurrentTransaction != null)
+			if (this.Transaction != null)
 			{
 				var registeredTypeIdsWithinTransaction = GetRegisteredTypeIdsWithinTransaction(typeIdsSetKey);
 				ids.ForEach(x => registeredTypeIdsWithinTransaction.Remove(x));
@@ -401,7 +401,7 @@ namespace ServiceStack.Redis
 		internal void RemoveTypeIds<T>(params T[] values)
 		{
 			var typeIdsSetKey = GetTypeIdsSetKey<T>();
-			if (this.CurrentTransaction != null)
+			if (this.Transaction != null)
 			{
 				var registeredTypeIdsWithinTransaction = GetRegisteredTypeIdsWithinTransaction(typeIdsSetKey);
 				values.ForEach(x => registeredTypeIdsWithinTransaction.Remove(x.GetId().ToString()));

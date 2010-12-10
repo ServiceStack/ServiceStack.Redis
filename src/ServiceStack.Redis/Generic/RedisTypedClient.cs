@@ -74,26 +74,26 @@ namespace ServiceStack.Redis.Generic
 			return client.AcquireLock(this.TypeLockKey, timeOut);
 		}
 
-		public IRedisTransactionBase CurrentTransaction
+		public IRedisTransactionBase Transaction
 		{
 			get
 			{
-				return client.CurrentTransaction;
+				return client.Transaction;
 			}
 			set
 			{
-				client.CurrentTransaction = value;
+				client.Transaction = value;
 			}
 		}
-        public IRedisPipelineBase CurrentPipeline
+        public IRedisPipelineBase Pipeline
         {
             get
             {
-                return client.CurrentPipeline;
+                return client.Pipeline;
             }
             set
             {
-                client.CurrentPipeline = value;
+                client.Pipeline = value;
             }
         }
 		public void Multi()

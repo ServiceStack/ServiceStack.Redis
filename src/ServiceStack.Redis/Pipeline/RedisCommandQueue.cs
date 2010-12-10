@@ -25,7 +25,7 @@ namespace ServiceStack.Redis
         {
             this.RedisClient = redisClient;
 
-            if (redisClient.CurrentTransaction != null)
+            if (redisClient.Transaction != null)
                 throw new InvalidOperationException("An atomic command is already in use");
         }
 

@@ -12,15 +12,14 @@ namespace ServiceStack.Redis
 		internal RedisTypedPipeline(RedisTypedClient<T> redisClient)
 			: base(redisClient)
 		{
+            if (redisClient.Transaction != null)
+                throw new InvalidOperationException("A transaction is already in use");
 
-			if (redisClient.CurrentPipeline != null)
+			if (redisClient.Pipeline != null)
 				throw new InvalidOperationException("A pipeline is already in use");
 
-			redisClient.CurrentPipeline = this;
+			redisClient.Pipeline = this;
 		}
-
-
-
 		public void Flush()
 		{
 			// flush send buffers
@@ -36,7 +35,7 @@ namespace ServiceStack.Redis
 		protected void ClosePipeline()
 		{
 			RedisClient.ResetSendBuffer();
-			RedisClient.CurrentPipeline = null;
+			RedisClient.Pipeline = null;
 		}
 
 		public void Dispose()

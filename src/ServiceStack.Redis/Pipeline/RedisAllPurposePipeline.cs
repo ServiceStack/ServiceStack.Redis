@@ -12,10 +12,13 @@ namespace ServiceStack.Redis
         public RedisAllPurposePipeline(RedisClient redisClient) : base(redisClient)
 		{
 
-            if (redisClient.CurrentPipeline != null)
+            if (redisClient.Transaction != null)
+                throw new InvalidOperationException("A transaction is already in use");
+
+            if (redisClient.Pipeline != null)
 				throw new InvalidOperationException("A pipeline is already in use");
 
-			redisClient.CurrentPipeline = this;
+			redisClient.Pipeline = this;
 		}
 
       
@@ -34,13 +37,16 @@ namespace ServiceStack.Redis
             }
             
 	    }
-        /// <summary>
-        /// reset send buffer and remove pipeline reference from client
-        /// </summary>
-		public void Dispose()
-		{
+
+        protected void ClosePipeline()
+        {
             RedisClient.ResetSendBuffer();
-		    RedisClient.CurrentPipeline = null;
-		}
+            RedisClient.Pipeline = null;
+        }
+
+        public void Dispose()
+        {
+            ClosePipeline();
+        }
 	}
 }

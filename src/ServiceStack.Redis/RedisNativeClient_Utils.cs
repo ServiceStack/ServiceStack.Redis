@@ -188,7 +188,7 @@ namespace ServiceStack.Redis
 				WriteAllToSendBuffer(cmdWithBinaryArgs);
 
                 //pipeline will handle flush, if pipelining is turned on
-                if (CurrentPipeline == null)
+                if (ActivePipeline() == null)
                     FlushSendBuffer();
 			}
 			catch (SocketException ex)
@@ -251,9 +251,9 @@ namespace ServiceStack.Redis
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
 
-            if (CurrentPipeline != null)
+            if (ActivePipeline() != null)
             {
-                CurrentPipeline.CompleteVoidQueuedCommand(ExpectSuccess);
+                ActivePipeline().CompleteVoidQueuedCommand(ExpectSuccess);
                 return;
             }
 			ExpectSuccess();
@@ -264,9 +264,9 @@ namespace ServiceStack.Redis
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
 
-            if (CurrentPipeline != null)
+            if (ActivePipeline() != null)
             {
-                CurrentPipeline.CompleteIntQueuedCommand(ReadInt);
+                ActivePipeline().CompleteIntQueuedCommand(ReadInt);
                 return default(int);
             }
 			return ReadInt();
@@ -277,9 +277,9 @@ namespace ServiceStack.Redis
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
 
-			if (CurrentPipeline != null)
+            if (ActivePipeline() != null)
 			{
-                CurrentPipeline.CompleteIntQueuedCommand(ReadInt);
+                ActivePipeline().CompleteIntQueuedCommand(ReadInt);
 				return default(long);
 			}
 			return ReadLong();
@@ -290,9 +290,9 @@ namespace ServiceStack.Redis
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
 
-			if (CurrentPipeline != null)
+            if (ActivePipeline() != null)
 			{
-				CurrentPipeline.CompleteBytesQueuedCommand(ReadData);
+                ActivePipeline().CompleteBytesQueuedCommand(ReadData);
 				return null;
 			}
 			return ReadData();
@@ -324,9 +324,9 @@ namespace ServiceStack.Redis
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
 
-            if (CurrentPipeline != null)
+            if (ActivePipeline() != null)
 			{
-                CurrentPipeline.CompleteBytesQueuedCommand(ReadData);
+                ActivePipeline().CompleteBytesQueuedCommand(ReadData);
 				return null;
 			}
 
@@ -338,9 +338,9 @@ namespace ServiceStack.Redis
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
 
-            if (CurrentPipeline != null)
+            if (ActivePipeline() != null)
 			{
-                CurrentPipeline.CompleteMultiBytesQueuedCommand(ReadMultiData);
+                ActivePipeline().CompleteMultiBytesQueuedCommand(ReadMultiData);
 				return new byte[0][];
 			}
 			return ReadMultiData();

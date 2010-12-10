@@ -21,14 +21,17 @@ namespace ServiceStack.Redis
 	public class RedisTransaction
 		: RedisAllPurposePipeline, IRedisTransaction, IRedisQueueCompletableOperation
 	{
+        private int _numCommands = 0;
 		public RedisTransaction(RedisClient redisClient) : base(redisClient)
 		{
-			if (redisClient.CurrentTransaction != null)
-				throw new InvalidOperationException("An atomic command is already in use");
+            if (redisClient.Pipeline != null)
+                throw new InvalidOperationException("An pipeline is already in use. Please move pipelined commands inside transaction");
+
+            if (redisClient.Transaction != null)
+                throw new InvalidOperationException("An atomic command is already in use");
 
 			redisClient.Multi();
-			redisClient.CurrentTransaction = this;
-		    redisClient.CurrentPipeline = this;
+			redisClient.Transaction = this;
 		}
 
         /// <summary>
@@ -42,58 +45,77 @@ namespace ServiceStack.Redis
             QueuedCommands.Insert(0, op);
         }
 
-		public void Commit()
-		{
-			try
-			{
-				RedisClient.Exec();
+        public void Commit()
+        {
+            try
+            {
+                RedisClient.Exec();
+                _numCommands = QueuedCommands.Count / 2;
+                
+                /////////////////////////////////////////////////////
+                // Queue up reading of stock multi/exec responses
+
+                //the first half of the responses will be "QUEUED", so insert read count operation
+                // after these
+                var readCountOp = new QueuedRedisOperation()
+                {
+                    IntReadCommand = RedisClient.ReadMultiDataResultCount,
+                    OnSuccessIntCallback = handleMultiDataResultCount
+                };
+                QueuedCommands.Insert(_numCommands, readCountOp);
+
+                //handle OK response from MULTI (insert at beginning)
+                var readOkOp = new QueuedRedisOperation()
+                {
+                    VoidReadCommand = RedisClient.ExpectOk,
+                };
+                QueuedCommands.Insert(0, readOkOp);
+
+                //////////////////////////////
                 // flush send buffers
                 RedisClient.FlushSendBuffer();
 
-                //handle OK response from MULTI
-                RedisClient.ExpectOk();
-
-                // handle QUEUED responses (half of the responses should be QUEUED)
-			    int numQueuedResponses = QueuedCommands.Count/2;
-                for (int i = 0; i < numQueuedResponses; ++ i )
-                    QueuedCommands[i].ProcessResult();
-			    QueuedCommands.RemoveRange(0, QueuedCommands.Count / 2);
-
-                //read multi-bulk result count
-			    int resultCount =  RedisClient.ReadMultiDataResultCount();
-                if (resultCount != QueuedCommands.Count)
-                    throw new InvalidOperationException(string.Format(
-                        "Invalid results received from 'EXEC', expected '{0}' received '{1}'"
-                        + "\nWarning: Transaction was committed",
-                        QueuedCommands.Count, resultCount));
-
+                /////////////////////////////
                 //receive expected results
                 foreach (var queuedCommand in QueuedCommands)
                 {
                     queuedCommand.ProcessResult();
                 }
-			}
-			finally
-			{
-				RedisClient.CurrentTransaction = null;
-			    RedisClient.CurrentPipeline = null;
-				RedisClient.AddTypeIdsRegisteredDuringTransaction();
-			}
-		}
+            }
+            finally
+            {
+                RedisClient.Transaction = null;
+                base.ClosePipeline();
+                RedisClient.AddTypeIdsRegisteredDuringTransaction();
+            }
+        }
+
+        /// <summary>
+        /// callback for after result count is read in
+        /// </summary>
+        /// <param name="count"></param>
+        private void handleMultiDataResultCount(int count)
+        {
+            if (count != _numCommands)
+                throw new InvalidOperationException(string.Format(
+                    "Invalid results received from 'EXEC', expected '{0}' received '{1}'"
+                    + "\nWarning: Transaction was committed",
+                    _numCommands, count));
+        }
 
 		public void Rollback()
 		{
-			if (RedisClient.CurrentTransaction == null) 
+			if (RedisClient.Transaction == null) 
 				throw new InvalidOperationException("There is no current transaction to Rollback");
 
-			RedisClient.CurrentTransaction = null;
+			RedisClient.Transaction = null;
 			RedisClient.ClearTypeIdsRegisteredDuringTransaction();
 		}
 
 		public void Dispose()
 		{
             base.Dispose();
-            if (RedisClient.CurrentTransaction == null) return;
+            if (RedisClient.Transaction == null) return;
 		    Rollback();
         }
 
