@@ -31,7 +31,7 @@ You can download the Redis Client in any one of the following ways:
 * As Source Code via Git: `git clone git://github.com/mythz/ServiceStack.Redis.git`
 * For those interested in having a GUI admin tool to visualize your Redis data should check out the [Redis Admin UI](http://www.servicestack.net/mythz_blog/?p=381)
 
-[View the release notes](https://github.com/mythz/ServiceStack.Redis/wiki/RedisClientReleaseNotes).
+[View the release notes](https://github.com/mythz/ServiceStack.Redis/wiki/Redis-Client-Release-Notes).
 
 ### Redis Server builds for Windows
 Downloads for Redis Server Windows builds [can be found here](https://github.com/mythz/ServiceStack.Redis/wiki/RedisWindowsDownload).
