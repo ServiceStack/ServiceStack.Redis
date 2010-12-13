@@ -1,5 +1,7 @@
 using System;
+using NUnit.Framework;
 using ServiceStack.Common.Tests.Models;
+using ServiceStack.Redis.Tests.Support;
 
 namespace ServiceStack.Redis.Tests.Generic
 {
@@ -43,6 +45,17 @@ namespace ServiceStack.Redis.Tests.Generic
 		private readonly IModelFactory<int> factory = new IntFactory();
 
 		protected override IModelFactory<int> Factory
+		{
+			get { return factory; }
+		}
+	}
+
+	public class RedisClientSetTestsCustomType
+		: RedisClientSetTestsBase<CustomType>
+	{
+		private readonly IModelFactory<CustomType> factory = new CustomTypeFactory();
+
+		protected override IModelFactory<CustomType> Factory
 		{
 			get { return factory; }
 		}

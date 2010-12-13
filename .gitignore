@@ -1,8 +1,9 @@
-
+bin/
+obj/
 .idea/
-*.resharper.user
-# Defaults
-#
+latest/
+/env-vars.bat
+*.suo
 #ignore thumbnails created by windows
 Thumbs.db
 #Ignore files build by Visual Studio
@@ -27,7 +28,9 @@ Thumbs.db
 [Dd]ebug*/
 *.lib
 *.sbr
+*.resharper.user
 obj/
 [Rr]elease*/
 _ReSharper*/
 [Tt]est[Rr]esult*
+App_Data/

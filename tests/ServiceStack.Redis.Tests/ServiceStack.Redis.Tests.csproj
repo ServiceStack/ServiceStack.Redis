@@ -167,6 +167,8 @@
     <Compile Include="RedisTransactionCommonTests.cs" />
     <Compile Include="RedisTransactionTests.cs" />
     <Compile Include="RedisUtilTests.cs" />
+    <Compile Include="Support\CustomType.cs" />
+    <Compile Include="Support\CustomTypeFactory.cs" />
     <Compile Include="Support\TcpClientWithTimeout.cs" />
     <Compile Include="TestConfig.cs" />
     <Compile Include="RedisPersistenceProviderTests.cs" />
