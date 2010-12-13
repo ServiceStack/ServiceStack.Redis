@@ -25,14 +25,7 @@ namespace ServiceStack.Redis.Generic
 		internal RedisTypedTransaction(RedisTypedClient<T> redisClient)
 			: base(redisClient)
 		{
-
-            if (redisClient.Pipeline != null)
-                throw new InvalidOperationException("An pipeline is already in use. Please move pipelined commands inside transaction");
-
-			if (redisClient.Transaction != null)
-				throw new InvalidOperationException("An atomic command is already in use");
-
-			redisClient.Transaction = this;
+            redisClient.Transaction = this;
 			redisClient.Multi();
 		}
 
