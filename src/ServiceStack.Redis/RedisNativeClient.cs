@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using ServiceStack.Logging;
 using ServiceStack.Redis;
+using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis
@@ -48,7 +49,7 @@ namespace ServiceStack.Redis
         protected BufferedStream Bstream;
 
         private IRedisTransactionBase _transaction;
-        private IRedisPipelineBase _pipeline;
+        private IRedisPipelineShared _pipeline;
 
         private Dictionary<string, string> info;
         /// <summary>
@@ -85,7 +86,7 @@ namespace ServiceStack.Redis
         }
 
 
-        internal IRedisPipelineBase Pipeline
+        internal IRedisPipelineShared Pipeline
         {
             get
             {

@@ -1,9 +1,11 @@
-﻿namespace ServiceStack.Redis
+﻿using ServiceStack.Redis.Pipeline;
+
+namespace ServiceStack.Redis
 {
     /// <summary>
     /// Base transaction interface, shared by typed and non-typed transactions
     /// </summary>
-    public interface IRedisTransactionBase : IRedisPipelineBase
+    public interface IRedisTransactionBase : IRedisPipelineShared
     {
     }
 }

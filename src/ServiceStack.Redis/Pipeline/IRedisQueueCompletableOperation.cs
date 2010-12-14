@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 
-namespace ServiceStack.Redis
+namespace ServiceStack.Redis.Pipeline
 {
-    /// <summary>
-    /// Interface to operations that allow queued commands to be completed
-    /// </summary>
+	/// <summary>
+	/// Interface to operations that allow queued commands to be completed
+	/// </summary>
 	public interface IRedisQueueCompletableOperation
 	{
 		void CompleteVoidQueuedCommand(Action voidReadCommand);

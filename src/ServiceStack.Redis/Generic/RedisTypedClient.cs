@@ -17,6 +17,7 @@ using System.Text;
 using ServiceStack.Common.Extensions;
 using ServiceStack.Common.Utils;
 using ServiceStack.DesignPatterns.Model;
+using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Generic
@@ -85,7 +86,7 @@ namespace ServiceStack.Redis.Generic
 				client.Transaction = value;
 			}
 		}
-        public IRedisPipelineBase Pipeline
+        public IRedisPipelineShared Pipeline
         {
             get
             {

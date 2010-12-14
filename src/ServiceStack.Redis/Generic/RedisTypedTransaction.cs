@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using ServiceStack.Redis.Pipeline;
 
 namespace ServiceStack.Redis.Generic
 {

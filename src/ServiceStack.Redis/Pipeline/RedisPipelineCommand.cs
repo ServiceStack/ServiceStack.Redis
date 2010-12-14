@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ServiceStack.Redis
+namespace ServiceStack.Redis.Pipeline
 {
 	public class RedisPipelineCommand
 	{

@@ -11,6 +11,7 @@
 //
 
 using System;
+using ServiceStack.Redis.Pipeline;
 
 namespace ServiceStack.Redis
 {

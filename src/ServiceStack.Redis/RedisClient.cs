@@ -18,6 +18,7 @@ using System.Text;
 using ServiceStack.Common.Extensions;
 using ServiceStack.Common.Utils;
 using ServiceStack.Redis.Generic;
+using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis

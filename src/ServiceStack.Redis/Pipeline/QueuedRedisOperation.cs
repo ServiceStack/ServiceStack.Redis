@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using ServiceStack.Logging;
 
-namespace ServiceStack.Redis
+namespace ServiceStack.Redis.Pipeline
 {
 	internal class QueuedRedisOperation
 	{
-	    protected static readonly ILog Log = LogManager.GetLogger(typeof(QueuedRedisOperation));
+		protected static readonly ILog Log = LogManager.GetLogger(typeof(QueuedRedisOperation));
 
 		public Action VoidReadCommand { get; set; }
 		public Func<int> IntReadCommand { get; set; }
@@ -34,10 +34,10 @@ namespace ServiceStack.Redis
 
 		public Action<Exception> OnErrorCallback { get; set; }
 
-         public virtual void Execute(IRedisClient client)
-         {
+		public virtual void Execute(IRedisClient client)
+		{
           
-         }
+		}
 
 		public void ProcessResult()
 		{
@@ -114,7 +114,7 @@ namespace ServiceStack.Redis
 					}
 					if (OnSuccessIntCallback != null)
 					{
-						OnSuccessIntCallback(int.Parse(result != null ?  Encoding.UTF8.GetString(result) : null));
+						OnSuccessIntCallback(result != null ?  int.Parse(Encoding.UTF8.GetString(result)) : 0);
 					}
 				}
 				else if (StringReadCommand != null)
@@ -166,7 +166,7 @@ namespace ServiceStack.Redis
 				}
 				else
 				{
-				    throw;
+					throw;
 				}
 			}
 		}
