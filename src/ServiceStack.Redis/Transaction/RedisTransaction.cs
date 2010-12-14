@@ -98,6 +98,10 @@ namespace ServiceStack.Redis
                     queuedCommand.ProcessResult();
                 }
             }
+            catch (RedisTransactionFailedException e)
+            {
+
+            }
             finally
             {
                 RedisClient.Transaction = null;
@@ -112,6 +116,9 @@ namespace ServiceStack.Redis
         /// <param name="count"></param>
         private void handleMultiDataResultCount(int count)
         {
+            // transaction failed due to WATCH condition
+            if (count == -1)
+                throw new RedisTransactionFailedException();
             if (count != _numCommands)
                 throw new InvalidOperationException(string.Format(
                     "Invalid results received from 'EXEC', expected '{0}' received '{1}'"
@@ -141,9 +148,12 @@ namespace ServiceStack.Redis
                     queuedCommand.ProcessResult();
                 }
             }
-            finally 
+            catch (RedisTransactionFailedException e)
             {
                 
+            }
+            finally 
+            {
                 RedisClient.Transaction = null;
                 ClosePipeline();
                 RedisClient.AddTypeIdsRegisteredDuringPipeline();

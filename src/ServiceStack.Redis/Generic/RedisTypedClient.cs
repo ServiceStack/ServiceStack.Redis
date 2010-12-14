@@ -97,6 +97,16 @@ namespace ServiceStack.Redis.Generic
             }
         }
 
+        public void Watch(params string[] keys)
+        {
+            client.Watch(keys);
+        }
+
+        public void UnWatch()
+        {
+            client.UnWatch();
+        }
+
 		public void Multi()
 		{
 			this.client.Multi();

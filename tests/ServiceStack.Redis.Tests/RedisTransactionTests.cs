@@ -160,7 +160,7 @@ namespace ServiceStack.Redis.Tests
             var temp = new byte[1];
             using (var trans = Redis.CreateTransaction())
             {
-                trans.QueueCommand(r => ((RedisNativeClient)r).SetEx("key",5,temp));
+                trans.QueueCommand(r => ((RedisNativeClient)r).SetEx(Key,5,temp));
                 trans.Commit();
             }
         }
@@ -190,6 +190,29 @@ namespace ServiceStack.Redis.Tests
                 Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));
                 Assert.That(Redis.GetValue(KeySquared), Is.EqualTo("1"));
             }
+        }
+            [Test]
+        public void Transaction_can_issue_watch()
+        {
+            Redis.Del(Key);
+            Assert.That(Redis.GetValue(Key), Is.Null);
+
+            string KeySquared = Key + Key;
+            Redis.Del(KeySquared);
+                
+            Redis.Watch(Key, KeySquared);
+            Redis.Set(Key, 7);
+
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.Set(Key, 1));
+                trans.QueueCommand(r => r.Set(KeySquared, 2));
+                trans.Commit();
+            }
+
+            Assert.That(Redis.GetValue(Key), Is.EqualTo("7"));
+            Assert.That(Redis.GetValue(KeySquared), Is.Null);   
+
         }
     }
 }

@@ -112,6 +112,8 @@ namespace ServiceStack.Redis
 
 		public readonly static byte[] Sort = "SORT".ToUtf8Bytes();
 
+        public readonly static byte[] Watch = "WATCH".ToUtf8Bytes();
+        public readonly static byte[] UnWatch = "UNWATCH".ToUtf8Bytes();
 		public readonly static byte[] Multi = "MULTI".ToUtf8Bytes();
 		public readonly static byte[] Exec = "EXEC".ToUtf8Bytes();
 		public readonly static byte[] Discard = "DISCARD".ToUtf8Bytes();

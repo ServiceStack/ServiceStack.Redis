@@ -106,15 +106,15 @@ namespace ServiceStack.Redis
 					}
 					if (OnSuccessStringCallback != null)
 					{
-						OnSuccessStringCallback(Encoding.UTF8.GetString(result));
+						OnSuccessStringCallback(result != null ? Encoding.UTF8.GetString(result) : null);
 					}
 					if (OnSuccessTypeCallback != null)
 					{
-						OnSuccessTypeCallback(Encoding.UTF8.GetString(result));
+						OnSuccessTypeCallback(result != null ? Encoding.UTF8.GetString(result) : null);
 					}
 					if (OnSuccessIntCallback != null)
 					{
-						OnSuccessIntCallback(int.Parse(Encoding.UTF8.GetString(result)));
+						OnSuccessIntCallback(int.Parse(result != null ?  Encoding.UTF8.GetString(result) : null));
 					}
 				}
 				else if (StringReadCommand != null)
@@ -138,12 +138,14 @@ namespace ServiceStack.Redis
 					}
 					if (OnSuccessMultiStringCallback != null)
 					{
-						OnSuccessMultiStringCallback(result.ToStringList());
+						OnSuccessMultiStringCallback(result != null ? result.ToStringList() : null);
 					}
+                    
 					if (OnSuccessMultiTypeCallback != null)
 					{
 						OnSuccessMultiTypeCallback(result.ToStringList());
 					}
+                     
 				}
 				else if (MultiStringReadCommand != null)
 				{
@@ -161,6 +163,10 @@ namespace ServiceStack.Redis
 				if (OnErrorCallback != null)
 				{
 					OnErrorCallback(ex);
+				}
+				else
+				{
+				    throw;
 				}
 			}
 		}

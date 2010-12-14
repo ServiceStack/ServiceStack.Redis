@@ -167,6 +167,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Support\OrderedDictionary.cs" />
+    <Compile Include="Transaction\RedisTransactionFailedException.cs" />
     <Compile Include="UtilExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

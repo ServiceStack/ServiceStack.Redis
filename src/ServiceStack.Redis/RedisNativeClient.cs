@@ -506,6 +506,34 @@ namespace ServiceStack.Redis
             return SendExpectMultiData(cmdWithArgs);
         }
 
+        public void Watch(params string[] keys)
+        {
+            var doesNotSupportSetEx = this.ServerVersion.CompareTo("2.1.0") < 0;
+            if (doesNotSupportSetEx)
+            {
+                throw new NotSupportedException("Watch is not supported for this version of the Redis server");
+            }
+
+            if (keys == null)
+                throw new ArgumentNullException("keys");
+            if (keys.Length == 0)
+                throw new ArgumentException("keys");
+
+            var cmdWithArgs = MergeCommandWithArgs(Commands.Watch, keys);
+
+            SendExpectCode(cmdWithArgs);
+
+        }
+        public void UnWatch()
+        {
+            var doesNotSupportSetEx = this.ServerVersion.CompareTo("2.1.0") < 0;
+            if (doesNotSupportSetEx)
+            {
+                throw new NotSupportedException("Unwatch is not supported for this version of the Redis server");
+            }
+
+            SendExpectCode(Commands.UnWatch);
+        }
         internal void Multi()
         {
             //make sure socket is connected. Otherwise, fetch of server info will interfere
