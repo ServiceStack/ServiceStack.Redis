@@ -96,6 +96,7 @@ namespace ServiceStack.Redis.Generic
                 client.Pipeline = value;
             }
         }
+
 		public void Multi()
 		{
 			this.client.Multi();
@@ -111,14 +112,14 @@ namespace ServiceStack.Redis.Generic
 			client.Exec();
 		}
 
-		internal void AddTypeIdsRegisteredDuringTransaction()
+		internal void AddTypeIdsRegisteredDuringPipeline()
 		{
-			client.AddTypeIdsRegisteredDuringTransaction();
+			client.AddTypeIdsRegisteredDuringPipeline();
 		}
 
-		internal void ClearTypeIdsRegisteredDuringTransaction()
+		internal void ClearTypeIdsRegisteredDuringPipeline()
 		{
-			client.ClearTypeIdsRegisteredDuringTransaction();
+			client.ClearTypeIdsRegisteredDuringPipeline();
 		}
 
 		public List<string> GetAllKeys()

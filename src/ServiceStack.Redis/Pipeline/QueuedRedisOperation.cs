@@ -7,7 +7,7 @@ namespace ServiceStack.Redis
 {
 	internal class QueuedRedisOperation
 	{
-		private static readonly ILog Log = LogManager.GetLogger(typeof(QueuedRedisOperation));
+	    protected static readonly ILog Log = LogManager.GetLogger(typeof(QueuedRedisOperation));
 
 		public Action VoidReadCommand { get; set; }
 		public Func<int> IntReadCommand { get; set; }

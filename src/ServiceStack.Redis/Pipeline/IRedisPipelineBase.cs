@@ -8,5 +8,6 @@ namespace ServiceStack.Redis
     public interface IRedisPipelineBase : IDisposable, IRedisQueueCompletableOperation
     {
         void Flush();
+        void Replay();
     }
 }

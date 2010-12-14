@@ -26,6 +26,7 @@ namespace ServiceStack.Redis.Generic
 		IRedisHash<TKey, T> GetHash<TKey>(string hashId);
 
 		IRedisTypedTransaction<T> CreateTransaction();
+        IRedisTypedPipeline<T> CreatePipeline();
 		
 		IDisposable AcquireLock();
 		IDisposable AcquireLock(TimeSpan timeOut);

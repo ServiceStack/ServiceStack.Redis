@@ -99,11 +99,6 @@ namespace ServiceStack.Redis
             }
         }
 
-        private IRedisPipelineBase ActivePipeline()
-        {
-            return (_transaction != null) ? _transaction : _pipeline;
-        }
-
         public RedisNativeClient(string host)
             : this(host, DefaultPort)
         {

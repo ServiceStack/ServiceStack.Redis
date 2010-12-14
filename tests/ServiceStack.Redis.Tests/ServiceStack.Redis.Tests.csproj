@@ -118,6 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdhocClientTests.cs" />
+    <Compile Include="Generic\RedisTypedPipelineTests.cs" />
     <Compile Include="RedisPipelineCommonTests.cs" />
     <Compile Include="RedisPipelineTests.cs" />
     <Compile Include="Examples\BestPractice\IBlogRepository.cs" />

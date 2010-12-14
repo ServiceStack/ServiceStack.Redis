@@ -339,17 +339,17 @@ namespace ServiceStack.Redis
 		#region IBasicPersistenceProvider
 
 
-		Dictionary<string, HashSet<string>> registeredTypeIdsWithinTransactionMap = new Dictionary<string, HashSet<string>>();
+		Dictionary<string, HashSet<string>> registeredTypeIdsWithinPipelineMap = new Dictionary<string, HashSet<string>>();
 
-		internal HashSet<string> GetRegisteredTypeIdsWithinTransaction(string typeIdsSet)
+		internal HashSet<string> GetRegisteredTypeIdsWithinPipeline(string typeIdsSet)
 		{
-			HashSet<string> registeredTypeIdsWithinTransaction;
-			if (!registeredTypeIdsWithinTransactionMap.TryGetValue(typeIdsSet, out registeredTypeIdsWithinTransaction))
+			HashSet<string> registeredTypeIdsWithinPipeline;
+			if (!registeredTypeIdsWithinPipelineMap.TryGetValue(typeIdsSet, out registeredTypeIdsWithinPipeline))
 			{
-				registeredTypeIdsWithinTransaction = new HashSet<string>();
-				registeredTypeIdsWithinTransactionMap[typeIdsSet] = registeredTypeIdsWithinTransaction;
+				registeredTypeIdsWithinPipeline = new HashSet<string>();
+				registeredTypeIdsWithinPipelineMap[typeIdsSet] = registeredTypeIdsWithinPipeline;
 			}
-			return registeredTypeIdsWithinTransaction;
+			return registeredTypeIdsWithinPipeline;
 		}
 
 		internal void RegisterTypeId<T>(T value)
@@ -357,10 +357,10 @@ namespace ServiceStack.Redis
 			var typeIdsSetKey = GetTypeIdsSetKey<T>();
 			var id = value.GetId().ToString();
 
-			if (this.Transaction != null)
+			if (this.Pipeline != null)
 			{
-				var registeredTypeIdsWithinTransaction = GetRegisteredTypeIdsWithinTransaction(typeIdsSetKey);
-				registeredTypeIdsWithinTransaction.Add(id);
+				var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
+				registeredTypeIdsWithinPipeline.Add(id);
 			}
 			else
 			{
@@ -373,10 +373,10 @@ namespace ServiceStack.Redis
 			var typeIdsSetKey = GetTypeIdsSetKey<T>();
 			var ids = values.ConvertAll(x => x.GetId().ToString());
 
-			if (this.Transaction != null)
+			if (this.Pipeline != null)
 			{
-				var registeredTypeIdsWithinTransaction = GetRegisteredTypeIdsWithinTransaction(typeIdsSetKey);
-				ids.ForEach(x => registeredTypeIdsWithinTransaction.Add(x));
+				var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
+				ids.ForEach(x => registeredTypeIdsWithinPipeline.Add(x));
 			}
 			else
 			{
@@ -387,10 +387,10 @@ namespace ServiceStack.Redis
 		internal void RemoveTypeIds<T>(params string[] ids)
 		{
 			var typeIdsSetKey = GetTypeIdsSetKey<T>();
-			if (this.Transaction != null)
+			if (this.Pipeline != null)
 			{
-				var registeredTypeIdsWithinTransaction = GetRegisteredTypeIdsWithinTransaction(typeIdsSetKey);
-				ids.ForEach(x => registeredTypeIdsWithinTransaction.Remove(x));
+				var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
+				ids.ForEach(x => registeredTypeIdsWithinPipeline.Remove(x));
 			}
 			else
 			{
@@ -401,10 +401,10 @@ namespace ServiceStack.Redis
 		internal void RemoveTypeIds<T>(params T[] values)
 		{
 			var typeIdsSetKey = GetTypeIdsSetKey<T>();
-			if (this.Transaction != null)
+			if (this.Pipeline != null)
 			{
-				var registeredTypeIdsWithinTransaction = GetRegisteredTypeIdsWithinTransaction(typeIdsSetKey);
-				values.ForEach(x => registeredTypeIdsWithinTransaction.Remove(x.GetId().ToString()));
+				var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
+				values.ForEach(x => registeredTypeIdsWithinPipeline.Remove(x.GetId().ToString()));
 			}
 			else
 			{
@@ -412,23 +412,23 @@ namespace ServiceStack.Redis
 			}
 		}
 
-		internal void AddTypeIdsRegisteredDuringTransaction()
+		internal void AddTypeIdsRegisteredDuringPipeline()
 		{
-			foreach (var entry in registeredTypeIdsWithinTransactionMap)
+			foreach (var entry in registeredTypeIdsWithinPipelineMap)
 			{
 				var typeIdsSetKey = entry.Key;
 				foreach (var id in entry.Value)
 				{
-					var registeredTypeIdsWithinTransaction = GetRegisteredTypeIdsWithinTransaction(typeIdsSetKey);
-					registeredTypeIdsWithinTransaction.ForEach(x => this.AddItemToSet(typeIdsSetKey, id));
+					var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
+					registeredTypeIdsWithinPipeline.ForEach(x => this.AddItemToSet(typeIdsSetKey, id));
 				}
 			}
-			registeredTypeIdsWithinTransactionMap = new Dictionary<string, HashSet<string>>();
+			registeredTypeIdsWithinPipelineMap = new Dictionary<string, HashSet<string>>();
 		}
 
-		internal void ClearTypeIdsRegisteredDuringTransaction()
+		internal void ClearTypeIdsRegisteredDuringPipeline()
 		{
-			registeredTypeIdsWithinTransactionMap = new Dictionary<string, HashSet<string>>();
+			registeredTypeIdsWithinPipelineMap = new Dictionary<string, HashSet<string>>();
 		}
 
 

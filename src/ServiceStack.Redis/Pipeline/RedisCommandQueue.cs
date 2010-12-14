@@ -25,8 +25,6 @@ namespace ServiceStack.Redis
         {
             this.RedisClient = redisClient;
 
-            if (redisClient.Transaction != null)
-                throw new InvalidOperationException("An atomic command is already in use");
         }
 
         public void QueueCommand(Action<IRedisClient> command)
@@ -41,8 +39,9 @@ namespace ServiceStack.Redis
 
         public virtual void QueueCommand(Action<IRedisClient> command, Action onSuccessCallback, Action<Exception> onErrorCallback)
         {
-            BeginQueuedCommand(new QueuedRedisOperation
+            BeginQueuedCommand(new QueuedRedisCommand
             {
+                VoidReturnCommand = command,
                 OnSuccessVoidCallback = onSuccessCallback,
                 OnErrorCallback = onErrorCallback
             });
@@ -62,8 +61,9 @@ namespace ServiceStack.Redis
 
         public virtual void QueueCommand(Func<IRedisClient, int> command, Action<int> onSuccessCallback, Action<Exception> onErrorCallback)
         {
-            BeginQueuedCommand(new QueuedRedisOperation
+            BeginQueuedCommand(new QueuedRedisCommand
             {
+                IntReturnCommand = command,
                 OnSuccessIntCallback = onSuccessCallback,
                 OnErrorCallback = onErrorCallback
             });
@@ -83,8 +83,9 @@ namespace ServiceStack.Redis
 
         public virtual void QueueCommand(Func<IRedisClient, long> command, Action<long> onSuccessCallback, Action<Exception> onErrorCallback)
         {
-            BeginQueuedCommand(new QueuedRedisOperation
+            BeginQueuedCommand(new QueuedRedisCommand
             {
+                LongReturnCommand = command,
                 OnSuccessLongCallback = onSuccessCallback,
                 OnErrorCallback = onErrorCallback
             });
@@ -104,8 +105,9 @@ namespace ServiceStack.Redis
 
         public virtual void QueueCommand(Func<IRedisClient, bool> command, Action<bool> onSuccessCallback, Action<Exception> onErrorCallback)
         {
-            BeginQueuedCommand(new QueuedRedisOperation
+            BeginQueuedCommand(new QueuedRedisCommand
             {
+                BoolReturnCommand = command,
                 OnSuccessBoolCallback = onSuccessCallback,
                 OnErrorCallback = onErrorCallback
             });
@@ -125,8 +127,9 @@ namespace ServiceStack.Redis
 
         public virtual void QueueCommand(Func<IRedisClient, double> command, Action<double> onSuccessCallback, Action<Exception> onErrorCallback)
         {
-            BeginQueuedCommand(new QueuedRedisOperation
+            BeginQueuedCommand(new QueuedRedisCommand
             {
+                DoubleReturnCommand = command,
                 OnSuccessDoubleCallback = onSuccessCallback,
                 OnErrorCallback = onErrorCallback
             });
@@ -146,8 +149,9 @@ namespace ServiceStack.Redis
 
         public virtual void QueueCommand(Func<IRedisClient, byte[]> command, Action<byte[]> onSuccessCallback, Action<Exception> onErrorCallback)
         {
-            BeginQueuedCommand(new QueuedRedisOperation
+            BeginQueuedCommand(new QueuedRedisCommand
             {
+                BytesReturnCommand = command,
                 OnSuccessBytesCallback = onSuccessCallback,
                 OnErrorCallback = onErrorCallback
             });
@@ -167,8 +171,9 @@ namespace ServiceStack.Redis
 
         public virtual void QueueCommand(Func<IRedisClient, string> command, Action<string> onSuccessCallback, Action<Exception> onErrorCallback)
         {
-            BeginQueuedCommand(new QueuedRedisOperation
+            BeginQueuedCommand(new QueuedRedisCommand
             {
+                StringReturnCommand = command,
                 OnSuccessStringCallback = onSuccessCallback,
                 OnErrorCallback = onErrorCallback
             });
@@ -188,8 +193,9 @@ namespace ServiceStack.Redis
 
         public virtual void QueueCommand(Func<IRedisClient, byte[][]> command, Action<byte[][]> onSuccessCallback, Action<Exception> onErrorCallback)
         {
-            BeginQueuedCommand(new QueuedRedisOperation
+            BeginQueuedCommand(new QueuedRedisCommand
             {
+                MultiBytesReturnCommand = command,
                 OnSuccessMultiBytesCallback = onSuccessCallback,
                 OnErrorCallback = onErrorCallback
             });
@@ -209,8 +215,9 @@ namespace ServiceStack.Redis
 
         public virtual void QueueCommand(Func<IRedisClient, List<string>> command, Action<List<string>> onSuccessCallback, Action<Exception> onErrorCallback)
         {
-            BeginQueuedCommand(new QueuedRedisOperation
+            BeginQueuedCommand(new QueuedRedisCommand
             {
+                MultiStringReturnCommand = command,
                 OnSuccessMultiStringCallback = onSuccessCallback,
                 OnErrorCallback = onErrorCallback
             });

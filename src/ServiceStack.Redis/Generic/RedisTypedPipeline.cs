@@ -12,27 +12,60 @@ namespace ServiceStack.Redis
 		internal RedisTypedPipeline(RedisTypedClient<T> redisClient)
 			: base(redisClient)
 		{
-            if (redisClient.Transaction != null)
+		    Init();
+		}
+
+        protected virtual void Init()
+        {
+             if (RedisClient.Transaction != null)
                 throw new InvalidOperationException("A transaction is already in use");
 
-			if (redisClient.Pipeline != null)
+			if (RedisClient.Pipeline != null)
 				throw new InvalidOperationException("A pipeline is already in use");
 
-			redisClient.Pipeline = this;
-		}
+			RedisClient.Pipeline = this;
+
+        }
 		public void Flush()
 		{
-			// flush send buffers
-			RedisClient.FlushSendBuffer();
+            try
+            {
 
-			//receive expected results
-			foreach (var queuedCommand in QueuedCommands)
-			{
-				queuedCommand.ProcessResult();
-			}
+
+                // flush send buffers
+                RedisClient.FlushSendBuffer();
+
+                //receive expected results
+                foreach (var queuedCommand in QueuedCommands)
+                {
+                    queuedCommand.ProcessResult();
+                }
+
+            }
+            finally
+            {
+                ClosePipeline();
+                RedisClient.AddTypeIdsRegisteredDuringPipeline();
+            }
 		}
+        protected void Execute()
+        {
+            foreach (var queuedCommand in QueuedCommands)
+            {
+                var cmd = queuedCommand as QueuedRedisTypedCommand<T>;
+                if (cmd != null)
+                    cmd.Execute(RedisClient);
+            }
+        }
 
-		protected void ClosePipeline()
+	    public void Replay()
+	    {
+	        RedisClient.Pipeline = this;
+	        Execute();
+            Flush();
+	    }
+
+	    protected void ClosePipeline()
 		{
 			RedisClient.ResetSendBuffer();
 			RedisClient.Pipeline = null;

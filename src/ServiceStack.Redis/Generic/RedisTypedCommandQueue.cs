@@ -29,8 +29,9 @@ namespace ServiceStack.Redis.Generic
 
 		public void QueueCommand(Action<IRedisTypedClient<T>> command, Action onSuccessCallback, Action<Exception> onErrorCallback)
 		{
-			BeginQueuedCommand(new QueuedRedisOperation
+			BeginQueuedCommand(new QueuedRedisTypedCommand<T>
            		{
+                    VoidReturnCommand = command,
            			OnSuccessVoidCallback = onSuccessCallback,
            			OnErrorCallback = onErrorCallback
            		});
@@ -50,8 +51,9 @@ namespace ServiceStack.Redis.Generic
 
 		public void QueueCommand(Func<IRedisTypedClient<T>, int> command, Action<int> onSuccessCallback, Action<Exception> onErrorCallback)
 		{
-			BeginQueuedCommand(new QueuedRedisOperation
+			BeginQueuedCommand(new QueuedRedisTypedCommand<T>
            	{
+                IntReturnCommand = command,
            		OnSuccessIntCallback = onSuccessCallback,
            		OnErrorCallback = onErrorCallback
            	});
@@ -71,8 +73,9 @@ namespace ServiceStack.Redis.Generic
 
 		public void QueueCommand(Func<IRedisTypedClient<T>, long> command, Action<long> onSuccessCallback, Action<Exception> onErrorCallback)
 		{
-			BeginQueuedCommand(new QueuedRedisOperation
+			BeginQueuedCommand(new QueuedRedisTypedCommand<T>
 			{
+                LongReturnCommand = command,
 				OnSuccessLongCallback = onSuccessCallback,
 				OnErrorCallback = onErrorCallback
 			});
@@ -92,8 +95,9 @@ namespace ServiceStack.Redis.Generic
 
 		public void QueueCommand(Func<IRedisTypedClient<T>, bool> command, Action<bool> onSuccessCallback, Action<Exception> onErrorCallback)
 		{
-			BeginQueuedCommand(new QueuedRedisOperation
+			BeginQueuedCommand(new QueuedRedisTypedCommand<T>
            		{
+                    BoolReturnCommand = command,
            			OnSuccessBoolCallback = onSuccessCallback,
            			OnErrorCallback = onErrorCallback
            		});
@@ -113,8 +117,9 @@ namespace ServiceStack.Redis.Generic
 
 		public void QueueCommand(Func<IRedisTypedClient<T>, double> command, Action<double> onSuccessCallback, Action<Exception> onErrorCallback)
 		{
-			BeginQueuedCommand(new QueuedRedisOperation
+			BeginQueuedCommand(new QueuedRedisTypedCommand<T>
                	{
+                    DoubleReturnCommand = command,
                		OnSuccessDoubleCallback = onSuccessCallback,
                		OnErrorCallback = onErrorCallback
                	});
@@ -134,8 +139,9 @@ namespace ServiceStack.Redis.Generic
 
 		public void QueueCommand(Func<IRedisTypedClient<T>, byte[]> command, Action<byte[]> onSuccessCallback, Action<Exception> onErrorCallback)
 		{
-			BeginQueuedCommand(new QueuedRedisOperation
+			BeginQueuedCommand(new QueuedRedisTypedCommand<T>
                	{
+                    BytesReturnCommand = command,
                		OnSuccessBytesCallback = onSuccessCallback,
                		OnErrorCallback = onErrorCallback
                	});
@@ -155,8 +161,9 @@ namespace ServiceStack.Redis.Generic
 
 		public void QueueCommand(Func<IRedisTypedClient<T>, string> command, Action<string> onSuccessCallback, Action<Exception> onErrorCallback)
 		{
-			BeginQueuedCommand(new QueuedRedisOperation
+			BeginQueuedCommand(new QueuedRedisTypedCommand<T>
                	{
+                    StringReturnCommand = command,
                		OnSuccessStringCallback = onSuccessCallback,
                		OnErrorCallback = onErrorCallback
                	});
@@ -175,8 +182,9 @@ namespace ServiceStack.Redis.Generic
 
 		public void QueueCommand(Func<IRedisTypedClient<T>, T> command, Action<T> onSuccessCallback, Action<Exception> onErrorCallback)
 		{
-			BeginQueuedCommand(new QueuedRedisOperation
+			BeginQueuedCommand(new QueuedRedisTypedCommand<T>
 			{
+                ObjectReturnCommand = command,
 				OnSuccessTypeCallback = x => onSuccessCallback(JsonSerializer.DeserializeFromString<T>(x)),
 				OnErrorCallback = onErrorCallback
 			});
@@ -196,8 +204,9 @@ namespace ServiceStack.Redis.Generic
 
 		public void QueueCommand(Func<IRedisTypedClient<T>, byte[][]> command, Action<byte[][]> onSuccessCallback, Action<Exception> onErrorCallback)
 		{
-			BeginQueuedCommand(new QueuedRedisOperation
+			BeginQueuedCommand(new QueuedRedisTypedCommand<T>
                	{
+                    MultiBytesReturnCommand = command,
                		OnSuccessMultiBytesCallback = onSuccessCallback,
                		OnErrorCallback = onErrorCallback
                	});
@@ -217,8 +226,9 @@ namespace ServiceStack.Redis.Generic
 
 		public void QueueCommand(Func<IRedisTypedClient<T>, List<string>> command, Action<List<string>> onSuccessCallback, Action<Exception> onErrorCallback)
 		{
-			BeginQueuedCommand(new QueuedRedisOperation
+			BeginQueuedCommand(new QueuedRedisTypedCommand<T>
                	{
+                    MultiStringReturnCommand = command,
                		OnSuccessMultiStringCallback = onSuccessCallback,
                		OnErrorCallback = onErrorCallback
                	});
@@ -237,8 +247,9 @@ namespace ServiceStack.Redis.Generic
 
 		public void QueueCommand(Func<IRedisTypedClient<T>, List<T>> command, Action<List<T>> onSuccessCallback, Action<Exception> onErrorCallback)
 		{
-			BeginQueuedCommand(new QueuedRedisOperation
+			BeginQueuedCommand(new QueuedRedisTypedCommand<T>
 			{
+                MultiObjectReturnCommand = command,
 				OnSuccessMultiTypeCallback = x => onSuccessCallback(x.ConvertAll(y => JsonSerializer.DeserializeFromString<T>(y))),
 				OnErrorCallback = onErrorCallback
 			});

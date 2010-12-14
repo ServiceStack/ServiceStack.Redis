@@ -24,9 +24,15 @@ namespace ServiceStack.Redis
         private int _numCommands = 0;
 		public RedisTransaction(RedisClient redisClient) : base(redisClient)
 		{
-			redisClient.Multi();
-			redisClient.Transaction = this;
+			
 		}
+
+        protected override void Init()
+        {
+           base.Init();
+           RedisClient.Multi();
+           RedisClient.Transaction = this;
+        }
 
         /// <summary>
         /// Put "QUEUED" messages at back of queue
@@ -80,7 +86,7 @@ namespace ServiceStack.Redis
             {
                 RedisClient.Transaction = null;
                 base.ClosePipeline();
-                RedisClient.AddTypeIdsRegisteredDuringTransaction();
+                RedisClient.AddTypeIdsRegisteredDuringPipeline();
             }
         }
 
@@ -103,7 +109,7 @@ namespace ServiceStack.Redis
 				throw new InvalidOperationException("There is no current transaction to Rollback");
 
 			RedisClient.Transaction = null;
-			RedisClient.ClearTypeIdsRegisteredDuringTransaction();
+			RedisClient.ClearTypeIdsRegisteredDuringPipeline();
 		}
 
 		public void Dispose()
@@ -115,44 +121,9 @@ namespace ServiceStack.Redis
 
         #region Overrides of RedisQueueCompletableOperation methods
 
-        public override void CompleteVoidQueuedCommand(Action voidReadCommand)
+        protected override void AddCurrentQueuedOperation()
         {
-            base.CompleteVoidQueuedCommand(voidReadCommand);
-            QueueExpectQueued();
-        }
-        public override void CompleteIntQueuedCommand(Func<int> intReadCommand)
-        {
-            base.CompleteIntQueuedCommand(intReadCommand);
-            QueueExpectQueued();
-        }
-        public override void CompleteLongQueuedCommand(Func<long> longReadCommand)
-        {
-            base.CompleteLongQueuedCommand(longReadCommand);
-            QueueExpectQueued();
-        }
-        public override void CompleteBytesQueuedCommand(Func<byte[]> bytesReadCommand)
-        {
-            base.CompleteBytesQueuedCommand(bytesReadCommand);
-            QueueExpectQueued();
-        }
-        public override void CompleteMultiBytesQueuedCommand(Func<byte[][]> multiBytesReadCommand)
-        {
-            base.CompleteMultiBytesQueuedCommand(multiBytesReadCommand);
-            QueueExpectQueued();
-        }
-        public override void CompleteStringQueuedCommand(Func<string> stringReadCommand)
-        {
-            base.CompleteStringQueuedCommand(stringReadCommand);
-            QueueExpectQueued();
-        }
-        public override void CompleteMultiStringQueuedCommand(Func<List<string>> multiStringReadCommand)
-        {
-            base.CompleteMultiStringQueuedCommand(multiStringReadCommand);
-            QueueExpectQueued();
-        }
-        public override void CompleteDoubleQueuedCommand(Func<double> doubleReadCommand)
-        {
-            base.CompleteDoubleQueuedCommand(doubleReadCommand);
+            base.AddCurrentQueuedOperation();
             QueueExpectQueued();
         }
         #endregion

@@ -26,7 +26,7 @@ namespace ServiceStack.Redis
                 throw new InvalidOperationException("No queued operation is currently set");
         }
 
-        private void AddCurrentQueuedOperation()
+        protected virtual void AddCurrentQueuedOperation()
         {
             this.QueuedCommands.Add(CurrentQueuedOperation);
             CurrentQueuedOperation = null;
