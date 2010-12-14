@@ -24,13 +24,16 @@ namespace ServiceStack.Redis
         private int _numCommands = 0;
 		public RedisTransaction(RedisClient redisClient) : base(redisClient)
 		{
-			
+		
 		}
 
         protected override void Init()
         {
+           //start pipelining
            base.Init();
+           //queue multi command
            RedisClient.Multi();
+           //set transaction
            RedisClient.Transaction = this;
         }
 
@@ -40,41 +43,54 @@ namespace ServiceStack.Redis
         /// <param name="queued"></param>
         private void QueueExpectQueued()
         {
-            var op = new QueuedRedisOperation();
-            op.VoidReadCommand = RedisClient.ExpectQueued;
-            QueuedCommands.Insert(0, op);
+            QueuedCommands.Insert(0, new QueuedRedisOperation()
+                                         {
+                                         VoidReadCommand = RedisClient.ExpectQueued
+                                         });
         }
 
-        public void Commit()
+
+        /// <summary>
+        /// Issue exec command (not queued)
+        /// </summary>
+        private void Exec()
+        {
+            RedisClient.Exec();
+            RedisClient.FlushSendBuffer();
+
+        }
+
+	    public void Commit()
         {
             try
             {
-                RedisClient.Exec();
                 _numCommands = QueuedCommands.Count / 2;
-                
-                /////////////////////////////////////////////////////
-                // Queue up reading of stock multi/exec responses
 
-                //the first half of the responses will be "QUEUED", so insert read count operation
-                // after these
-                var readCountOp = new QueuedRedisOperation()
+                //insert multi command at beginning
+                QueuedCommands.Insert(0, new QueuedRedisCommand()
+                {
+                    VoidReturnCommand = r => Init(),
+                    VoidReadCommand = RedisClient.ExpectOk,
+                });
+
+
+                //the first half of the responses will be "QUEUED",
+                // so insert reading of multiline after these responses
+                QueuedCommands.Insert(_numCommands + 1, new QueuedRedisOperation()
                 {
                     IntReadCommand = RedisClient.ReadMultiDataResultCount,
                     OnSuccessIntCallback = handleMultiDataResultCount
-                };
-                QueuedCommands.Insert(_numCommands, readCountOp);
+                });
 
-                //handle OK response from MULTI (insert at beginning)
-                var readOkOp = new QueuedRedisOperation()
+                // add Exec command at end (not queued)
+                QueuedCommands.Add(new RedisCommand()
                 {
-                    VoidReadCommand = RedisClient.ExpectOk,
-                };
-                QueuedCommands.Insert(0, readOkOp);
+                    VoidReturnCommand = r => Exec()
+                });
 
-                //////////////////////////////
-                // flush send buffers
-                RedisClient.FlushSendBuffer();
-
+                //execute transaction
+                Exec();
+                
                 /////////////////////////////
                 //receive expected results
                 foreach (var queuedCommand in QueuedCommands)
@@ -85,7 +101,7 @@ namespace ServiceStack.Redis
             finally
             {
                 RedisClient.Transaction = null;
-                base.ClosePipeline();
+                ClosePipeline();
                 RedisClient.AddTypeIdsRegisteredDuringPipeline();
             }
         }
@@ -111,6 +127,28 @@ namespace ServiceStack.Redis
 			RedisClient.Transaction = null;
 			RedisClient.ClearTypeIdsRegisteredDuringPipeline();
 		}
+
+        public void Replay()
+        {
+            try
+            {
+                Execute();
+
+                /////////////////////////////
+                //receive expected results
+                foreach (var queuedCommand in QueuedCommands)
+                {
+                    queuedCommand.ProcessResult();
+                }
+            }
+            finally 
+            {
+                
+                RedisClient.Transaction = null;
+                ClosePipeline();
+                RedisClient.AddTypeIdsRegisteredDuringPipeline();
+            }
+        }
 
 		public void Dispose()
 		{

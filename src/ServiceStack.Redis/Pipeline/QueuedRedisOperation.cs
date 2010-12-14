@@ -34,6 +34,11 @@ namespace ServiceStack.Redis
 
 		public Action<Exception> OnErrorCallback { get; set; }
 
+         public virtual void Execute(IRedisClient client)
+         {
+          
+         }
+
 		public void ProcessResult()
 		{
 			try

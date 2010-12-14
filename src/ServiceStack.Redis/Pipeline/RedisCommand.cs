@@ -1,13 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace ServiceStack.Redis
 {
     /// <summary>
-    /// A complete redis command, with method to send command, receive response, and run callback on success or failure
+    /// Redis command that does not get queued
     /// </summary>
-    internal class QueuedRedisCommand : RedisCommand
+    internal class RedisCommand : QueuedRedisOperation
     {
+        public Action<IRedisClient> VoidReturnCommand { get; set; }
+        public Func<IRedisClient, int> IntReturnCommand { get; set; }
+        public Func<IRedisClient, long> LongReturnCommand { get; set; }
+        public Func<IRedisClient, bool> BoolReturnCommand { get; set; }
+        public Func<IRedisClient, byte[]> BytesReturnCommand { get; set; }
+        public Func<IRedisClient, byte[][]> MultiBytesReturnCommand { get; set; }
+        public Func<IRedisClient, string> StringReturnCommand { get; set; }
+        public Func<IRedisClient, List<string>> MultiStringReturnCommand { get; set; }
+        public Func<IRedisClient, double> DoubleReturnCommand { get; set; }
+
         public override void Execute(IRedisClient client)
         {
             try
@@ -57,7 +69,6 @@ namespace ServiceStack.Redis
             {
                 Log.Error(ex);
             }
-          
         }
     }
 }

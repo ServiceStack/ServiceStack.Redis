@@ -48,13 +48,10 @@ namespace ServiceStack.Redis
             int count = QueuedCommands.Count;
             for (int i = 0; i < count; ++i)
             {
-                var cmd = QueuedCommands[0] as QueuedRedisCommand;
+                var op = QueuedCommands[0];
                 QueuedCommands.RemoveAt(0);
-                if (cmd != null)
-                {
-                    BeginQueuedCommand(cmd);
-                    cmd.Execute(RedisClient);
-                }
+                op.Execute(RedisClient);
+                QueuedCommands.Add(op);
             }
         }
 

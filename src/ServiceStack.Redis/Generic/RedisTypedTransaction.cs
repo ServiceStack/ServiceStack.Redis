@@ -30,52 +30,67 @@ namespace ServiceStack.Redis.Generic
 
         protected override void Init()
         {
+            //start pipelining
             base.Init();
-            RedisClient.Transaction = this;
+            //queue multi command
             RedisClient.Multi();
+            //set transaction
+            RedisClient.Transaction = this;
         }
 
-		/// <summary>
-		/// Put "QUEUED" messages at back of queue
-		/// </summary>
-		public void QueueExpectQueued()
-		{
-			var op = new QueuedRedisOperation
-			{
-				VoidReadCommand = RedisClient.ExpectQueued
-			};
-			QueuedCommands.Insert(0, op);
-		}
+        /// <summary>
+        /// Put "QUEUED" messages at back of queue
+        /// </summary>
+        /// <param name="queued"></param>
+        private void QueueExpectQueued()
+        {
+            QueuedCommands.Insert(0, new QueuedRedisOperation()
+            {
+                VoidReadCommand = RedisClient.ExpectQueued
+            });
+        }
+
+
+        /// <summary>
+        /// Issue exec command (not queued)
+        /// </summary>
+        private void Exec()
+        {
+            RedisClient.Exec();
+            RedisClient.FlushSendBuffer();
+
+        }
 
         public void Commit()
         {
             try
             {
-                RedisClient.Exec();
                 _numCommands = QueuedCommands.Count / 2;
 
-                /////////////////////////////////////////////////////
-                // Queue up reading of stock multi/exec responses
+                //insert multi command at beginning
+                QueuedCommands.Insert(0, new QueuedRedisCommand()
+                {
+                    VoidReturnCommand = r => Init(),
+                    VoidReadCommand = RedisClient.ExpectOk,
+                });
 
-                //the first half of the responses will be "QUEUED", so insert read count operation
-                // after these
-                var readCountOp = new QueuedRedisOperation()
+
+                //the first half of the responses will be "QUEUED",
+                // so insert reading of multiline after these responses
+                QueuedCommands.Insert(_numCommands + 1, new QueuedRedisOperation()
                 {
                     IntReadCommand = RedisClient.ReadMultiDataResultCount,
                     OnSuccessIntCallback = handleMultiDataResultCount
-                };
-                QueuedCommands.Insert(_numCommands, readCountOp);
+                });
 
-                //handle OK response from MULTI (insert at beginning)
-                var readOkOp = new QueuedRedisOperation()
+                // add Exec command at end (not queued)
+                QueuedCommands.Add(new RedisCommand()
                 {
-                    VoidReadCommand = RedisClient.ExpectOk,
-                };
-                QueuedCommands.Insert(0, readOkOp);
+                    VoidReturnCommand = r => Exec()
+                });
 
-                //////////////////////////////
-                // flush send buffers
-                RedisClient.FlushSendBuffer();
+                //execute transaction
+                Exec();
 
                 /////////////////////////////
                 //receive expected results
@@ -87,7 +102,7 @@ namespace ServiceStack.Redis.Generic
             finally
             {
                 RedisClient.Transaction = null;
-                base.ClosePipeline();
+                ClosePipeline();
                 RedisClient.AddTypeIdsRegisteredDuringPipeline();
             }
         }
@@ -105,22 +120,43 @@ namespace ServiceStack.Redis.Generic
                     _numCommands, count));
         }
 
+        public void Rollback()
+        {
+            if (RedisClient.Transaction == null)
+                throw new InvalidOperationException("There is no current transaction to Rollback");
 
-		public void Rollback()
-		{
-			if (RedisClient.Transaction == null)
-				throw new InvalidOperationException("There is no current transaction to Rollback");
+            RedisClient.Transaction = null;
+            RedisClient.ClearTypeIdsRegisteredDuringPipeline();
+        }
 
-			RedisClient.Transaction = null;
-			RedisClient.ClearTypeIdsRegisteredDuringPipeline();
-		}
+        public void Replay()
+        {
+            try
+            {
+                Execute();
 
-		public void Dispose()
-		{
-			base.Dispose();
-			if (RedisClient.Transaction == null) return;
-			Rollback();
-		}
+                /////////////////////////////
+                //receive expected results
+                foreach (var queuedCommand in QueuedCommands)
+                {
+                    queuedCommand.ProcessResult();
+                }
+            }
+            finally
+            {
+
+                RedisClient.Transaction = null;
+                ClosePipeline();
+                RedisClient.AddTypeIdsRegisteredDuringPipeline();
+            }
+        }
+
+        public void Dispose()
+        {
+            base.Dispose();
+            if (RedisClient.Transaction == null) return;
+            Rollback();
+        }
 
         #region Overrides of RedisQueueCompletableOperation methods
 

@@ -197,6 +197,45 @@ namespace ServiceStack.Redis.Tests.Generic
 			modelFactory.AssertIsEqual(item1, modelFactory.CreateInstance(1));
 			Assert.That(item4, Is.Null);
 		}
+        [Test]
+        // Operations that are not supported in older versions will look at server info to determine what to do.
+        // If server info is fetched each time, then it will interfer with transaction
+        public void Can_call_operation_not_supported_on_older_servers_in_transaction()
+        {
+            var temp = new byte[1];
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => ((RedisNativeClient)r).SetEx("key", 5, temp));
+                trans.Commit();
+            }
+        }
+
+
+        [Test]
+        public void Transaction_can_be_replayed()
+        {
+            string KeySquared = Key + Key;
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            Assert.That(Redis.GetValue(KeySquared), Is.Null);
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.IncrementValue(Key));
+                trans.QueueCommand(r => r.IncrementValue(KeySquared));
+                trans.Commit();
+
+                Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));
+                Assert.That(Redis.GetValue(KeySquared), Is.EqualTo("1"));
+                Redis.Del(Key);
+                Redis.Del(KeySquared);
+                Assert.That(Redis.GetValue(Key), Is.Null);
+                Assert.That(Redis.GetValue(KeySquared), Is.Null);
+
+                trans.Replay();
+                trans.Dispose();
+                Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));
+                Assert.That(Redis.GetValue(KeySquared), Is.EqualTo("1"));
+            }
+        }
 	
 	}
 }

@@ -165,5 +165,31 @@ namespace ServiceStack.Redis.Tests
             }
         }
 
-	}
+       
+        [Test]
+        public void Transaction_can_be_replayed()
+        {
+            string KeySquared = Key + Key;
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            Assert.That(Redis.GetValue(KeySquared), Is.Null);
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.IncrementValue(Key));
+                trans.QueueCommand(r => r.IncrementValue(KeySquared));
+                trans.Commit();
+
+                Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));
+                Assert.That(Redis.GetValue(KeySquared), Is.EqualTo("1"));
+                Redis.Del(Key);
+                Redis.Del(KeySquared);
+                Assert.That(Redis.GetValue(Key), Is.Null);
+                Assert.That(Redis.GetValue(KeySquared), Is.Null);
+
+                trans.Replay();
+                trans.Dispose();
+                Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));
+                Assert.That(Redis.GetValue(KeySquared), Is.EqualTo("1"));
+            }
+        }
+    }
 }
