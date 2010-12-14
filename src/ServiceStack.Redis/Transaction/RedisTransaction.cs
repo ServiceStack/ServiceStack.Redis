@@ -61,8 +61,9 @@ namespace ServiceStack.Redis
 
         }
 
-	    public void Commit()
+	    public bool Commit()
         {
+	        bool rc = true;
             try
             {
                 _numCommands = QueuedCommands.Count / 2;
@@ -101,7 +102,7 @@ namespace ServiceStack.Redis
             }
             catch (RedisTransactionFailedException e)
             {
-
+                rc = false;
             }
             finally
             {
@@ -109,6 +110,7 @@ namespace ServiceStack.Redis
                 ClosePipeline();
                 RedisClient.AddTypeIdsRegisteredDuringPipeline();
             }
+	        return rc;
         }
 
         /// <summary>
@@ -136,8 +138,9 @@ namespace ServiceStack.Redis
 			RedisClient.ClearTypeIdsRegisteredDuringPipeline();
 		}
 
-        public void Replay()
+        public bool Replay()
         {
+            bool rc = true;
             try
             {
                 Execute();
@@ -151,7 +154,7 @@ namespace ServiceStack.Redis
             }
             catch (RedisTransactionFailedException e)
             {
-                
+                rc = false;  
             }
             finally 
             {
@@ -159,6 +162,7 @@ namespace ServiceStack.Redis
                 ClosePipeline();
                 RedisClient.AddTypeIdsRegisteredDuringPipeline();
             }
+            return rc;
         }
 
 		public void Dispose()

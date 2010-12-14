@@ -58,11 +58,12 @@ namespace ServiceStack.Redis
             }
         }
 
-	    public void Replay()
+	    public bool Replay()
 	    {
 	        RedisClient.Pipeline = this;
 	        Execute();
             Flush();
+	        return true;
 	    }
 
 	    protected void ClosePipeline()

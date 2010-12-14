@@ -20,7 +20,7 @@ namespace ServiceStack.Redis.Generic
     /// <typeparam name="T"></typeparam>
 	public interface IRedisTypedTransaction<T>: IRedisTypedQueueableOperation<T>, IDisposable
 	{
-		void Commit();
+		bool Commit();
 		void Rollback();
 	}
 }

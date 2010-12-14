@@ -21,7 +21,7 @@ namespace ServiceStack.Redis
 	public interface IRedisTransaction
         : IRedisTransactionBase, IRedisQueueableOperation, IDisposable
 	{
-		void Commit();
+		bool Commit();
 		void Rollback();
 	}
 }
