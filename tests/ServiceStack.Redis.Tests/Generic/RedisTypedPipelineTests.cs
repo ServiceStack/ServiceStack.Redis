@@ -209,17 +209,17 @@ namespace ServiceStack.Redis.Tests.Generic
                 pipeline.QueueCommand(r => r.IncrementValue(keySquared));
                 pipeline.Flush();
 
-                Assert.That(typedClient.GetValue(Key), Is.EqualTo("1"));
-                Assert.That(typedClient.GetValue(keySquared), Is.EqualTo("1"));
+                Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));
+                Assert.That(Redis.GetValue(keySquared), Is.EqualTo("1"));
                 typedClient.RemoveEntry(Key);
                 typedClient.RemoveEntry(keySquared);
-                Assert.That(typedClient.GetValue(Key), Is.Null);
-                Assert.That(typedClient.GetValue(keySquared), Is.Null);
+                Assert.That(Redis.GetValue(Key), Is.Null);
+                Assert.That(Redis.GetValue(keySquared), Is.Null);
 
                 pipeline.Replay();
                 pipeline.Dispose();
-                Assert.That(typedClient.GetValue(Key), Is.EqualTo("1"));
-                Assert.That(typedClient.GetValue(keySquared), Is.EqualTo("1"));
+                Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));
+                Assert.That(Redis.GetValue(keySquared), Is.EqualTo("1"));
             }
 
         }
