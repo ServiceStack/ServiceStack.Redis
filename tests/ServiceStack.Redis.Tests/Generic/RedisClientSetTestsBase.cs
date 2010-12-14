@@ -14,7 +14,6 @@ namespace ServiceStack.Redis.Tests.Generic
 		private const string SetId = "testset";
 		private const string SetId2 = "testset2";
 		private const string SetId3 = "testset3";
-
 		protected abstract IModelFactory<T> Factory { get; }
 
 		private RedisClient client;
