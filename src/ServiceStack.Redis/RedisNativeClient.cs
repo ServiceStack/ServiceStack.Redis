@@ -577,11 +577,11 @@ namespace ServiceStack.Redis
             return SendExpectInt(Commands.SAdd, setId.ToUtf8Bytes(), value);
         }
 
-        public void SRem(string setId, byte[] value)
+        public int SRem(string setId, byte[] value)
         {
             AssertSetIdAndValue(setId, value);
 
-            SendExpectSuccess(Commands.SRem, setId.ToUtf8Bytes(), value);
+            return SendExpectInt(Commands.SRem, setId.ToUtf8Bytes(), value);
         }
 
         public byte[] SPop(string setId)
