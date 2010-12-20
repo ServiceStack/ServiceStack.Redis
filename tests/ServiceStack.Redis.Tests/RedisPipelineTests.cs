@@ -190,6 +190,24 @@ namespace ServiceStack.Redis.Tests
             }
 
         }
+        [Test]
+        public void Pipeline_can_be_contain_watch()
+        {
+            string KeySquared = Key + Key;
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            Assert.That(Redis.GetValue(KeySquared), Is.Null);
+            using (var pipeline = Redis.CreatePipeline())
+            {
+                pipeline.QueueCommand(r => r.IncrementValue(Key));
+                pipeline.QueueCommand(r => r.IncrementValue(KeySquared));
+                pipeline.QueueCommand(r => ((RedisNativeClient)r).Watch("FOO"));
+                pipeline.Flush();
+
+                Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));
+                Assert.That(Redis.GetValue(KeySquared), Is.EqualTo("1"));
+            }
+
+        }
 
 	}
 }

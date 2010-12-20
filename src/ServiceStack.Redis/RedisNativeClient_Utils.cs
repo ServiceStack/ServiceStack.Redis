@@ -326,7 +326,7 @@ namespace ServiceStack.Redis
 
             if (Pipeline != null)
 			{
-                Pipeline.CompleteBytesQueuedCommand(ReadData);
+                Pipeline.CompleteStringQueuedCommand(ExpectCode);
 				return null;
 			}
 
