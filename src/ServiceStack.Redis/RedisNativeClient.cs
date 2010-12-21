@@ -495,6 +495,18 @@ namespace ServiceStack.Redis
             return SendExpectMultiData(Commands.Keys, pattern.ToUtf8Bytes());
         }
 
+        public byte[][] MGet(params byte[][] keys)
+        {
+            if (keys == null)
+                throw new ArgumentNullException("keys");
+            if (keys.Length == 0)
+                throw new ArgumentException("keys");
+
+            var cmdWithArgs = MergeCommandWithArgs(Commands.MGet, keys);
+
+            return SendExpectMultiData(cmdWithArgs);
+        }
+
         public byte[][] MGet(params string[] keys)
         {
             if (keys == null)

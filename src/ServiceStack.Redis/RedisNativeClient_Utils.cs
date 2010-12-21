@@ -627,14 +627,22 @@ namespace ServiceStack.Redis
 
 		private static byte[][] MergeCommandWithArgs(byte[] cmd, params string[] args)
 		{
-			var mergedBytes = new byte[1 + args.Length][];
-			mergedBytes[0] = cmd;
-			for (var i = 0; i < args.Length; i++)
-			{
-				mergedBytes[i + 1] = args[i].ToUtf8Bytes();
-			}
-			return mergedBytes;
+		    var byteArgs = new byte[args.Length][];
+            for (var i = 0; i < args.Length; ++i)
+                byteArgs[i] = args[i].ToUtf8Bytes();
+		    return MergeCommandWithArgs(cmd, byteArgs);
+	
 		}
+        private static byte[][] MergeCommandWithArgs(byte[] cmd, params byte[][] args)
+        {
+            var mergedBytes = new byte[1 + args.Length][];
+            mergedBytes[0] = cmd;
+            for (var i = 0; i < args.Length; i++)
+            {
+                mergedBytes[i + 1] = args[i];
+            }
+            return mergedBytes;
+        }
 
 		private static byte[][] MergeCommandWithArgs(byte[] cmd, byte[] firstArg, params byte[][] args)
 		{
