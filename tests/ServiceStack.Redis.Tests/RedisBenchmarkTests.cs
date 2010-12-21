@@ -67,7 +67,7 @@ namespace ServiceStack.Redis.Tests
         public void Compare_sort_nosort_to_smembers_mget()
         {
             string setKey = "setKey";
-            int total = 255;
+            int total = 25;
             int count = 20;
             var temp = new byte[5];
             temp[0] = 0;
@@ -89,8 +89,8 @@ namespace ServiceStack.Redis.Tests
 
             for (int i = 0; i < count; ++i)
             {
-                var keys = stringsFromBytes(Redis.SMembers(setKey));
-                stringsFromBytes(Redis.MGet(keys));
+                var keys = Redis.SMembers(setKey);
+                Redis.MGet(keys);
             }
 
             sw.Stop();
