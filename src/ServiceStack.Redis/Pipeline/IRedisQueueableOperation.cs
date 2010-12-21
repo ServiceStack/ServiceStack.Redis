@@ -32,6 +32,11 @@ namespace ServiceStack.Redis.Pipeline
 		void QueueCommand(Func<IRedisClient, byte[]> command, Action<byte[]> onSuccessCallback);
 		void QueueCommand(Func<IRedisClient, byte[]> command, Action<byte[]> onSuccessCallback, Action<Exception> onErrorCallback);
 
+        void QueueCommand(Func<IRedisClient, byte[][]> command);
+        void QueueCommand(Func<IRedisClient, byte[][]> command, Action<byte[][]> onSuccessCallback);
+        void QueueCommand(Func<IRedisClient, byte[][]> command, Action<byte[][]> onSuccessCallback, Action<Exception> onErrorCallback);
+
+
 		void QueueCommand(Func<IRedisClient, string> command);
 		void QueueCommand(Func<IRedisClient, string> command, Action<string> onSuccessCallback);
 		void QueueCommand(Func<IRedisClient, string> command, Action<string> onSuccessCallback, Action<Exception> onErrorCallback);

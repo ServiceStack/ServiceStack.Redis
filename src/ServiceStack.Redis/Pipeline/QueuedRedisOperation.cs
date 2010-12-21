@@ -132,7 +132,7 @@ namespace ServiceStack.Redis.Pipeline
 				else if (MultiBytesReadCommand != null)
 				{
 					var result = MultiBytesReadCommand();
-					if (OnSuccessBytesCallback != null)
+					if (OnSuccessMultiBytesCallback != null)
 					{
 						OnSuccessMultiBytesCallback(result);
 					}
