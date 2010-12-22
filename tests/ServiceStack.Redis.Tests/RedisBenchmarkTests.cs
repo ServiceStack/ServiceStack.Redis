@@ -69,12 +69,10 @@ namespace ServiceStack.Redis.Tests
             string setKey = "setKey";
             int total = 25;
             int count = 20;
-            var temp = new byte[5];
-            temp[0] = 0;
-            temp[1] = 1;
-            temp[2] = 2;
-            temp[3] = 3;
-            temp[4] = 0;
+            var temp = new byte[1];
+            byte fixedValue = 124;
+            temp[0] = fixedValue;
+
 
             //initialize set and individual keys
             Redis.Del(setKey);
@@ -87,20 +85,38 @@ namespace ServiceStack.Redis.Tests
 
             var sw = Stopwatch.StartNew();
 
+            byte[][] results = null;
             for (int i = 0; i < count; ++i)
             {
                 var keys = Redis.SMembers(setKey);
-                Redis.MGet(keys);
+                results = Redis.MGet(keys);
+  
             }
 
             sw.Stop();
+
+            //make sure that results are valid
+            foreach (var result in results)
+            {
+                Assert.AreEqual(result[0], fixedValue);
+            }
+
+
             Console.WriteLine(String.Format("Time to call {0} SMembers and MGet operations: {1} ms", count, sw.ElapsedMilliseconds));
             var opt = new SortOptions() {SortPattern = "nosort", GetPattern = "*"};
 
             sw = Stopwatch.StartNew();
             for (int i = 0; i < count; ++i)
-               stringsFromBytes(Redis.Sort(setKey, opt));
+               results = Redis.Sort(setKey, opt);
             sw.Stop();
+
+            //make sure that results are valid
+            foreach (var result in results)
+            {
+                Assert.AreEqual(result[0], fixedValue);
+            }
+
+
             Console.WriteLine(String.Format("Time to call {0} sort operations: {1} ms", count, sw.ElapsedMilliseconds));
 
 
