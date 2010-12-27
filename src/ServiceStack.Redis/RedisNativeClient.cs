@@ -48,8 +48,8 @@ namespace ServiceStack.Redis
         protected Socket socket;
         protected BufferedStream Bstream;
 
-        private IRedisTransactionBase _transaction;
-        private IRedisPipelineShared _pipeline;
+        private IRedisTransactionBase transaction;
+        private IRedisPipelineShared pipeline;
 
         private Dictionary<string, string> info;
         /// <summary>
@@ -75,13 +75,13 @@ namespace ServiceStack.Redis
         {
             get
             {
-                return _transaction;
+                return transaction;
             }
             set
             {
                 if (value != null)
                     AssertConnectedSocket();
-                _transaction = value;
+                transaction = value;
             }
         }
 
@@ -90,13 +90,13 @@ namespace ServiceStack.Redis
         {
             get
             {
-                return _pipeline;
+                return pipeline;
             }
             set
             {
                 if (value != null)
                     AssertConnectedSocket();
-                _pipeline = value;
+                pipeline = value;
             }
         }
 

@@ -13,7 +13,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ServiceStack.Common.Extensions;
 using ServiceStack.DesignPatterns.Model;
+using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis
@@ -78,17 +80,42 @@ namespace ServiceStack.Redis
 
 		public void AddRangeToSet(string setId, List<string> items)
 		{
-			var uSetId = setId.ToUtf8Bytes();
+			if (setId.IsNullOrEmpty())
+				throw new ArgumentNullException("setId");
+			if (items == null)
+				throw new ArgumentNullException("items");
+			if (items.Count == 0)
+				return;
 
-			var pipeline = CreatePipelineCommand();
-			foreach (var item in items)
+			if (this.Transaction != null)
 			{
-				pipeline.WriteCommand(Commands.SAdd, uSetId, item.ToUtf8Bytes());
-			}
-			pipeline.Flush();
+				var trans = this.Transaction as IRedisQueueableOperation;
+				if (trans == null)
+					throw new NotSupportedException("Cannot AddRangeToSet() when Transaction is: " + this.Transaction.GetType().Name);
 
-			//the number of items after 
-			var intResults = pipeline.ReadAllAsInts();
+				//Complete the first QueuedCommand()
+				AddItemToSet(setId, items[0]);
+
+				//Add subsequent queued commands
+				for (var i = 1; i < items.Count; i++)
+				{
+					var item = items[i];
+					trans.QueueCommand(c => c.AddItemToSet(setId, item));
+				}
+			}
+			else
+			{
+				var uSetId = setId.ToUtf8Bytes();
+				var pipeline = CreatePipelineCommand();
+				foreach (var item in items)
+				{
+					pipeline.WriteCommand(Commands.SAdd, uSetId, item.ToUtf8Bytes());
+				}
+				pipeline.Flush();
+
+				//the number of items after 
+				var intResults = pipeline.ReadAllAsInts();
+			}
 		}
 
 		public void RemoveItemFromSet(string setId, string item)

@@ -475,6 +475,12 @@ namespace ServiceStack.Redis
 		public void StoreAll<TEntity>(IEnumerable<TEntity> entities)
 			where TEntity : class, new()
 		{
+			_StoreAll(entities);
+		}
+
+		//Without the Generic Constraints
+		internal void _StoreAll<TEntity>(IEnumerable<TEntity> entities)
+		{
 			if (entities == null) return;
 
 			var entitiesList = entities.ToList();

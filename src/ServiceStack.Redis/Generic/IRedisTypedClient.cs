@@ -66,6 +66,7 @@ namespace ServiceStack.Redis.Generic
 		List<T> GetValues(List<string> keys);
 		List<T> GetSortedEntryValues(IRedisSet<T> fromSet, int startingFrom, int endingAt);
 
+		//Set operations
 		HashSet<T> GetAllItemsFromSet(IRedisSet<T> fromSet);
 		void AddItemToSet(IRedisSet<T> toSet, T item);
 		void RemoveItemFromSet(IRedisSet<T> fromSet, T item);
@@ -81,6 +82,7 @@ namespace ServiceStack.Redis.Generic
 		void StoreDifferencesFromSet(IRedisSet<T> intoSet, IRedisSet<T> fromSet, params IRedisSet<T>[] withSets);
 		T GetRandomItemFromSet(IRedisSet<T> fromSet);
 
+		//List operations
 		List<T> GetAllItemsFromList(IRedisList<T> fromList);
 		List<T> GetRangeFromList(IRedisList<T> fromList, int startingFrom, int endingAt);
 		List<T> SortList(IRedisList<T> fromList, int startingFrom, int endingAt);
@@ -108,6 +110,7 @@ namespace ServiceStack.Redis.Generic
 		T BlockingPopItemFromList(IRedisList<T> fromList, TimeSpan? timeOut);
 		T PopAndPushItemBetweenLists(IRedisList<T> fromList, IRedisList<T> toList);
 
+		//Sorted Set operations
 		void AddItemToSortedSet(IRedisSortedSet<T> toSet, T value);
 		void AddItemToSortedSet(IRedisSortedSet<T> toSet, T value, double score);
 		bool RemoveItemFromSortedSet(IRedisSortedSet<T> fromSet, T value);
@@ -146,7 +149,8 @@ namespace ServiceStack.Redis.Generic
 		double GetItemScoreInSortedSet(IRedisSortedSet<T> set, T value);
 		int StoreIntersectFromSortedSets(IRedisSortedSet<T> intoSetId, params IRedisSortedSet<T>[] setIds);
 		int StoreUnionFromSortedSets(IRedisSortedSet<T> intoSetId, params IRedisSortedSet<T>[] setIds);
-
+		
+		//Hash operations
 		bool HashContainsEntry<TKey>(IRedisHash<TKey, T> hash, TKey key);
 		bool SetEntryInHash<TKey>(IRedisHash<TKey, T> hash, TKey key, T value);
 		bool SetEntryInHashIfNotExists<TKey>(IRedisHash<TKey, T> hash, TKey key, T value);
@@ -157,6 +161,13 @@ namespace ServiceStack.Redis.Generic
 		List<TKey> GetHashKeys<TKey>(IRedisHash<TKey, T> hash);
 		List<T> GetHashValues<TKey>(IRedisHash<TKey, T> hash);
 		Dictionary<TKey, T> GetAllEntriesFromHash<TKey>(IRedisHash<TKey, T> hash);
+
+		//Useful common app-logic 
+		void StoreRelatedEntities<TChild>(object parentId, List<TChild> children);
+		List<TChild> GetRelatedEntities<TChild>(object parentId);
+		void AddToRecentsList(T value);
+		List<T> GetLatestFromRecentsList(int skip, int take);
+		List<T> GetEarliestFromRecentsList(int skip, int take);
 	}
 
 }
