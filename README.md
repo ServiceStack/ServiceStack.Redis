@@ -38,11 +38,12 @@ Downloads for Redis Server Windows builds [can be found here](http://code.google
 
 # Getting Started with the C# Redis client
 
-Head over to the [C# Redis Client wiki](https://github.com/mythz/ServiceStack.Redis/wiki) for all the resources you need to get you up to speed with common operations and the latest features.
+##[C# Redis Client wiki](https://github.com/mythz/ServiceStack.Redis/wiki)
+Contains all the examples, tutorials and resources you need to get you up to speed with common operations and the latest features.
 
 [Useful Links on Redis server](https://github.com/mythz/ServiceStack.Redis/wiki/Useful-Redis-Links)
 
-# Specific Examples
+## Specific Examples
   * [Using Transactions in Redis (i.e. MULTI/EXEC/DISCARD)](https://github.com/mythz/ServiceStack.Redis/wiki/RedisTransactions)
   * [Using Redis's built-in Publsih/Subscribe pattern for high performance network notifications](https://github.com/mythz/ServiceStack.Redis/wiki/RedisPubSub)
   * [Using Redis to create high performance *distributed locks* spannable across multiple app servers](https://github.com/mythz/ServiceStack.Redis/wiki/RedisLocks)
