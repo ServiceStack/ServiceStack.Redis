@@ -11,6 +11,7 @@
 //
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -323,25 +324,28 @@ namespace ServiceStack.Redis.Generic
 
 		#region Implementation of IBasicPersistenceProvider<T>
 
-		public T GetById(string id)
+		public T GetById(object id)
 		{
 			var key = IdUtils.CreateUrn<T>(id);
 			return this.GetValue(key);
 		}
 
-		public IList<T> GetByIds(ICollection<string> ids)
+		public IList<T> GetByIds(IEnumerable ids)
 		{
-			if (ids == null || ids.Count == 0)
-				return new List<T>();
+			if (ids != null)
+			{
+				var urnKeys = ids.ConvertAll(x => IdUtils.CreateUrn<T>(x));
+				if (urnKeys.Count != 0)
+					return GetValues(urnKeys);
+			}
 
-			var urnKeys = ids.ConvertAll(x => IdUtils.CreateUrn<T>(x));
-			return GetValues(urnKeys);
+			return new List<T>();
 		}
 
 		public IList<T> GetAll()
 		{
 			var allKeys = client.GetAllItemsFromSet(this.TypeIdsSetKey);
-			return this.GetByIds(allKeys);
+			return this.GetByIds(allKeys.ToArray());
 		}
 
 		public T Store(T entity)
@@ -379,21 +383,21 @@ namespace ServiceStack.Redis.Generic
 			client.RemoveTypeIds(entity);
 		}
 
-		public void DeleteById(string id)
+		public void DeleteById(object id)
 		{
 			var urnKey = IdUtils.CreateUrn<T>(id);
 
 			this.RemoveEntry(urnKey);
-			client.RemoveTypeIds<T>(id);
+			client.RemoveTypeIds<T>(id.ToString());
 		}
 
-		public void DeleteByIds(ICollection<string> ids)
+		public void DeleteByIds(IEnumerable ids)
 		{
 			if (ids == null) return;
 
 			var urnKeys = ids.ConvertAll(x => IdUtils.CreateUrn<T>(x));
 			this.RemoveEntry(urnKeys.ToArray());
-			client.RemoveTypeIds<T>(ids.ToArray());
+			client.RemoveTypeIds<T>(ids.ConvertAll(x => x.ToString()).ToArray());
 		}
 
 		public void DeleteAll()
