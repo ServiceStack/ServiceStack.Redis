@@ -164,6 +164,7 @@ namespace ServiceStack.Redis.Generic
 
 		//Useful common app-logic 
 		void StoreRelatedEntities<TChild>(object parentId, List<TChild> children);
+		void StoreRelatedEntities<TChild>(object parentId, params TChild[] children);
 		List<TChild> GetRelatedEntities<TChild>(object parentId);
 		void AddToRecentsList(T value);
 		List<T> GetLatestFromRecentsList(int skip, int take);

@@ -35,6 +35,11 @@ namespace ServiceStack.Redis.Generic
 			}
 		}
 
+		public void StoreRelatedEntities<TChild>(object parentId, params TChild[] children)
+		{
+			StoreRelatedEntities(parentId, new List<TChild>(children));
+		}
+
 		public List<TChild> GetRelatedEntities<TChild>(object parentId)
 		{
 			var childRefKey = GetChildReferenceSetKey<TChild>(parentId);
