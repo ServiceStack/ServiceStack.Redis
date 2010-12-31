@@ -118,6 +118,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdhocClientTests.cs" />
+    <Compile Include="AlchemyClientTestsBase.cs" />
+    <Compile Include="AlchemyNativeClientTests.cs" />
     <Compile Include="Generic\RedisTypedClientAppTests.cs" />
     <Compile Include="Generic\RedisTypedPipelineTests.cs" />
     <Compile Include="RedisPipelineCommonTests.cs" />
