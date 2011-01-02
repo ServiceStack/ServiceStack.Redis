@@ -56,7 +56,8 @@ namespace ServiceStack.Redis
             /// <param name="column"></param>
             public void CreateIndex(byte[] indexname, byte[] tablename, byte[] column)
             {
-                var cmdWithArgs = new byte[6][] { Alchemy.Commands.Create, Keywords.Index, indexname, Keywords.On, tablename, column };
+                var columnString = "(" + column + ")";
+                var cmdWithArgs = new byte[6][] { Alchemy.Commands.Create, Keywords.Index, indexname, Keywords.On, tablename, columnString.ToUtf8Bytes() };
                 SendExpectSuccess(cmdWithArgs);
             }
             /// <summary>
@@ -135,7 +136,7 @@ namespace ServiceStack.Redis
             public void InsertReturnSize(byte[] tablename, byte[] valuesList)
             {
                 var valuesListString = "(" + valuesList + ")";
-                var cmdWithArgs = new byte[7][] { Alchemy.Commands.Insert, Keywords.Into, tablename, Keywords.Values, valuesListString.ToUtf8Bytes(), Alchemy.Commands.Return, Alchemy.Commands.Size };
+                var cmdWithArgs = new byte[7][] { Alchemy.Commands.Insert, Keywords.Into, tablename, Keywords.Values, valuesListString.ToUtf8Bytes(), Keywords.Return, Keywords.Size };
                 SendCommand(cmdWithArgs);
 
             }

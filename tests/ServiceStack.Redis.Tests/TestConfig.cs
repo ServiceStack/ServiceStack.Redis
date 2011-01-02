@@ -13,8 +13,11 @@ namespace ServiceStack.Redis.Tests
 		public const bool IgnoreLongTests = true;
 
 		public const string SingleHost = "localhost";
-		public static readonly string[] MasterHosts = new[] { "localhost" };
-		public static readonly string[] SlaveHosts = new[] { "localhost" };
+        public static readonly string[] MasterHosts = new[] { "localhost" };
+        public static readonly string[] SlaveHosts = new[] { "localhost" };
+
+	    public const int RedisPort = 6379;
+        public const int AlchemyPort = 6380;
 
 		//public const string SingleHost = "chi-dev-mem1.ddnglobal.local";
 		//public static readonly string [] MasterHosts = new[] { "chi-dev-mem1.ddnglobal.local" };

@@ -12,7 +12,5 @@ namespace ServiceStack.Redis.Alchemy
 		public readonly static byte[] Update = "UPDATE".ToUtf8Bytes();
 		public readonly static byte[] Delete = "DELETE".ToUtf8Bytes();
 		public readonly static byte[] Lua = "LUA".ToUtf8Bytes();
-		public readonly static byte[] Return = "RETURN".ToUtf8Bytes();
-		public readonly static byte[] Size = "SIZE".ToUtf8Bytes();
 	}
 }

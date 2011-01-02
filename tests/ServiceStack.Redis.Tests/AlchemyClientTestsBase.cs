@@ -18,20 +18,20 @@ namespace ServiceStack.Redis.Tests
 		public virtual void OnBeforeEachTest()
 		{
 			if (Alchemy != null) Alchemy.Dispose();
-			Alchemy = new RedisNativeClient.AlchemyNativeClient(TestConfig.SingleHost);
+			Alchemy = new RedisNativeClient.AlchemyNativeClient(TestConfig.SingleHost, TestConfig.AlchemyPort);
 			Alchemy.FlushDb();
 		}
 
-        public RedisNativeClient.AlchemyNativeClient GetRedisClient()
+        public RedisNativeClient.AlchemyNativeClient GetAlchemyClient()
 		{
-            var client = new RedisNativeClient.AlchemyNativeClient(TestConfig.SingleHost);
+            var client = new RedisNativeClient.AlchemyNativeClient(TestConfig.SingleHost, TestConfig.AlchemyPort);
 			client.FlushDb();
 			return client;
 		}
 
-        public RedisNativeClient.AlchemyNativeClient CreateRedisClient()
+        public RedisNativeClient.AlchemyNativeClient CreateAlchemyClient()
 		{
-            var client = new RedisNativeClient.AlchemyNativeClient(TestConfig.SingleHost);
+            var client = new RedisNativeClient.AlchemyNativeClient(TestConfig.SingleHost, TestConfig.AlchemyPort);
 			return client;
 		}
 
