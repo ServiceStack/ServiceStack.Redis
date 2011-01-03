@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace ServiceStack.Redis.Pipeline
 {
@@ -56,6 +56,7 @@ namespace ServiceStack.Redis.Pipeline
 			catch (Exception ex)
 			{
 				Log.Error(ex);
+			    throw;
 			}
           
 		}
