@@ -73,6 +73,29 @@ namespace ServiceStack.Redis.Tests
 
 			Assert.That(Redis.GetValue(Key), Is.EqualTo("3"));
 		}
+        [Test]
+        public void Can_call_multiple_setexs_in_pipeline()
+        {
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            var keys = new[] {"key1", "key2", "key3"};
+            var values = new[] { "1","2","3" };
+            var pipeline = Redis.CreatePipeline();
+          
+            for (int i = 0; i < 3; ++i )
+            {
+                int index0 = i;
+                pipeline.QueueCommand(r => ((RedisNativeClient)r).SetEx(keys[index0], 100, GetBytes(values[index0])));
+            }
+
+            pipeline.Flush();
+            pipeline.Replay();
+        
+            
+            for (int i = 0; i < 3; ++i )
+                Assert.AreEqual(Redis.GetValue(keys[i]), values[i]);
+
+            pipeline.Dispose();
+        }
 
 		[Test]
 		public void Can_call_single_operation_with_callback_3_Times_in_pipeline()

@@ -40,6 +40,30 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(Redis.GetValue(Key), Is.Null);
 		}
 
+        [Test]
+        public void Watch_aborts_transaction()
+        {
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            const string value1 = "value1";
+            const string value2 = "value2";
+            try
+            {
+                Redis.Watch(Key);
+                Redis.Set(Key, value1);
+                using (var trans = Redis.CreateTransaction())
+                {
+                    trans.QueueCommand(r => r.Set(Key,value1));
+                    var success = trans.Commit();
+                    Assert.False(success);
+                    Assert.AreEqual(Redis.GetValue(Key), value1);
+                }
+            }
+            catch (NotSupportedException ignore)
+            {
+                Assert.That(Redis.GetValue(Key), Is.Null);
+            }
+        }
+
 		[Test]
 		public void Exception_in_atomic_transactions_discards_all_commands()
 		{
@@ -152,6 +176,29 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(item1, Is.EqualTo("listitem1"));
 			Assert.That(item4, Is.Null);
 		}
+        [Test]
+        public void Can_call_multiple_setexs_in_transaction()
+        {
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            var keys = new[] { "key1", "key2", "key3" };
+            var values = new[] { "1", "2", "3" };
+            var trans = Redis.CreateTransaction();
+
+            for (int i = 0; i < 3; ++i)
+            {
+                int index0 = i;
+                trans.QueueCommand(r => ((RedisNativeClient)r).SetEx(keys[index0], 100, GetBytes(values[index0])));
+            }
+
+            trans.Commit();
+            trans.Replay();
+
+
+            for (int i = 0; i < 3; ++i)
+                Assert.AreEqual(Redis.GetValue(keys[i]), values[i]);
+
+            trans.Dispose();
+        }
         [Test]
         // Operations that are not supported in older versions will look at server info to determine what to do.
         // If server info is fetched each time, then it will interfer with transaction

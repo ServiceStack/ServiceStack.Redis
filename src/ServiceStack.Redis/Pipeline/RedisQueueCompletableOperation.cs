@@ -35,7 +35,9 @@ namespace ServiceStack.Redis
 
         public virtual void CompleteVoidQueuedCommand(Action voidReadCommand)
         {
-            AssertCurrentOperation();
+            //AssertCurrentOperation();
+            // this can happen when replaying pipeline/transaction
+            if (CurrentQueuedOperation == null) return;
 
             CurrentQueuedOperation.VoidReadCommand = voidReadCommand;
             AddCurrentQueuedOperation();
@@ -43,7 +45,9 @@ namespace ServiceStack.Redis
 
         public virtual  void CompleteIntQueuedCommand(Func<int> intReadCommand)
         {
-            AssertCurrentOperation();
+            //AssertCurrentOperation();
+            // this can happen when replaying pipeline/transaction
+            if (CurrentQueuedOperation == null) return;
 
             CurrentQueuedOperation.IntReadCommand = intReadCommand;
             AddCurrentQueuedOperation();
@@ -51,7 +55,9 @@ namespace ServiceStack.Redis
 
         public virtual void CompleteLongQueuedCommand(Func<long> longReadCommand)
         {
-            AssertCurrentOperation();
+            //AssertCurrentOperation();
+            // this can happen when replaying pipeline/transaction
+            if (CurrentQueuedOperation == null) return;
 
             CurrentQueuedOperation.LongReadCommand = longReadCommand;
             AddCurrentQueuedOperation();
@@ -59,7 +65,9 @@ namespace ServiceStack.Redis
 
         public virtual void CompleteBytesQueuedCommand(Func<byte[]> bytesReadCommand)
         {
-            AssertCurrentOperation();
+            //AssertCurrentOperation();
+            // this can happen when replaying pipeline/transaction
+            if (CurrentQueuedOperation == null) return;
 
             CurrentQueuedOperation.BytesReadCommand = bytesReadCommand;
             AddCurrentQueuedOperation();
@@ -67,7 +75,9 @@ namespace ServiceStack.Redis
 
         public virtual void CompleteMultiBytesQueuedCommand(Func<byte[][]> multiBytesReadCommand)
         {
-            AssertCurrentOperation();
+            //AssertCurrentOperation();
+            // this can happen when replaying pipeline/transaction
+            if (CurrentQueuedOperation == null) return;
 
             CurrentQueuedOperation.MultiBytesReadCommand = multiBytesReadCommand;
             AddCurrentQueuedOperation();
@@ -75,7 +85,9 @@ namespace ServiceStack.Redis
 
         public virtual void CompleteStringQueuedCommand(Func<string> stringReadCommand)
         {
-            AssertCurrentOperation();
+            //AssertCurrentOperation();
+            // this can happen when replaying pipeline/transaction
+            if (CurrentQueuedOperation == null) return;
 
             CurrentQueuedOperation.StringReadCommand = stringReadCommand;
             AddCurrentQueuedOperation();
@@ -83,7 +95,9 @@ namespace ServiceStack.Redis
 
         public virtual void CompleteMultiStringQueuedCommand(Func<List<string>> multiStringReadCommand)
         {
-            AssertCurrentOperation();
+            //AssertCurrentOperation();
+            // this can happen when replaying pipeline/transaction
+            if (CurrentQueuedOperation == null) return;
 
             CurrentQueuedOperation.MultiStringReadCommand = multiStringReadCommand;
             AddCurrentQueuedOperation();
@@ -91,7 +105,9 @@ namespace ServiceStack.Redis
 
         public virtual void CompleteDoubleQueuedCommand(Func<double> doubleReadCommand)
         {
-            AssertCurrentOperation();
+            //AssertCurrentOperation();
+            // this can happen when replaying pipeline/transaction
+            if (CurrentQueuedOperation == null) return;
 
             CurrentQueuedOperation.DoubleReadCommand = doubleReadCommand;
             AddCurrentQueuedOperation();
