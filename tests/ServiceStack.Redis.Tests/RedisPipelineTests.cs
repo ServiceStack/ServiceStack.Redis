@@ -74,6 +74,44 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(Redis.GetValue(Key), Is.EqualTo("3"));
 		}
         [Test]
+        public void Can_call_hash_operations_in_pipeline()
+        {
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            var fields = new[] { "field1", "field2", "field3" };
+            var values = new[] { "1", "2", "3" };
+            var fieldBytes = new byte[fields.Length][];
+            for (int i = 0; i < fields.Length; ++i)
+            {
+                fieldBytes[i] = GetBytes(fields[i]);
+
+            }
+            var valueBytes = new byte[values.Length][];
+            for (int i = 0; i < values.Length; ++i)
+            {
+                valueBytes[i] = GetBytes(values[i]);
+
+            }
+            byte[][] members = null;
+            var pipeline = Redis.CreatePipeline();
+         
+          
+            pipeline.QueueCommand(r => ((RedisNativeClient)r).HMSet(Key, fieldBytes, valueBytes));
+            pipeline.QueueCommand(r => ((RedisNativeClient)r).HGetAll(Key), x => members = x);
+            
+
+            pipeline.Flush();
+
+
+            for (var i = 0; i < members.Length; i += 2)
+            {
+                Assert.AreEqual(members[i], fieldBytes[i / 2]);
+                Assert.AreEqual(members[i + 1], valueBytes[i / 2]);
+
+            }
+            pipeline.Dispose();
+        }
+
+        [Test]
         public void Can_call_multiple_setexs_in_pipeline()
         {
             Assert.That(Redis.GetValue(Key), Is.Null);

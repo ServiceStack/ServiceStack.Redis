@@ -225,6 +225,32 @@ namespace ServiceStack.Redis.Tests
 
 			Assert.That(hashValues.EquivalentTo(expectedValues), Is.True);
 		}
+        [Test]
+        public void Can_hash_set()
+        {
+            var key = "key";
+            var field = GetBytes("foo");
+            var value = GetBytes("value");
+            Assert.AreEqual(Redis.HDel(key, field),0);
+            Assert.AreEqual(Redis.HSet(key, field, value),1);
+            Assert.AreEqual(Redis.HDel(key, field),1);
+        }
+
+        [Test]
+        public void Can_hash_multi_set_and_get()
+        {
+            const string Key = "multitest";
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            var fields = new Dictionary<string,string> { {"field1", "1"},{"field2","2"}, {"field3","3"} };
+           
+            Redis.SetRangeInHash(Key, fields);
+            var members = Redis.GetAllEntriesFromHash(Key);
+            foreach (var member in members)
+            {
+                Assert.IsTrue(fields.ContainsKey(member.Key));
+                Assert.AreEqual(fields[member.Key], member.Value);
+            }
+        }
 
 	}
 
