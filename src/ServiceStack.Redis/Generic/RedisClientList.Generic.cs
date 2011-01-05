@@ -173,6 +173,11 @@ namespace ServiceStack.Redis.Generic
 			return client.RemoveItemFromList(this, value, noOfMatches);
 		}
 
+		public void AddRange(IEnumerable<T> values)
+		{
+			client.AddRangeToList(this, values);
+		}
+
 		public void Append(T value)
 		{
 			Add(value);

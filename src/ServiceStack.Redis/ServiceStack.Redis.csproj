@@ -98,6 +98,7 @@
     <Compile Include="Generic\RedisTypedClient_App.cs" />
     <Compile Include="Generic\RedisTypedPipeline.cs" />
     <Compile Include="Generic\RedisTypedCommandQueue.cs" />
+    <Compile Include="RedisClientsManagerExtensions.cs" />
     <Compile Include="Pipeline\QueuedRedisCommand.cs" />
     <Compile Include="Pipeline\RedisCommand.cs" />
     <Compile Include="Transaction\IRedisTransactionBase.cs" />

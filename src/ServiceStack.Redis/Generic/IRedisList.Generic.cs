@@ -31,6 +31,7 @@ namespace ServiceStack.Redis.Generic
 		int RemoveValue(T value);
 		int RemoveValue(T value, int noOfMatches);
 
+		void AddRange(IEnumerable<T> values);
 		void Append(T value);
 		void Prepend(T value);
 		T RemoveStart();

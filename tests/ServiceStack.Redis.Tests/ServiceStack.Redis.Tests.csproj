@@ -122,6 +122,7 @@
     <Compile Include="AlchemyNativeClientTests.cs" />
     <Compile Include="Generic\RedisTypedClientAppTests.cs" />
     <Compile Include="Generic\RedisTypedPipelineTests.cs" />
+    <Compile Include="RedisClientsManagerExtensionsTests.cs" />
     <Compile Include="RedisPipelineCommonTests.cs" />
     <Compile Include="RedisPipelineTests.cs" />
     <Compile Include="Examples\BestPractice\IBlogRepository.cs" />

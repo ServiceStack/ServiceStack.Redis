@@ -85,6 +85,15 @@ namespace ServiceStack.Redis.Generic
 			client.RPush(fromList.Id, SerializeValue(value));
 		}
 
+		//TODO: replace it with a pipeline implementation ala AddRangeToSet
+		public void AddRangeToList(IRedisList<T> fromList, IEnumerable<T> values)
+		{
+			foreach (var value in values)
+			{
+				AddItemToList(fromList, value);
+			}
+		}
+
 		public void PrependItemToList(IRedisList<T> fromList, T value)
 		{
 			client.LPush(fromList.Id, SerializeValue(value));
