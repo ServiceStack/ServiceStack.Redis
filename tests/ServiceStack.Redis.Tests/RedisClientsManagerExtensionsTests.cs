@@ -98,7 +98,7 @@ namespace ServiceStack.Redis.Tests
 		public void Can_Exec_CustomType_Func()
 		{
 			var expected = ModelWithIdAndName.Create(1);
-			var actual = redisManager.Exec<ModelWithIdAndName>(m =>
+			ModelWithIdAndName actual = redisManager.Exec<ModelWithIdAndName>(m =>
 			{
 				m.Store(expected);
 				return m.GetById(expected.Id);
@@ -114,7 +114,24 @@ namespace ServiceStack.Redis.Tests
            		ModelWithIdAndName.Create(2),
            		ModelWithIdAndName.Create(3),
            	};
-			var actual = redisManager.Exec<ModelWithIdAndName>(m =>
+			IList<ModelWithIdAndName> actual = redisManager.Exec<ModelWithIdAndName>(m =>
+			{
+				var list = m.Lists["typed-list"];
+				list.AddRange(expected);
+				return (IList<ModelWithIdAndName>)list.GetAll();
+			});
+			Assert.That(actual.EquivalentTo(expected));
+		}
+
+		[Test]
+		public void Can_Exec_CustomType_Func_List()
+		{
+			var expected = new[] {
+           		ModelWithIdAndName.Create(1),
+           		ModelWithIdAndName.Create(2),
+           		ModelWithIdAndName.Create(3),
+           	};
+			List<ModelWithIdAndName> actual = redisManager.Exec<ModelWithIdAndName>(m =>
 			{
 				var list = m.Lists["typed-list"];
 				list.AddRange(expected);

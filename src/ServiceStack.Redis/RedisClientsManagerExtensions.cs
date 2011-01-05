@@ -83,6 +83,15 @@ namespace ServiceStack.Redis
 				return lambda(typedRedis);
 			}
 		}
+
+		public static List<T> Exec<T>(this IRedisClientsManager redisManager, Func<IRedisTypedClient<T>, List<T>> lambda)
+		{
+			using (var redis = redisManager.GetClient())
+			using (var typedRedis = redis.GetTypedClient<T>())
+			{
+				return lambda(typedRedis);
+			}
+		}
 	}
 
 }
