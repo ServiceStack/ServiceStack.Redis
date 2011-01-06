@@ -166,6 +166,7 @@ namespace ServiceStack.Redis.Generic
 		void StoreRelatedEntities<TChild>(object parentId, List<TChild> children);
 		void StoreRelatedEntities<TChild>(object parentId, params TChild[] children);
 		List<TChild> GetRelatedEntities<TChild>(object parentId);
+		int GetRelatedEntitiesCount<TChild>(object parentId);
 		void AddToRecentsList(T value);
 		List<T> GetLatestFromRecentsList(int skip, int take);
 		List<T> GetEarliestFromRecentsList(int skip, int take);

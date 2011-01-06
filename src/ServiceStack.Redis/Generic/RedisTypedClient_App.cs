@@ -51,6 +51,12 @@ namespace ServiceStack.Redis.Generic
 			}
 		}
 
+		public int GetRelatedEntitiesCount<TChild>(object parentId)
+		{
+			var childRefKey = GetChildReferenceSetKey<TChild>(parentId);
+			return client.GetSetCount(childRefKey);
+		}
+
 		public void AddToRecentsList(T value)
 		{
 			var key = value.CreateUrn();
