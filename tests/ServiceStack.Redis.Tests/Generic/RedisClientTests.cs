@@ -24,6 +24,18 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 
 		[Test]
+		public void Can_GetTypeIdsSet()
+		{
+			using (var redis = new RedisClient(TestConfig.SingleHost))
+			using (var typedClient = redis.GetTypedClient<OrderDetail>())
+			{
+				typedClient.StoreAll(NorthwindData.OrderDetails);
+
+				Assert.That(typedClient.TypeIdsSet.Count, Is.EqualTo(NorthwindData.OrderDetails.Count));
+			}
+		}
+
+		[Test]
 		public void Can_Set_and_Get_string()
 		{
 			const string value = "value";

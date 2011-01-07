@@ -139,6 +139,14 @@ namespace ServiceStack.Redis.Generic
 			return client.GetAllKeys();
 		}
 
+		public IRedisSet TypeIdsSet
+		{
+			get
+			{
+				return new RedisClientSet(client, client.GetTypeIdsSetKey<T>());
+			}
+		}
+
 		public T this[string key]
 		{
 			get { return GetValue(key); }

@@ -57,6 +57,17 @@ namespace ServiceStack.Redis
 			}
 		}
 
+		public static void ExecTrans(this IRedisClientsManager redisManager, Action<IRedisTransaction> lambda)
+		{
+			using (var redis = redisManager.GetClient())
+			using (var trans = redis.CreateTransaction())
+			{
+				lambda(trans);
+
+				trans.Commit();
+			}
+		}
+
 		public static void Exec<T>(this IRedisClientsManager redisManager, Action<IRedisTypedClient<T>> lambda)
 		{
 			using (var redis = redisManager.GetClient())

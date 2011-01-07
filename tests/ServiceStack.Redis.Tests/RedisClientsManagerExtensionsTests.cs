@@ -83,6 +83,19 @@ namespace ServiceStack.Redis.Tests
 		}
 
 		[Test]
+		public void Can_Exec_Transaction_Action()
+		{
+			var value = false;
+			redisManager.ExecTrans(trans =>
+			{
+				trans.QueueCommand(r => r.AddItemToSet("set", "item"));
+				trans.QueueCommand(r => r.SetContainsItem("set", "item"), x => value = x);
+			});
+
+			Assert.That(value, Is.True);
+		}
+
+		[Test]
 		public void Can_Exec_CustomType_Action()
 		{
 			var expected = ModelWithIdAndName.Create(1);

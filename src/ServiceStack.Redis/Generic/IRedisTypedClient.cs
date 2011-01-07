@@ -33,6 +33,7 @@ namespace ServiceStack.Redis.Generic
 
 		int Db { get; set; }
 		List<string> GetAllKeys();
+		IRedisSet TypeIdsSet { get; }
 
 		T this[string key] { get; set; }
 
