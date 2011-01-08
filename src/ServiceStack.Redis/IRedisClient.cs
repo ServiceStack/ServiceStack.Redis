@@ -78,6 +78,7 @@ namespace ServiceStack.Redis
 
 		//Useful high-level abstractions
 		IRedisTypedClient<T> GetTypedClient<T>();
+		IRedisTypedClient<T> As<T>(); //Alias for GetTypedClient<T>();
 
 		IHasNamed<IRedisList> Lists { get; set; }
 		IHasNamed<IRedisSet> Sets { get; set; }

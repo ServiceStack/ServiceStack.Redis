@@ -68,7 +68,7 @@ namespace ServiceStack.Redis
 			}
 		}
 
-		public static void Exec<T>(this IRedisClientsManager redisManager, Action<IRedisTypedClient<T>> lambda)
+		public static void ExecAs<T>(this IRedisClientsManager redisManager, Action<IRedisTypedClient<T>> lambda)
 		{
 			using (var redis = redisManager.GetClient())
 			using (var typedRedis = redis.GetTypedClient<T>())
@@ -77,7 +77,7 @@ namespace ServiceStack.Redis
 			}
 		}
 
-		public static T Exec<T>(this IRedisClientsManager redisManager, Func<IRedisTypedClient<T>, T> lambda)
+		public static T ExecAs<T>(this IRedisClientsManager redisManager, Func<IRedisTypedClient<T>, T> lambda)
 		{
 			using (var redis = redisManager.GetClient())
 			using (var typedRedis = redis.GetTypedClient<T>())
@@ -86,7 +86,7 @@ namespace ServiceStack.Redis
 			}
 		}
 
-		public static IList<T> Exec<T>(this IRedisClientsManager redisManager, Func<IRedisTypedClient<T>, IList<T>> lambda)
+		public static IList<T> ExecAs<T>(this IRedisClientsManager redisManager, Func<IRedisTypedClient<T>, IList<T>> lambda)
 		{
 			using (var redis = redisManager.GetClient())
 			using (var typedRedis = redis.GetTypedClient<T>())
@@ -95,7 +95,7 @@ namespace ServiceStack.Redis
 			}
 		}
 
-		public static List<T> Exec<T>(this IRedisClientsManager redisManager, Func<IRedisTypedClient<T>, List<T>> lambda)
+		public static List<T> ExecAs<T>(this IRedisClientsManager redisManager, Func<IRedisTypedClient<T>, List<T>> lambda)
 		{
 			using (var redis = redisManager.GetClient())
 			using (var typedRedis = redis.GetTypedClient<T>())

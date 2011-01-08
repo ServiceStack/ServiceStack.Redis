@@ -200,6 +200,11 @@ namespace ServiceStack.Redis
 			return new RedisTypedClient<T>(this);
 		}
 
+		public IRedisTypedClient<T> As<T>()
+		{
+			return new RedisTypedClient<T>(this);
+		}
+
 		public IDisposable AcquireLock(string key)
 		{
 			return new RedisLock(this, key, null);
