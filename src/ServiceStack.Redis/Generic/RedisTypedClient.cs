@@ -315,6 +315,8 @@ namespace ServiceStack.Redis.Generic
 
 		public List<T> GetValues(List<string> keys)
 		{
+			if (keys.IsNullOrEmpty()) return  new List<T>();
+
 			var resultBytesArray = client.MGet(keys.ToArray());
 
 			var results = new List<T>();

@@ -101,6 +101,16 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 
 		[Test]
+		public void Can_GetRelatedEntities_When_Empty()
+		{
+			redisQuestions.Store(question1);
+
+			var answers = redisQuestions.GetRelatedEntities<Answer>(question1.Id);
+
+			Assert.That(answers, Has.Count.EqualTo(0));
+		}
+
+		[Test]
 		public void Can_AddToRecentsList()
 		{
 			var redisAnswers = Redis.GetTypedClient<Answer>();
