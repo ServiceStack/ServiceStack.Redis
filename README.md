@@ -1,4 +1,5 @@
 # An Open Source C# Client for Redis
+For twitter updates follow <a href="http://twitter.com/demisbellot">@demisbellot</a> or <a href="http://twitter.com/boxerab">@boxerab</a>
 
 [Redis](http://code.google.com/p/redis/) is one of the fastest and feature-rich key-value stores to come from the [NoSQL](http://en.wikipedia.org/wiki/NoSQL) movement.
 It is similar to memcached but the dataset is not volatile, and values can either be strings lists, sets, sorted sets or hashes.
