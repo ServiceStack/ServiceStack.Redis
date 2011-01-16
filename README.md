@@ -38,7 +38,11 @@ You can download the Redis Client in any one of the following ways:
 [View the release notes](https://github.com/mythz/ServiceStack.Redis/wiki/Redis-Client-Release-Notes).
 
 ### Redis Server builds for Windows
-Downloads for Redis Server Windows builds [can be found here](http://code.google.com/p/servicestack/wiki/RedisWindowsDownload).
+
+  * [Downloads for Cygwin 32bit Redis Server Windows builds](http://code.google.com/p/servicestack/wiki/RedisWindowsDownload).
+  * [Project that lets you run Redis as a Windows Service](https://github.com/rgl/redis)
+  * [Downloads for MinGW 32bit and 64bit Redis Server Windows builds](http://github.com/dmajkic/redis/downloads)
+
 
 # Getting Started with the C# Redis client
 
