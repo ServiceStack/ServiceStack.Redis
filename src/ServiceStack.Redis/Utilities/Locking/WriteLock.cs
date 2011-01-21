@@ -5,7 +5,7 @@ namespace ServiceStack.Redis.Utilities.Locking
 {
     public class WriteLock : IDisposable
     {
-        private readonly ReaderWriterLockSlim _lockObject;
+        private readonly ReaderWriterLockSlim lockObject;
 
         /// <summary>
         /// This class manages a write lock for a local readers/writer lock, 
@@ -14,7 +14,7 @@ namespace ServiceStack.Redis.Utilities.Locking
         /// <param name="lockObject"></param>
         public WriteLock(ReaderWriterLockSlim lockObject)
         {
-            this._lockObject = lockObject;
+            this.lockObject = lockObject;
             lockObject.EnterWriteLock();
         }
 
@@ -23,7 +23,7 @@ namespace ServiceStack.Redis.Utilities.Locking
         /// </summary>
         public void Dispose()
         {
-            _lockObject.ExitWriteLock();
+            lockObject.ExitWriteLock();
         }
     }
 }

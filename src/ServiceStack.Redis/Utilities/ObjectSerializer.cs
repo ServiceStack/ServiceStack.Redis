@@ -11,7 +11,7 @@ namespace ServiceStack.Redis.Utilities
     /// </summary>
     public class ObjectSerializer
     {
-        private readonly BinaryFormatter _bf = new BinaryFormatter();
+        private readonly BinaryFormatter bf = new BinaryFormatter();
  
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace ServiceStack.Redis.Utilities
                 return null;
             var memoryStream = new MemoryStream();
             memoryStream.Seek(0, 0);
-            _bf.Serialize(memoryStream, value);
+            bf.Serialize(memoryStream, value);
             return memoryStream.ToArray();
         }
 
@@ -58,7 +58,7 @@ namespace ServiceStack.Redis.Utilities
             var memoryStream = new MemoryStream();
             memoryStream.Write(someBytes, 0, someBytes.Length);
             memoryStream.Seek(0, 0);
-            var de = _bf.Deserialize(memoryStream);
+            var de = bf.Deserialize(memoryStream);
             return de;
         }
         /// <summary>

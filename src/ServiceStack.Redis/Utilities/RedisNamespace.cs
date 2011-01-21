@@ -26,19 +26,19 @@ namespace ServiceStack.Redis.Utilities
         private const string Sanitizer = UniqueCharacter + UniqueCharacter;
 
         // namespace generation - when generation changes, namespace is slated for garbage collection
-        private long _namespaceGeneration = -1;
+        private long namespaceGeneration = -1;
 
         // key for namespace generation
-        private readonly string _namespaceGenerationKey;
+        private readonly string namespaceGenerationKey;
 
         //sanitized name for namespace (includes namespace generation)
-        private readonly string _namespacePrefix;
+        private readonly string namespacePrefix;
 
         //reserved, unique name for meta entries for this namespace
-        private readonly string _namespaceReservedName;
+        private readonly string namespaceReservedName;
 
         // key for set of all global keys in this namespace
-        private readonly string _globalKeysKey;
+        private readonly string globalKeysKey;
 
         // key for list of keys slated for garbage collection
         public const string NamespacesGarbageKey = ReservedTag + "REDIS_NAMESPACES_GARBAGE";
@@ -48,14 +48,14 @@ namespace ServiceStack.Redis.Utilities
 
         public RedisNamespace(string name)
         {
-            _namespacePrefix = Sanitize(name);
+            namespacePrefix = Sanitize(name);
 
-            _namespaceReservedName = NamespaceTag + _namespacePrefix;
+            namespaceReservedName = NamespaceTag + namespacePrefix;
 
-            _globalKeysKey = _namespaceReservedName;
+            globalKeysKey = namespaceReservedName;
 
             //get generation
-            _namespaceGenerationKey = _namespaceReservedName + "_" + "generation";
+            namespaceGenerationKey = namespaceReservedName + "_" + "generation";
 
             LockingStrategy = new ReaderWriterLockingStrategy();
         }
@@ -74,7 +74,7 @@ namespace ServiceStack.Redis.Utilities
         {
             using (LockingStrategy.ReadLock())
             {
-                return _namespaceGeneration;
+                return namespaceGeneration;
             }
         }
         /// <summary>
@@ -87,8 +87,8 @@ namespace ServiceStack.Redis.Utilities
 
             using (LockingStrategy.WriteLock())
             {
-                if (_namespaceGeneration == -1 || generation > _namespaceGeneration)
-                     _namespaceGeneration = generation;
+                if (namespaceGeneration == -1 || generation > namespaceGeneration)
+                     namespaceGeneration = generation;
             }
         }
         /// <summary>
@@ -97,7 +97,7 @@ namespace ServiceStack.Redis.Utilities
         /// <returns></returns>
         public string GetGenerationKey()
         {
-            return _namespaceGenerationKey;
+            return namespaceGenerationKey;
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace ServiceStack.Redis.Utilities
         /// <returns></returns>
         public string GetGlobalKeysKey()
         {
-            return _globalKeysKey;
+            return globalKeysKey;
         }
         /// <summary>
         /// get global cache key
@@ -126,8 +126,8 @@ namespace ServiceStack.Redis.Utilities
         public string GlobalKey(object key, int numUniquePrefixes)
         {
             var rc = Sanitize(key);
-            if (_namespacePrefix != null && !_namespacePrefix.Equals(""))
-                rc = _namespacePrefix + "_" + GetGeneration() + NamespaceKeySeparator + rc;
+            if (namespacePrefix != null && !namespacePrefix.Equals(""))
+                rc = namespacePrefix + "_" + GetGeneration() + NamespaceKeySeparator + rc;
             for (int i = 0; i < numUniquePrefixes; ++i)
                 rc += KeyTag;
             return rc;

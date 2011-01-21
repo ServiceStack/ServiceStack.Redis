@@ -9,7 +9,7 @@ namespace ServiceStack.Redis.Utilities.Locking
     /// </summary>
     public class ReadLock : IDisposable
     {
-        private readonly ReaderWriterLockSlim _lockObject;
+        private readonly ReaderWriterLockSlim lockObject;
 
         /// <summary>
         /// RAII initialization 
@@ -17,7 +17,7 @@ namespace ServiceStack.Redis.Utilities.Locking
         /// <param name="lockObject"></param>
         public ReadLock(ReaderWriterLockSlim lockObject)
         {
-            this._lockObject = lockObject;
+            this.lockObject = lockObject;
             lockObject.EnterReadLock();
         }
 
@@ -26,7 +26,7 @@ namespace ServiceStack.Redis.Utilities.Locking
         /// </summary>
         public void Dispose()
         {
-            _lockObject.ExitReadLock();
+            lockObject.ExitReadLock();
         }
     }
 }

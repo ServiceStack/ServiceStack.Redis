@@ -4,7 +4,7 @@ namespace ServiceStack.Redis.Utilities
 {
     public class DistributedLock
     {
-        private readonly ObjectSerializer _serializer = new ObjectSerializer();
+        private readonly ObjectSerializer serializer = new ObjectSerializer();
 
         /// <summary>
         /// 
@@ -32,7 +32,7 @@ namespace ServiceStack.Redis.Utilities
 
             var ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
             double lockExpire = CalculateLockExire(ts, lockTimeout);
-            int wasSet = client.SetNX(key, _serializer.Serialize(lockExpire));
+            int wasSet = client.SetNX(key, serializer.Serialize(lockExpire));
             int totalTime = 0;
             while (wasSet == 0 && totalTime < acquisitionTimeout)
             {
@@ -43,7 +43,7 @@ namespace ServiceStack.Redis.Utilities
                     totalTime += sleepIfLockSet;
                     ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
                     lockExpire = CalculateLockExire(ts, lockTimeout);
-                    wasSet = client.SetNX(key, _serializer.Serialize(lockExpire));
+                    wasSet = client.SetNX(key, serializer.Serialize(lockExpire));
                     count++;
                 }
                 // acquired lock!
@@ -54,7 +54,7 @@ namespace ServiceStack.Redis.Utilities
                 {
                     object lockValRaw = null;
                     pipe.QueueCommand(r => ((RedisNativeClient)r).Watch(key));
-                    pipe.QueueCommand(r => ((RedisNativeClient)r).Get(key), x => lockValRaw = _serializer.Deserialize((x)));
+                    pipe.QueueCommand(r => ((RedisNativeClient)r).Get(key), x => lockValRaw = serializer.Deserialize((x)));
                     pipe.Flush();
 
                     double lockVal = 0;
@@ -69,7 +69,7 @@ namespace ServiceStack.Redis.Utilities
                         using (var trans = client.CreateTransaction())
                         {
                             var expire = lockExpire;
-                            trans.QueueCommand(r => ((RedisNativeClient)r).Set(key, _serializer.Serialize(expire)));
+                            trans.QueueCommand(r => ((RedisNativeClient)r).Set(key, serializer.Serialize(expire)));
                             if (trans.Commit())
                                 wasSet = 1; //acquire lock!
                         }
@@ -99,7 +99,7 @@ namespace ServiceStack.Redis.Utilities
             {
                 object lockValRaw = null;
                 pipe.QueueCommand(r => ((RedisNativeClient)r).Watch(key));
-                pipe.QueueCommand(r => ((RedisNativeClient)r).Get(key), x => lockValRaw = _serializer.Deserialize((x)));
+                pipe.QueueCommand(r => ((RedisNativeClient)r).Get(key), x => lockValRaw = serializer.Deserialize((x)));
                 pipe.Flush();
 
                 var needUnwatch = true;
