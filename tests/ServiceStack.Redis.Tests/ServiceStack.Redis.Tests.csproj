@@ -120,6 +120,7 @@
     <Compile Include="AdhocClientTests.cs" />
     <Compile Include="AlchemyClientTestsBase.cs" />
     <Compile Include="AlchemyNativeClientTests.cs" />
+    <Compile Include="ObjectSerializerTests.cs" />
     <Compile Include="Generic\RedisTypedClientAppTests.cs" />
     <Compile Include="Generic\RedisTypedPipelineTests.cs" />
     <Compile Include="RedisClientsManagerExtensionsTests.cs" />

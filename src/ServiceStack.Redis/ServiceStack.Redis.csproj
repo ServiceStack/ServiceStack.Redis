@@ -175,6 +175,14 @@
     <Compile Include="Support\OrderedDictionary.cs" />
     <Compile Include="Transaction\RedisTransactionFailedException.cs" />
     <Compile Include="UtilExtensions.cs" />
+    <Compile Include="Utilities\DistributedLock.cs" />
+    <Compile Include="Utilities\Locking\ILockingStrategy.cs" />
+    <Compile Include="Utilities\Locking\NoLockingStrategy.cs" />
+    <Compile Include="Utilities\Locking\ReaderWriterLockingStrategy.cs" />
+    <Compile Include="Utilities\Locking\ReadLock.cs" />
+    <Compile Include="Utilities\Locking\WriteLock.cs" />
+    <Compile Include="Utilities\ObjectSerializer.cs" />
+    <Compile Include="Utilities\RedisNamespace.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

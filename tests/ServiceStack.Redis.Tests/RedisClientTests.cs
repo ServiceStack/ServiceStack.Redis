@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Common.Extensions;
+using ServiceStack.Redis.Utilities;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
@@ -353,6 +354,36 @@ namespace ServiceStack.Redis.Tests
 
 			Assert.That(world.Length, Is.EqualTo(expectedString.Length));
 		}
+
+        [Test]
+        public void Can_create_distributed_lock()
+        {
+            var key = "lockkey";
+            var distributedLock = new DistributedLock();
+            int lockTimeout = 2;
+            double lockVal;
+
+            Assert.AreNotEqual(lockVal = distributedLock.Lock(Redis,key,lockTimeout,lockTimeout),0);
+
+            //can't re-lock
+            Assert.AreEqual(distributedLock.Lock(Redis, key, lockTimeout, lockTimeout), 0);
+
+            // re-acquire lock after timeout
+            Thread.Sleep(lockTimeout * 1000 + 1000);
+            Assert.AreNotEqual(lockVal = distributedLock.Lock(Redis, key, lockTimeout, lockTimeout), 0);
+
+
+            Assert.IsTrue(distributedLock.Unlock(Redis,key, lockVal));
+
+            //can now lock
+            Assert.AreNotEqual(lockVal = distributedLock.Lock(Redis, key, lockTimeout, lockTimeout), 0);
+
+
+            //cleanup
+            Assert.IsTrue(distributedLock.Unlock(Redis, key, lockVal));
+
+ 
+        }
 	}
 
 }
