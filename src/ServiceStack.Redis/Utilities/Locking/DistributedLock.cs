@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ServiceStack.Redis.Utilities
+namespace ServiceStack.Redis.Utilities.Locking
 {
     public class DistributedLock
     {
@@ -94,7 +94,9 @@ namespace ServiceStack.Redis.Utilities
         /// <param name="setLockValue">value that lock key was set to when it was locked</param>
         public bool Unlock(RedisClient client, string key, double setLockValue)
         {
-            bool rc = false;
+            if (setLockValue <= 0)
+                return false;
+            var rc = false;
             using (var pipe = client.CreatePipeline())
             {
                 object lockValRaw = null;
