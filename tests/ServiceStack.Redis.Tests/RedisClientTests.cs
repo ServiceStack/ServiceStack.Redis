@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Common.Extensions;
-using ServiceStack.Redis.Utilities;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests

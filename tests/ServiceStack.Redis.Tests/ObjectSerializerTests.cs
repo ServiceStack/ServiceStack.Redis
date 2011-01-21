@@ -1,6 +1,7 @@
 using System.Text;
 using NUnit.Framework;
-using ServiceStack.Redis.Utilities;
+using ServiceStack.Redis.Support;
+
 namespace ServiceStack.Redis.Tests
 {
 	[TestFixture]
