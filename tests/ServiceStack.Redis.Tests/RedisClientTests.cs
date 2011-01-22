@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Common.Extensions;
+using ServiceStack.Redis.Support.Locking;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
