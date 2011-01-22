@@ -26,14 +26,6 @@ namespace ServiceStack.Redis.Utilities.Locking
             lockValue = myLock.Lock(client, globalLockKey, acquisitionTimeout, lockTimeout);
         }
         /// <summary>
-        /// retrieve lock value
-        /// </summary>
-        public double LockValue
-        {
-            get{ return lockValue;}
-        }
-
-        /// <summary>
         /// unlock
         /// </summary>
         public void Dispose()

@@ -306,10 +306,11 @@ namespace ServiceStack.Redis
 
 		private double SendExpectDouble(params byte[][] cmdWithBinaryArgs)
 		{
-			return ParseDouble(SendExpectData(cmdWithBinaryArgs));
+		    var bytes = SendExpectData(cmdWithBinaryArgs);
+		    return bytes == null ? Double.MinValue : ParseDouble(bytes);
 		}
 
-		private static double ParseDouble(byte[] doubleBytes)
+	    public static double ParseDouble(byte[] doubleBytes)
 		{
 			var doubleString = Encoding.UTF8.GetString(doubleBytes);
 
