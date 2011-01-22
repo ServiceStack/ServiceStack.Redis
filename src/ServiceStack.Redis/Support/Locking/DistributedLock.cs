@@ -4,17 +4,15 @@ namespace ServiceStack.Redis.Support.Locking
 {
 	public class DistributedLock
 	{
-		private readonly ObjectSerializer serializer = new ObjectSerializer();
-
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="ts"></param>
 		/// <param name="timeout"></param>
 		/// <returns></returns>
-		private static double CalculateLockExpire(TimeSpan ts, int timeout)
+		private static long CalculateLockExpire(TimeSpan ts, int timeout)
 		{
-			return ts.TotalSeconds + timeout + 1;
+			return (long)(ts.TotalSeconds + timeout + 1 + 0.5);
 		}
 
 		/// <summary>
@@ -24,14 +22,14 @@ namespace ServiceStack.Redis.Support.Locking
 		/// <param name="key">global key for this lock</param>
 		/// <param name="acquisitionTimeout">timeout for acquiring lock</param>
 		/// <param name="lockTimeout">timeout for lock, in seconds (stored as value against lock key) </param>
-		public double Lock(RedisClient client, string key, int acquisitionTimeout, int lockTimeout)
+		public long Lock(RedisClient client, string key, int acquisitionTimeout, int lockTimeout)
 		{
 			const int sleepIfLockSet = 200;
 			acquisitionTimeout *= 1000; //convert to ms
-			int tryCount = acquisitionTimeout / sleepIfLockSet + 1;
+			int tryCount = (acquisitionTimeout / sleepIfLockSet) + 1;
 
 			var ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
-			double lockExpire = CalculateLockExpire(ts, lockTimeout);
+			long lockExpire = CalculateLockExpire(ts, lockTimeout);
 
 			/* TODO: using the ObjectSerializer/BinaryFormatter seems pretty inefficient, we should look for an alternative.
 			 * It would be good if any distributed locking can be as efficient as possible.
@@ -39,7 +37,7 @@ namespace ServiceStack.Redis.Support.Locking
 			 * http://code.google.com/p/protobuf-net/source/browse/trunk/protobuf-net/ProtoWriter.cs
 			 * i.e. BitConverter.ToInt64(BitConverter.GetBytes(value), 0);
 			 */
-			int wasSet = client.SetNX(key, serializer.Serialize(lockExpire));
+			int wasSet = client.SetNX(key, BitConverter.GetBytes(lockExpire));
 			int totalTime = 0;
 			while (wasSet == 0 && totalTime < acquisitionTimeout)
 			{
@@ -50,7 +48,7 @@ namespace ServiceStack.Redis.Support.Locking
 					totalTime += sleepIfLockSet;					
 					ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
 					lockExpire = CalculateLockExpire(ts, lockTimeout);
-					wasSet = client.SetNX(key, serializer.Serialize(lockExpire));
+                    wasSet = client.SetNX(key, BitConverter.GetBytes(lockExpire));
 					count++;
 				}
 				// acquired lock!
@@ -59,24 +57,21 @@ namespace ServiceStack.Redis.Support.Locking
 				// handle possibliity of crashed client still holding the lock
 				using (var pipe = client.CreatePipeline())
 				{
-					object lockValRaw = null;
+				    long lockVal=0;
 					pipe.QueueCommand(r => ((RedisNativeClient)r).Watch(key));
-					pipe.QueueCommand(r => ((RedisNativeClient)r).Get(key), x => lockValRaw = serializer.Deserialize((x)));
+					pipe.QueueCommand(r => ((RedisNativeClient)r).Get(key), x => lockVal = (x != null) ? BitConverter.ToInt64(x,0) : 0);
 					pipe.Flush();
 
-					double lockVal = 0;
-					if (lockValRaw != null)
-						lockVal = (double)lockValRaw;
 
 					// if lock value is null, or expired, then we can try to acquire it
-					if (lockValRaw == null || lockVal < ts.TotalSeconds)
+					if (lockVal < ts.TotalSeconds)
 					{
 						ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
 						lockExpire = CalculateLockExpire(ts, lockTimeout);
 						using (var trans = client.CreateTransaction())
 						{
 							var expire = lockExpire;
-							trans.QueueCommand(r => ((RedisNativeClient)r).Set(key, serializer.Serialize(expire)));
+							trans.QueueCommand(r => ((RedisNativeClient)r).Set(key, BitConverter.GetBytes(expire)));
 							if (trans.Commit())
 								wasSet = 1; //acquire lock!
 						}
@@ -99,35 +94,31 @@ namespace ServiceStack.Redis.Support.Locking
 		/// <param name="client"></param>
 		/// <param name="key">global lock key</param>
 		/// <param name="setLockValue">value that lock key was set to when it was locked</param>
-		public bool Unlock(RedisClient client, string key, double setLockValue)
+		public bool Unlock(RedisClient client, string key, long setLockValue)
 		{
 			if (setLockValue <= 0)
 				return false;
 			var rc = false;
 			using (var pipe = client.CreatePipeline())
 			{
-				object lockValRaw = null;
+			    long lockVal = 0;
 				pipe.QueueCommand(r => ((RedisNativeClient)r).Watch(key));
-				pipe.QueueCommand(r => ((RedisNativeClient)r).Get(key), x => lockValRaw = serializer.Deserialize((x)));
+				pipe.QueueCommand(r => ((RedisNativeClient)r).Get(key), x => lockVal = (x != null) ? BitConverter.ToInt64(x,0) : 0);
 				pipe.Flush();
 
-				var needUnwatch = true;
-				if (lockValRaw != null)
-				{
-					var lockVal = (double)lockValRaw;
-					if (lockVal == setLockValue)
-					{
-						needUnwatch = false;
-						using (var trans = client.CreateTransaction())
-						{
-							trans.QueueCommand(r => ((RedisNativeClient)r).Del(key));
-							if (trans.Commit())
-								rc = true;
-						}
-					}
-				}
-				if (needUnwatch)
-					client.UnWatch();
+                if (lockVal == setLockValue)
+                {
+                    using (var trans = client.CreateTransaction())
+                    {
+                        trans.QueueCommand(r => ((RedisNativeClient)r).Del(key));
+                        if (trans.Commit())
+                            rc = true;
+                    }
+                }
+                else
+                {
+                  client.UnWatch();
+                }
 			}
 			return rc;
 		}

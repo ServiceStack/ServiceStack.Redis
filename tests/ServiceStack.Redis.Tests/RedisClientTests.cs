@@ -361,7 +361,7 @@ namespace ServiceStack.Redis.Tests
             var key = "lockkey";
             var distributedLock = new DistributedLock();
             int lockTimeout = 2;
-            double lockVal;
+            long lockVal;
 
             Assert.AreNotEqual(lockVal = distributedLock.Lock(Redis,key,lockTimeout,lockTimeout),0);
 
