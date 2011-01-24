@@ -31,12 +31,6 @@ namespace ServiceStack.Redis.Support.Locking
 			var ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
 			long lockExpire = CalculateLockExpire(ts, lockTimeout);
 
-			/* TODO: using the ObjectSerializer/BinaryFormatter seems pretty inefficient, we should look for an alternative.
-			 * It would be good if any distributed locking can be as efficient as possible.
-			 * If we only need it for doubles so we don't lose any precision we may want to copy what protobuf-net is doing?
-			 * http://code.google.com/p/protobuf-net/source/browse/trunk/protobuf-net/ProtoWriter.cs
-			 * i.e. BitConverter.ToInt64(BitConverter.GetBytes(value), 0);
-			 */
 			int wasSet = client.SetNX(key, BitConverter.GetBytes(lockExpire));
 			int totalTime = 0;
 			while (wasSet == 0 && totalTime < acquisitionTimeout)
