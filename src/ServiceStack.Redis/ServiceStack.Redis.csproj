@@ -102,7 +102,7 @@
     <Compile Include="Pipeline\QueuedRedisCommand.cs" />
     <Compile Include="Pipeline\RedisCommand.cs" />
     <Compile Include="Support\Locking\DisposableDistributedLock.cs" />
-    <Compile Include="DisposablePooledClient.cs" />
+    <Compile Include="PooledRedisClientManager.DisposablePooledClient.cs" />
     <Compile Include="Transaction\IRedisTransactionBase.cs" />
     <Compile Include="Pipeline\IRedisPipelineShared.cs" />
     <Compile Include="Pipeline\IRedisQueueableOperation.cs" />
