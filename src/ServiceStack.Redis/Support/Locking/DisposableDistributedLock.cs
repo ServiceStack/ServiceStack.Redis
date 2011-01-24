@@ -1,13 +1,14 @@
 ﻿using System;
+using ServiceStack.Redis.Support.Locking;
 
-namespace ServiceStack.Redis.Utilities.Locking
+namespace ServiceStack.Redis.Support.Locking
 {
     /// <summary>
     /// distributed lock class that follows the Resource Allocation Is Initialization pattern
     /// </summary>
     public class DisposableDistributedLock : IDisposable
     {
-        private readonly double lockValue;
+        private readonly long lockValue;
         private readonly RedisClient client;
         private readonly string key;
         private DistributedLock myLock = new DistributedLock();

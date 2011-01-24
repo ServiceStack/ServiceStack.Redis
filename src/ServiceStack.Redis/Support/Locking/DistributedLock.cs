@@ -62,8 +62,7 @@ namespace ServiceStack.Redis.Support.Locking
 					pipe.QueueCommand(r => ((RedisNativeClient)r).Get(key), x => lockVal = (x != null) ? BitConverter.ToInt64(x,0) : 0);
 					pipe.Flush();
 
-
-					// if lock value is null, or expired, then we can try to acquire it
+					// if lock value is 0 (key is empty), or expired, then we can try to acquire it
 					if (lockVal < ts.TotalSeconds)
 					{
 						ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
