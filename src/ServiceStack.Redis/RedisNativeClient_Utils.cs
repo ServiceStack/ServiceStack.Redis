@@ -60,7 +60,7 @@ namespace ServiceStack.Redis
 			catch (SocketException ex)
 			{
 				HadExceptions = true;
-				var throwEx = new InvalidOperationException("could not connect to redis Instance at " + Host + ":" + Port, ex);
+				var throwEx = new RedisException("could not connect to redis Instance at " + Host + ":" + Port, ex);
 				log.Error(throwEx.Message, ex);
 				throw throwEx;
 			}
@@ -144,10 +144,10 @@ namespace ServiceStack.Redis
 			throw throwEx;
 		}
 
-		private Exception CreateConnectionError()
+		private RedisException CreateConnectionError()
 		{
 			HadExceptions = true;
-			var throwEx = new Exception(
+            var throwEx = new RedisException(
 				string.Format("Unable to Connect: sPort: {0}",
 					clientPort), lastSocketException);
 			log.Error(throwEx.Message);

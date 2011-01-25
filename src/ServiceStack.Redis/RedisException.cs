@@ -2,6 +2,9 @@ using System;
 
 namespace ServiceStack.Redis
 {
+    /// <summary>
+    /// Redis-specific exception. Thrown if unable to connect to Redis server due to socket exception, for example.
+    /// </summary>
 	public class RedisException
 		: Exception
 	{
@@ -9,10 +12,9 @@ namespace ServiceStack.Redis
 			: base(message)
 		{
 		}
-
-		public RedisException(string message, string code)
-			: base(message)
-		{
-		}
+        public RedisException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
 	}
 }
