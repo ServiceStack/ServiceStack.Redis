@@ -59,6 +59,10 @@ namespace ServiceStack.Redis
 			}
 			catch (SocketException ex)
 			{
+                if (socket != null)
+                    socket.Close();
+                socket = null;
+
 				HadExceptions = true;
 				var throwEx = new RedisException("could not connect to redis Instance at " + Host + ":" + Port, ex);
 				log.Error(throwEx.Message, ex);
