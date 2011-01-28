@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace ServiceStack.Redis.Support
@@ -14,22 +12,6 @@ namespace ServiceStack.Redis.Support
 		private readonly BinaryFormatter bf = new BinaryFormatter();
  
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="values">array of serializable objects</param>
-		/// <returns></returns>
-		public List<byte[]> Serialize(object[] values)
-		{
-			var rc = new List<byte[]>();
-			foreach (var value in values)
-			{
-				var bytes = Serialize(value);
-				if (bytes != null)
-					rc.Add(bytes);
-			}
-			return rc;
-		}
 
 		/// <summary>
 		///  Serialize object to buffer
@@ -60,22 +42,6 @@ namespace ServiceStack.Redis.Support
 			memoryStream.Seek(0, 0);
 			var de = bf.Deserialize(memoryStream);
 			return de;
-		}
-		/// <summary>
-		/// deserialize an array of byte arrays
-		/// </summary>
-		/// <param name="byteArray"></param>
-		/// <returns></returns>
-		public IList Deserialize(byte[][] byteArray)
-		{
-			IList rc = new ArrayList();
-			foreach (var someBytes in byteArray)
-			{
-				var obj = Deserialize(someBytes);
-				if (obj != null)
-					rc.Add(obj);
-			}
-			return rc;
 		}
 	}
 }

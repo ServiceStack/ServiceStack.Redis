@@ -1,4 +1,6 @@
-﻿using ServiceStack.Redis.Support.Locking;
+﻿using System.Collections;
+using System.Collections.Generic;
+using ServiceStack.Redis.Support.Locking;
 
 namespace ServiceStack.Redis.Support.Queue.Implementation
 {
@@ -52,6 +54,23 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="values">array of serializable objects</param>
+        /// <returns></returns>
+        public List<byte[]> Serialize(object[] values)
+        {
+            var rc = new List<byte[]>();
+            foreach (var value in values)
+            {
+                var bytes = Serialize(value);
+                if (bytes != null)
+                    rc.Add(bytes);
+            }
+            return rc;
+        }
+
+        /// <summary>
         ///  Deserialize buffer to object
         /// </summary>
         /// <param name="someBytes">byte array to deserialize</param>
@@ -59,6 +78,22 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         public  object Deserialize(byte[] someBytes)
         {
             return serializer.Deserialize(someBytes);
+        }
+
+        /// deserialize an array of byte arrays
+        /// </summary>
+        /// <param name="byteArray"></param>
+        /// <returns></returns>
+        public IList Deserialize(byte[][] byteArray)
+        {
+            IList rc = new ArrayList();
+            foreach (var someBytes in byteArray)
+            {
+                var obj = Deserialize(someBytes);
+                if (obj != null)
+                    rc.Add(obj);
+            }
+            return rc;
         }
 
     }
