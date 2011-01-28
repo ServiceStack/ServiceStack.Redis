@@ -3,7 +3,7 @@
 namespace ServiceStack.Redis.Support
 {
 	/// <summary>
-	/// managed a "region" in the redis key space
+	/// manages a "region" in the redis key space
 	/// namespace can be cleared by incrementing the generation
 	/// </summary>
 	public class RedisNamespace

@@ -183,6 +183,7 @@
     <Compile Include="TestData\PopulateTestData.cs" />
     <Compile Include="UserSessionRedisClientTests.cs" />
     <Compile Include="ValueTypeExamples.cs" />
+    <Compile Include="QueueTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Examples\BlogPostExample.cd" />

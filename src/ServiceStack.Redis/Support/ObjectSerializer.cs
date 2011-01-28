@@ -9,7 +9,7 @@ namespace ServiceStack.Redis.Support
 	/// serialize/deserialize arbitrary objects
 	/// (objects must be serializable)
 	/// </summary>
-	public class ObjectSerializer
+	public class ObjectSerializer : ISerializer
 	{
 		private readonly BinaryFormatter bf = new BinaryFormatter();
  
