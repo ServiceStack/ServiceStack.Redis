@@ -103,7 +103,7 @@
     <Compile Include="Pipeline\RedisCommand.cs" />
     <Compile Include="Support\ISerializer.cs" />
     <Compile Include="Support\Locking\DisposableDistributedLock.cs" />
-    <Compile Include="PooledRedisClientManager.DisposablePooledClient.cs" />
+    <Compile Include="PooledRedisClientManager.Disposable.cs" />
     <Compile Include="Support\Queue\IChronologicalWorkQueue.cs" />
     <Compile Include="Support\Queue\ISequentialWorkQueue.cs" />
     <Compile Include="Support\Queue\ISimpleWorkQueue.cs" />

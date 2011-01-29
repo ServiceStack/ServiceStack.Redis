@@ -36,7 +36,7 @@ namespace ServiceStack.Redis
             public void Dispose()
             {
                 if (client != null)
-                    clientManager.DisposeClient((RedisNativeClient)client);
+                    clientManager.DisposeClient(client);
             }
         }
 
