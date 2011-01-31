@@ -9,8 +9,14 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
     public class RedisChronologicalWorkQueue<T> : RedisWorkQueue<T>, IChronologicalWorkQueue<T> where T : class
     {
 
-        public RedisChronologicalWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port) 
-            : base(maxReadPoolSize, maxWritePoolSize, host, port)
+        public RedisChronologicalWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port) : 
+                                               this(maxReadPoolSize, maxWritePoolSize, host, port, null)
+        {
+           
+        }
+
+        public RedisChronologicalWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port, string queueName) 
+            : base(maxReadPoolSize, maxWritePoolSize, host, port, queueName)
         {
         }
 

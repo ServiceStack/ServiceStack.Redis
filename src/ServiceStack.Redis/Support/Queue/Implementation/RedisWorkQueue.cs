@@ -8,13 +8,21 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
     /// </summary>
     public class RedisWorkQueue<T> 
     {
-        protected RedisNamespace queueNamespace = new RedisNamespace(typeof(T) + "_Shared_Work_Queue");
+        protected readonly RedisNamespace queueNamespace;
         protected string pendingWorkItemIdQueue = "PendingWorkItemIdQueue";
         protected string workQueue = "WorkQueue";
         protected readonly PooledRedisClientManager clientManager;
 
-        public RedisWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port )
+        public RedisWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port) : 
+                                               this(maxReadPoolSize, maxWritePoolSize, host, port, null)
         {
+           
+        }
+
+        public RedisWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port, string queueName )
+        {
+            var qname = queueName ?? typeof (T) + "_Shared_Work_Queue";
+            queueNamespace = new RedisNamespace(qname);
             var poolConfig = new RedisClientManagerConfig
                                  {
                                      MaxReadPoolSize = maxReadPoolSize,
@@ -25,14 +33,6 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                                 {
                                     RedisClientFactory = new SerializingRedisClientFactory()
                                 };
-        }
-        /// <summary>
-        /// customize key namespace for this queue
-        /// </summary>
-        /// <param name="name"></param>
-        public void SetQueueNamespace(string name)
-        {
-            queueNamespace = new RedisNamespace(name);
         }
 
         public void Dispose()

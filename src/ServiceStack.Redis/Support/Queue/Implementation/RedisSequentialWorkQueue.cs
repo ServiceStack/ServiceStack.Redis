@@ -18,8 +18,14 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         private double  CONVENIENTLY_SIZED_FLOAT = 18014398509481984.0;
 
 
-        public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port ) 
+
+        public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port)
             : base(maxReadPoolSize, maxWritePoolSize, host, port)
+        {
+        }
+
+        public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port, string queueName ) 
+            : base(maxReadPoolSize, maxWritePoolSize, host, port, queueName)
         {
         }
 
