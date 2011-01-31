@@ -9,7 +9,7 @@ namespace ServiceStack.Redis.Support
 	/// </summary>
 	public class ObjectSerializer : ISerializer
 	{
-		private readonly BinaryFormatter bf = new BinaryFormatter();
+		protected readonly BinaryFormatter bf = new BinaryFormatter();
  
 
 
@@ -18,7 +18,7 @@ namespace ServiceStack.Redis.Support
 		/// </summary>
 		/// <param name="value">serializable object</param>
 		/// <returns></returns>
-		public byte[] Serialize(object value)
+		public virtual byte[] Serialize(object value)
 		{
 			if (value == null)
 				return null;
@@ -33,7 +33,7 @@ namespace ServiceStack.Redis.Support
 		/// </summary>
 		/// <param name="someBytes">byte array to deserialize</param>
 		/// <returns></returns>
-		public object Deserialize(byte[] someBytes)
+		public virtual object Deserialize(byte[] someBytes)
 		{
 			if (someBytes == null)
 				return null;
