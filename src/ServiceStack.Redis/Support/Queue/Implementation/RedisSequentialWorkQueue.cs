@@ -74,15 +74,23 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 if (smallest != null && smallest.Length > 1 && RedisNativeClient.ParseDouble(smallest[1]) != CONVENIENTLY_SIZED_FLOAT)
                 {
                     client.ZAdd(pendingWorkItemIdQueue, CONVENIENTLY_SIZED_FLOAT, smallest[0]);
-                    var workItemCount = 0;
                     workItemId = client.Deserialize(smallest[0]) as string;
-                    var key = queueNamespace.GlobalCacheKey(workItemId);
-                    while (client.LLen(key) > 0 && workItemCount < maxBatchSize)
+                    using (var pipe = client.CreatePipeline())
                     {
-                        var workItem = (T)client.Deserialize(client.LPop(key));
-                        if (workItem == null) continue;
-                        dequeueItems.Add(workItem);
-                        workItemCount++;
+                        var key = queueNamespace.GlobalCacheKey(workItemId);
+                        for (var i = 0; i < maxBatchSize; ++i)
+                        {
+                            pipe.QueueCommand(
+                                r => ((RedisNativeClient)r).LPop(key),
+                                x =>
+                                {
+                                    if (x != null)
+                                        dequeueItems.Add((T)client.Deserialize(x));
+                                });
+
+                        }
+                        pipe.Flush();
+
                     }
                 }
                 return new KeyValuePair<string, IList<T>>(workItemId, dequeueItems);
