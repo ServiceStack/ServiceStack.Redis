@@ -8,6 +8,8 @@ namespace ServiceStack.Redis.Support.Queue
 	{
 		void Enqueue(T workItem);
 
+        void UnDequeue(IList<T> workItems);
+
 		IList<T> Dequeue(int maxBatchSize);
 	}
 }

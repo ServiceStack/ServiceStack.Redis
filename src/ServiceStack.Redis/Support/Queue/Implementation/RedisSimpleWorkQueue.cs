@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 
 namespace ServiceStack.Redis.Support.Queue.Implementation
@@ -34,7 +35,33 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 client.RPush(key, client.Serialize(msg));
             }
         }
-        
+
+        /// <summary>
+        /// Return dequeued items to front of list
+        /// </summary>
+        /// <param name="workItems"></param>
+        public void UnDequeue(IList<T> workItems)
+        {
+            if (workItems == null || workItems.Count == 0)
+                return;
+            using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
+            {
+                var client = disposableClient.Client;
+                var key = queueNamespace.GlobalCacheKey(pendingWorkItemIdQueue);
+                using (var pipe = client.CreatePipeline())
+                {
+                    for (int i = workItems.Count - 1; i >= 0; i-- )
+                    {
+                        int index = i;
+                        pipe.QueueCommand(r => ((RedisNativeClient)r).LPush(key, client.Serialize(workItems[index])));
+                    }
+                    pipe.Flush();
+
+                }
+            }
+        }
+
+
         /// <summary>
         /// Dequeue next batch of work items for processing. After this method is called,
         /// no other work items with same id will be available for
@@ -48,14 +75,22 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             {
                 var client = disposableClient.Client;
                 var dequeueItems = new List<T>();
-                var key = queueNamespace.GlobalCacheKey(pendingWorkItemIdQueue);
-                int workItemCount = 0;
-                while (client.LLen(key) > 0 && workItemCount < maxBatchSize)
+                using (var pipe = client.CreatePipeline())
                 {
-                    var workItem = (T) client.Deserialize(client.LPop(key));
-                    if (workItem == null) continue;
-                    dequeueItems.Add(workItem);
-                    workItemCount++;
+                    var key = queueNamespace.GlobalCacheKey(pendingWorkItemIdQueue);
+                    for (var i = 0; i < maxBatchSize; ++i)
+                    {
+                        pipe.QueueCommand(
+                            r => ((RedisNativeClient) r).LPop(key),
+                            x =>
+                                {
+                                    if (x != null)
+                                        dequeueItems.Add((T) client.Deserialize(x));
+                                });
+                        
+                    }
+                    pipe.Flush();
+
                 }
                 return dequeueItems;
             }

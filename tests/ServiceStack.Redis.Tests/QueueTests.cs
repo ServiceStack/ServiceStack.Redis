@@ -119,6 +119,11 @@ namespace ServiceStack.Redis.Tests
                 batch = queue.Dequeue(numMessages * 2);
                 Assert.AreEqual(batch.Count, 0);
 
+                // test that UnDequeue works
+                queue.UnDequeue(batch);
+                var undequeuedBatch = queue.Dequeue(numMessages*2);
+                Assert.AreEqual(undequeuedBatch, batch);
+
             }
         }
 
