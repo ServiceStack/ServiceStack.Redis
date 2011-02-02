@@ -35,6 +35,34 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                                 };
         }
 
+
+        /// <summary>
+        /// Return dequeued items to front of queue 
+        /// </summary>
+        /// <param name="workItems"></param>
+        /// <param name="listId"></param>
+        protected void UnDequeueImpl(IList<T> workItems, string listId)
+        {
+            if (workItems == null || workItems.Count == 0)
+                return;
+            using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
+            {
+                var client = disposableClient.Client;
+                var key = queueNamespace.GlobalCacheKey(listId);
+                using (var pipe = client.CreatePipeline())
+                {
+                    for (int i = workItems.Count - 1; i >= 0; i--)
+                    {
+                        int index = i;
+                        pipe.QueueCommand(r => ((RedisNativeClient)r).LPush(key, client.Serialize(workItems[index])));
+                    }
+                    pipe.Flush();
+
+                }
+            }
+        }
+
+
         public void Dispose()
         {
             clientManager.Dispose();

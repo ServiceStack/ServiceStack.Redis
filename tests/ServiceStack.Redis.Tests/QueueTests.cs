@@ -48,11 +48,19 @@ namespace ServiceStack.Redis.Tests
                 Assert.AreEqual(batch.Value.Count, numMessages/2);
                 queue.PostDequeue(batch.Key);
 
+                // test that PushFront works
+                queue.PushFront(batch.Key, batch.Value);
+                var undequeuedBatch = queue.Dequeue(numMessages * 2);
+                Assert.AreEqual(undequeuedBatch.Value, batch.Value);
+                Assert.AreEqual(undequeuedBatch.Key, batch.Key);
+                queue.PostDequeue(batch.Key);
+
+
                 // check that there are no more messages in the queue
                 batch = queue.Dequeue(numMessages);
                 Assert.IsNull(batch.Key);
                 Assert.AreEqual(batch.Value.Count, 0);
-             
+ 
             }
         }
 
@@ -120,7 +128,7 @@ namespace ServiceStack.Redis.Tests
                 Assert.AreEqual(batch.Count, 0);
 
                 // test that UnDequeue works
-                queue.UnDequeue(batch);
+                queue.PushFront(batch);
                 var undequeuedBatch = queue.Dequeue(numMessages*2);
                 Assert.AreEqual(undequeuedBatch, batch);
 
