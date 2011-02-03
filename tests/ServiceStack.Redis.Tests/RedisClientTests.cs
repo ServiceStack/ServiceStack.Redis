@@ -361,8 +361,7 @@ namespace ServiceStack.Redis.Tests
             var key = "lockkey";
             var distributedLock = new DistributedLock();
             int lockTimeout = 2;
-            long lockVal;
-
+   
             Assert.AreEqual(distributedLock.Lock(Redis,key,lockTimeout,lockTimeout), DistributedLock.LOCK_ACQUIRED);
 
             //can't re-lock

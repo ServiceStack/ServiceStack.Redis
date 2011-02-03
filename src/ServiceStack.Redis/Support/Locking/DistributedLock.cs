@@ -26,7 +26,7 @@ namespace ServiceStack.Redis.Support.Locking
 		/// <param name="key">global key for this lock</param>
 		/// <param name="acquisitionTimeout">timeout for acquiring lock</param>
 		/// <param name="lockTimeout">timeout for lock, in seconds (stored as value against lock key) </param>
-        public long Lock(IRedisClient client, string key, int acquisitionTimeout, int lockTimeout)
+        public virtual long Lock(IRedisClient client, string key, int acquisitionTimeout, int lockTimeout)
 		{
             lockKey = key;
 
@@ -85,7 +85,7 @@ namespace ServiceStack.Redis.Support.Locking
 				System.Threading.Thread.Sleep(sleepIfLockSet);
 				totalTime += sleepIfLockSet;
 			}
-	        if (wasSet != LOCK_ACQUIRED)
+	        if (wasSet != LOCK_NOT_ACQUIRED)
                 lockExpire = newLockExpire;
 		    return wasSet;
 

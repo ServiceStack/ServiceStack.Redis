@@ -17,7 +17,27 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             this.pendingWorkItemIdQueue = pendingWorkItemIdQueue;
         }
 
-    	public override bool Unlock(IRedisClient client)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="key"></param>
+        /// <param name="acquisitionTimeout"></param>
+        /// <param name="lockTimeout"></param>
+        /// <returns></returns>
+        public override long Lock(IRedisClient client, string key, int acquisitionTimeout, int lockTimeout)
+        {
+            var rc = base.Lock(client, key, acquisitionTimeout, lockTimeout);
+            if (rc == LOCK_RECOVERED)
+            {
+                //handle recovery??
+            }
+            return rc;
+
+
+        }
+
+        public override bool Unlock(IRedisClient client)
     	{
             if (lockExpire <= 0)
                 return false;

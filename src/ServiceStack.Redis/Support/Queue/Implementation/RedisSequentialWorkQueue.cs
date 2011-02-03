@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ServiceStack.Redis.Support.Locking;
+using ServiceStack.Redis.Support.Locking.Factory;
 
 
 namespace ServiceStack.Redis.Support.Queue.Implementation
@@ -16,6 +17,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         private int lockAcquisitionTimeout = 2;
         private int lockTimeout = 2;
         protected const double  CONVENIENTLY_SIZED_FLOAT = 18014398509481984.0;
+
 
         public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port)
             : base(maxReadPoolSize, maxWritePoolSize, host, port)

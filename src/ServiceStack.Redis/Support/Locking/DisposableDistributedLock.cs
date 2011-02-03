@@ -1,4 +1,5 @@
 ﻿using System;
+using ServiceStack.Redis.Support.Locking.Factory;
 
 namespace ServiceStack.Redis.Support.Locking
 {
@@ -14,25 +15,27 @@ namespace ServiceStack.Redis.Support.Locking
         /// Lock
         /// </summary>
         /// <param name="client"></param>
+        /// <param name="lockFactory"></param>
         /// <param name="globalLockKey"></param>
         /// <param name="acquisitionTimeout">in seconds</param>
         /// <param name="lockTimeout">in seconds</param>
-        public DisposableDistributedLock(RedisClient client, string globalLockKey, int acquisitionTimeout, int lockTimeout)
+        public DisposableDistributedLock(RedisClient client, IDistributedLockFactory lockFactory, string globalLockKey, int acquisitionTimeout, int lockTimeout)
         {
             this.client = client;
-            myLock = new DistributedLock();
+            myLock = lockFactory.CreateLock();
             myLock.Lock(client, globalLockKey, acquisitionTimeout, lockTimeout);
         }
 
         /// <summary>
-        /// 
+        /// Lock
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="myLock"></param>
-        public DisposableDistributedLock(RedisClient client, IDistributedLock myLock)
+        /// <param name="globalLockKey"></param>
+        /// <param name="acquisitionTimeout">in seconds</param>
+        /// <param name="lockTimeout">in seconds</param>
+        public DisposableDistributedLock(RedisClient client, string globalLockKey, int acquisitionTimeout, int lockTimeout) :
+            this(client, new DistributedLockFactory(), globalLockKey, acquisitionTimeout, lockTimeout)
         {
-            this.client = client;
-            this.myLock = myLock;
         }
 
         /// <summary>
