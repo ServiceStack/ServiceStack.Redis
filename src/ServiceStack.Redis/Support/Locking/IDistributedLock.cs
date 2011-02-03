@@ -5,7 +5,8 @@
     /// </summary>
 	public interface IDistributedLock
 	{
-	    bool Lock(IRedisClient client, string key, int acquisitionTimeout, int lockTimeout);
+
+	    long Lock(IRedisClient client, string key, int acquisitionTimeout, int lockTimeout);
 
 	    bool Unlock(IRedisClient client);
 	}

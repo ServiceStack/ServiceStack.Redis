@@ -8,7 +8,7 @@ namespace ServiceStack.Redis.Support.Locking
     public class DisposableDistributedLock : IDisposable
     {
         private readonly RedisClient client;
-        private readonly DistributedLock myLock;
+        private readonly IDistributedLock myLock;
 
         /// <summary>
         /// Lock
@@ -23,6 +23,18 @@ namespace ServiceStack.Redis.Support.Locking
             myLock = new DistributedLock();
             myLock.Lock(client, globalLockKey, acquisitionTimeout, lockTimeout);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="myLock"></param>
+        public DisposableDistributedLock(RedisClient client, IDistributedLock myLock)
+        {
+            this.client = client;
+            this.myLock = myLock;
+        }
+
         /// <summary>
         /// unlock
         /// </summary>

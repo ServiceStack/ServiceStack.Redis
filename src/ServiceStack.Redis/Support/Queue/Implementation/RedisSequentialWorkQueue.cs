@@ -17,9 +17,6 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         private int lockTimeout = 2;
         protected const double  CONVENIENTLY_SIZED_FLOAT = 18014398509481984.0;
 
-        private const int numTagsForDequeueLocked = RedisNamespace.NumTagsForLockKey + 1;
-        
-
         public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port)
             : base(maxReadPoolSize, maxWritePoolSize, host, port)
         {
@@ -66,8 +63,6 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             {
                 var client = disposableClient.Client;
 
-                //0. get list of all locked work ids, and unlock
-
                 //1. get next workItemId 
                 string workItemId = null;
                 var dequeueItems = new List<T>();
@@ -99,7 +94,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
         /// <summary>
         /// Return dequeued items to front of queue. Assumes that <see cref="PostDequeue"/> 
-        /// has not been called yet, so this method does not lock 
+        /// has not been called yet, as this method does not lock 
         /// </summary>
         /// <param name="workItems"></param>
         /// <param name="workItemId"></param>

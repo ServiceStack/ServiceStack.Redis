@@ -363,20 +363,20 @@ namespace ServiceStack.Redis.Tests
             int lockTimeout = 2;
             long lockVal;
 
-            Assert.True(distributedLock.Lock(Redis,key,lockTimeout,lockTimeout));
+            Assert.AreEqual(distributedLock.Lock(Redis,key,lockTimeout,lockTimeout), DistributedLock.LOCK_ACQUIRED);
 
             //can't re-lock
-            Assert.False(distributedLock.Lock(Redis, key, lockTimeout, lockTimeout));
+            Assert.AreEqual(distributedLock.Lock(Redis, key, lockTimeout, lockTimeout), DistributedLock.LOCK_NOT_ACQUIRED);
 
             // re-acquire lock after timeout
             Thread.Sleep(lockTimeout * 1000 + 1000);
-            Assert.True(distributedLock.Lock(Redis, key, lockTimeout, lockTimeout));
+            Assert.AreEqual(distributedLock.Lock(Redis, key, lockTimeout, lockTimeout), DistributedLock.LOCK_RECOVERED);
 
 
             Assert.IsTrue(distributedLock.Unlock(Redis));
 
             //can now lock
-            Assert.True(distributedLock.Lock(Redis, key, lockTimeout, lockTimeout));
+            Assert.AreEqual(distributedLock.Lock(Redis, key, lockTimeout, lockTimeout), DistributedLock.LOCK_ACQUIRED);
 
 
             //cleanup
