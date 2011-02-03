@@ -9,8 +9,8 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
     public class RedisWorkQueue<T> 
     {
         protected readonly RedisNamespace queueNamespace;
-        protected string pendingWorkItemIdQueue = "PendingWorkItemIdQueue";
-        protected string workQueue = "WorkQueue";
+        protected const string pendingWorkItemIdQueue = "PendingWorkItemIdQueue";
+        protected const string workQueue = "WorkQueue";
         protected readonly PooledRedisClientManager clientManager;
 
         public RedisWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port) : 

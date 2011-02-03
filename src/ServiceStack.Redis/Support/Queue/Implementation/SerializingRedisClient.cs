@@ -20,7 +20,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         /// <param name="key">global key for this lock</param>
         /// <param name="acquisitionTimeout">timeout for acquiring lock</param>
         /// <param name="lockTimeout">timeout for lock, in seconds (stored as value against lock key) </param>
-        public long Lock(string key, int acquisitionTimeout, int lockTimeout)
+        public bool Lock(string key, int acquisitionTimeout, int lockTimeout)
         {
             return myLock.Lock(this, key, acquisitionTimeout, lockTimeout);
 
@@ -28,11 +28,10 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         /// <summary>
         /// unlock key
         /// </summary>
-        /// <param name="key">global lock key</param>
         /// <param name="setLockValue">value that lock key was set to when it was locked</param>
-        public bool Unlock(string key, long setLockValue)
+        public bool Unlock()
         {
-            return myLock.Unlock(this, key, setLockValue);
+            return myLock.Unlock(this);
         }
 
         /// <summary>

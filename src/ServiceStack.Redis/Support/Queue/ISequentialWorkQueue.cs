@@ -22,11 +22,11 @@ namespace ServiceStack.Redis.Support.Queue
 		KeyValuePair<string, IList<T>> Dequeue(int maxBatchSize);
 
         /// <summary>
-        /// Push items to front of queue corresponding to workItemId identifier
+        /// Requeue items to front of queue corresponding to workItemId identifier
         /// </summary>
         /// <param name="workItemId"></param>
         /// <param name="workItems"></param>
-	    void PushFront(string workItemId, IList<T> workItems);
+	    void Requeue(string workItemId, IList<T> workItems);
 
         /// <summary>
         ///  Must be called after dequeued items have been processed, in order for other callers

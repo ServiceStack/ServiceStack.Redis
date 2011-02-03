@@ -16,6 +16,7 @@ using ServiceStack.CacheAccess;
 using ServiceStack.DataAccess;
 using ServiceStack.DesignPatterns.Model;
 using ServiceStack.Redis.Generic;
+using ServiceStack.Redis.Pipeline;
 
 namespace ServiceStack.Redis
 {
@@ -86,6 +87,7 @@ namespace ServiceStack.Redis
 		IHasNamed<IRedisHash> Hashes { get; set; }
 
 		IRedisTransaction CreateTransaction();
+	    IRedisPipeline CreatePipeline();
 
 		IDisposable AcquireLock(string key);
 		IDisposable AcquireLock(string key, TimeSpan timeOut);

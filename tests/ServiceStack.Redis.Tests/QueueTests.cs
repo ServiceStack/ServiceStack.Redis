@@ -50,7 +50,7 @@ namespace ServiceStack.Redis.Tests
                 queue.PostDequeue(batch.Key);
 
                 // test that PushFront works
-                queue.PushFront(batch.Key, batch.Value);
+                queue.Requeue(batch.Key, batch.Value);
                 var undequeuedBatch = queue.Dequeue(numMessages * 2);
                 Assert.AreEqual(undequeuedBatch.Value, batch.Value);
                 Assert.AreEqual(undequeuedBatch.Key, batch.Key);

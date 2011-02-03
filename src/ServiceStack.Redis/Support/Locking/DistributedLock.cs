@@ -2,8 +2,12 @@
 
 namespace ServiceStack.Redis.Support.Locking
 {
-	public class DistributedLock
+    public class DistributedLock : IDistributedLock
 	{
+
+        private string lockKey;
+        private long lockExpire;
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -22,16 +26,19 @@ namespace ServiceStack.Redis.Support.Locking
 		/// <param name="key">global key for this lock</param>
 		/// <param name="acquisitionTimeout">timeout for acquiring lock</param>
 		/// <param name="lockTimeout">timeout for lock, in seconds (stored as value against lock key) </param>
-		public long Lock(RedisClient client, string key, int acquisitionTimeout, int lockTimeout)
+		public bool Lock(IRedisClient client, string key, int acquisitionTimeout, int lockTimeout)
 		{
+            lockKey = key;
+
 			const int sleepIfLockSet = 200;
 			acquisitionTimeout *= 1000; //convert to ms
 			int tryCount = (acquisitionTimeout / sleepIfLockSet) + 1;
 
 			var ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
-			long lockExpire = CalculateLockExpire(ts, lockTimeout);
+			var newLockExpire = CalculateLockExpire(ts, lockTimeout);
 
-			int wasSet = client.SetNX(key, BitConverter.GetBytes(lockExpire));
+		    var nativeClient = client as RedisNativeClient;
+            int wasSet = nativeClient.SetNX(key, BitConverter.GetBytes(newLockExpire));
 			int totalTime = 0;
 			while (wasSet == 0 && totalTime < acquisitionTimeout)
 			{
@@ -41,8 +48,8 @@ namespace ServiceStack.Redis.Support.Locking
 					System.Threading.Thread.Sleep(sleepIfLockSet);
 					totalTime += sleepIfLockSet;					
 					ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
-					lockExpire = CalculateLockExpire(ts, lockTimeout);
-                    wasSet = client.SetNX(key, BitConverter.GetBytes(lockExpire));
+					newLockExpire = CalculateLockExpire(ts, lockTimeout);
+                    wasSet = nativeClient.SetNX(key, BitConverter.GetBytes(newLockExpire));
 					count++;
 				}
 				// acquired lock!
@@ -51,19 +58,19 @@ namespace ServiceStack.Redis.Support.Locking
 				// handle possibliity of crashed client still holding the lock
 				using (var pipe = client.CreatePipeline())
 				{
-				    long lockVal=0;
+				    long lockValue=0;
 					pipe.QueueCommand(r => ((RedisNativeClient)r).Watch(key));
-					pipe.QueueCommand(r => ((RedisNativeClient)r).Get(key), x => lockVal = (x != null) ? BitConverter.ToInt64(x,0) : 0);
+					pipe.QueueCommand(r => ((RedisNativeClient)r).Get(key), x => lockValue = (x != null) ? BitConverter.ToInt64(x,0) : 0);
 					pipe.Flush();
 
 					// if lock value is 0 (key is empty), or expired, then we can try to acquire it
-					if (lockVal < ts.TotalSeconds)
+					if (lockValue < ts.TotalSeconds)
 					{
 						ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
-						lockExpire = CalculateLockExpire(ts, lockTimeout);
+						newLockExpire = CalculateLockExpire(ts, lockTimeout);
 						using (var trans = client.CreateTransaction())
 						{
-							var expire = lockExpire;
+							var expire = newLockExpire;
 							trans.QueueCommand(r => ((RedisNativeClient)r).Set(key, BitConverter.GetBytes(expire)));
 							if (trans.Commit())
 								wasSet = 1; //acquire lock!
@@ -71,46 +78,47 @@ namespace ServiceStack.Redis.Support.Locking
 					}
 					else
 					{
-						client.UnWatch();
+                        nativeClient.UnWatch();
 					}
 				}
 				if (wasSet == 1) break;
 				System.Threading.Thread.Sleep(sleepIfLockSet);
 				totalTime += sleepIfLockSet;
 			}
-			return (wasSet == 1) ? lockExpire : 0;
+		    var rc = (wasSet == 1);
+            if (rc)
+                lockExpire = newLockExpire;
+		    return (wasSet == 1);
 
 		}
 		/// <summary>
 		/// unlock key
 		/// </summary>
 		/// <param name="client"></param>
-		/// <param name="key">global lock key</param>
-		/// <param name="setLockValue">value that lock key was set to when it was locked</param>
-		public bool Unlock(RedisClient client, string key, long setLockValue)
+		public bool Unlock(IRedisClient client)
 		{
-			if (setLockValue <= 0)
+			if (lockExpire <= 0)
 				return false;
 			var rc = false;
 			using (var pipe = client.CreatePipeline())
 			{
 			    long lockVal = 0;
-				pipe.QueueCommand(r => ((RedisNativeClient)r).Watch(key));
-				pipe.QueueCommand(r => ((RedisNativeClient)r).Get(key), x => lockVal = (x != null) ? BitConverter.ToInt64(x,0) : 0);
+				pipe.QueueCommand(r => ((RedisNativeClient)r).Watch(lockKey));
+				pipe.QueueCommand(r => ((RedisNativeClient)r).Get(lockKey), x => lockVal = (x != null) ? BitConverter.ToInt64(x,0) : 0);
 				pipe.Flush();
 
-                if (lockVal == setLockValue)
+                if (lockVal == lockExpire)
                 {
                     using (var trans = client.CreateTransaction())
                     {
-                        trans.QueueCommand(r => ((RedisNativeClient)r).Del(key));
+                        trans.QueueCommand(r => ((RedisNativeClient)r).Del(lockKey));
                         if (trans.Commit())
                             rc = true;
                     }
                 }
                 else
                 {
-                  client.UnWatch();
+                  ((RedisNativeClient)client).UnWatch();
                 }
 			}
 			return rc;

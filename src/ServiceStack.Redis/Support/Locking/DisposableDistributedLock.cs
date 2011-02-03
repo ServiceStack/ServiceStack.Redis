@@ -1,5 +1,4 @@
 ﻿using System;
-using ServiceStack.Redis.Support.Locking;
 
 namespace ServiceStack.Redis.Support.Locking
 {
@@ -8,10 +7,8 @@ namespace ServiceStack.Redis.Support.Locking
     /// </summary>
     public class DisposableDistributedLock : IDisposable
     {
-        private readonly long lockValue;
         private readonly RedisClient client;
-        private readonly string key;
-        private DistributedLock myLock = new DistributedLock();
+        private readonly DistributedLock myLock;
 
         /// <summary>
         /// Lock
@@ -23,15 +20,15 @@ namespace ServiceStack.Redis.Support.Locking
         public DisposableDistributedLock(RedisClient client, string globalLockKey, int acquisitionTimeout, int lockTimeout)
         {
             this.client = client;
-            key = globalLockKey;
-            lockValue = myLock.Lock(client, globalLockKey, acquisitionTimeout, lockTimeout);
+            myLock = new DistributedLock();
+            myLock.Lock(client, globalLockKey, acquisitionTimeout, lockTimeout);
         }
         /// <summary>
         /// unlock
         /// </summary>
         public void Dispose()
         {
-            myLock.Unlock(client, key, lockValue);
+            myLock.Unlock(client);
         }
     }
 }
