@@ -35,14 +35,6 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 client.RPush(key, client.Serialize(msg));
             }
         }
-        /// <summary>
-        /// Return dequeued items to front of queue 
-        /// </summary>
-        /// <param name="workItems"></param>
-        public void PushFront(IList<T> workItems)
-        {
-            UnDequeueImpl(workItems, pendingWorkItemIdQueue);
-        }
 
 
         /// <summary>

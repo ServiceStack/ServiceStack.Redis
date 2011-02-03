@@ -15,7 +15,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
     {
         private int lockAcquisitionTimeout = 2;
         private int lockTimeout = 2;
-        private double  CONVENIENTLY_SIZED_FLOAT = 18014398509481984.0;
+        protected const double  CONVENIENTLY_SIZED_FLOAT = 18014398509481984.0;
 
 
 
@@ -24,7 +24,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         {
         }
 
-        public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port, string queueName ) 
+        public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port, string queueName) 
             : base(maxReadPoolSize, maxWritePoolSize, host, port, queueName)
         {
         }
@@ -53,33 +53,6 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             }
         }
 
-        /// <summary>
-        /// Return dequeued items to front of queue 
-        /// </summary>
-        /// <param name="workItems"></param>
-        /// <param name="workItemId"></param>
-        public void PushFront(string workItemId, IList<T> workItems)
-        {
-            if (workItems == null || workItems.Count == 0)
-                return;
-            using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
-            {
-                var client = disposableClient.Client;
-                var key = queueNamespace.GlobalCacheKey(workItemId);
-                using (var pipe = client.CreatePipeline())
-                {
-                    for (int i = workItems.Count - 1; i >= 0; i--)
-                    {
-                        int index = i;
-                        pipe.QueueCommand(r => ((RedisNativeClient)r).LPush(key, client.Serialize(workItems[index])));
-                    }
-                    pipe.Flush();
-
-                }
-                PostDequeue(workItemId);
-            }
-        }
-        
         /// <summary>
         /// Dequeue next batch of messages for processing. After this method is called,
         /// no other messages with same work item id will be available for
@@ -123,6 +96,37 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             }
         }
 
+        /// <summary>
+        /// Return dequeued items to front of queue 
+        /// </summary>
+        /// <param name="workItems"></param>
+        /// <param name="workItemId"></param>
+        public void PushFront(string workItemId, IList<T> workItems)
+        {
+            if (workItems == null || workItems.Count == 0)
+                return;
+            using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
+            {
+                var client = disposableClient.Client;
+                var key = queueNamespace.GlobalCacheKey(workItemId);
+                var lockKey = queueNamespace.GlobalKey(workItemId, RedisNamespace.NumTagsForLockKey);
+                using (var disposableLock = new DisposableDistributedLock(client, lockKey, lockAcquisitionTimeout, lockTimeout))
+                {
+                    using (var pipe = client.CreatePipeline())
+                    {
+                        for (int i = workItems.Count - 1; i >= 0; i--)
+                        {
+                            int index = i;
+                            pipe.QueueCommand(
+                                r => ((RedisNativeClient) r).LPush(key, client.Serialize(workItems[index])));
+                        }
+                        pipe.QueueCommand(r => ((RedisNativeClient)r).ZIncrBy(pendingWorkItemIdQueue, -1, client.Serialize(workItemId)));
+                        pipe.Flush();
+                    }
+                }
+            }
+        }
+        
         /// <summary>
         /// Unlock message id, so other servers can process messages for this message id
         /// </summary>

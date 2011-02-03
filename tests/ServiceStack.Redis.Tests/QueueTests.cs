@@ -8,6 +8,7 @@ namespace ServiceStack.Redis.Tests
     [TestFixture]
     public class QueueTests
     {
+    
         [Test]
         public void TestSequentialWorkQueue()
         {
@@ -126,11 +127,6 @@ namespace ServiceStack.Redis.Tests
                 //test that messages were removed from queue
                 batch = queue.Dequeue(numMessages * 2);
                 Assert.AreEqual(batch.Count, 0);
-
-                // test that UnDequeue works
-                queue.PushFront(batch);
-                var undequeuedBatch = queue.Dequeue(numMessages*2);
-                Assert.AreEqual(undequeuedBatch, batch);
 
             }
         }

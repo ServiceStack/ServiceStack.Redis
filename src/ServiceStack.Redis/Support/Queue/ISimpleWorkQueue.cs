@@ -13,12 +13,6 @@ namespace ServiceStack.Redis.Support.Queue
 		void Enqueue(T workItem);
 
         /// <summary>
-        /// Push items to front of queue
-        /// </summary>
-        /// <param name="workItems"></param>
-        void PushFront(IList<T> workItems);
-
-        /// <summary>
         /// Dequeue up to maxBatchSize items from queue
         /// </summary>
         /// <param name="maxBatchSize"></param>
