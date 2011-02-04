@@ -14,12 +14,23 @@ namespace ServiceStack.Redis.Support.Queue
 		
         /// <summary>
         /// Dequeue up to maxBatchSize items from queue corresponding to workItemId identifier.
-        /// Once this method is called, no items for workItemId queue can be dequeued until
-        /// <see cref="PostDequeue"/> is called
+        /// Once this method is called, <see cref="Dequeue"/> or <see cref="Peek"/> will not
+        /// return any items for workItemId until the dequeue lock returned is unlocked.
         /// </summary>
         /// <param name="maxBatchSize"></param>
         /// <returns></returns>
-        SequentialDeueueData<T> Dequeue(int maxBatchSize);
+        SequentialData<T> Dequeue(int maxBatchSize);
+
+        /// <summary>
+        /// Get up to maxBatchSize items from queue corresponding to workItemId identifier.
+        /// Items are not removed form the queue. 
+        /// Once this method is called, <see cref="Dequeue"/> or <see cref="Peek"/> will not
+        /// return any items for workItemId until the dequeue lock returned is unlocked.
+        /// </summary>
+        /// <param name="maxBatchSize"></param>
+        /// <returns></returns>
+        SequentialData<T> Peek(int maxBatchSize);
+
 
     }
 }
