@@ -32,5 +32,8 @@ namespace ServiceStack.Redis.Support.Queue
         SequentialData<T> Peek(int maxBatchSize);
 
 
+	    bool HarvestZombies();
+
+
     }
 }

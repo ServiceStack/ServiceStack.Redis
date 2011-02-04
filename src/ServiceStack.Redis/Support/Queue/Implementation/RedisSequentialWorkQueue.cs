@@ -64,19 +64,22 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
         private int lockAcquisitionTimeout = 2;
         private int lockTimeout = 2;
+        private int dequeueLockTimeout = 300;
         protected const double  CONVENIENTLY_SIZED_FLOAT = 18014398509481984.0;
 
         private string dequeueIds = "DequeueIds";
         private const int numTagsForDequeueLock = RedisNamespace.NumTagsForLockKey + 1;
 
-        public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port)
+        public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port, int dequeueLockTimeout)
             : base(maxReadPoolSize, maxWritePoolSize, host, port)
         {
+            this.dequeueLockTimeout = dequeueLockTimeout;
         }
 
-        public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port, string queueName) 
+        public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port, string queueName, int dequeueLockTimeout) 
             : base(maxReadPoolSize, maxWritePoolSize, host, port, queueName)
         {
+            this.dequeueLockTimeout = dequeueLockTimeout;
         }
 
         /// <summary>
@@ -104,6 +107,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
         public SequentialData<T> Dequeue(int maxBatchSize)
         {
+            HarvestZombies();
             return Peek(maxBatchSize, true);
         }
         public SequentialData<T> Peek(int maxBatchSize)
@@ -131,7 +135,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                         // acquire dequeue lock
                         var dequeueLockKey = queueNamespace.GlobalKey(workItemId, numTagsForDequeueLock);
                         workItemIdLock = new WorkItemIdLock(client, clientManager, this, workItemId);
-                        workItemIdLock.Lock(dequeueLockKey, 2, 300);
+                        workItemIdLock.Lock(dequeueLockKey, 2, dequeueLockTimeout);
                       
                         using (var pipe = client.CreatePipeline())
                         {
@@ -186,23 +190,25 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             }
         }
 
-
-        private void HarvestZombies()
+        /// <summary>
+        /// Force release of locks held by crashed servers
+        /// </summary>
+        public bool HarvestZombies()
         {
-            // store list of dequeued workItemIds
-            // dequeue acquires dequeue lock on these ids
-            // each dequeue will MGet on list of all dequeued workItemIds: then MGet on all lock keys.
-            // if expired, then reacquire and PostDequeue
+            bool rc = false;
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
             {
                 var client = disposableClient.Client;
                 var dequeueWorkItemIds = client.SMembers(dequeueIds);
                 foreach (var workItemId in dequeueWorkItemIds)
                 {
-                    var lockId = queueNamespace.GlobalKey(client.Deserialize(workItemId), RedisNamespace.NumTagsForLockKey);
+                    var lockId = queueNamespace.GlobalKey(client.Deserialize(workItemId), numTagsForDequeueLock);
+                    var myLock = new DistributedLock(client);
+                    rc |= myLock.TryForceRelease(lockId);
 
                 }
             }
+            return rc;
         }
     
         /// <summary>

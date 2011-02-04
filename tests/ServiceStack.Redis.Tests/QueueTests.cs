@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Redis.Support.Queue.Implementation;
 
@@ -12,7 +13,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void TestSequentialWorkQueue()
         {
-            using (var queue = new RedisSequentialWorkQueue<string>(10,10,"127.0.0.1",6379))
+            using (var queue = new RedisSequentialWorkQueue<string>(10,10,"127.0.0.1",6379,1))
             {
                 const int numMessages = 6;
                 var messages0 = new List<string>();
@@ -33,6 +34,8 @@ namespace ServiceStack.Redis.Tests
                 // check that half of patient[0] messages are returned
                 for (int i = 0; i < numMessages/2; ++i )
                     Assert.AreEqual(batch.WorkItems[i], messages0[i]);
+                Thread.Sleep(2000);
+                Assert.IsTrue(queue.HarvestZombies());
                 batch.WorkItemIdLock.Unlock();
 
                 // check that all patient[1] messages are returned

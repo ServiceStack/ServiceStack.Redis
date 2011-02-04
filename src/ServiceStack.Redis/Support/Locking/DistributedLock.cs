@@ -40,7 +40,7 @@ namespace ServiceStack.Redis.Support.Locking
 		    var localClient = (RedisClient)myClient;
             int wasSet = localClient.SetNX(key, BitConverter.GetBytes(newLockExpire));
 			int totalTime = 0;
-			while (wasSet == 0 && totalTime < acquisitionTimeout)
+            while (wasSet == LOCK_NOT_ACQUIRED && totalTime < acquisitionTimeout)
 			{
 				int count = 0;
 				while (wasSet == 0 && count < tryCount && totalTime < acquisitionTimeout)
@@ -95,6 +95,47 @@ namespace ServiceStack.Redis.Support.Locking
 		    return wasSet;
 
 		}
+
+        /// <summary>
+        /// release lock held by crashed server
+        /// </summary>
+        /// <param name="key">global key for this lock</param>
+        public bool TryForceRelease(string key)
+        {
+            var localClient = (RedisClient)myClient;
+            bool rc = true;
+            // handle possibliity of crashed client still holding the lock
+            using (var pipe = localClient.CreatePipeline())
+            {
+                long lockValue = 0;
+                pipe.QueueCommand(r => ((RedisNativeClient)r).Watch(key));
+                pipe.QueueCommand(r => ((RedisNativeClient)r).Get(key), x => lockValue = (x != null) ? BitConverter.ToInt64(x, 0) : 0);
+                pipe.Flush();
+
+                var ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
+                // no lock to release
+                if (lockValue == 0)
+                {
+                    localClient.UnWatch();
+                } 
+                else if (lockValue >= ts.TotalSeconds)
+                {
+                    rc = false;
+                    localClient.UnWatch();
+                } 
+                else
+                {
+                    // if lock value is expired, then we can try to release it
+                    using (var trans = localClient.CreateTransaction())
+                    {
+                        trans.QueueCommand(r => ((RedisNativeClient) r).Del(key));
+                        trans.Commit();
+                    }
+                }
+            }
+            return rc;
+        }
+
 
 		/// <summary>
 		/// unlock key
