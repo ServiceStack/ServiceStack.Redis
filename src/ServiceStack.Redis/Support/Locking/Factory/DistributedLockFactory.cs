@@ -5,12 +5,12 @@
     /// </summary>
     public class DistributedLockFactory : IDistributedLockFactory
     {
-        private readonly IRedisClient client;
+        protected readonly IRedisClient client;
         public DistributedLockFactory(IRedisClient client)
         {
             this.client = client;
         }
-        public IDistributedLock CreateLock()
+        public virtual IDistributedLock CreateLock()
         {
             return new DistributedLock(client);
         }

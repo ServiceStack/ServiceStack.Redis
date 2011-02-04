@@ -12,56 +12,9 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
     /// 
     /// 
     /// </summary>
-    public class RedisSequentialWorkQueue<T> : RedisWorkQueue<T>, ISequentialWorkQueue<T> where T : class
+    public partial class RedisSequentialWorkQueue<T> : RedisWorkQueue<T>, ISequentialWorkQueue<T> where T : class
     {
-        public class WorkItemIdLock : DistributedLock
-        {
-            private bool ownsClient;
-            private readonly RedisSequentialWorkQueue<T> workQueue;
-            private readonly string workItemId;
-            protected readonly PooledRedisClientManager clientManager;
-            public WorkItemIdLock(IRedisClient client,    PooledRedisClientManager clientManager, RedisSequentialWorkQueue<T> workQueue, string workItemId) : base(client)
-            {
-                this.workQueue = workQueue;
-                this.workItemId = workItemId;
-                this.clientManager = clientManager;
-                ownsClient = false;
-            }
-
-            public override long Lock(string key, int acquisitionTimeout, int lockTimeout)
-            {
-                long rc = base.Lock(key, acquisitionTimeout, lockTimeout);
-                // do not hang on to the client reference. This lock may be held for a long time.
-                ReleaseClient();
-                return rc;
-            }
-
-            public override bool Unlock()
-            {
-                workQueue.Unlock(workItemId);
-                bool rc =  base.Unlock();
-                ReleaseClient();
-                return rc;
-            }
-            private void ReleaseClient()
-            {
-                if (ownsClient && myClient != null)
-                    clientManager.DisposeClient((RedisNativeClient)myClient);
-                myClient = null;
-                ownsClient = false;
-            }
-
-            protected override RedisClient AcquireClient()
-            {
-                if (myClient == null)
-                {
-                    myClient = clientManager.GetClient();
-                    ownsClient = true;
-                }
-                return (RedisClient) myClient;
-            }
-        }
-
+       
         private int lockAcquisitionTimeout = 2;
         private int lockTimeout = 2;
         private int dequeueLockTimeout = 300;
@@ -108,14 +61,14 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         public SequentialData<T> Dequeue(int maxBatchSize)
         {
             HarvestZombies();
-            return Peek(maxBatchSize, true);
+            return Peek(maxBatchSize, true,true);
         }
         public SequentialData<T> Peek(int maxBatchSize)
         {
-            return Peek(maxBatchSize, false);
+            return Peek(maxBatchSize, false,true);
         }
 
-        private SequentialData<T> Peek(int maxBatchSize, bool dequeue)
+        private SequentialData<T> Peek(int maxBatchSize, bool dequeue, bool workItemLock)
         {
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
             {
@@ -132,11 +85,6 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                     {
                         workItemId = client.Deserialize(smallest[0]) as string;
 
-                        // acquire dequeue lock
-                        var dequeueLockKey = queueNamespace.GlobalKey(workItemId, numTagsForDequeueLock);
-                        workItemIdLock = new WorkItemIdLock(client, clientManager, this, workItemId);
-                        workItemIdLock.Lock(dequeueLockKey, 2, dequeueLockTimeout);
-                      
                         using (var pipe = client.CreatePipeline())
                         {
                             // track dequeue lock id
@@ -171,6 +119,16 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                             }
                             pipe.Flush();
                         }
+
+                        // acquire peek lock
+                        if (workItemLock)
+                        {
+                            var dequeueLockKey = queueNamespace.GlobalKey(workItemId, numTagsForDequeueLock);
+                            workItemIdLock = dequeue ? 
+                                                new DequeueLock(client, clientManager, this, workItemId) :
+                                                            new PeekLock(client, clientManager, this, workItemId, dequeueItems.Count);
+                            workItemIdLock.Lock(dequeueLockKey, 2, dequeueLockTimeout);
+                        }
                     }
                     return  new SequentialData<T>
                                  {
@@ -179,7 +137,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                                      WorkItemIdLock = workItemIdLock
                                  };
                 }
-                catch (System.Exception)
+                catch (Exception)
                 {
                     //release resources
                     if (workItemIdLock != null)
