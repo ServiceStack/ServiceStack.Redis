@@ -11,7 +11,7 @@ namespace ServiceStack.Redis
         /// </summary>
         public class DisposablePooledClient<T> : IDisposable where T : RedisNativeClient
         {
-            private readonly T client;
+            private T client;
             private readonly PooledRedisClientManager clientManager;
 
             /// <summary>
@@ -37,6 +37,7 @@ namespace ServiceStack.Redis
             {
                 if (client != null)
                     clientManager.DisposeClient(client);
+                client = null;
             }
         }
 

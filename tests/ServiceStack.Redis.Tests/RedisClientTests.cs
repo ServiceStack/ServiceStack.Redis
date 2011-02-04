@@ -359,22 +359,25 @@ namespace ServiceStack.Redis.Tests
         public void Can_create_distributed_lock()
         {
             var key = "lockkey";
-            var distributedLock = new DistributedLock(Redis);
             int lockTimeout = 2;
-   
+
+            var distributedLock = new DistributedLock(Redis);
             Assert.AreEqual(distributedLock.Lock(key,lockTimeout,lockTimeout), DistributedLock.LOCK_ACQUIRED);
 
             //can't re-lock
+            distributedLock = new DistributedLock(Redis);
             Assert.AreEqual(distributedLock.Lock( key, lockTimeout, lockTimeout), DistributedLock.LOCK_NOT_ACQUIRED);
 
             // re-acquire lock after timeout
             Thread.Sleep(lockTimeout * 1000 + 1000);
+            distributedLock = new DistributedLock(Redis);
             Assert.AreEqual(distributedLock.Lock( key, lockTimeout, lockTimeout), DistributedLock.LOCK_RECOVERED);
 
 
             Assert.IsTrue(distributedLock.Unlock());
 
             //can now lock
+            distributedLock = new DistributedLock(Redis);
             Assert.AreEqual(distributedLock.Lock(key, lockTimeout, lockTimeout), DistributedLock.LOCK_ACQUIRED);
 
 
