@@ -102,11 +102,10 @@
     <Compile Include="Pipeline\QueuedRedisCommand.cs" />
     <Compile Include="Pipeline\RedisCommand.cs" />
     <Compile Include="Support\Locking\Factory\DistributedLockFactory.cs" />
-    <Compile Include="Support\Queue\Implementation\SequentialLockFactory.cs" />
     <Compile Include="Support\Locking\Factory\IDistributedLockFactory.cs" />
     <Compile Include="Support\Locking\IDistributedLock.cs" />
     <Compile Include="Support\OptimizedObjectSerializer.cs" />
-    <Compile Include="Support\Queue\Implementation\SequentialLock.cs" />
+    <Compile Include="Support\Queue\SequentialDequeueData.cs" />
     <Compile Include="Support\SerializedObjectWrapper.cs" />
     <Compile Include="Support\ISerializer.cs" />
     <Compile Include="Support\Locking\DisposableDistributedLock.cs" />

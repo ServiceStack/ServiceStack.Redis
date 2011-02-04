@@ -6,12 +6,13 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 {
     public class SerializingRedisClient : RedisClient
     {
-        private readonly DistributedLock myLock = new DistributedLock();
+        private readonly DistributedLock myLock;
         private ISerializer serializer = new ObjectSerializer();
    
         public SerializingRedisClient(string host, int port)
             : base(host, port)
         {
+             myLock = new DistributedLock(this);
         }
         
         /// <summary>
@@ -22,16 +23,15 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         /// <param name="lockTimeout">timeout for lock, in seconds (stored as value against lock key) </param>
         public long Lock(string key, int acquisitionTimeout, int lockTimeout)
         {
-            return myLock.Lock(this, key, acquisitionTimeout, lockTimeout);
+            return myLock.Lock(key, acquisitionTimeout, lockTimeout);
 
         }
         /// <summary>
         /// unlock key
         /// </summary>
-        /// <param name="setLockValue">value that lock key was set to when it was locked</param>
         public bool Unlock()
         {
-            return myLock.Unlock(this);
+            return myLock.Unlock();
         }
 
         /// <summary>

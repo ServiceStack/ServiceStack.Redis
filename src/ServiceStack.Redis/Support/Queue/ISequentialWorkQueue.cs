@@ -19,20 +19,7 @@ namespace ServiceStack.Redis.Support.Queue
         /// </summary>
         /// <param name="maxBatchSize"></param>
         /// <returns></returns>
-		KeyValuePair<string, IList<T>> Dequeue(int maxBatchSize);
+        SequentialDeueueData<T> Dequeue(int maxBatchSize);
 
-        /// <summary>
-        /// Requeue items to front of queue corresponding to workItemId identifier
-        /// </summary>
-        /// <param name="workItemId"></param>
-        /// <param name="workItems"></param>
-	    void Requeue(string workItemId, IList<T> workItems);
-
-        /// <summary>
-        ///  Must be called after dequeued items have been processed, in order for other callers
-        /// to dequeue items from workItemId queue
-        /// </summary>
-        /// <param name="workItemId"></param>
-		void PostDequeue(string workItemId);
-	}
+    }
 }

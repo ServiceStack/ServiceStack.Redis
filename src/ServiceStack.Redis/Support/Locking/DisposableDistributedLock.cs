@@ -8,22 +8,23 @@ namespace ServiceStack.Redis.Support.Locking
     /// </summary>
     public class DisposableDistributedLock : IDisposable
     {
-        private readonly RedisClient client;
+        private readonly IRedisClient client;
         private readonly IDistributedLock myLock;
+        private long lockState;
 
         /// <summary>
         /// Lock
         /// </summary>
-        /// <param name="client"></param>
+        /// <param name="clientManager"></param>
         /// <param name="lockFactory"></param>
         /// <param name="globalLockKey"></param>
         /// <param name="acquisitionTimeout">in seconds</param>
         /// <param name="lockTimeout">in seconds</param>
-        public DisposableDistributedLock(RedisClient client, IDistributedLockFactory lockFactory, string globalLockKey, int acquisitionTimeout, int lockTimeout)
+        public DisposableDistributedLock(IRedisClient client, IDistributedLockFactory lockFactory, string globalLockKey, int acquisitionTimeout, int lockTimeout)
         {
             this.client = client;
             myLock = lockFactory.CreateLock();
-            myLock.Lock(client, globalLockKey, acquisitionTimeout, lockTimeout);
+            lockState = myLock.Lock(globalLockKey, acquisitionTimeout, lockTimeout);
         }
 
         /// <summary>
@@ -33,9 +34,14 @@ namespace ServiceStack.Redis.Support.Locking
         /// <param name="globalLockKey"></param>
         /// <param name="acquisitionTimeout">in seconds</param>
         /// <param name="lockTimeout">in seconds</param>
-        public DisposableDistributedLock(RedisClient client, string globalLockKey, int acquisitionTimeout, int lockTimeout) :
-            this(client, new DistributedLockFactory(), globalLockKey, acquisitionTimeout, lockTimeout)
+        public DisposableDistributedLock(IRedisClient client, string globalLockKey, int acquisitionTimeout, int lockTimeout) :
+            this(client, new DistributedLockFactory(client), globalLockKey, acquisitionTimeout, lockTimeout)
         {
+        }
+
+        public long LockState
+        {
+            get { return lockState; } 
         }
 
         /// <summary>
@@ -43,7 +49,7 @@ namespace ServiceStack.Redis.Support.Locking
         /// </summary>
         public void Dispose()
         {
-            myLock.Unlock(client);
+            myLock.Unlock();
         }
     }
 }

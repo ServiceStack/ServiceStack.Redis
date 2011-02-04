@@ -32,35 +32,30 @@ namespace ServiceStack.Redis.Tests
                 var batch = queue.Dequeue(numMessages/2);
                 // check that half of patient[0] messages are returned
                 for (int i = 0; i < numMessages/2; ++i )
-                    Assert.AreEqual(batch.Value[i], messages0[i]);
-                queue.PostDequeue(batch.Key);
+                    Assert.AreEqual(batch.DequeueItems[i], messages0[i]);
+                batch.DequeueLock.Unlock();
 
                 // check that all patient[1] messages are returned
                 batch = queue.Dequeue(2 * numMessages);
                 // check that batch size is respected
-                Assert.AreEqual(batch.Value.Count, numMessages);
+                Assert.AreEqual(batch.DequeueItems.Count, numMessages);
                 for (int i = 0; i < numMessages; ++i)
-                    Assert.AreEqual(batch.Value[i], messages1[i]);
-                queue.PostDequeue(batch.Key);
+                    Assert.AreEqual(batch.DequeueItems[i], messages1[i]);
+                batch.DequeueLock.Unlock();
+
 
                 // check that there are numMessages/2 messages in the queue
                 batch = queue.Dequeue(numMessages);
-                Assert.AreEqual(batch.Key, patients[0]);
-                Assert.AreEqual(batch.Value.Count, numMessages/2);
-                queue.PostDequeue(batch.Key);
+                Assert.AreEqual(batch.WorkItemId, patients[0]);
+                Assert.AreEqual(batch.DequeueItems.Count, numMessages / 2);
+                batch.DequeueLock.Unlock();
 
-                // test that PushFront works
-                queue.Requeue(batch.Key, batch.Value);
-                var undequeuedBatch = queue.Dequeue(numMessages * 2);
-                Assert.AreEqual(undequeuedBatch.Value, batch.Value);
-                Assert.AreEqual(undequeuedBatch.Key, batch.Key);
-                queue.PostDequeue(batch.Key);
 
 
                 // check that there are no more messages in the queue
                 batch = queue.Dequeue(numMessages);
-                Assert.IsNull(batch.Key);
-                Assert.AreEqual(batch.Value.Count, 0);
+                Assert.IsNull(batch.WorkItemId);
+                Assert.AreEqual(batch.DequeueItems.Count, 0);
  
             }
         }

@@ -11,22 +11,20 @@ namespace ServiceStack.Redis.Support.Locking
         protected string lockKey;
         protected long lockExpire;
 
-        /// <summary>
-        /// get lock key
-        /// </summary>
-        public string LockKey()
+        protected readonly IRedisClient client;
+
+        public DistributedLock(IRedisClient client)
         {
-            return lockKey; 
+            this.client = client;
         }
 
 		/// <summary>
 		/// acquire distributed, non-reentrant lock on key
 		/// </summary>
-		/// <param name="client"></param>
-		/// <param name="key">global key for this lock</param>
+	    /// <param name="key">global key for this lock</param>
 		/// <param name="acquisitionTimeout">timeout for acquiring lock</param>
 		/// <param name="lockTimeout">timeout for lock, in seconds (stored as value against lock key) </param>
-        public virtual long Lock(IRedisClient client, string key, int acquisitionTimeout, int lockTimeout)
+        public virtual long Lock(string key, int acquisitionTimeout, int lockTimeout)
 		{
             lockKey = key;
 
@@ -93,8 +91,7 @@ namespace ServiceStack.Redis.Support.Locking
 		/// <summary>
 		/// unlock key
 		/// </summary>
-		/// <param name="client"></param>
-		public virtual bool Unlock(IRedisClient client)
+		public virtual bool Unlock()
 		{
 			if (lockExpire <= 0)
 				return false;

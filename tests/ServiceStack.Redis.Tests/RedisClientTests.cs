@@ -359,27 +359,27 @@ namespace ServiceStack.Redis.Tests
         public void Can_create_distributed_lock()
         {
             var key = "lockkey";
-            var distributedLock = new DistributedLock();
+            var distributedLock = new DistributedLock(Redis);
             int lockTimeout = 2;
    
-            Assert.AreEqual(distributedLock.Lock(Redis,key,lockTimeout,lockTimeout), DistributedLock.LOCK_ACQUIRED);
+            Assert.AreEqual(distributedLock.Lock(key,lockTimeout,lockTimeout), DistributedLock.LOCK_ACQUIRED);
 
             //can't re-lock
-            Assert.AreEqual(distributedLock.Lock(Redis, key, lockTimeout, lockTimeout), DistributedLock.LOCK_NOT_ACQUIRED);
+            Assert.AreEqual(distributedLock.Lock( key, lockTimeout, lockTimeout), DistributedLock.LOCK_NOT_ACQUIRED);
 
             // re-acquire lock after timeout
             Thread.Sleep(lockTimeout * 1000 + 1000);
-            Assert.AreEqual(distributedLock.Lock(Redis, key, lockTimeout, lockTimeout), DistributedLock.LOCK_RECOVERED);
+            Assert.AreEqual(distributedLock.Lock( key, lockTimeout, lockTimeout), DistributedLock.LOCK_RECOVERED);
 
 
-            Assert.IsTrue(distributedLock.Unlock(Redis));
+            Assert.IsTrue(distributedLock.Unlock());
 
             //can now lock
-            Assert.AreEqual(distributedLock.Lock(Redis, key, lockTimeout, lockTimeout), DistributedLock.LOCK_ACQUIRED);
+            Assert.AreEqual(distributedLock.Lock(key, lockTimeout, lockTimeout), DistributedLock.LOCK_ACQUIRED);
 
 
             //cleanup
-            Assert.IsTrue(distributedLock.Unlock(Redis));
+            Assert.IsTrue(distributedLock.Unlock());
 
  
         }
