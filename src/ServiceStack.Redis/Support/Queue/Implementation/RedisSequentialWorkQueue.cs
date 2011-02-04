@@ -58,17 +58,13 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             }
         }
 
-        public SequentialData<T> Dequeue(int maxBatchSize)
+        public SequentialData<T> Dequeue(int maxBatchSize, bool defer)
         {
             HarvestZombies();
-            return Peek(maxBatchSize, true,true);
-        }
-        public SequentialData<T> Peek(int maxBatchSize)
-        {
-            return Peek(maxBatchSize, false,true);
+            return DequeueImpl(maxBatchSize, defer);
         }
 
-        private SequentialData<T> Peek(int maxBatchSize, bool dequeue, bool workItemLock)
+        private SequentialData<T> DequeueImpl(int maxBatchSize, bool defer)
         {
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
             {
@@ -103,32 +99,27 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
                             for (var i = 0; i < maxBatchSize; ++i)
                             {
-                                if (dequeue)
-                                {
-                                    pipe.QueueCommand(
-                                        r => ((RedisNativeClient) r).LPop(key),
-                                       dequeueCallback);
-                                }
-                                else
+                                if (defer)
                                 {
                                     int index = i;
                                     pipe.QueueCommand(
                                       r => ((RedisNativeClient)r).LIndex(key, index),
                                       dequeueCallback);
+                                   
+                                }
+                                else
+                                {
+                                    pipe.QueueCommand(
+                                        r => ((RedisNativeClient)r).LPop(key),
+                                       dequeueCallback);
                                 }
                             }
                             pipe.Flush();
                         }
+                        workItemIdLock = defer ?   
+                            new DeferredDequeueLock(client, clientManager, this, workItemId, dequeueItems.Count) :
+                                new DequeueLock(client, clientManager, this, workItemId);
 
-                        // acquire peek lock
-                        if (workItemLock)
-                        {
-                            var dequeueLockKey = queueNamespace.GlobalKey(workItemId, numTagsForDequeueLock);
-                            workItemIdLock = dequeue ? 
-                                                new DequeueLock(client, clientManager, this, workItemId) :
-                                                            new PeekLock(client, clientManager, this, workItemId, dequeueItems.Count);
-                            workItemIdLock.Lock(dequeueLockKey, 2, dequeueLockTimeout);
-                        }
                     }
                     return  new SequentialData<T>
                                  {
@@ -144,6 +135,26 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                         workItemIdLock.Unlock();
 
                     throw;
+                }
+            }
+        }
+
+        private void Pop(string workItemId, int itemCount)
+        {
+            using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
+            {
+                var client = disposableClient.Client;
+                using (var pipe = client.CreatePipeline())
+                {
+                    var key = queueNamespace.GlobalCacheKey(workItemId);
+                    for (var i = 0; i < itemCount; ++i)
+                    {
+                        pipe.QueueCommand(
+                            r => ((RedisNativeClient)r).LPop(key));
+
+                    }
+                    pipe.Flush();
+
                 }
             }
         }

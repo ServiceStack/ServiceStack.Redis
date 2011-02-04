@@ -78,10 +78,10 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 return (RedisClient) myClient;
             }
         }
-        public class PeekLock : DequeueLock
+        public class DeferredDequeueLock : DequeueLock
         {
             private readonly int numberofPeekedItems;
-            public PeekLock(IRedisClient client, PooledRedisClientManager clientManager, RedisSequentialWorkQueue<T> workQueue, string workItemId, int numberofPeekedItems)
+            public DeferredDequeueLock(IRedisClient client, PooledRedisClientManager clientManager, RedisSequentialWorkQueue<T> workQueue, string workItemId, int numberofPeekedItems)
                                                                        :base(client, clientManager, workQueue, workItemId)
             {
                 this.numberofPeekedItems = numberofPeekedItems;
@@ -89,9 +89,12 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             public override bool Unlock()
             {
                 //remove items from queue
-                workQueue.Peek(numberofPeekedItems, true, false);
+                workQueue.Pop(workItemId, numberofPeekedItems);
+                
+                // unlock work queue id
                 workQueue.Unlock(workItemId);
                 bool rc = base.Unlock();
+                
                 ReleaseClient();
                 return rc;
             }
