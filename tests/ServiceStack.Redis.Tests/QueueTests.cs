@@ -39,7 +39,7 @@ namespace ServiceStack.Redis.Tests
                     // check that half of patient[0] messages are returned
                     for (int i = 0; i < numMessages/2; ++i)
                         Assert.AreEqual(batch.WorkItems[i], messages0[i]);
-                    Thread.Sleep(2000);
+                    Thread.Sleep(5000);
                     Assert.IsTrue(queue.HarvestZombies());
                     batch.WorkItemIdLock.Unlock();
 

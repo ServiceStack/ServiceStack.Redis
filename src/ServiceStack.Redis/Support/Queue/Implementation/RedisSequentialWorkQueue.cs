@@ -119,6 +119,8 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                         workItemIdLock = defer ?   
                             new DeferredDequeueLock(client, clientManager, this, workItemId, dequeueItems.Count) :
                                 new DequeueLock(client, clientManager, this, workItemId);
+                        var dequeueLockKey = queueNamespace.GlobalKey(workItemId, numTagsForDequeueLock);
+                        workItemIdLock.Lock(dequeueLockKey, lockAcquisitionTimeout, dequeueLockTimeout);
 
                     }
                     return  new SequentialData<T>
@@ -167,70 +169,85 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             bool rc = false;
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
             {
-                var client = disposableClient.Client;
+            var client = disposableClient.Client;
                 var dequeueWorkItemIds = client.SMembers(dequeueIds);
-                foreach (var workItemId in dequeueWorkItemIds)
-                    rc |= TryForceReleaseLock(client, (string)client.Deserialize(workItemId));
+                if (dequeueWorkItemIds.Length == 0) return false;
+
+                var keys = new string[dequeueWorkItemIds.Length];
+                for (int i = 0; i < dequeueWorkItemIds.Length; ++i)
+                    keys[i] = queueNamespace.GlobalKey(client.Deserialize(dequeueWorkItemIds[i]), numTagsForDequeueLock);
+                var dequeueLockVals = client.MGet(keys);
+
+                var ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
+                for (int i = 0; i < dequeueLockVals.Length; ++i)
+                {
+                    double lockValue = (dequeueLockVals[i] != null) ? BitConverter.ToInt64(dequeueLockVals[i], 0) : 0;
+                    if (lockValue < ts.TotalSeconds)
+                        rc |= TryForceReleaseLock(client, (string) client.Deserialize(dequeueWorkItemIds[i]));
+                }
             }
             return rc;
         }
+
 
         /// <summary>
         /// release lock held by crashed server
         /// </summary>
         /// <param name="client"></param>
         /// <param name="workItemId"></param>
+        /// <returns>true if lock is released, either by this method or by another client; false otherwise</returns>
         public bool TryForceReleaseLock(SerializingRedisClient client, string workItemId)
         {
-            bool rc = true;
+            bool rc = false;
 
             var dequeueLockKey = queueNamespace.GlobalKey(workItemId, numTagsForDequeueLock);
             // handle possibliity of crashed client still holding the lock
+            long lockValue = 0;
             using (var pipe = client.CreatePipeline())
             {
-                long lockValue = 0;
-                pipe.QueueCommand(r => ((RedisNativeClient)r).Watch(dequeueLockKey));
-                pipe.QueueCommand(r => ((RedisNativeClient)r).Get(dequeueLockKey), x => lockValue = (x != null) ? BitConverter.ToInt64(x, 0) : 0);
+                
+                pipe.QueueCommand(r => ((RedisNativeClient) r).Watch(dequeueLockKey));
+                pipe.QueueCommand(r => ((RedisNativeClient) r).Get(dequeueLockKey),
+                                  x => lockValue = (x != null) ? BitConverter.ToInt64(x, 0) : 0);
                 pipe.Flush();
+            }
 
-                var ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
-                // no lock to release
-                if (lockValue == 0)
+            var ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
+            // no lock to release
+            if (lockValue == 0)
+            {
+                client.UnWatch();
+            }
+            //lock still fresh
+            else if (lockValue >= ts.TotalSeconds)
+            {
+                client.UnWatch();
+            }
+            else
+            {
+                // lock value is expired; try to release it, and other associated resources
+                var len = client.LLen(queueNamespace.GlobalCacheKey(workItemId));
+                using (var trans = client.CreateTransaction())
                 {
-                    client.UnWatch();
-                }
-                //lock still fresh
-                else if (lockValue >= ts.TotalSeconds)
-                {
-                    rc = false;
-                    client.UnWatch();
-                }
-                else
-                {
-                    // if lock value is expired, then we can try to release it
-                    var len = client.LLen(queueNamespace.GlobalCacheKey(workItemId));
-                    using (var trans = client.CreateTransaction())
-                    {
-                        //untrack dequeue lock
-                        pipe.QueueCommand(r => ((RedisNativeClient)r).SRem(dequeueIds, client.Serialize(workItemId)));
+                    //untrack dequeue lock
+                    trans.QueueCommand(r => ((RedisNativeClient)r).SRem(dequeueIds, client.Serialize(workItemId)));
 
-                        //delete dequeue lock
-                        trans.QueueCommand(r => ((RedisNativeClient)r).Del(dequeueLockKey));
-                        
-                        // update priority queue
-                        if (len == 0)
-                            pipe.QueueCommand(r => ((RedisNativeClient)r).ZRem(pendingWorkItemIdQueue, client.Serialize(workItemId)));
-                        else
-                            pipe.QueueCommand(r => ((RedisNativeClient)r).ZAdd(pendingWorkItemIdQueue, len, client.Serialize(workItemId)));
+                    //delete dequeue lock
+                    trans.QueueCommand(r => ((RedisNativeClient)r).Del(dequeueLockKey));
+                    
+                    // update priority queue : this will allow other clients to access this workItemId
+                    if (len == 0)
+                        trans.QueueCommand(r => ((RedisNativeClient)r).ZRem(pendingWorkItemIdQueue, client.Serialize(workItemId)));
+                    else
+                        trans.QueueCommand(r => ((RedisNativeClient)r).ZAdd(pendingWorkItemIdQueue, len, client.Serialize(workItemId)));
 
-                        trans.Commit();
-                    }
+                    rc = trans.Commit();
                 }
+
             }
             return rc;
         }
 
-    
         /// <summary>
         /// Unlock work item id, so other servers can process items for this id
         /// </summary>
