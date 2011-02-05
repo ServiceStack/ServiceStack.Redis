@@ -1,6 +1,4 @@
 ﻿using ServiceStack.Redis.Support.Locking;
-using ServiceStack.Redis.Support.Locking.Factory;
-
 
 namespace ServiceStack.Redis.Support.Queue.Implementation
 {

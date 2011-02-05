@@ -268,14 +268,15 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                     var len = client.LLen(key);
                     using (var pipe = client.CreatePipeline())
                     {
-                        // update priority queue
-                        if (len == 0)
-                            pipe.QueueCommand(r => ((RedisNativeClient)r).ZRem(pendingWorkItemIdQueue, client.Serialize(workItemId)) );
-                        else
-                            pipe.QueueCommand(r => ((RedisNativeClient)r).ZAdd(pendingWorkItemIdQueue, len, client.Serialize(workItemId)) );
-
                         //untrack dequeue lock
                         pipe.QueueCommand(r => ((RedisNativeClient)r).SRem(dequeueIds, client.Serialize(workItemId)));
+
+                        // update priority queue
+                        if (len == 0)
+                            pipe.QueueCommand(r => ((RedisNativeClient)r).ZRem(pendingWorkItemIdQueue, client.Serialize(workItemId)));
+                        else
+                            pipe.QueueCommand(r => ((RedisNativeClient)r).ZAdd(pendingWorkItemIdQueue, len, client.Serialize(workItemId)));
+
 
                         pipe.Flush();
                     }
