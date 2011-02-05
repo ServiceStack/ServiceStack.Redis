@@ -80,8 +80,22 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
             public override bool Unlock()
             {
+                return Unlock(numberOfDequeuedItems);
+            }
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="numProcessed"></param>
+            /// <returns></returns>
+            public bool Unlock(int numProcessed)
+            {
+                if (numProcessed < 0)
+                    numProcessed = 0;
+                if (numProcessed > numberOfDequeuedItems)
+                    numProcessed = numberOfDequeuedItems;
+
                 //remove items from queue
-                workQueue.Pop(workItemId, numberOfDequeuedItems);
+                workQueue.Pop(workItemId, numProcessed);
                 
                 // unlock work queue id
                 workQueue.Unlock(workItemId);
