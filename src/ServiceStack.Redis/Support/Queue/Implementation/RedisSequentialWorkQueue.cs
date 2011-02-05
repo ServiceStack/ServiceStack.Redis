@@ -74,7 +74,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 string workItemId = null;
                 var dequeueItems = new List<T>();
                 var smallest = client.ZRangeWithScores(pendingWorkItemIdQueue, 0, 0);
-                IDistributedLock workItemIdLock = null;
+                DequeueLock workItemIdLock = null;
                 try
                 {
                     if (smallest != null && smallest.Length > 1 && RedisNativeClient.ParseDouble(smallest[1]) != CONVENIENTLY_SIZED_FLOAT)
@@ -118,7 +118,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                         }
                         workItemIdLock = defer ?   
                             new DeferredDequeueLock(client, clientManager, this, workItemId, dequeueItems.Count) :
-                                new DequeueLock(client, clientManager, this, workItemId);
+                                new DequeueLock(client, clientManager, this, workItemId, dequeueItems.Count);
                         var dequeueLockKey = queueNamespace.GlobalKey(workItemId, numTagsForDequeueLock);
                         workItemIdLock.Lock(dequeueLockKey, lockAcquisitionTimeout, dequeueLockTimeout);
 

@@ -48,9 +48,11 @@ namespace ServiceStack.Redis.Tests
                     // check that batch size is respected
                     Assert.AreEqual(batch.WorkItems.Count, numMessages);
                     for (int i = 0; i < numMessages; ++i)
+                    {
                         Assert.AreEqual(batch.WorkItems[i], messages1[i]);
-                    batch.WorkItemIdLock.Unlock();
-
+                        batch.WorkItemIdLock.DoneProcessedWorkItem();
+                    }
+               
 
                     // check that there are numMessages/2 messages in the queue
                     batch = queue.Dequeue(numMessages, defer);

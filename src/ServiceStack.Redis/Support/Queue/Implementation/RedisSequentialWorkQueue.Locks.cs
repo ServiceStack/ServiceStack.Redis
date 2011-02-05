@@ -11,25 +11,8 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
     /// 
     /// 
     /// </summary>
-    public partial class RedisSequentialWorkQueue<T> : RedisWorkQueue<T>, ISequentialWorkQueue<T> where T : class
+    public partial class RedisSequentialWorkQueue<T> 
     {
-        public class DequeueLockFactory : DistributedLockFactory
-        {
-            protected readonly RedisSequentialWorkQueue<T> workQueue;
-            protected readonly string workItemId;
-            protected readonly PooledRedisClientManager clientManager;
-            public DequeueLockFactory(IRedisClient client, PooledRedisClientManager clientManager, RedisSequentialWorkQueue<T> workQueue, string workItemId)
-                : base(client)
-            {
-                this.clientManager = clientManager;
-                this.workQueue = workQueue;
-                this.workItemId = workItemId;
-            }
-            public override IDistributedLock CreateLock()
-            {
-                return new DequeueLock(client, clientManager, workQueue, workItemId);
-            }
-        }
 
         public class DequeueLock : DistributedLock
         {
@@ -37,12 +20,15 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             protected readonly RedisSequentialWorkQueue<T> workQueue;
             protected readonly string workItemId;
             protected readonly PooledRedisClientManager clientManager;
-            public DequeueLock(IRedisClient client,    PooledRedisClientManager clientManager, RedisSequentialWorkQueue<T> workQueue, string workItemId) : base(client)
+            protected readonly int numberOfDequeuedItems;
+            protected int numberOfProcessedItems;
+            public DequeueLock(IRedisClient client,    PooledRedisClientManager clientManager, RedisSequentialWorkQueue<T> workQueue, string workItemId, int numberOfDequeuedItems) : base(client)
             {
                 this.workQueue = workQueue;
                 this.workItemId = workItemId;
                 this.clientManager = clientManager;
                 ownsClient = false;
+                this.numberOfDequeuedItems = numberOfDequeuedItems;
             }
 
             public override long Lock(string key, int acquisitionTimeout, int lockTimeout)
@@ -51,6 +37,13 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 // do not hang on to the client reference. This lock may be held for a long time.
                 ReleaseClient();
                 return rc;
+            }
+
+            public void DoneProcessedWorkItem()
+            {
+                numberOfProcessedItems++;
+                if (numberOfProcessedItems == numberOfDequeuedItems)
+                    Unlock();
             }
 
             public override bool Unlock()
@@ -80,16 +73,15 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         }
         public class DeferredDequeueLock : DequeueLock
         {
-            private readonly int numberofPeekedItems;
-            public DeferredDequeueLock(IRedisClient client, PooledRedisClientManager clientManager, RedisSequentialWorkQueue<T> workQueue, string workItemId, int numberofPeekedItems)
-                                                                       :base(client, clientManager, workQueue, workItemId)
+            public DeferredDequeueLock(IRedisClient client, PooledRedisClientManager clientManager, RedisSequentialWorkQueue<T> workQueue, string workItemId, int numberOfDequeuedItems) 
+                : base(client, clientManager, workQueue, workItemId, numberOfDequeuedItems)
             {
-                this.numberofPeekedItems = numberofPeekedItems;
             }
+
             public override bool Unlock()
             {
                 //remove items from queue
-                workQueue.Pop(workItemId, numberofPeekedItems);
+                workQueue.Pop(workItemId, numberOfDequeuedItems);
                 
                 // unlock work queue id
                 workQueue.Unlock(workItemId);
