@@ -170,15 +170,66 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 var client = disposableClient.Client;
                 var dequeueWorkItemIds = client.SMembers(dequeueIds);
                 foreach (var workItemId in dequeueWorkItemIds)
-                {
-                    var lockId = queueNamespace.GlobalKey(client.Deserialize(workItemId), numTagsForDequeueLock);
-                    var myLock = new DistributedLock(client);
-                    rc |= myLock.TryForceRelease(lockId);
+                    rc |= TryForceReleaseLock(client, (string)client.Deserialize(workItemId));
+            }
+            return rc;
+        }
 
+        /// <summary>
+        /// release lock held by crashed server
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="workItemId"></param>
+        public bool TryForceReleaseLock(SerializingRedisClient client, string workItemId)
+        {
+            bool rc = true;
+
+            var dequeueLockKey = queueNamespace.GlobalKey(workItemId, numTagsForDequeueLock);
+            // handle possibliity of crashed client still holding the lock
+            using (var pipe = client.CreatePipeline())
+            {
+                long lockValue = 0;
+                pipe.QueueCommand(r => ((RedisNativeClient)r).Watch(dequeueLockKey));
+                pipe.QueueCommand(r => ((RedisNativeClient)r).Get(dequeueLockKey), x => lockValue = (x != null) ? BitConverter.ToInt64(x, 0) : 0);
+                pipe.Flush();
+
+                var ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
+                // no lock to release
+                if (lockValue == 0)
+                {
+                    client.UnWatch();
+                }
+                //lock still fresh
+                else if (lockValue >= ts.TotalSeconds)
+                {
+                    rc = false;
+                    client.UnWatch();
+                }
+                else
+                {
+                    // if lock value is expired, then we can try to release it
+                    var len = client.LLen(queueNamespace.GlobalCacheKey(workItemId));
+                    using (var trans = client.CreateTransaction())
+                    {
+                        //untrack dequeue lock
+                        pipe.QueueCommand(r => ((RedisNativeClient)r).SRem(dequeueIds, client.Serialize(workItemId)));
+
+                        //delete dequeue lock
+                        trans.QueueCommand(r => ((RedisNativeClient)r).Del(dequeueLockKey));
+                        
+                        // update priority queue
+                        if (len == 0)
+                            pipe.QueueCommand(r => ((RedisNativeClient)r).ZRem(pendingWorkItemIdQueue, client.Serialize(workItemId)));
+                        else
+                            pipe.QueueCommand(r => ((RedisNativeClient)r).ZAdd(pendingWorkItemIdQueue, len, client.Serialize(workItemId)));
+
+                        trans.Commit();
+                    }
                 }
             }
             return rc;
         }
+
     
         /// <summary>
         /// Unlock work item id, so other servers can process items for this id
