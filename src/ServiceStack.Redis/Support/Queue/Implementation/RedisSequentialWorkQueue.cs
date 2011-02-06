@@ -14,7 +14,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
     /// </summary>
     public partial class RedisSequentialWorkQueue<T> : RedisWorkQueue<T>, ISequentialWorkQueue<T> where T : class
     {
-       
+        private DateTime harvestTime = DateTime.UtcNow;
         private int lockAcquisitionTimeout = 2;
         private int lockTimeout = 2;
         private int dequeueLockTimeout = 300;
@@ -61,7 +61,16 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
  
         public SequentialData<T> Dequeue(int maxBatchSize)
         {
-            HarvestZombies();
+            //harvest zombies every 5 minutes
+            var now = DateTime.UtcNow;
+            var ts = now - harvestTime;
+            if (ts.TotalMinutes > 5)
+            {
+                HarvestZombies();
+                harvestTime = now;
+            }
+
+           
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
             {
                 var client = disposableClient.Client;

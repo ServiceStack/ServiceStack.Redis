@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-
-
-namespace ServiceStack.Redis.Support.Queue
+﻿namespace ServiceStack.Redis.Support.Queue
 {
+    /// <summary>
+    /// Token returned to client after dequeue.
+    /// </summary>
 	public interface IDequeueToken
 	{
         /// <summary>
