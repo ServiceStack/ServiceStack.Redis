@@ -58,14 +58,10 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             }
         }
 
-        public SequentialData<T> Dequeue(int maxBatchSize, bool defer)
+ 
+        public SequentialData<T> Dequeue(int maxBatchSize)
         {
             HarvestZombies();
-            return DequeueImpl(maxBatchSize, defer);
-        }
-
-        private SequentialData<T> DequeueImpl(int maxBatchSize, bool defer)
-        {
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
             {
                 var client = disposableClient.Client;
@@ -99,35 +95,23 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
                             for (var i = 0; i < maxBatchSize; ++i)
                             {
-                                if (defer)
-                                {
-                                    int index = i;
-                                    pipe.QueueCommand(
-                                      r => ((RedisNativeClient)r).LIndex(key, index),
-                                      dequeueCallback);
-                                   
-                                }
-                                else
-                                {
-                                    pipe.QueueCommand(
-                                        r => ((RedisNativeClient)r).LPop(key),
-                                       dequeueCallback);
-                                }
+                                int index = i;
+                                pipe.QueueCommand(
+                                  r => ((RedisNativeClient)r).LIndex(key, index),
+                                  dequeueCallback);
+
                             }
                             pipe.Flush();
                         }
-                        workItemIdLock = defer ?   
-                            new DeferredDequeueLock(client, clientManager, this, workItemId, dequeueItems.Count) :
-                                new DequeueLock(client, clientManager, this, workItemId, dequeueItems.Count);
+                        workItemIdLock = new DequeueLock(client, clientManager, this, workItemId, dequeueItems.Count);
                         var dequeueLockKey = queueNamespace.GlobalKey(workItemId, numTagsForDequeueLock);
                         workItemIdLock.Lock(dequeueLockKey, lockAcquisitionTimeout, dequeueLockTimeout);
 
                     }
-                    return  new SequentialData<T>
-                                 {
-                                     WorkItems = dequeueItems,
-                                     WorkItemId = workItemId,
-                                     WorkItemIdLock = workItemIdLock
+                    return new SequentialData<T>
+                               {
+                                   WorkItems = dequeueItems,
+                                   WorkItemIdLock = new DequeueLock.DequeueToken(workItemIdLock)
                                  };
                 }
                 catch (Exception)

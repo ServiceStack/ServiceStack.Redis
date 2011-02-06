@@ -6,15 +6,11 @@ namespace ServiceStack.Redis.Support.Queue
 {
 	public class SequentialData<T> where T : class
 	{
-        public string WorkItemId
-        {
-            get; set;
-        }
         public IList<T> WorkItems
         {
             get; set;
         }
-        public RedisSequentialWorkQueue<T>.DequeueLock WorkItemIdLock
+        public IDequeueToken WorkItemIdLock
         {
             get;set;
         }

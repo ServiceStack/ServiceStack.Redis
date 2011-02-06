@@ -20,7 +20,7 @@ namespace ServiceStack.Redis.Support.Queue
         /// <param name="maxBatchSize"></param>
         /// <param name="defer"></param>
         /// <returns></returns>
-        SequentialData<T> Dequeue(int maxBatchSize, bool defer);
+        SequentialData<T> Dequeue(int maxBatchSize);
 
 	    bool HarvestZombies();
 

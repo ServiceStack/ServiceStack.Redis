@@ -101,10 +101,9 @@
     <Compile Include="RedisClientsManagerExtensions.cs" />
     <Compile Include="Pipeline\QueuedRedisCommand.cs" />
     <Compile Include="Pipeline\RedisCommand.cs" />
-    <Compile Include="Support\Locking\Factory\DistributedLockFactory.cs" />
-    <Compile Include="Support\Locking\Factory\IDistributedLockFactory.cs" />
     <Compile Include="Support\Locking\IDistributedLock.cs" />
     <Compile Include="Support\OptimizedObjectSerializer.cs" />
+    <Compile Include="Support\Queue\IDequeueToken.cs" />
     <Compile Include="Support\Queue\Implementation\RedisSequentialWorkQueue.Locks.cs" />
     <Compile Include="Support\Queue\SequentialData.cs" />
     <Compile Include="Support\SerializedObjectWrapper.cs" />

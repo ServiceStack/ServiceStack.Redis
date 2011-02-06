@@ -22,52 +22,48 @@ namespace ServiceStack.Redis.Tests
                 patients[0] = "patient0";
                 patients[1] = "patient1";
 
-                for (int k = 0; k < 2; ++k)
+                for (int i = 0; i < numMessages; ++i)
                 {
-
-                    for (int i = 0; i < numMessages; ++i)
-                    {
-                        messages0.Add(String.Format("{0}_message{1}", patients[0], i));
-                        queue.Enqueue(patients[0], messages0[i]);
-                        messages1.Add(String.Format("{0}_message{1}", patients[1], i));
-                        queue.Enqueue(patients[1], messages1[i]);
-                    }
-
-                    bool defer = k == 1;
-
-                    var batch = queue.Dequeue(numMessages/2, defer);
-                    // check that half of patient[0] messages are returned
-                    for (int i = 0; i < numMessages/2; ++i)
-                        Assert.AreEqual(batch.WorkItems[i], messages0[i]);
-                    Thread.Sleep(5000);
-                    Assert.IsTrue(queue.HarvestZombies());
-                    batch.WorkItemIdLock.Unlock();
-
-                    // check that all patient[1] messages are returned
-                    batch = queue.Dequeue(2*numMessages, defer);
-                    // check that batch size is respected
-                    Assert.AreEqual(batch.WorkItems.Count, numMessages);
-                    for (int i = 0; i < numMessages; ++i)
-                    {
-                        Assert.AreEqual(batch.WorkItems[i], messages1[i]);
-                        batch.WorkItemIdLock.DoneProcessedWorkItem();
-                    }
-               
-
-                    // check that there are numMessages/2 messages in the queue
-                    batch = queue.Dequeue(numMessages, defer);
-                    Assert.AreEqual(batch.WorkItemId, patients[0]);
-                    Assert.AreEqual(batch.WorkItems.Count, numMessages/2);
-                    batch.WorkItemIdLock.Unlock();
-
-
-
-                    // check that there are no more messages in the queue
-                    batch = queue.Dequeue(numMessages, defer);
-                    Assert.IsNull(batch.WorkItemId);
-                    Assert.AreEqual(batch.WorkItems.Count, 0);
+                    messages0.Add(String.Format("{0}_message{1}", patients[0], i));
+                    queue.Enqueue(patients[0], messages0[i]);
+                    messages1.Add(String.Format("{0}_message{1}", patients[1], i));
+                    queue.Enqueue(patients[1], messages1[i]);
                 }
+
+                var batch = queue.Dequeue(numMessages/2);
+                // check that half of patient[0] messages are returned
+                for (int i = 0; i < numMessages/2; ++i)
+                    Assert.AreEqual(batch.WorkItems[i], messages0[i]);
+                Thread.Sleep(5000);
+                Assert.IsTrue(queue.HarvestZombies());
+                for (int i = 0; i < batch.WorkItems.Count; ++i)
+                    batch.WorkItemIdLock.DoneProcessedWorkItem();
+     
+
+                // check that all patient[1] messages are returned
+                batch = queue.Dequeue(2*numMessages);
+                // check that batch size is respected
+                Assert.AreEqual(batch.WorkItems.Count, numMessages);
+                for (int i = 0; i < numMessages; ++i)
+                {
+                    Assert.AreEqual(batch.WorkItems[i], messages1[i]);
+                    batch.WorkItemIdLock.DoneProcessedWorkItem();
+                }
+           
+
+                // check that there are numMessages/2 messages in the queue
+                batch = queue.Dequeue(numMessages);
+                Assert.AreEqual(batch.WorkItems.Count, numMessages/2);
+                for (int i = 0; i < batch.WorkItems.Count; ++i)
+                    batch.WorkItemIdLock.DoneProcessedWorkItem();
+     
+
+
+                // check that there are no more messages in the queue
+                batch = queue.Dequeue(numMessages);
+                Assert.AreEqual(batch.WorkItems.Count, 0);
             }
+ 
         }
 
         [Test]

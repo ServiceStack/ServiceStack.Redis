@@ -11,9 +11,30 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
     /// </summary>
     public partial class RedisSequentialWorkQueue<T> 
     {
-
         public class DequeueLock : DistributedLock
         {
+            public class DequeueToken : IDequeueToken
+            {
+                private readonly DequeueLock dequeueLock;
+
+                public DequeueToken(DequeueLock dequeueLock)
+                {
+                    this.dequeueLock = dequeueLock;
+                }
+
+
+                public bool PopAndUnlock(int numProcessed)
+                {
+                    return dequeueLock.PopAndUnlock(numProcessed);
+                }
+
+                public void DoneProcessedWorkItem()
+                {
+                    dequeueLock.DoneProcessedWorkItem();
+                }
+            }
+
+
             private bool ownsClient;
             protected readonly RedisSequentialWorkQueue<T> workQueue;
             protected readonly string workItemId;
@@ -46,8 +67,28 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
             public override bool Unlock()
             {
+                return PopAndUnlock(numberOfDequeuedItems);
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="numProcessed"></param>
+            /// <returns></returns>
+            private bool PopAndUnlock(int numProcessed)
+            {
+                if (numProcessed < 0)
+                    numProcessed = 0;
+                if (numProcessed > numberOfDequeuedItems)
+                    numProcessed = numberOfDequeuedItems;
+
+                //remove items from queue
+                workQueue.Pop(workItemId, numProcessed);
+
+                // unlock work queue id
                 workQueue.Unlock(workItemId);
-                bool rc =  base.Unlock();
+                bool rc = base.Unlock();
+
                 ReleaseClient();
                 return rc;
             }
@@ -67,40 +108,6 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                     ownsClient = true;
                 }
                 return (RedisClient) myClient;
-            }
-        }
-        public class DeferredDequeueLock : DequeueLock
-        {
-            public DeferredDequeueLock(IRedisClient client, PooledRedisClientManager clientManager, RedisSequentialWorkQueue<T> workQueue, string workItemId, int numberOfDequeuedItems) 
-                : base(client, clientManager, workQueue, workItemId, numberOfDequeuedItems)
-            {
-            }
-
-            public override bool Unlock()
-            {
-                return Unlock(numberOfDequeuedItems);
-            }
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="numProcessed"></param>
-            /// <returns></returns>
-            public bool Unlock(int numProcessed)
-            {
-                if (numProcessed < 0)
-                    numProcessed = 0;
-                if (numProcessed > numberOfDequeuedItems)
-                    numProcessed = numberOfDequeuedItems;
-
-                //remove items from queue
-                workQueue.Pop(workItemId, numProcessed);
-                
-                // unlock work queue id
-                workQueue.Unlock(workItemId);
-                bool rc = base.Unlock();
-                
-                ReleaseClient();
-                return rc;
             }
         }
     }
