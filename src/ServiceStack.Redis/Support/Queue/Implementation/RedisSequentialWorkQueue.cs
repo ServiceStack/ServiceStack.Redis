@@ -120,7 +120,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                     return new SequentialData<T>
                                {
                                    WorkItems = dequeueItems,
-                                   WorkItemIdLock = new DequeueLock.DequeueToken(workItemIdLock)
+                                   SequentialDequeueToken = new DequeueLock.DequeueToken(workItemIdLock)
                                  };
                 }
                 catch (Exception)
