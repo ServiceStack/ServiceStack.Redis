@@ -8,8 +8,12 @@ namespace ServiceStack.Redis.Support.Queue
         /// <summary>
         /// 
         /// </summary>
-         IList<T> WorkItems
+         IList<T> DequeueItems
          { get;}
+
+         string DequeueId
+         { get;
+         }
 
 
         /// <summary>

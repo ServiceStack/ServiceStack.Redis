@@ -1,22 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ServiceStack.Redis.Support.Queue.Implementation
 {
     public class SequentialData<T> : ISequentialData<T> where T : class
     {
-        private IList<T> workItems;
+        private string dequeueId;
+        private IList<T> _dequeueItems;
         private readonly RedisSequentialWorkQueue<T>.DequeueLock dequeueLock;
         private int processedCount;
 
-        public SequentialData(IList<T> workItems, RedisSequentialWorkQueue<T>.DequeueLock dequeueToken)
+        public SequentialData(string dequeueId, IList<T> _dequeueItems, RedisSequentialWorkQueue<T>.DequeueLock dequeueLock)
         {
-            this.workItems = workItems;
-            this.dequeueLock = dequeueToken;
+            this.dequeueId = dequeueId;
+            this._dequeueItems = _dequeueItems;
+            this.dequeueLock = dequeueLock;
         }
 
-        public IList<T> WorkItems
+        public IList<T> DequeueItems
         {
-            get { return workItems; }
+            get { return _dequeueItems; }
+        }
+
+        public string DequeueId
+        {
+            get { throw new NotImplementedException(); }
         }
 
         /// <summary>
@@ -25,10 +33,10 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         /// <returns></returns>
         public void PopAndUnlock()
         {
-            if (workItems == null || workItems.Count <= 0 || processedCount >= workItems.Count) return;
+            if (_dequeueItems == null || _dequeueItems.Count <= 0 || processedCount >= _dequeueItems.Count) return;
             dequeueLock.PopAndUnlock(processedCount);
             processedCount = 0;
-            workItems = null;
+            _dequeueItems = null;
         }
 
         /// <summary>
@@ -36,7 +44,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         /// </summary>
         public void DoneProcessedWorkItem()
         {
-            if (processedCount >= workItems.Count) return;
+            if (processedCount >= _dequeueItems.Count) return;
             dequeueLock.DoneProcessedWorkItem();
             processedCount++;
         }

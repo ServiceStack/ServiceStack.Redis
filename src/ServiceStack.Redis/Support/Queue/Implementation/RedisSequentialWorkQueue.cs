@@ -77,7 +77,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
                 //1. get next workItemId 
                 string workItemId = null;
-                var dequeueItems = new List<T>();
+                var workItems = new List<T>();
                 var smallest = client.ZRangeWithScores(pendingWorkItemIdQueue, 0, 0);
                 DequeueLock workItemIdLock = null;
                 try
@@ -99,7 +99,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                             Action<byte[]> dequeueCallback =  x =>
                                             {
                                                 if (x != null)
-                                                    dequeueItems.Add((T) client.Deserialize(x));
+                                                    workItems.Add((T) client.Deserialize(x));
                                             };
 
                             for (var i = 0; i < maxBatchSize; ++i)
@@ -112,12 +112,12 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                             }
                             pipe.Flush();
                         }
-                        workItemIdLock = new DequeueLock(client, clientManager, this, workItemId, dequeueItems.Count);
+                        workItemIdLock = new DequeueLock(client, clientManager, this, workItemId, workItems.Count);
                         var dequeueLockKey = queueNamespace.GlobalKey(workItemId, numTagsForDequeueLock);
                         workItemIdLock.Lock(dequeueLockKey, lockAcquisitionTimeout, dequeueLockTimeout);
 
                     }
-                    return new SequentialData<T>(dequeueItems, workItemIdLock);
+                    return new SequentialData<T>(workItemId, workItems, workItemIdLock);
                            
                 }
                 catch (Exception)
