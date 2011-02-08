@@ -59,7 +59,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         }
 
  
-        public SequentialData<T> Dequeue(int maxBatchSize)
+        public ISequentialData<T> Dequeue(int maxBatchSize)
         {
             //harvest zombies every 5 minutes
             var now = DateTime.UtcNow;
@@ -117,11 +117,8 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                         workItemIdLock.Lock(dequeueLockKey, lockAcquisitionTimeout, dequeueLockTimeout);
 
                     }
-                    return new SequentialData<T>
-                               {
-                                   WorkItems = dequeueItems,
-                                   SequentialDequeueToken = new DequeueLock.DequeueToken(workItemIdLock)
-                                 };
+                    return new SequentialData<T>(dequeueItems, workItemIdLock);
+                           
                 }
                 catch (Exception)
                 {

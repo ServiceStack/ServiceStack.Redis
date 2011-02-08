@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ServiceStack.Redis.Support.Queue.Implementation;
 
 namespace ServiceStack.Redis.Support.Queue
 {
@@ -20,7 +21,7 @@ namespace ServiceStack.Redis.Support.Queue
         /// <param name="maxBatchSize"></param>
         /// <param name="defer"></param>
         /// <returns></returns>
-        SequentialData<T> Dequeue(int maxBatchSize);
+        ISequentialData<T> Dequeue(int maxBatchSize);
 
 	    bool HarvestZombies();
 

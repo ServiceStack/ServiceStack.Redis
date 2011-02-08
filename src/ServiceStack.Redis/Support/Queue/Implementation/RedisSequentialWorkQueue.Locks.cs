@@ -13,28 +13,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
     {
         public class DequeueLock : DistributedLock
         {
-            public class DequeueToken : IDequeueToken
-            {
-                private readonly DequeueLock dequeueLock;
-
-                public DequeueToken(DequeueLock dequeueLock)
-                {
-                    this.dequeueLock = dequeueLock;
-                }
-
-
-                public bool PopAndUnlock(int numProcessed)
-                {
-                    return dequeueLock.PopAndUnlock(numProcessed);
-                }
-
-                public void DoneProcessedWorkItem()
-                {
-                    dequeueLock.DoneProcessedWorkItem();
-                }
-            }
-
-
+ 
             private bool ownsClient;
             protected readonly RedisSequentialWorkQueue<T> workQueue;
             protected readonly string workItemId;
@@ -75,7 +54,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             /// </summary>
             /// <param name="numProcessed"></param>
             /// <returns></returns>
-            private bool PopAndUnlock(int numProcessed)
+            public bool PopAndUnlock(int numProcessed)
             {
                 if (numProcessed < 0)
                     numProcessed = 0;

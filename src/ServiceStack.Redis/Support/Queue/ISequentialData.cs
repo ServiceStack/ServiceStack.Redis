@@ -1,17 +1,23 @@
-﻿namespace ServiceStack.Redis.Support.Queue
+﻿using System.Collections.Generic;
+
+namespace ServiceStack.Redis.Support.Queue
 {
-    /// <summary>
-    /// Token returned to client after dequeue.
-    /// </summary>
-	public interface IDequeueToken
+    public interface ISequentialData<T>
 	{
+
+        /// <summary>
+        /// 
+        /// </summary>
+         IList<T> WorkItems
+         { get;}
+
+
         /// <summary>
         /// pop numProcessed items from queue and unlock queue for work item id that dequeued
         /// items are associated with
         /// </summary>
-        /// <param name="numProcessed"></param>
         /// <returns></returns>
-	    bool PopAndUnlock(int numProcessed);
+	    void PopAndUnlock();
 
         /// <summary>
         /// A dequeued work item has been processed. When all of the dequeued items have been processed,
