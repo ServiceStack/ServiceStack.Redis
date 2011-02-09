@@ -40,7 +40,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         /// </summary>
         /// <param name="workItem"></param>
         /// <param name="workItemId"></param>
-        public void Enqueue(string workItemId, T workItem)
+        public virtual void Enqueue(string workItemId, T workItem)
         {
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
             {
