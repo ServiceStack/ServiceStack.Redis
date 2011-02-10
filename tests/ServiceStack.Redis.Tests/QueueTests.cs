@@ -33,44 +33,44 @@ namespace ServiceStack.Redis.Tests
                 var batch = queue.Dequeue(numMessages/2);
                 // check that half of patient[0] messages are returned
                 for (int i = 0; i < numMessages/2; ++i)
-                    Assert.AreEqual(batch.WorkItems[i], messages0[i]);
+                    Assert.AreEqual(batch.DequeueItems[i], messages0[i]);
                 Thread.Sleep(5000);
                 Assert.IsTrue(queue.HarvestZombies());
-                for (int i = 0; i < batch.WorkItems.Count; ++i)
+                for (int i = 0; i < batch.DequeueItems.Count; ++i)
                     batch.DoneProcessedWorkItem();
      
 
                 // check that all patient[1] messages are returned
                 batch = queue.Dequeue(2*numMessages);
                 // check that batch size is respected
-                Assert.AreEqual(batch.WorkItems.Count, numMessages);
+                Assert.AreEqual(batch.DequeueItems.Count, numMessages);
                 for (int i = 0; i < numMessages; ++i)
                 {
-                    Assert.AreEqual(batch.WorkItems[i], messages1[i]);
+                    Assert.AreEqual(batch.DequeueItems[i], messages1[i]);
                     batch.DoneProcessedWorkItem();
                 }
            
 
                 // check that there are numMessages/2 messages in the queue
                 batch = queue.Dequeue(numMessages);
-                Assert.AreEqual(batch.WorkItems.Count, numMessages/2);
+                Assert.AreEqual(batch.DequeueItems.Count, numMessages/2);
 
                 // test pop and unlock
                 batch.DoneProcessedWorkItem();
-                int remaining = batch.WorkItems.Count-1;
+                int remaining = batch.DequeueItems.Count-1;
                 batch.PopAndUnlock();
 
                 batch = queue.Dequeue(numMessages);
-                Assert.AreEqual(batch.WorkItems.Count, remaining);
+                Assert.AreEqual(batch.DequeueItems.Count, remaining);
 
                 //process remaining items
                 batch = queue.Dequeue(remaining);
-                Assert.AreEqual(batch.WorkItems.Count, remaining);
+                Assert.AreEqual(batch.DequeueItems.Count, remaining);
                 for (int i = 0; i < numMessages; ++i)
                     batch.DoneProcessedWorkItem();
 
                 batch = queue.Dequeue(remaining);
-                Assert.AreEqual(batch.WorkItems.Count, 0);
+                Assert.AreEqual(batch.DequeueItems.Count, 0);
            
             }
  
