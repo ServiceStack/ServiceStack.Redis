@@ -40,6 +40,19 @@ namespace ServiceStack.Redis.Generic
 			StoreRelatedEntities(parentId, new List<TChild>(children));
 		}
 
+		public void DeleteRelatedEntity<TChild>(object parentId, object childId)
+		{
+			var childRefKey = GetChildReferenceSetKey<TChild>(parentId);
+
+			client.RemoveItemFromSet(childRefKey, TypeSerializer.SerializeToString(childId));
+		}
+
+		public void DeleteRelatedEntities<TChild>(object parentId)
+		{
+			var childRefKey = GetChildReferenceSetKey<TChild>(parentId);
+			client.Remove(childRefKey);
+		}
+
 		public List<TChild> GetRelatedEntities<TChild>(object parentId)
 		{
 			var childRefKey = GetChildReferenceSetKey<TChild>(parentId);

@@ -111,6 +111,37 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 
 		[Test]
+		public void Can_DeleteRelatedEntity()
+		{
+			redisQuestions.Store(question1);
+
+			redisQuestions.StoreRelatedEntities(question1.Id, q1Answers);
+
+			var answerToDelete = q1Answers[3];
+			redisQuestions.DeleteRelatedEntity<Answer>(question1.Id, answerToDelete.Id);
+
+			q1Answers.RemoveAll(x => x.Id == answerToDelete.Id);
+
+			var answers = redisQuestions.GetRelatedEntities<Answer>(question1.Id);
+
+			Assert.That(answers.EquivalentTo(answers));
+		}
+
+		[Test]
+		public void Can_DeleteRelatedEntities()
+		{
+			redisQuestions.Store(question1);
+
+			redisQuestions.StoreRelatedEntities(question1.Id, q1Answers);
+
+			redisQuestions.DeleteRelatedEntities<Answer>(question1.Id);
+
+			var answers = redisQuestions.GetRelatedEntities<Answer>(question1.Id);
+
+			Assert.That(answers.Count, Is.EqualTo(0));
+		}
+
+		[Test]
 		public void Can_AddToRecentsList()
 		{
 			var redisAnswers = Redis.GetTypedClient<Answer>();
