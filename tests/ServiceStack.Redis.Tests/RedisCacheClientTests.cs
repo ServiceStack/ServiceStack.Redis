@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using ServiceStack.CacheAccess;
-using ServiceStack.CacheAccess.Providers;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Common.Utils;
 
