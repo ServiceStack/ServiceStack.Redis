@@ -24,7 +24,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
         public string DequeueId
         {
-            get { throw new NotImplementedException(); }
+            get { return dequeueId; }
         }
 
         /// <summary>
