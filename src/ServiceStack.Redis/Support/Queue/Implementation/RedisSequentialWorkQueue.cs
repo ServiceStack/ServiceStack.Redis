@@ -20,19 +20,19 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         private int dequeueLockTimeout = 300;
         protected const double  CONVENIENTLY_SIZED_FLOAT = 18014398509481984.0;
 
-        private string dequeueIds = "DequeueIds";
+        private string dequeueIds;
         private const int numTagsForDequeueLock = RedisNamespace.NumTagsForLockKey + 1;
 
         public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port, int dequeueLockTimeout)
-            : base(maxReadPoolSize, maxWritePoolSize, host, port)
+            : this(maxReadPoolSize, maxWritePoolSize, host, port,null, dequeueLockTimeout)
         {
-            this.dequeueLockTimeout = dequeueLockTimeout;
         }
 
         public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port, string queueName, int dequeueLockTimeout) 
             : base(maxReadPoolSize, maxWritePoolSize, host, port, queueName)
         {
             this.dequeueLockTimeout = dequeueLockTimeout;
+            dequeueIds = queueNamespace.GlobalCacheKey("DequeueIds");
         }
 
         /// <summary>
