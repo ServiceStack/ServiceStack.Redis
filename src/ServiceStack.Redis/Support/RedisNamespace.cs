@@ -117,6 +117,12 @@ namespace ServiceStack.Redis.Support
 		{
 			return GlobalKey(key, NumTagsForKey);
 		}
+
+        public string GlobalLockKey(object key)
+        {
+            return GlobalKey(key, NumTagsForLockKey) + "LOCK";
+        }
+
 		/// <summary>
 		/// get global key inside of this namespace
 		/// </summary>

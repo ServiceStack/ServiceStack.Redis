@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace ServiceStack.Redis.Support.Locking
 {
@@ -26,6 +27,10 @@ namespace ServiceStack.Redis.Support.Locking
 		/// <param name="lockTimeout">timeout for lock, in seconds (stored as value against lock key) </param>
         public virtual long Lock(string key, int acquisitionTimeout, int lockTimeout)
 		{
+            // cannot lock on a null key
+            if (key == null)
+                return LOCK_NOT_ACQUIRED;
+
             // cannot re-enter a lock
             if (lockKey != null)
                 return LOCK_NOT_ACQUIRED;
@@ -117,6 +122,7 @@ namespace ServiceStack.Redis.Support.Locking
 
 		    if (lockVal != lockExpire)
 		    {
+                Debug.WriteLine(String.Format("Unlock(): Failed to unlock key {0}; lock has been acquired by another client ", lockKey));
                 localClient.UnWatch();
 		        return false;
 		    }
@@ -124,7 +130,10 @@ namespace ServiceStack.Redis.Support.Locking
             using (var trans = localClient.CreateTransaction())
             {
                 trans.QueueCommand(r => ((RedisNativeClient)r).Del(lockKey));
-                return trans.Commit();
+                var rc =  trans.Commit();
+                if (!rc)
+                    Debug.WriteLine(String.Format("Unlock(): Failed to delete key {0}; lock has been acquired by another client ", lockKey));
+                return rc;
             }
 
 		}

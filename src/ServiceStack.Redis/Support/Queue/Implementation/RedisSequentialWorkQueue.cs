@@ -45,7 +45,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
             {
                 var client = disposableClient.Client;
-                var lockKey = queueNamespace.GlobalKey(workItemId, RedisNamespace.NumTagsForLockKey);
+                var lockKey = queueNamespace.GlobalLockKey(workItemId);
                 using (var disposableLock = new DisposableDistributedLock(client, lockKey, lockAcquisitionTimeout, lockTimeout))
                 {
                     using (var pipe = client.CreatePipeline())
@@ -112,8 +112,12 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                             }
                             pipe.Flush();
                         }
+
                         workItemIdLock = new DequeueLock(client, clientManager, this, workItemId, workItems.Count);
-                        var dequeueLockKey = queueNamespace.GlobalKey(workItemId, numTagsForDequeueLock);
+                        string dequeueLockKey = null;
+                        // don't lock if there are no work items to be processed (can't lock on null lock key)
+                        if (workItems.Count > 0)
+                           dequeueLockKey = GlobalDequeueLockKey(workItemId);
                         workItemIdLock.Lock(dequeueLockKey, lockAcquisitionTimeout, dequeueLockTimeout);
 
                     }
@@ -131,6 +135,11 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             }
         }
 
+        /// <summary>
+        /// Pop items from list
+        /// </summary>
+        /// <param name="workItemId"></param>
+        /// <param name="itemCount"></param>
         private void Pop(string workItemId, int itemCount)
         {
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
@@ -140,13 +149,9 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 {
                     var key = queueNamespace.GlobalCacheKey(workItemId);
                     for (var i = 0; i < itemCount; ++i)
-                    {
-                        pipe.QueueCommand(
-                            r => ((RedisNativeClient)r).LPop(key));
+                        pipe.QueueCommand(r => ((RedisNativeClient)r).LPop(key));
 
-                    }
                     pipe.Flush();
-
                 }
             }
         }
@@ -165,7 +170,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
                 var keys = new string[dequeueWorkItemIds.Length];
                 for (int i = 0; i < dequeueWorkItemIds.Length; ++i)
-                    keys[i] = queueNamespace.GlobalKey(client.Deserialize(dequeueWorkItemIds[i]), numTagsForDequeueLock);
+                    keys[i] = GlobalDequeueLockKey(client.Deserialize(dequeueWorkItemIds[i]));
                 var dequeueLockVals = client.MGet(keys);
 
                 var ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
@@ -190,7 +195,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         {
             bool rc = false;
 
-            var dequeueLockKey = queueNamespace.GlobalKey(workItemId, numTagsForDequeueLock);
+            var dequeueLockKey = GlobalDequeueLockKey(workItemId);
             // handle possibliity of crashed client still holding the lock
             long lockValue = 0;
             using (var pipe = client.CreatePipeline())
@@ -248,7 +253,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 return;
 
             var key = queueNamespace.GlobalCacheKey(workItemId);
-            var lockKey = queueNamespace.GlobalKey(workItemId, RedisNamespace.NumTagsForLockKey);
+            var lockKey = queueNamespace.GlobalLockKey(workItemId);
 
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
             {
@@ -273,6 +278,10 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                    
                 }
             }
+        }
+        private string GlobalDequeueLockKey(object key)
+        {
+            return queueNamespace.GlobalKey(key, numTagsForDequeueLock) + "_DEQUEUE_LOCK";
         }
     }
 }
