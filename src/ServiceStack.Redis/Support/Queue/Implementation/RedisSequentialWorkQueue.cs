@@ -65,7 +65,9 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             }
         }
 
-
+        /// <summary>
+        /// Must call this periodically to move work items from priority queue to pending queue
+        /// </summary>
         public void PrepareNextWorkItem()
         {
             //harvest zombies every 5 minutes
