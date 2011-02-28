@@ -20,7 +20,13 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         private int dequeueLockTimeout = 300;
         protected const double  CONVENIENTLY_SIZED_FLOAT = 18014398509481984.0;
 
-        private string dequeueIds;
+        // store list of work item ids that have been dequeued
+        // this list is checked regularly in harvest zombies method
+        private string dequeueIdSet;
+
+
+        private string workItemIdPriorityQueue;
+
         private const int numTagsForDequeueLock = RedisNamespace.NumTagsForLockKey + 1;
 
         public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port, int dequeueLockTimeout)
@@ -32,7 +38,8 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             : base(maxReadPoolSize, maxWritePoolSize, host, port, queueName)
         {
             this.dequeueLockTimeout = dequeueLockTimeout;
-            dequeueIds = queueNamespace.GlobalCacheKey("DequeueIds");
+            dequeueIdSet = queueNamespace.GlobalCacheKey("DequeueIdSet");
+            workItemIdPriorityQueue = queueNamespace.GlobalCacheKey("WorkItemIdPriorityQueue");
         }
 
         /// <summary>
@@ -51,15 +58,15 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                     using (var pipe = client.CreatePipeline())
                     {
                         pipe.QueueCommand(r => ((RedisNativeClient)r).RPush(queueNamespace.GlobalCacheKey(workItemId), client.Serialize(workItem)));
-                        pipe.QueueCommand(r => ((RedisNativeClient)r).ZIncrBy(pendingWorkItemIdQueue, -1, client.Serialize(workItemId)));
+                        pipe.QueueCommand(r => ((RedisNativeClient)r).ZIncrBy(workItemIdPriorityQueue, -1, client.Serialize(workItemId)));
                         pipe.Flush();
                     }
                 }
             }
         }
 
- 
-        public ISequentialData<T> Dequeue(int maxBatchSize)
+
+        public void PrepareNextWorkItem()
         {
             //harvest zombies every 5 minutes
             var now = DateTime.UtcNow;
@@ -70,44 +77,65 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 harvestTime = now;
             }
 
-           
+            using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
+            {
+                var client = disposableClient.Client;
+
+                //1. get next workItemId, or return if there isn't one
+                var smallest = client.ZRangeWithScores(workItemIdPriorityQueue, 0, 0);
+                if (smallest == null || smallest.Length <= 1 ||
+                    RedisNativeClient.ParseDouble(smallest[1]) == CONVENIENTLY_SIZED_FLOAT) return;
+                var workItemId = client.Deserialize(smallest[0]) as string;
+                using (var pipe = client.CreatePipeline())
+                {
+                    var rawWorkItemId = client.Serialize(workItemId);
+
+                    // lock work item id
+                    pipe.QueueCommand(r => ((RedisNativeClient)r).ZAdd(workItemIdPriorityQueue, CONVENIENTLY_SIZED_FLOAT, smallest[0]));
+
+                    // track dequeue lock id
+                    pipe.QueueCommand(r => ((RedisNativeClient)r).SAdd(dequeueIdSet, rawWorkItemId));
+
+                    // push into pending set
+                    pipe.QueueCommand(r => ((RedisNativeClient)r).SAdd(pendingWorkItemIdQueue, rawWorkItemId));
+
+                    pipe.Flush();
+                }
+            }
+        }
+ 
+        public ISequentialData<T> Dequeue(int maxBatchSize)
+        {
+ 
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
             {
                 var client = disposableClient.Client;
 
                 //1. get next workItemId 
-                string workItemId = null;
                 var workItems = new List<T>();
-                var smallest = client.ZRangeWithScores(pendingWorkItemIdQueue, 0, 0);
                 DequeueLock workItemIdLock = null;
                 try
                 {
-                    if (smallest != null && smallest.Length > 1 && RedisNativeClient.ParseDouble(smallest[1]) != CONVENIENTLY_SIZED_FLOAT)
+                    var rawWorkItemId = client.SPop(pendingWorkItemIdQueue);
+                    var workItemId = client.Deserialize(rawWorkItemId) as string;;
+                    if (rawWorkItemId != null)
                     {
-                        workItemId = client.Deserialize(smallest[0]) as string;
-
                         using (var pipe = client.CreatePipeline())
                         {
-                            // track dequeue lock id
-                            pipe.QueueCommand(r => ((RedisNativeClient)r).SAdd(dequeueIds, client.Serialize(workItemId)));
-                            
-                            // lock work item id
-                            pipe.QueueCommand(r => ((RedisNativeClient)r).ZAdd(pendingWorkItemIdQueue, CONVENIENTLY_SIZED_FLOAT, smallest[0]));
-
                             // dequeue items
                             var key = queueNamespace.GlobalCacheKey(workItemId);
-                            Action<byte[]> dequeueCallback =  x =>
-                                            {
-                                                if (x != null)
-                                                    workItems.Add((T) client.Deserialize(x));
-                                            };
+                            Action<byte[]> dequeueCallback = x =>
+                                                                 {
+                                                                     if (x != null)
+                                                                         workItems.Add((T) client.Deserialize(x));
+                                                                 };
 
                             for (var i = 0; i < maxBatchSize; ++i)
                             {
                                 int index = i;
                                 pipe.QueueCommand(
-                                  r => ((RedisNativeClient)r).LIndex(key, index),
-                                  dequeueCallback);
+                                    r => ((RedisNativeClient) r).LIndex(key, index),
+                                    dequeueCallback);
 
                             }
                             pipe.Flush();
@@ -117,7 +145,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                         string dequeueLockKey = null;
                         // don't lock if there are no work items to be processed (can't lock on null lock key)
                         if (workItems.Count > 0)
-                           dequeueLockKey = GlobalDequeueLockKey(workItemId);
+                            dequeueLockKey = GlobalDequeueLockKey(workItemId);
                         workItemIdLock.Lock(dequeueLockKey, lockAcquisitionTimeout, dequeueLockTimeout);
 
                     }
@@ -165,7 +193,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
             {
             var client = disposableClient.Client;
-                var dequeueWorkItemIds = client.SMembers(dequeueIds);
+                var dequeueWorkItemIds = client.SMembers(dequeueIdSet);
                 if (dequeueWorkItemIds.Length == 0) return false;
 
                 var keys = new string[dequeueWorkItemIds.Length];
@@ -225,16 +253,16 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 using (var trans = client.CreateTransaction())
                 {
                     //untrack dequeue lock
-                    trans.QueueCommand(r => ((RedisNativeClient)r).SRem(dequeueIds, client.Serialize(workItemId)));
+                    trans.QueueCommand(r => ((RedisNativeClient)r).SRem(dequeueIdSet, client.Serialize(workItemId)));
 
                     //delete dequeue lock
                     trans.QueueCommand(r => ((RedisNativeClient)r).Del(dequeueLockKey));
                     
                     // update priority queue : this will allow other clients to access this workItemId
                     if (len == 0)
-                        trans.QueueCommand(r => ((RedisNativeClient)r).ZRem(pendingWorkItemIdQueue, client.Serialize(workItemId)));
+                        trans.QueueCommand(r => ((RedisNativeClient)r).ZRem(workItemIdPriorityQueue, client.Serialize(workItemId)));
                     else
-                        trans.QueueCommand(r => ((RedisNativeClient)r).ZAdd(pendingWorkItemIdQueue, len, client.Serialize(workItemId)));
+                        trans.QueueCommand(r => ((RedisNativeClient)r).ZAdd(workItemIdPriorityQueue, len, client.Serialize(workItemId)));
 
                     rc = trans.Commit();
                 }
@@ -264,13 +292,13 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                     using (var pipe = client.CreatePipeline())
                     {
                         //untrack dequeue lock
-                        pipe.QueueCommand(r => ((RedisNativeClient)r).SRem(dequeueIds, client.Serialize(workItemId)));
+                        pipe.QueueCommand(r => ((RedisNativeClient)r).SRem(dequeueIdSet, client.Serialize(workItemId)));
 
                         // update priority queue
                         if (len == 0)
-                            pipe.QueueCommand(r => ((RedisNativeClient)r).ZRem(pendingWorkItemIdQueue, client.Serialize(workItemId)));
+                            pipe.QueueCommand(r => ((RedisNativeClient)r).ZRem(workItemIdPriorityQueue, client.Serialize(workItemId)));
                         else
-                            pipe.QueueCommand(r => ((RedisNativeClient)r).ZAdd(pendingWorkItemIdQueue, len, client.Serialize(workItemId)));
+                            pipe.QueueCommand(r => ((RedisNativeClient)r).ZAdd(workItemIdPriorityQueue, len, client.Serialize(workItemId)));
 
 
                         pipe.Flush();

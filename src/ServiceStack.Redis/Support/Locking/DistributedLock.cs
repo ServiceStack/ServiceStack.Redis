@@ -122,7 +122,10 @@ namespace ServiceStack.Redis.Support.Locking
 
 		    if (lockVal != lockExpire)
 		    {
-                Debug.WriteLine(String.Format("Unlock(): Failed to unlock key {0}; lock has been acquired by another client ", lockKey));
+                if (lockVal != 0)
+                    Debug.WriteLine(String.Format("Unlock(): Failed to unlock key {0}; lock has been acquired by another client ", lockKey));
+                else
+                    Debug.WriteLine(String.Format("Unlock(): Failed to unlock key {0}; lock has been identifed as a zombie and harvested ", lockKey));
                 localClient.UnWatch();
 		        return false;
 		    }

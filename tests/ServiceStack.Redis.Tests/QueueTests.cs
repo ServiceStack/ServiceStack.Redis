@@ -30,6 +30,7 @@ namespace ServiceStack.Redis.Tests
                     queue.Enqueue(patients[1], messages1[i]);
                 }
 
+                queue.PrepareNextWorkItem();
                 var batch = queue.Dequeue(numMessages/2);
                 // check that half of patient[0] messages are returned
                 for (int i = 0; i < numMessages/2; ++i)
@@ -41,6 +42,7 @@ namespace ServiceStack.Redis.Tests
      
 
                 // check that all patient[1] messages are returned
+                queue.PrepareNextWorkItem();
                 batch = queue.Dequeue(2*numMessages);
                 // check that batch size is respected
                 Assert.AreEqual(batch.DequeueItems.Count, numMessages);
@@ -52,6 +54,7 @@ namespace ServiceStack.Redis.Tests
            
 
                 // check that there are numMessages/2 messages in the queue
+                queue.PrepareNextWorkItem();
                 batch = queue.Dequeue(numMessages);
                 Assert.AreEqual(batch.DequeueItems.Count, numMessages/2);
 
@@ -60,15 +63,18 @@ namespace ServiceStack.Redis.Tests
                 int remaining = batch.DequeueItems.Count-1;
                 batch.PopAndUnlock();
 
+                queue.PrepareNextWorkItem();
                 batch = queue.Dequeue(numMessages);
                 Assert.AreEqual(batch.DequeueItems.Count, remaining);
 
                 //process remaining items
+                queue.PrepareNextWorkItem();
                 batch = queue.Dequeue(remaining);
                 Assert.AreEqual(batch.DequeueItems.Count, remaining);
                 for (int i = 0; i < numMessages; ++i)
                     batch.DoneProcessedWorkItem();
 
+                queue.PrepareNextWorkItem();
                 batch = queue.Dequeue(remaining);
                 Assert.AreEqual(batch.DequeueItems.Count, 0);
            
