@@ -7,14 +7,14 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
     {
         private string dequeueId;
         private IList<T> _dequeueItems;
-        private readonly RedisSequentialWorkQueue<T>.DequeueLock dequeueLock;
+        private readonly RedisSequentialWorkQueue<T>.DequeueManager _dequeueManager;
         private int processedCount;
 
-        public SequentialData(string dequeueId, IList<T> _dequeueItems, RedisSequentialWorkQueue<T>.DequeueLock dequeueLock)
+        public SequentialData(string dequeueId, IList<T> _dequeueItems, RedisSequentialWorkQueue<T>.DequeueManager _dequeueManager)
         {
             this.dequeueId = dequeueId;
             this._dequeueItems = _dequeueItems;
-            this.dequeueLock = dequeueLock;
+            this._dequeueManager = _dequeueManager;
         }
 
         public IList<T> DequeueItems
@@ -34,7 +34,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         public void PopAndUnlock()
         {
             if (_dequeueItems == null || _dequeueItems.Count <= 0 || processedCount >= _dequeueItems.Count) return;
-            dequeueLock.PopAndUnlock(processedCount);
+            _dequeueManager.PopAndUnlock(processedCount);
             processedCount = 0;
             _dequeueItems = null;
         }
@@ -45,8 +45,17 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         public void DoneProcessedWorkItem()
         {
             if (processedCount >= _dequeueItems.Count) return;
-            dequeueLock.DoneProcessedWorkItem();
+            _dequeueManager.DoneProcessedWorkItem();
             processedCount++;
+        }
+
+        /// <summary>
+        /// Update first unprocessed work item
+        /// </summary>
+        /// <param name="newWorkItem"></param>
+        public void UpdateNextUnprocessed(T newWorkItem)
+        {
+            _dequeueManager.UpdateNextUnprocessed(newWorkItem);
         }
 
     }

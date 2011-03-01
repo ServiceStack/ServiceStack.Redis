@@ -130,7 +130,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
                 //1. get next workItemId 
                 var workItems = new List<T>();
-                DequeueLock workItemIdLock = null;
+                DequeueManager workItemDequeueManager = null;
                 try
                 {
                     var rawWorkItemId = client.RPop(pendingWorkItemIdQueue);
@@ -158,22 +158,22 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                             pipe.Flush();
                         }
 
-                        workItemIdLock = new DequeueLock(client, clientManager, this, workItemId, workItems.Count);
+                        workItemDequeueManager = new DequeueManager(client, clientManager, this, workItemId, workItems.Count);
                         string dequeueLockKey = null;
                         // don't lock if there are no work items to be processed (can't lock on null lock key)
                         if (workItems.Count > 0)
                             dequeueLockKey = GlobalDequeueLockKey(workItemId);
-                        workItemIdLock.Lock(dequeueLockKey, lockAcquisitionTimeout, dequeueLockTimeout);
+                        workItemDequeueManager.Lock(dequeueLockKey, lockAcquisitionTimeout, dequeueLockTimeout);
 
                     }
-                    return new SequentialData<T>(workItemId, workItems, workItemIdLock);
+                    return new SequentialData<T>(workItemId, workItems, workItemDequeueManager);
                            
                 }
                 catch (Exception)
                 {
                     //release resources
-                    if (workItemIdLock != null)
-                        workItemIdLock.Unlock();
+                    if (workItemDequeueManager != null)
+                        workItemDequeueManager.Unlock();
 
                     throw;
                 }

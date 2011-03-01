@@ -11,7 +11,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
     /// </summary>
     public partial class RedisSequentialWorkQueue<T> 
     {
-        public class DequeueLock : DistributedLock
+        public class DequeueManager : DistributedLock
         {
  
             private bool ownsClient;
@@ -20,7 +20,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             protected readonly PooledRedisClientManager clientManager;
             protected readonly int numberOfDequeuedItems;
             protected int numberOfProcessedItems;
-            public DequeueLock(IRedisClient client,    PooledRedisClientManager clientManager, RedisSequentialWorkQueue<T> workQueue, string workItemId, int numberOfDequeuedItems) : base(client)
+            public DequeueManager(IRedisClient client,    PooledRedisClientManager clientManager, RedisSequentialWorkQueue<T> workQueue, string workItemId, int numberOfDequeuedItems) : base(client)
             {
                 this.workQueue = workQueue;
                 this.workItemId = workItemId;
@@ -42,6 +42,14 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 numberOfProcessedItems++;
                 if (numberOfProcessedItems == numberOfDequeuedItems)
                     Unlock();
+            }
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="newWorkItem"></param>
+            public void UpdateNextUnprocessed(T newWorkItem)
+            {
+                workQueue.Update(workItemId, numberOfProcessedItems, newWorkItem);
             }
 
             public override bool Unlock()

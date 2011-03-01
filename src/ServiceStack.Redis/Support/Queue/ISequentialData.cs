@@ -29,5 +29,11 @@ namespace ServiceStack.Redis.Support.Queue
         /// the dequeued items are associated with
         /// </summary>
 	    void DoneProcessedWorkItem();
+
+        /// <summary>
+        /// Update first unprocessed item with new work item.
+        /// </summary>
+        /// <param name="newWorkItem"></param>
+        void UpdateNextUnprocessed(T newWorkItem);
 	}
 }
