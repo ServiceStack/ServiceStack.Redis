@@ -25,7 +25,34 @@ namespace ServiceStack.Redis.Tests
            }
 
         }
-    
+
+        [Test]
+        public void TestSequentialWorkQueueUpdate()
+        {
+            using (var queue = new RedisSequentialWorkQueue<string>(10, 10, "127.0.0.1", 6379, 1))
+            {
+
+                for (int i = 0; i < numMessages; ++i)
+                {
+                    queue.Enqueue(patients[0], messages0[i]);
+                    queue.Enqueue(patients[1], messages1[i]);
+                }
+
+                for (int i = 0; i < numMessages / 2; ++i)
+                {
+                    queue.Update(patients[0], i, messages0[i] + "UPDATE");
+               }
+                queue.PrepareNextWorkItem();
+                var batch = queue.Dequeue(numMessages / 2);
+                // check that half of patient[0] messages are returned
+                for (int i = 0; i < numMessages / 2; ++i)
+                {
+                    Assert.AreEqual(batch.DequeueItems[i], messages0[i] + "UPDATE");
+
+                }
+            }
+        }
+
         [Test]
         public void TestSequentialWorkQueue()
         {

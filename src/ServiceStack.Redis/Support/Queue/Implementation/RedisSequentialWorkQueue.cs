@@ -89,12 +89,13 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                     RedisNativeClient.ParseDouble(smallest[1]) == CONVENIENTLY_SIZED_FLOAT) return false;
                 var workItemId = client.Deserialize(smallest[0]) as string;
 
-                // lock on work item id
+                // lock work item id
                 var lockKey = queueNamespace.GlobalLockKey(workItemId);
                 using (var disposableLock = new DisposableDistributedLock(client, lockKey, lockAcquisitionTimeout, lockTimeout))
                 {
-                    // if another client has queued this work item id, then the work item id score
-                    // will be set to CONVENIENTLY_SIZED_FLOAT
+                    // if another client has queued this work item id,
+                    // then the work item id score will be set to CONVENIENTLY_SIZED_FLOAT
+                    // so we return false in this case
                     var score = client.ZScore(workItemIdPriorityQueue, smallest[0]);
                     if (score == CONVENIENTLY_SIZED_FLOAT) return false;
 
@@ -102,7 +103,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                     {
                         var rawWorkItemId = client.Serialize(workItemId);
 
-                        // lock work item id
+                        // lock work item id in priority queue
                         pipe.QueueCommand(
                             r =>
                             ((RedisNativeClient) r).ZAdd(workItemIdPriorityQueue, CONVENIENTLY_SIZED_FLOAT, smallest[0]));
@@ -111,11 +112,10 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                         pipe.QueueCommand(r => ((RedisNativeClient) r).SAdd(dequeueIdSet, rawWorkItemId));
 
                         // push into pending set
-                        pipe.QueueCommand(r => ((RedisNativeClient) r).SAdd(pendingWorkItemIdQueue, rawWorkItemId));
+                        pipe.QueueCommand(r => ((RedisNativeClient) r).LPush(pendingWorkItemIdQueue, rawWorkItemId));
 
                         pipe.Flush();
                     }
-
                 }
             }
             return true;
@@ -133,7 +133,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 DequeueLock workItemIdLock = null;
                 try
                 {
-                    var rawWorkItemId = client.SPop(pendingWorkItemIdQueue);
+                    var rawWorkItemId = client.RPop(pendingWorkItemIdQueue);
                     var workItemId = client.Deserialize(rawWorkItemId) as string;;
                     if (rawWorkItemId != null)
                     {
@@ -177,6 +177,22 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
                     throw;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Replace existing work item in workItemId queue
+        /// </summary>
+        /// <param name="workItemId"></param>
+        /// <param name="index"></param>
+        /// <param name="newWorkItem"></param>
+        public void Update(string workItemId, int index, T newWorkItem)
+        {
+            using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
+            {
+                var client = disposableClient.Client;
+                var key = queueNamespace.GlobalCacheKey(workItemId);
+                client.LSet(key, index, client.Serialize(newWorkItem));
             }
         }
 

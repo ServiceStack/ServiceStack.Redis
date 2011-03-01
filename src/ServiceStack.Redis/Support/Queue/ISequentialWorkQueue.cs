@@ -30,6 +30,15 @@ namespace ServiceStack.Redis.Support.Queue
         /// <returns></returns>
         ISequentialData<T> Dequeue(int maxBatchSize);
 
+
+        /// <summary>
+        /// Replace existing work item in workItemId queue
+        /// </summary>
+        /// <param name="workItemId"></param>
+        /// <param name="index"></param>
+        /// <param name="newWorkItem"></param>
+	    void Update(string workItemId, int index, T newWorkItem);
+
 	    bool HarvestZombies();
 
 
