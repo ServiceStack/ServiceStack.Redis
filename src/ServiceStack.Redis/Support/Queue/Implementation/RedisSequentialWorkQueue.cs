@@ -68,7 +68,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         /// <summary>
         /// Must call this periodically to move work items from priority queue to pending queue
         /// </summary>
-        public void PrepareNextWorkItem()
+        public bool PrepareNextWorkItem()
         {
             //harvest zombies every 5 minutes
             var now = DateTime.UtcNow;
@@ -86,24 +86,39 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 //1. get next workItemId, or return if there isn't one
                 var smallest = client.ZRangeWithScores(workItemIdPriorityQueue, 0, 0);
                 if (smallest == null || smallest.Length <= 1 ||
-                    RedisNativeClient.ParseDouble(smallest[1]) == CONVENIENTLY_SIZED_FLOAT) return;
+                    RedisNativeClient.ParseDouble(smallest[1]) == CONVENIENTLY_SIZED_FLOAT) return false;
                 var workItemId = client.Deserialize(smallest[0]) as string;
-                using (var pipe = client.CreatePipeline())
+
+                // lock on work item id
+                var lockKey = queueNamespace.GlobalLockKey(workItemId);
+                using (var disposableLock = new DisposableDistributedLock(client, lockKey, lockAcquisitionTimeout, lockTimeout))
                 {
-                    var rawWorkItemId = client.Serialize(workItemId);
+                    // if another client has queued this work item id, then the work item id score
+                    // will be set to CONVENIENTLY_SIZED_FLOAT
+                    var score = client.ZScore(workItemIdPriorityQueue, smallest[0]);
+                    if (score == CONVENIENTLY_SIZED_FLOAT) return false;
 
-                    // lock work item id
-                    pipe.QueueCommand(r => ((RedisNativeClient)r).ZAdd(workItemIdPriorityQueue, CONVENIENTLY_SIZED_FLOAT, smallest[0]));
+                    using (var pipe = client.CreatePipeline())
+                    {
+                        var rawWorkItemId = client.Serialize(workItemId);
 
-                    // track dequeue lock id
-                    pipe.QueueCommand(r => ((RedisNativeClient)r).SAdd(dequeueIdSet, rawWorkItemId));
+                        // lock work item id
+                        pipe.QueueCommand(
+                            r =>
+                            ((RedisNativeClient) r).ZAdd(workItemIdPriorityQueue, CONVENIENTLY_SIZED_FLOAT, smallest[0]));
 
-                    // push into pending set
-                    pipe.QueueCommand(r => ((RedisNativeClient)r).SAdd(pendingWorkItemIdQueue, rawWorkItemId));
+                        // track dequeue lock id
+                        pipe.QueueCommand(r => ((RedisNativeClient) r).SAdd(dequeueIdSet, rawWorkItemId));
 
-                    pipe.Flush();
+                        // push into pending set
+                        pipe.QueueCommand(r => ((RedisNativeClient) r).SAdd(pendingWorkItemIdQueue, rawWorkItemId));
+
+                        pipe.Flush();
+                    }
+
                 }
             }
+            return true;
         }
  
         public ISequentialData<T> Dequeue(int maxBatchSize)

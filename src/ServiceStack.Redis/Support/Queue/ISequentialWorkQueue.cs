@@ -17,7 +17,7 @@ namespace ServiceStack.Redis.Support.Queue
         /// <summary>
         /// Preprare next work item id for dequeueing
         /// </summary>
-        void PrepareNextWorkItem();
+        bool PrepareNextWorkItem();
 
 
         /// <summary>

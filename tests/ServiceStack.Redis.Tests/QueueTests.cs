@@ -9,24 +9,32 @@ namespace ServiceStack.Redis.Tests
     [TestFixture]
     public class QueueTests : RedisClientTestsBase
     {
+        const int numMessages = 6;
+        private IList<string> messages0 = new List<string>();
+        private IList<string> messages1 = new List<string>();
+        private string[] patients = new[] {"patient0", "patient1"};
+
+        [SetUp]
+        public override void OnBeforeEachTest()
+        {
+           base.OnBeforeEachTest();
+           for (int i = 0; i < numMessages; ++i)
+           {
+               messages0.Add(String.Format("{0}_message{1}", patients[0], i));
+               messages1.Add(String.Format("{0}_message{1}", patients[1], i));
+           }
+
+        }
     
         [Test]
         public void TestSequentialWorkQueue()
         {
             using (var queue = new RedisSequentialWorkQueue<string>(10,10,"127.0.0.1",6379,1))
             {
-                const int numMessages = 6;
-                var messages0 = new List<string>();
-                var messages1 = new List<string>();
-                var patients = new string[2];
-                patients[0] = "patient0";
-                patients[1] = "patient1";
-
+              
                 for (int i = 0; i < numMessages; ++i)
                 {
-                    messages0.Add(String.Format("{0}_message{1}", patients[0], i));
                     queue.Enqueue(patients[0], messages0[i]);
-                    messages1.Add(String.Format("{0}_message{1}", patients[1], i));
                     queue.Enqueue(patients[1], messages1[i]);
                 }
 
