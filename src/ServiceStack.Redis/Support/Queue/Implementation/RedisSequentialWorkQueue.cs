@@ -203,6 +203,9 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         /// <param name="itemCount"></param>
         private void Pop(string workItemId, int itemCount)
         {
+            if (itemCount <= 0)
+                return;
+
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
             {
                 var client = disposableClient.Client;
@@ -254,7 +257,10 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         /// <returns>true if lock is released, either by this method or by another client; false otherwise</returns>
         public bool TryForceReleaseLock(SerializingRedisClient client, string workItemId)
         {
-            bool rc = false;
+            if (workItemId == null)
+                return false;
+            
+            var rc = false;
 
             var dequeueLockKey = GlobalDequeueLockKey(workItemId);
             // handle possibliity of crashed client still holding the lock
