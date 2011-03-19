@@ -275,6 +275,18 @@ namespace ServiceStack.Redis.Generic
 			return client.ExpireAt(key, expireAt.ToUnixTime()) == RedisNativeClient.Success;
 		}
 
+		public bool ExpireIn(object id, TimeSpan expireIn)
+		{
+			var key = IdUtils.CreateUrn<T>(id);
+			return client.Expire(key, (int)expireIn.TotalSeconds) == RedisNativeClient.Success;
+		}
+
+		public bool ExpireAt(object id, DateTime expireAt)
+		{
+			var key = IdUtils.CreateUrn<T>(id);
+			return client.ExpireAt(key, expireAt.ToUnixTime()) == RedisNativeClient.Success;
+		}
+
 		public TimeSpan GetTimeToLive(string key)
 		{
 			return TimeSpan.FromSeconds(client.Ttl(key));
