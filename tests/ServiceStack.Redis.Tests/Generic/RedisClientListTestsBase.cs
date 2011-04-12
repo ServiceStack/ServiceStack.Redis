@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using ServiceStack.Common.Extensions;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Redis.Generic;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Generic
 {
@@ -242,6 +245,25 @@ namespace ServiceStack.Redis.Tests.Generic
 			{
 				Assert.That(List.IndexOf(item), Is.EqualTo(storeMembers.IndexOf(item)));
 			}
+		}
+
+
+		[Test]
+		public void Can_GetRangeFromList()
+		{
+			var storeMembers = Factory.CreateList();
+			storeMembers.ForEach(x => redis.AddItemToList(List, x));
+
+			//in SetUp(): List = redis.Lists["testlist"];
+			//alias for: redis.GetRangeFromList(redis.Lists["testlist"], 1, 3);
+			var range = List.GetRange(1, 3);
+			var expected = storeMembers.Skip(1).Take(3).ToList();
+
+			//Uncomment to view list contents
+			//Console.WriteLine(range.Dump());
+			//Console.WriteLine(expected.Dump());
+
+			Factory.AssertListsAreEqual(range, expected);
 		}
 
 	}
