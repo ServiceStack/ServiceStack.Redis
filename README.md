@@ -24,7 +24,7 @@ The class heirachy for the C# Redis clients effectively look like:
 
     RedisTypedClient (POCO) > RedisClient (string) > RedisNativeClient (raw byte[])
 
-Each client is optimized for maximum efficiency and provides layers for higher level functionality:
+Each client is optimized for maximum efficiency and provides layered functionality for maximum developer productivity:
   
   * The RedisNativeClient exposes raw **byte[]** apis and does no marshalling and passes all values directly to redis.
   * The RedisClient assumes **string** values and simply converts strings to UTF8 bytes before sending to Redis
