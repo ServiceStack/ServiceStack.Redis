@@ -174,5 +174,39 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(channelsSubscribed, Is.EqualTo(publishChannelCount));
 			Assert.That(channelsUnSubscribed, Is.EqualTo(publishChannelCount));
 		}
+		
+		[Test]
+        public void Can_Subscribe_and_UnSubscribe_without_messages()
+        {
+            const string channelName = "CHANNEL";
+
+            bool finishedSuccessfully = false;
+
+            using (var subscription = Redis.CreateSubscription())
+            {
+                ThreadPool.QueueUserWorkItem(o =>
+                {
+                    try
+                    {
+                        Log("Subscribing to channel in thread...");
+                        subscription.SubscribeToChannels(channelName);
+                        Log("No longer subscribed to channel in thread.");
+                        finishedSuccessfully = true;
+                    }
+                    catch
+                    {
+                        Log("Exception in thread");
+                    }
+                });
+
+                System.Threading.Thread.Sleep(1000);
+
+                Log("UnSubscribing from channel.");
+                subscription.UnSubscribeFromAllChannels();
+            }
+
+            Assert.That(finishedSuccessfully);
+            Log("Completed successfully.");
+        }		
 	}
 }
