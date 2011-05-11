@@ -312,7 +312,7 @@ namespace ServiceStack.Redis
 		private double SendExpectDouble(params byte[][] cmdWithBinaryArgs)
 		{
 		    var bytes = SendExpectData(cmdWithBinaryArgs);
-		    return bytes == null ? Double.MinValue : ParseDouble(bytes);
+		    return bytes == null ? Double.NaN : ParseDouble(bytes);
 		}
 
 	    public static double ParseDouble(byte[] doubleBytes)

@@ -333,6 +333,15 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(members, Is.EquivalentTo(storeMembers));
 		}
 
+		[Test]
+		public void Score_from_non_existent_item_returns_NaN()
+		{
+			var score = Redis.GetItemScoreInSortedSet("nonexistentset", "value");
+
+			Assert.That(score, Is.EqualTo(Double.NaN));
+		}
+
+
 	}
 
 }
