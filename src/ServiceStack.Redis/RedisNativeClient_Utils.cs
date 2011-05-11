@@ -11,6 +11,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -317,9 +318,9 @@ namespace ServiceStack.Redis
 	    public static double ParseDouble(byte[] doubleBytes)
 		{
 			var doubleString = Encoding.UTF8.GetString(doubleBytes);
-
+			
 			double d;
-			double.TryParse(doubleString, out d);
+			double.TryParse(doubleString, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture.NumberFormat, out d);
 
 			return d;
 		}

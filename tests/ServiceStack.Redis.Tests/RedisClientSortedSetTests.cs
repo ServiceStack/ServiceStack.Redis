@@ -328,7 +328,7 @@ namespace ServiceStack.Redis.Tests
 			storeMembers.Remove("two");
 			list.Remove("two");
 
-			var members = list.ToList<string>();
+			var members = list.ToList();
 
 			Assert.That(members, Is.EquivalentTo(storeMembers));
 		}
