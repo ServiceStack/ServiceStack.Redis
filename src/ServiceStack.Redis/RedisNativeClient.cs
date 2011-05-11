@@ -990,12 +990,14 @@ namespace ServiceStack.Redis
 
         public byte[][] ZRevRangeByScore(string setId, double min, double max, int? skip, int? take)
         {
-            return GetRangeByScore(Commands.ZRevRangeByScore, setId, min, max, skip, take, false);
+			//Note: http://redis.io/commands/zrevrangebyscore has max, min in the wrong other
+			return GetRangeByScore(Commands.ZRevRangeByScore, setId, max, min, skip, take, false);
         }
 
         public byte[][] ZRevRangeByScoreWithScores(string setId, double min, double max, int? skip, int? take)
         {
-            return GetRangeByScore(Commands.ZRevRangeByScore, setId, min, max, skip, take, true);
+			//Note: http://redis.io/commands/zrevrangebyscore has max, min in the wrong other
+			return GetRangeByScore(Commands.ZRevRangeByScore, setId, max, min, skip, take, true);
         }
 
         public int ZRemRangeByRank(string setId, int min, int max)
