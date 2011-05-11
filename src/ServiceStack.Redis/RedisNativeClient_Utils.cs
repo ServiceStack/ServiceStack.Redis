@@ -320,7 +320,7 @@ namespace ServiceStack.Redis
 			var doubleString = Encoding.UTF8.GetString(doubleBytes);
 			
 			double d;
-			double.TryParse(doubleString, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture.NumberFormat, out d);
+			double.TryParse(doubleString, NumberStyles.Any, CultureInfo.InvariantCulture.NumberFormat, out d);
 
 			return d;
 		}

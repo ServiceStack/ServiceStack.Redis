@@ -341,6 +341,14 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(score, Is.EqualTo(Double.NaN));
 		}
 
+		[Test]
+		public void Can_add_large_score_to_sortedset()
+		{
+			Redis.AddItemToSortedSet(SetId, "value", 12345678901234567890d);
+			var score = Redis.GetItemScoreInSortedSet(SetId, "value");
+
+			Assert.That(score, Is.EqualTo(12345678901234567890d));
+		}
 
 	}
 
