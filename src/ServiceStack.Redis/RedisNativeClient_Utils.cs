@@ -672,6 +672,36 @@ namespace ServiceStack.Redis
 			}
 			return keyBytes;
 		}
+
+		public int EvalInt(string body, int numberKeysInArgs, params byte[][] keys)
+		{
+			if (body == null)
+				throw new ArgumentNullException("body");
+
+			var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys);
+
+			return SendExpectInt(cmdArgs);
+		}
+
+		public byte[] EvalStr(string body, int numberKeysInArgs, params byte[][] keys)
+		{
+			if (body == null)
+				throw new ArgumentNullException("body");
+
+			var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys);
+			return SendExpectData(cmdArgs);
+		}
+
+		public byte[][] EvalMultiData(string body, int numberKeysInArgs, params byte[][] keys)
+		{
+			if (body == null)
+				throw new ArgumentNullException("body");
+
+			var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys);
+
+			return SendExpectMultiData(cmdArgs);
+		}
+
 	}
 
 }

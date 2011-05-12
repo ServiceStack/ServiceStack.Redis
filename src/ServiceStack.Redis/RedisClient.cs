@@ -562,6 +562,40 @@ namespace ServiceStack.Redis
 		}
 
 		#endregion
+
+		#region LUA EVAL
+
+		public string GetEvalStr(string body, int numOfArgs, params string[] args)
+		{
+			var allArgs = new string[args.Count() + 1];
+			args.CopyTo(allArgs, 1);
+			allArgs[0] = numOfArgs.ToString();
+			var argsBytes = ConvertToBytes(allArgs);
+
+			return base.EvalStr(body, numOfArgs, argsBytes).FromUtf8Bytes();
+		}
+
+		public int GetEvalInt(string body, int numOfArgs, params string[] args)
+		{
+			var allArgs = new string[args.Count() + 1];
+			args.CopyTo(allArgs, 1);
+			allArgs[0] = numOfArgs.ToString();
+			var argsBytes = ConvertToBytes(allArgs);
+
+			return base.EvalInt(body, numOfArgs, argsBytes);
+		}
+
+		public List<string> GetEvalMultiData(string body, int numOfArgs, params string[] args)
+		{
+			var allArgs = new string[args.Count() + 1];
+			args.CopyTo(allArgs, 1);
+			allArgs[0] = numOfArgs.ToString();
+			var argsBytes = ConvertToBytes(allArgs);
+
+			return base.EvalMultiData(body, numOfArgs, argsBytes).ToStringList();
+		}
+
+		#endregion
 	}
 
 }
