@@ -32,6 +32,9 @@ Each client is optimized for maximum efficiency and provides layered functionali
 
 At all times you can pick the most optimal Redis Client for your needs so you can achieve maximum efficiency in your applications.
 
+### Redis Client API Overview
+[![Redis Client API](http://servicestack.net/img/Redis-annotated-preview.png)](http://servicestack.net/img/Redis-annotated.png)
+
 ### Thread-safe client managers
 For multi-threaded applications you can choose from our different client connection managers:
 
