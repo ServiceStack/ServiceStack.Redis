@@ -10,14 +10,7 @@ namespace ServiceStack.Redis.Support.Locking
         public const int LOCK_RECOVERED = 2;
 
         protected string lockKey;
-        protected long lockExpire;
 
-        protected IRedisClient myClient;
-
-        public DistributedLock(IRedisClient client)
-        {
-            myClient = client;
-        }
 
 		/// <summary>
 		/// acquire distributed, non-reentrant lock on key
@@ -25,8 +18,12 @@ namespace ServiceStack.Redis.Support.Locking
 	    /// <param name="key">global key for this lock</param>
 		/// <param name="acquisitionTimeout">timeout for acquiring lock</param>
 		/// <param name="lockTimeout">timeout for lock, in seconds (stored as value against lock key) </param>
-        public virtual long Lock(string key, int acquisitionTimeout, int lockTimeout)
+        /// <param name="client"></param>
+        /// <param name="lockExpire"></param>
+        public virtual long Lock(string key, int acquisitionTimeout, int lockTimeout, out long lockExpire, IRedisClient client)
 		{
+		    lockExpire = 0;
+
             // cannot lock on a null key
             if (key == null)
                 return LOCK_NOT_ACQUIRED;
@@ -42,7 +39,7 @@ namespace ServiceStack.Redis.Support.Locking
 			var ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
 			var newLockExpire = CalculateLockExpire(ts, lockTimeout);
 
-		    var localClient = (RedisClient)myClient;
+            var localClient = (RedisClient)client;
             int wasSet = localClient.SetNX(key, BitConverter.GetBytes(newLockExpire));
 			int totalTime = 0;
             while (wasSet == LOCK_NOT_ACQUIRED && totalTime < acquisitionTimeout)
@@ -105,12 +102,12 @@ namespace ServiceStack.Redis.Support.Locking
 		/// <summary>
 		/// unlock key
 		/// </summary>
-		public virtual bool Unlock()
+		public virtual bool Unlock(long lockExpire, IRedisClient client)
 		{
 			if (lockExpire <= 0)
 				return false;
 		    long lockVal = 0;
-            var localClient = AcquireClient();
+            var localClient = (RedisClient)client;
             using (var pipe = localClient.CreatePipeline())
             {
                
@@ -151,11 +148,6 @@ namespace ServiceStack.Redis.Support.Locking
         private static long CalculateLockExpire(TimeSpan ts, int timeout)
         {
             return (long)(ts.TotalSeconds + timeout + 1.5);
-        }
-
-        protected virtual RedisClient AcquireClient()
-        {
-            return (RedisClient)myClient;
         }
 
 	}

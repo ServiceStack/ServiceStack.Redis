@@ -9,6 +9,8 @@ namespace ServiceStack.Redis.Support.Locking
     {
         private readonly IDistributedLock myLock;
         private readonly long lockState;
+        private readonly long lockExpire;
+        private readonly IRedisClient myClient;
 
         /// <summary>
         /// Lock
@@ -19,8 +21,9 @@ namespace ServiceStack.Redis.Support.Locking
         /// <param name="lockTimeout">in seconds</param>
         public DisposableDistributedLock(IRedisClient client, string globalLockKey, int acquisitionTimeout, int lockTimeout)
         {
-            myLock = new DistributedLock(client);
-            lockState = myLock.Lock(globalLockKey, acquisitionTimeout, lockTimeout);
+            myLock = new DistributedLock();
+            myClient = client;
+            lockState = myLock.Lock(globalLockKey, acquisitionTimeout, lockTimeout, out lockExpire, myClient);
         }
 
 
@@ -29,12 +32,18 @@ namespace ServiceStack.Redis.Support.Locking
             get { return lockState; } 
         }
 
+        public long LockExpire
+        {
+            get { return lockExpire; }
+        }
+
+
         /// <summary>
         /// unlock
         /// </summary>
         public void Dispose()
         {
-            myLock.Unlock();
+            myLock.Unlock(lockExpire, myClient);
         }
     }
 }

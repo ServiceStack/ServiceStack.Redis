@@ -6,34 +6,13 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 {
     public class SerializingRedisClient : RedisClient
     {
-        private readonly DistributedLock myLock;
         private ISerializer serializer = new ObjectSerializer();
    
         public SerializingRedisClient(string host, int port)
             : base(host, port)
         {
-             myLock = new DistributedLock(this);
         }
         
-        /// <summary>
-        /// acquire distributed, non-reentrant lock on key
-        /// </summary>
-        /// <param name="key">global key for this lock</param>
-        /// <param name="acquisitionTimeout">timeout for acquiring lock</param>
-        /// <param name="lockTimeout">timeout for lock, in seconds (stored as value against lock key) </param>
-        public long Lock(string key, int acquisitionTimeout, int lockTimeout)
-        {
-            return myLock.Lock(key, acquisitionTimeout, lockTimeout);
-
-        }
-        /// <summary>
-        /// unlock key
-        /// </summary>
-        public bool Unlock()
-        {
-            return myLock.Unlock();
-        }
-
         /// <summary>
         /// customize the client serializer
         /// </summary>

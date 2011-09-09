@@ -11,37 +11,39 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
     /// </summary>
     public partial class RedisSequentialWorkQueue<T> 
     {
-        public class DequeueManager : DistributedLock
+        public class DequeueManager
         {
- 
-            private bool ownsClient;
             protected readonly RedisSequentialWorkQueue<T> workQueue;
             protected readonly string workItemId;
             protected readonly PooledRedisClientManager clientManager;
             protected readonly int numberOfDequeuedItems;
             protected int numberOfProcessedItems;
-            public DequeueManager(IRedisClient client,    PooledRedisClientManager clientManager, RedisSequentialWorkQueue<T> workQueue, string workItemId, int numberOfDequeuedItems) : base(client)
+            private readonly DistributedLock myLock;
+            private readonly string dequeueLockKey;
+            private int dequeueLockTimeout = 300;
+            private long lockExpire;
+
+            public DequeueManager(PooledRedisClientManager clientManager, RedisSequentialWorkQueue<T> workQueue, string workItemId, string dequeueLockKey, int numberOfDequeuedItems, int dequeueLockTimeout) 
             {
                 this.workQueue = workQueue;
                 this.workItemId = workItemId;
                 this.clientManager = clientManager;
-                ownsClient = false;
                 this.numberOfDequeuedItems = numberOfDequeuedItems;
-            }
-
-            public override long Lock(string key, int acquisitionTimeout, int lockTimeout)
-            {
-                long rc = base.Lock(key, acquisitionTimeout, lockTimeout);
-                // do not hang on to the client reference. This lock may be held for a long time.
-                ReleaseClient();
-                return rc;
+                myLock = new DistributedLock();
+                this.dequeueLockKey = dequeueLockKey;
+                this.dequeueLockTimeout = dequeueLockTimeout;
             }
 
             public void DoneProcessedWorkItem()
             {
                 numberOfProcessedItems++;
                 if (numberOfProcessedItems == numberOfDequeuedItems)
-                    Unlock();
+                {
+                    using (var disposable = new PooledRedisClientManager.DisposablePooledClient<SerializingRedisClient>(clientManager))
+                    {
+                        Unlock(disposable.Client);
+                    }
+                }
             }
             /// <summary>
             /// 
@@ -52,17 +54,23 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 workQueue.Update(workItemId, numberOfProcessedItems, newWorkItem);
             }
 
-            public override bool Unlock()
+            public long Lock(int acquisitionTimeout, IRedisClient client)
             {
-                return PopAndUnlock(numberOfDequeuedItems);
+                return myLock.Lock(dequeueLockKey, acquisitionTimeout, dequeueLockTimeout, out lockExpire, client);
+            }
+
+            public bool Unlock(IRedisClient client)
+            {
+                return PopAndUnlock(numberOfDequeuedItems, client);
             }
 
             /// <summary>
             /// 
             /// </summary>
             /// <param name="numProcessed"></param>
+            /// <param name="client"></param>
             /// <returns></returns>
-            public bool PopAndUnlock(int numProcessed)
+            public bool PopAndUnlock(int numProcessed, IRedisClient client)
             {
                 if (numProcessed < 0)
                     numProcessed = 0;
@@ -74,27 +82,20 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
                 // unlock work queue id
                 workQueue.Unlock(workItemId);
-                bool rc = base.Unlock();
-
-                ReleaseClient();
-                return rc;
-            }
-            protected void ReleaseClient()
-            {
-                if (ownsClient && myClient != null)
-                    clientManager.DisposeClient((RedisNativeClient)myClient);
-                myClient = null;
-                ownsClient = false;
+                return  myLock.Unlock(lockExpire, client);
             }
 
-            protected override RedisClient AcquireClient()
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="numProcessed"></param>
+            /// <returns></returns>
+            public bool PopAndUnlock(int numProcessed)
             {
-                if (myClient == null)
+                using (var disposable = new PooledRedisClientManager.DisposablePooledClient<SerializingRedisClient>(clientManager))
                 {
-                    myClient = clientManager.GetClient();
-                    ownsClient = true;
+                    return PopAndUnlock(numProcessed, disposable.Client);
                 }
-                return (RedisClient) myClient;
             }
         }
     }

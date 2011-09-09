@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using ServiceStack.Redis.Support.Locking;
 
 
@@ -17,13 +18,12 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         private DateTime harvestTime = DateTime.UtcNow;
         private int lockAcquisitionTimeout = 2;
         private int lockTimeout = 2;
-        private int dequeueLockTimeout = 300;
         protected const double  CONVENIENTLY_SIZED_FLOAT = 18014398509481984.0;
 
         // store list of work item ids that have been dequeued
         // this list is checked regularly in harvest zombies method
         private string dequeueIdSet;
-
+        private int dequeueLockTimeout = 300;
 
         private string workItemIdPriorityQueue;
 
@@ -37,9 +37,9 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         public RedisSequentialWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port, string queueName, int dequeueLockTimeout) 
             : base(maxReadPoolSize, maxWritePoolSize, host, port, queueName)
         {
-            this.dequeueLockTimeout = dequeueLockTimeout;
             dequeueIdSet = queueNamespace.GlobalCacheKey("DequeueIdSet");
             workItemIdPriorityQueue = queueNamespace.GlobalCacheKey("WorkItemIdPriorityQueue");
+            this.dequeueLockTimeout = dequeueLockTimeout;
         }
 
         /// <summary>
@@ -158,12 +158,10 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                             pipe.Flush();
                         }
 
-                        workItemDequeueManager = new DequeueManager(client, clientManager, this, workItemId, workItems.Count);
-                        string dequeueLockKey = null;
+                        workItemDequeueManager = new DequeueManager(clientManager, this, workItemId, GlobalDequeueLockKey(workItemId), workItems.Count, dequeueLockTimeout);
                         // don't lock if there are no work items to be processed (can't lock on null lock key)
                         if (workItems.Count > 0)
-                            dequeueLockKey = GlobalDequeueLockKey(workItemId);
-                        workItemDequeueManager.Lock(dequeueLockKey, lockAcquisitionTimeout, dequeueLockTimeout);
+                           workItemDequeueManager.Lock(lockAcquisitionTimeout, client);
 
                     }
                     return new SequentialData<T>(workItemId, workItems, workItemDequeueManager);
@@ -173,7 +171,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 {
                     //release resources
                     if (workItemDequeueManager != null)
-                        workItemDequeueManager.Unlock();
+                        workItemDequeueManager.Unlock(client);
 
                     throw;
                 }
@@ -228,7 +226,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             bool rc = false;
             using (var disposableClient = clientManager.GetDisposableClient<SerializingRedisClient>())
             {
-            var client = disposableClient.Client;
+                var client = disposableClient.Client;
                 var dequeueWorkItemIds = client.SMembers(dequeueIdSet);
                 if (dequeueWorkItemIds.Length == 0) return false;
 

@@ -29,7 +29,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void TestSequentialWorkQueueUpdate()
         {
-            using (var queue = new RedisSequentialWorkQueue<string>(10, 10, "127.0.0.1", 6379, 1))
+            using (var queue = new RedisSequentialWorkQueue<string>(10, 10, "127.0.0.1", 6379,1))
             {
 
                 for (int i = 0; i < numMessages; ++i)
@@ -70,6 +70,7 @@ namespace ServiceStack.Redis.Tests
                 // check that half of patient[0] messages are returned
                 for (int i = 0; i < numMessages/2; ++i)
                     Assert.AreEqual(batch.DequeueItems[i], messages0[i]);
+                Assert.AreEqual(numMessages/2, batch.DequeueItems.Count);
                 Thread.Sleep(5000);
                 Assert.IsTrue(queue.HarvestZombies());
                 for (int i = 0; i < batch.DequeueItems.Count; ++i)
@@ -98,18 +99,14 @@ namespace ServiceStack.Redis.Tests
                 int remaining = batch.DequeueItems.Count-1;
                 batch.PopAndUnlock();
 
-                queue.PrepareNextWorkItem();
-                batch = queue.Dequeue(numMessages);
-                Assert.AreEqual(batch.DequeueItems.Count, remaining);
-
                 //process remaining items
-                queue.PrepareNextWorkItem();
+                Assert.IsTrue(queue.PrepareNextWorkItem());
                 batch = queue.Dequeue(remaining);
                 Assert.AreEqual(batch.DequeueItems.Count, remaining);
-                for (int i = 0; i < numMessages; ++i)
+                for (int i = 0; i < batch.DequeueItems.Count; ++i)
                     batch.DoneProcessedWorkItem();
 
-                queue.PrepareNextWorkItem();
+                Assert.IsFalse(queue.PrepareNextWorkItem());
                 batch = queue.Dequeue(remaining);
                 Assert.AreEqual(batch.DequeueItems.Count, 0);
            

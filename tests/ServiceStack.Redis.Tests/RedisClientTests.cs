@@ -361,28 +361,29 @@ namespace ServiceStack.Redis.Tests
             var key = "lockkey";
             int lockTimeout = 2;
 
-            var distributedLock = new DistributedLock(Redis);
-            Assert.AreEqual(distributedLock.Lock(key,lockTimeout,lockTimeout), DistributedLock.LOCK_ACQUIRED);
+            var distributedLock = new DistributedLock();
+            long lockExpire;
+            Assert.AreEqual(distributedLock.Lock(key, lockTimeout, lockTimeout, out lockExpire, Redis), DistributedLock.LOCK_ACQUIRED);
 
             //can't re-lock
-            distributedLock = new DistributedLock(Redis);
-            Assert.AreEqual(distributedLock.Lock( key, lockTimeout, lockTimeout), DistributedLock.LOCK_NOT_ACQUIRED);
+            distributedLock = new DistributedLock();
+            Assert.AreEqual(distributedLock.Lock(key, lockTimeout, lockTimeout, out lockExpire, Redis), DistributedLock.LOCK_NOT_ACQUIRED);
 
             // re-acquire lock after timeout
             Thread.Sleep(lockTimeout * 1000 + 1000);
-            distributedLock = new DistributedLock(Redis);
-            Assert.AreEqual(distributedLock.Lock( key, lockTimeout, lockTimeout), DistributedLock.LOCK_RECOVERED);
+            distributedLock = new DistributedLock();
+            Assert.AreEqual(distributedLock.Lock(key, lockTimeout, lockTimeout, out lockExpire, Redis), DistributedLock.LOCK_RECOVERED);
 
 
-            Assert.IsTrue(distributedLock.Unlock());
+            Assert.IsTrue(distributedLock.Unlock(lockExpire, Redis));
 
             //can now lock
-            distributedLock = new DistributedLock(Redis);
-            Assert.AreEqual(distributedLock.Lock(key, lockTimeout, lockTimeout), DistributedLock.LOCK_ACQUIRED);
+            distributedLock = new DistributedLock();
+            Assert.AreEqual(distributedLock.Lock(key, lockTimeout, lockTimeout, out lockExpire, Redis), DistributedLock.LOCK_ACQUIRED);
 
 
             //cleanup
-            Assert.IsTrue(distributedLock.Unlock());
+            Assert.IsTrue(distributedLock.Unlock(lockExpire, Redis));
 
  
         }
