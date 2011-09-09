@@ -82,7 +82,7 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
 
                 // unlock work queue id
                 workQueue.Unlock(workItemId);
-                return  myLock.Unlock(lockExpire, client);
+                return myLock.Unlock(dequeueLockKey, lockExpire, client);
             }
 
             /// <summary>

@@ -11,6 +11,7 @@ namespace ServiceStack.Redis.Support.Locking
         private readonly long lockState;
         private readonly long lockExpire;
         private readonly IRedisClient myClient;
+        private readonly string globalLockKey;
 
         /// <summary>
         /// Lock
@@ -23,6 +24,7 @@ namespace ServiceStack.Redis.Support.Locking
         {
             myLock = new DistributedLock();
             myClient = client;
+            this.globalLockKey = globalLockKey;
             lockState = myLock.Lock(globalLockKey, acquisitionTimeout, lockTimeout, out lockExpire, myClient);
         }
 
@@ -43,7 +45,7 @@ namespace ServiceStack.Redis.Support.Locking
         /// </summary>
         public void Dispose()
         {
-            myLock.Unlock(lockExpire, myClient);
+            myLock.Unlock(globalLockKey, lockExpire, myClient);
         }
     }
 }

@@ -9,9 +9,6 @@ namespace ServiceStack.Redis.Support.Locking
         public const int LOCK_ACQUIRED = 1;
         public const int LOCK_RECOVERED = 2;
 
-        protected string lockKey;
-
-
 		/// <summary>
 		/// acquire distributed, non-reentrant lock on key
 		/// </summary>
@@ -26,10 +23,6 @@ namespace ServiceStack.Redis.Support.Locking
 
             // cannot lock on a null key
             if (key == null)
-                return LOCK_NOT_ACQUIRED;
-
-            // cannot re-enter a lock
-            if (lockKey != null)
                 return LOCK_NOT_ACQUIRED;
 
 			const int sleepIfLockSet = 200;
@@ -91,8 +84,6 @@ namespace ServiceStack.Redis.Support.Locking
             if (wasSet != LOCK_NOT_ACQUIRED)
             {
                 lockExpire = newLockExpire;
-                lockKey = key;
-
             }
 		    return wasSet;
 
@@ -102,7 +93,7 @@ namespace ServiceStack.Redis.Support.Locking
 		/// <summary>
 		/// unlock key
 		/// </summary>
-		public virtual bool Unlock(long lockExpire, IRedisClient client)
+		public virtual bool Unlock(string key, long lockExpire, IRedisClient client)
 		{
 			if (lockExpire <= 0)
 				return false;
@@ -111,8 +102,8 @@ namespace ServiceStack.Redis.Support.Locking
             using (var pipe = localClient.CreatePipeline())
             {
                
-                pipe.QueueCommand(r => ((RedisNativeClient) r).Watch(lockKey));
-                pipe.QueueCommand(r => ((RedisNativeClient) r).Get(lockKey),
+                pipe.QueueCommand(r => ((RedisNativeClient) r).Watch(key));
+                pipe.QueueCommand(r => ((RedisNativeClient) r).Get(key),
                                   x => lockVal = (x != null) ? BitConverter.ToInt64(x, 0) : 0);
                 pipe.Flush();
             }
@@ -120,19 +111,19 @@ namespace ServiceStack.Redis.Support.Locking
 		    if (lockVal != lockExpire)
 		    {
                 if (lockVal != 0)
-                    Debug.WriteLine(String.Format("Unlock(): Failed to unlock key {0}; lock has been acquired by another client ", lockKey));
+                    Debug.WriteLine(String.Format("Unlock(): Failed to unlock key {0}; lock has been acquired by another client ", key));
                 else
-                    Debug.WriteLine(String.Format("Unlock(): Failed to unlock key {0}; lock has been identifed as a zombie and harvested ", lockKey));
+                    Debug.WriteLine(String.Format("Unlock(): Failed to unlock key {0}; lock has been identifed as a zombie and harvested ", key));
                 localClient.UnWatch();
 		        return false;
 		    }
 
             using (var trans = localClient.CreateTransaction())
             {
-                trans.QueueCommand(r => ((RedisNativeClient)r).Del(lockKey));
+                trans.QueueCommand(r => ((RedisNativeClient)r).Del(key));
                 var rc =  trans.Commit();
                 if (!rc)
-                    Debug.WriteLine(String.Format("Unlock(): Failed to delete key {0}; lock has been acquired by another client ", lockKey));
+                    Debug.WriteLine(String.Format("Unlock(): Failed to delete key {0}; lock has been acquired by another client ", key));
                 return rc;
             }
 

@@ -375,7 +375,7 @@ namespace ServiceStack.Redis.Tests
             Assert.AreEqual(distributedLock.Lock(key, lockTimeout, lockTimeout, out lockExpire, Redis), DistributedLock.LOCK_RECOVERED);
 
 
-            Assert.IsTrue(distributedLock.Unlock(lockExpire, Redis));
+            Assert.IsTrue(distributedLock.Unlock(key, lockExpire, Redis));
 
             //can now lock
             distributedLock = new DistributedLock();
@@ -383,7 +383,7 @@ namespace ServiceStack.Redis.Tests
 
 
             //cleanup
-            Assert.IsTrue(distributedLock.Unlock(lockExpire, Redis));
+            Assert.IsTrue(distributedLock.Unlock(key, lockExpire, Redis));
 
  
         }
