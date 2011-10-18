@@ -255,6 +255,11 @@ namespace ServiceStack.Redis.Generic
 			return IncrementValue(SequenceKey);
 		}
 
+		public long GetNextSequence(int incrBy)
+		{
+			return IncrementValueBy(SequenceKey, incrBy);
+		}
+
 		public RedisKeyType GetEntryType(string key)
 		{
 			return client.GetEntryType(key);
