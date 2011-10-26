@@ -12,6 +12,7 @@
 
 using System;
 using ServiceStack.Messaging;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Messaging
 {
@@ -68,6 +69,7 @@ namespace ServiceStack.Redis.Messaging
 		public void Publish(string queueName, byte[] messageBytes)
 		{
 			this.ReadWriteClient.LPush(queueName, messageBytes);
+			this.ReadWriteClient.Publish(QueueNames.Topic, queueName.ToUtf8Bytes());
 
 			if (onPublishedCallback != null)
 			{
@@ -91,6 +93,18 @@ namespace ServiceStack.Redis.Messaging
 		public byte[] GetAsync(string queueName)
 		{
 			return this.ReadOnlyClient.RPop(queueName);
+		}
+
+		public string WaitForNotifyOnAny(params string[] channelNames)
+		{
+			string result = null;
+			var subscription = new RedisSubscription(readOnlyClient);
+			subscription.OnMessage = (channel, msg) => {
+				result = msg;
+				subscription.UnSubscribeFromAllChannels();
+			};
+			subscription.SubscribeToChannels(channelNames); //blocks
+			return result;
 		}
 
 		public void Dispose()

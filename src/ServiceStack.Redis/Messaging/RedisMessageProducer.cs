@@ -12,6 +12,7 @@
 
 using System;
 using ServiceStack.Messaging;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Messaging
 {
@@ -49,6 +50,7 @@ namespace ServiceStack.Redis.Messaging
 		{
 			var messageBytes = message.ToBytes();
 			this.ReadWriteClient.LPush(message.ToInQueueName(), messageBytes);
+			this.ReadWriteClient.Publish(QueueNames.Topic, message.ToInQueueName().ToUtf8Bytes());
 			
 			if (onPublishedCallback != null)
 			{

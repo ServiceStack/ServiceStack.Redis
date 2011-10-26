@@ -8,7 +8,7 @@ namespace ServiceStack.Redis
 	public class RedisSubscription
 		: IRedisSubscription
 	{
-		private readonly RedisClient redisClient;
+		private readonly IRedisNativeClient redisClient;
 		private List<string> activeChannels;
 		public int SubscriptionCount { get; private set; }
 
@@ -16,7 +16,7 @@ namespace ServiceStack.Redis
 		private static readonly byte[] UnSubscribeWord = "unsubscribe".ToUtf8Bytes();
 		private static readonly byte[] MessageWord = "message".ToUtf8Bytes();
 
-		public RedisSubscription(RedisClient redisClient)
+		public RedisSubscription(IRedisNativeClient redisClient)
 		{
 			this.redisClient = redisClient;
 
