@@ -5,16 +5,19 @@ using System.Text;
 using System.Threading;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
+using ServiceStack.Service;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Messaging
 {
-    public class BackgroundThreadMqHost : IMessageService
+	public class BackgroundThreadMqHost : IMessageService
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(BackgroundThreadMqHost));
         public const int DefaultRetryCount = 2; //Will be a total of 3 attempts
 
-        readonly Random rand = new Random(Environment.TickCount);
+		public IMessageFactory MessageFactory { get; private set; }
+
+		readonly Random rand = new Random(Environment.TickCount);
         private void SleepBackOffMultiplier(int continuousErrorsCount)
         {
             if (continuousErrorsCount == 0) return;
@@ -54,7 +57,12 @@ namespace ServiceStack.Redis.Messaging
         }
 
         public int RetryCount { get; protected set; }
-        public TimeSpan? RequestTimeOut { get; protected set; }
+		public TimeSpan? RequestTimeOut { get; protected set; }
+
+		/// <summary>
+		/// Inject your own Reply Client Factory to handle custom Message.ReplyTo urls.
+		/// </summary>
+		public Func<string, IOneWayClient> ReplyClientFactory { get; set; }
 
         private readonly IRedisClientsManager clientsManager; //Thread safe redis client/conn factory
 
@@ -69,6 +77,7 @@ namespace ServiceStack.Redis.Messaging
             this.clientsManager = clientsManager;
             this.RetryCount = retryCount;
             this.RequestTimeOut = requestTimeOut;
+			this.MessageFactory = new RedisMessageFactory(clientsManager);
         }
 
         private readonly Dictionary<Type, IMessageHandlerFactory> handlerMap
@@ -82,7 +91,7 @@ namespace ServiceStack.Redis.Messaging
             RegisterHandler(processMessageFn, null);
         }
 
-        public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn, Action<Exception> processExceptionEx)
+		public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn, Action<IMessage<T>, Exception> processExceptionEx)
         {
             if (handlerMap.ContainsKey(typeof(T)))
             {
@@ -92,11 +101,12 @@ namespace ServiceStack.Redis.Messaging
             handlerMap[typeof(T)] = CreateMessageHandlerFactory(processMessageFn, processExceptionEx);
         }
 
-        protected IMessageHandlerFactory CreateMessageHandlerFactory<T>(Func<IMessage<T>, object> processMessageFn, Action<Exception> processExceptionEx)
+        protected IMessageHandlerFactory CreateMessageHandlerFactory<T>(Func<IMessage<T>, object> processMessageFn, Action<IMessage<T>, Exception> processExceptionEx)
         {
             return new MessageHandlerFactory<T>(this, processMessageFn, processExceptionEx)
             {
-                RetryCount = RetryCount
+                RetryCount = RetryCount,
+				
             };
         }
 
@@ -130,7 +140,7 @@ namespace ServiceStack.Redis.Messaging
                         //Record that we had a good run...
                         Interlocked.CompareExchange(ref noOfContinuousErrors, 0, noOfContinuousErrors);
 
-                        var cmd = mqClient.WaitForNotifyOnAny(QueueNames.Topic);
+                        var cmd = mqClient.WaitForNotifyOnAny(QueueNames.TopicIn);
                         if (cmd == StopCommand)
                         {
                             Log.Debug("Stop Command Issued");
@@ -282,7 +292,7 @@ namespace ServiceStack.Redis.Messaging
                 {
                     using (var redis = clientsManager.GetClient())
                     {
-                        redis.PublishMessage(QueueNames.Topic, StopCommand);
+                        redis.PublishMessage(QueueNames.TopicIn, StopCommand);
                     }
                 }
                 catch (Exception ex)
@@ -292,7 +302,7 @@ namespace ServiceStack.Redis.Messaging
             }
         }
 
-        public virtual void Dispose()
+    	public virtual void Dispose()
         {
             Stop();
 

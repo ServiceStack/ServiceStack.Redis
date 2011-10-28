@@ -19,21 +19,19 @@ namespace ServiceStack.Redis.Messaging
 	public class RedisTransientMessageService
 		: TransientMessageServiceBase
 	{
-		private readonly RedisMessageQueueClientFactory factory;
+		private readonly RedisTransientMessageFactory messageFactory;
 
 		public RedisTransientMessageService(int retryAttempts, TimeSpan? requestTimeOut,
 			RedisTransientMessageFactory messageFactory)
 			: base(retryAttempts, requestTimeOut)
 		{
 			messageFactory.ThrowIfNull("messageFactory");
-
-			this.factory = new RedisMessageQueueClientFactory(
-				messageFactory.ClientsManager, messageFactory.OnMessagePublished);
+			this.messageFactory = messageFactory;
 		}
 
-		public override IMessageQueueClientFactory MessageFactory
+		public override IMessageFactory MessageFactory
 		{
-			get { return this.factory; }
+			get { return messageFactory; }
 		}
 	}
 

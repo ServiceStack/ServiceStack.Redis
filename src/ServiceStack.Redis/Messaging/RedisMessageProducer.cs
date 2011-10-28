@@ -22,6 +22,9 @@ namespace ServiceStack.Redis.Messaging
 		private readonly IRedisClientsManager clientsManager;
 		private readonly Action onPublishedCallback;
 
+		public RedisMessageProducer(IRedisClientsManager clientsManager)
+			: this(clientsManager, null) {}
+
 		public RedisMessageProducer(IRedisClientsManager clientsManager, Action onPublishedCallback)
 		{
 			this.clientsManager = clientsManager;
@@ -50,7 +53,7 @@ namespace ServiceStack.Redis.Messaging
 		{
 			var messageBytes = message.ToBytes();
 			this.ReadWriteClient.LPush(message.ToInQueueName(), messageBytes);
-			this.ReadWriteClient.Publish(QueueNames.Topic, message.ToInQueueName().ToUtf8Bytes());
+			this.ReadWriteClient.Publish(QueueNames.TopicIn, message.ToInQueueName().ToUtf8Bytes());
 			
 			if (onPublishedCallback != null)
 			{
