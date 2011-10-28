@@ -62,7 +62,9 @@ namespace ServiceStack.Redis.Messaging
 		/// <summary>
 		/// Inject your own Reply Client Factory to handle custom Message.ReplyTo urls.
 		/// </summary>
-		public Func<string, IOneWayClient> ReplyClientFactory { get; set; }
+        public Func<string, IOneWayClient> ReplyClientFactory { get; set; }
+        
+        public Action<Exception> ErrorHandler { get; set; }
 
         private readonly IRedisClientsManager clientsManager; //Thread safe redis client/conn factory
 
@@ -78,6 +80,7 @@ namespace ServiceStack.Redis.Messaging
             this.RetryCount = retryCount;
             this.RequestTimeOut = requestTimeOut;
 			this.MessageFactory = new RedisMessageFactory(clientsManager);
+            this.ErrorHandler = ex => Log.Error("Exception in Background Thread: " + ex.Message, ex);
         }
 
         private readonly Dictionary<Type, IMessageHandlerFactory> handlerMap
@@ -161,7 +164,7 @@ namespace ServiceStack.Redis.Messaging
                 if (Interlocked.CompareExchange(ref status, Stopped, Started) != Started)
                     Interlocked.CompareExchange(ref status, Stopped, Stopping);
 
-                Log.Error("Exception in Background Thread: " + ex.Message, ex);
+                if (this.ErrorHandler != null) this.ErrorHandler(ex);
             }
         }
 
@@ -175,26 +178,33 @@ namespace ServiceStack.Redis.Messaging
 
             if (Interlocked.CompareExchange(ref status, Starting, Stopped) == Stopped) //Should only be 1 thread past this point
             {
-                Init();
-
-                if (this.messageHandlers == null || this.messageHandlers.Length == 0)
+                try
                 {
-                    Log.Warn("Cannot start a MQ Host with no Message Handlers registered, ignoring.");
-                    Interlocked.CompareExchange(ref status, Stopped, Starting);
-                    return;
+                    Init();
+
+                    if (this.messageHandlers == null || this.messageHandlers.Length == 0)
+                    {
+                        Log.Warn("Cannot start a MQ Host with no Message Handlers registered, ignoring.");
+                        Interlocked.CompareExchange(ref status, Stopped, Starting);
+                        return;
+                    }
+
+                    SleepBackOffMultiplier(Interlocked.CompareExchange(ref noOfContinuousErrors, 0, 0));
+
+                    KillBgThreadIfExists();
+
+                    bgThread = new Thread(RunLoop)
+                    {
+                        IsBackground = true,
+                        Name = "Redis MQ Host " + Interlocked.Increment(ref bgThreadCount)
+                    };
+                    bgThread.Start();
+                    Log.Debug("Started Background Thread: " + bgThread.Name);
                 }
-
-                SleepBackOffMultiplier(Interlocked.CompareExchange(ref noOfContinuousErrors, 0, 0));
-
-                KillBgThreadIfExists();
-
-                bgThread = new Thread(RunLoop)
+                catch (Exception ex)
                 {
-                    IsBackground = true,
-                    Name = "Redis MQ Host " + Interlocked.Increment(ref bgThreadCount)
-                };
-                bgThread.Start();
-                Log.Debug("Started Background Thread: " + bgThread.Name);
+                    if (this.ErrorHandler != null) this.ErrorHandler(ex);
+                }
             }
         }
 
@@ -297,6 +307,7 @@ namespace ServiceStack.Redis.Messaging
                 }
                 catch (Exception ex)
                 {
+                    if (this.ErrorHandler != null) this.ErrorHandler(ex);
                     Log.Warn("Could not send STOP message to bg thread: " + ex.Message);
                 }
             }
@@ -309,8 +320,15 @@ namespace ServiceStack.Redis.Messaging
             if (Interlocked.CompareExchange(ref status, Disposed, Stopped) != Stopped)
                 Interlocked.CompareExchange(ref status, Disposed, Stopping);
 
-            Thread.Sleep(100); //give it a small chance to die gracefully
-            KillBgThreadIfExists();
+            try
+            {
+                Thread.Sleep(100); //give it a small chance to die gracefully
+                KillBgThreadIfExists();
+            }
+            catch (Exception ex)
+            {
+                if (this.ErrorHandler != null) this.ErrorHandler(ex);
+            }
         }
 
     }
