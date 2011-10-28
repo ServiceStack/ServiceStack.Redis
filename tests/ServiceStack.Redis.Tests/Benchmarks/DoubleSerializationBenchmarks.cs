@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using NUnit.Framework;
 using ServiceStack.Text;
@@ -42,24 +43,25 @@ namespace ServiceStack.Redis.Tests.Benchmarks
 
 			for (var i = 0; i < times; i++)
 			{
+				results[i] = (initalVal + i).ToString("r");
+			}
+
+			Console.WriteLine("double.ToString('r') completed in ms: " + sw.ElapsedMilliseconds);
+			//PrintLastValues(results, 100);
+
+			//Default
+			ResetGC();
+			sw = Stopwatch.StartNew();
+
+			for (var i = 0; i < times; i++)
+			{
 				results[i] = DoubleConverter.ToExactString(initalVal + i);
 			}
 
 			Console.WriteLine("DoubleConverter.ToExactString(): Completed in ms: " + sw.ElapsedMilliseconds);
 			//PrintLastValues(results, 100);
 
-			ResetGC();
-			sw = Stopwatch.StartNew();
-
-			for (var i = 0; i < times; i++)
-			{
-				results[i] = (initalVal + i).ToString("r");
-			}
-
-			Console.WriteLine("Double.ToString('r') completed in ms: " + sw.ElapsedMilliseconds);
-			//PrintLastValues(results, 100);
-
-
+			//What #XBOX uses
 			ResetGC();
 			sw = Stopwatch.StartNew();
 
@@ -69,7 +71,20 @@ namespace ServiceStack.Redis.Tests.Benchmarks
 			}
 
 			Console.WriteLine("BitConverter.ToString() completed in ms: " + sw.ElapsedMilliseconds);
-			//PrintLastValues(results, 100);
+			//PrintLastValues(results, 100); 
+
+
+			//What Booksleeve uses
+			ResetGC();
+			sw = Stopwatch.StartNew();
+
+			for (var i = 0; i < times; i++)
+			{
+				results[i] = (initalVal + i).ToString("G", CultureInfo.InvariantCulture);
+			}
+
+			Console.WriteLine("double.ToString('G') completed in ms: " + sw.ElapsedMilliseconds);
+			//PrintLastValues(results, 100); 
 		}
 
 		private static void PrintLastValues(string[] results, int count)
