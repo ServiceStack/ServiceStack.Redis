@@ -44,6 +44,11 @@ namespace ServiceStack.Redis.Messaging
 				retryAttempts, requestTimeOut, this);
 		}
 
+		public IMessageQueueClient CreateMessageQueueClient()
+		{
+			return new RedisMessageQueueClient(this.ClientsManager, OnMessagePublished);
+		}
+
 		public IMessageProducer CreateMessageProducer()
 		{
 			return new RedisMessageProducer(this.ClientsManager, OnMessagePublished);
@@ -77,5 +82,6 @@ namespace ServiceStack.Redis.Messaging
 				this.ClientsManager = null;
 			}
 		}
+
 	}
 }

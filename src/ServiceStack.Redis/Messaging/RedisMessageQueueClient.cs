@@ -22,6 +22,9 @@ namespace ServiceStack.Redis.Messaging
 		private readonly Action onPublishedCallback;
 		private readonly IRedisClientsManager clientsManager;
 
+		public RedisMessageQueueClient(IRedisClientsManager clientsManager)
+			: this(clientsManager, null) {}
+
 		public RedisMessageQueueClient(
 			IRedisClientsManager clientsManager, Action onPublishedCallback)
 		{
@@ -69,7 +72,7 @@ namespace ServiceStack.Redis.Messaging
 		public void Publish(string queueName, byte[] messageBytes)
 		{
 			this.ReadWriteClient.LPush(queueName, messageBytes);
-			this.ReadWriteClient.Publish(QueueNames.Topic, queueName.ToUtf8Bytes());
+			this.ReadWriteClient.Publish(QueueNames.TopicIn, queueName.ToUtf8Bytes());
 
 			if (onPublishedCallback != null)
 			{
@@ -82,6 +85,7 @@ namespace ServiceStack.Redis.Messaging
 			const int maxSuccessQueueSize = 1000;
 			this.ReadWriteClient.LPush(queueName, messageBytes);
 			this.ReadWriteClient.LTrim(queueName, 0, maxSuccessQueueSize);
+			this.ReadWriteClient.Publish(QueueNames.TopicOut, queueName.ToUtf8Bytes());
 		}
 
 		public byte[] Get(string queueName, TimeSpan? timeOut)

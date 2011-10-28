@@ -118,7 +118,8 @@
     <Compile Include="AdhocClientTests.cs" />
     <Compile Include="AlchemyClientTestsBase.cs" />
     <Compile Include="AlchemyNativeClientTests.cs" />
-    <Compile Include="BackgroundThreadMessageServiceTests.cs" />
+    <Compile Include="BackgroundThreadMqHostTests.cs" />
+    <Compile Include="Benchmarks\BackgroundMqHostBenchmarks.cs" />
     <Compile Include="CultureInfoTests.cs" />
     <Compile Include="Generic\RedisTypedClientTests.cs" />
     <Compile Include="ObjectSerializerTests.cs" />
