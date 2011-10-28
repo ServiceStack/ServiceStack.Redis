@@ -58,6 +58,30 @@ namespace ServiceStack.Redis.Tests
             mqClient.Publish(new Reverse { Value = "Redis" });
         }
 
+        private static void Publish_4_Rot13_messages(IMessageQueueClient mqClient)
+        {
+            mqClient.Publish(new Rot13 { Value = "Hello" });
+            mqClient.Publish(new Rot13 { Value = "World" });
+            mqClient.Publish(new Rot13 { Value = "ServiceStack" });
+            mqClient.Publish(new Rot13 { Value = "Redis" });
+        }
+
+        [Test]
+        public void Utils_publish_Reverse_messages()
+        {
+            var mqHost = new BackgroundThreadMqHost(new BasicRedisClientManager(), 2, null);
+            var mqClient = mqHost.CreateMessageQueueClient();
+            Publish_4_messages(mqClient);
+        }
+
+        [Test]
+        public void Utils_publish_Rot13_messages()
+        {
+            var mqHost = new BackgroundThreadMqHost(new BasicRedisClientManager(), 2, null);
+            var mqClient = mqHost.CreateMessageQueueClient();
+            Publish_4_Rot13_messages(mqClient);
+        }
+
         [Test]
         public void Does_process_messages_sent_before_it_was_started()
         {

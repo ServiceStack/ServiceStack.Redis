@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Security.Cryptography;
 using NUnit.Framework;
 using ServiceStack.Common.Utils;
+using ServiceStack.ServiceClient.Web;
 using ServiceStack.Redis;
 using System.Text;
 using ServiceStack.Text;
@@ -26,6 +28,43 @@ namespace ServiceStack.Redis.Tests
 				Assert.That(result, Is.EqualTo(value));
 			}
 		}
+
+        public string CalculateMD5Hash(string input)
+        {
+            // step 1, calculate MD5 hash from input
+            var md5 = MD5.Create();
+            byte[] inputBytes = Encoding.ASCII.GetBytes(input);
+            byte[] hash = md5.ComputeHash(inputBytes);
+ 
+            // step 2, convert byte array to hex string
+            var sb = new StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+            return sb.ToString();
+        }
+
+        [Test]
+        public void PrintHash()
+        {
+            Console.WriteLine(CalculateMD5Hash("X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"));
+        }
+
+        [Test]
+        public void Write_Known_Virus_JsonResult()
+        {
+            //var html = "http://www.virustotal.com/latest-report.html?resource=44D88612FEA8A8F36DE82E1278ABB02F".DownloadJsonFromUrl();
+            var json = "https://www.virustotal.com/api/get_file_report.json?resource=44D88612FEA8A8F36DE82E1278ABB02F".DownloadJsonFromUrl();
+            Console.WriteLine(json);
+        }
+
+        [Test]
+        public void Write_Unknown_file_JsonResult()
+        {
+            var json = "http://www.virustotal.com/latest-report.html?resource=AAAA8612FEA8A8F36DE82E1278ABB02F".DownloadJsonFromUrl();
+            Console.WriteLine(json);
+        }
 
 		[Test]
 		public void Can_infer_utf8_bytes()
