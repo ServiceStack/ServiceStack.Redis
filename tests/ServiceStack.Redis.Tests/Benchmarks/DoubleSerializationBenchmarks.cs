@@ -25,9 +25,20 @@ namespace ServiceStack.Redis.Tests.Benchmarks
 			var initalVal = 0.3333333333333333d;
 
 			var results = new string[times];
-			
+
 			ResetGC();
 			var sw = Stopwatch.StartNew();
+
+			for (var i = 0; i < times; i++)
+			{
+				results[i] = (initalVal + i).ToString();
+			}
+
+			Console.WriteLine("double.ToString(): Completed in ms: " + sw.ElapsedMilliseconds);
+			//PrintLastValues(results, 100);
+
+			ResetGC();
+			sw = Stopwatch.StartNew();
 
 			for (var i = 0; i < times; i++)
 			{
