@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Sockets;
 using System.Text;
 using ServiceStack.Common.Web;
@@ -76,6 +77,20 @@ namespace ServiceStack.Redis
 				results.Add(multiData.FromUtf8Bytes());
 			}
 			return results;
+		}
+
+		public static byte[] ToFastUtf8Bytes(this double value)
+		{
+			return FastToUtf8Bytes(value.ToString("G", CultureInfo.InvariantCulture));
+		}
+
+		private static byte[] FastToUtf8Bytes(string strVal)
+		{
+			var bytes = new byte[strVal.Length];
+			for (var i = 0; i < strVal.Length; i++)
+				bytes[i] = (byte)strVal[i];
+
+			return bytes;
 		}
 	}
 

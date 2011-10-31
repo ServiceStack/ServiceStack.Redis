@@ -86,6 +86,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\tests\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="ServiceStack">
+      <HintPath>..\..\lib\tests\ServiceStack.dll</HintPath>
+    </Reference>
     <Reference Include="ServiceStack.Common">
       <HintPath>..\..\lib\ServiceStack.Common.dll</HintPath>
     </Reference>
@@ -97,6 +100,10 @@
     </Reference>
     <Reference Include="ServiceStack.Messaging.Tests">
       <HintPath>..\..\lib\tests\ServiceStack.Messaging.Tests.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.ServiceInterface, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\tests\ServiceStack.ServiceInterface.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.Text">
       <HintPath>..\..\lib\ServiceStack.Text.dll</HintPath>
@@ -118,8 +125,8 @@
     <Compile Include="AdhocClientTests.cs" />
     <Compile Include="AlchemyClientTestsBase.cs" />
     <Compile Include="AlchemyNativeClientTests.cs" />
-    <Compile Include="BackgroundThreadMqHostTests.cs" />
-    <Compile Include="Benchmarks\BackgroundMqHostBenchmarks.cs" />
+    <Compile Include="RedisMqHostTests.cs" />
+    <Compile Include="Benchmarks\RedisMqHostBenchmarks.cs" />
     <Compile Include="Benchmarks\DoubleSerializationBenchmarks.cs" />
     <Compile Include="CultureInfoTests.cs" />
     <Compile Include="Generic\RedisTypedClientTests.cs" />

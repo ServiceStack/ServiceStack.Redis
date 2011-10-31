@@ -6,19 +6,19 @@ using ServiceStack.Redis.Messaging;
 namespace ServiceStack.Redis.Tests.Benchmarks
 {
 	[TestFixture]
-	public class BackgroundMqHostBenchmarks
+	public class RedisMqHostBenchmarks
 	{
 		public class Incr
 		{
 			public int Value { get; set; }
 		}
 
-		private static BackgroundThreadMqHost CreateMqHost()
+		private static RedisMqHost CreateMqHost()
 		{
 			return CreateMqHost(2);
 		}
 
-		private static BackgroundThreadMqHost CreateMqHost(int noOfRetries)
+		private static RedisMqHost CreateMqHost(int noOfRetries)
 		{
 			var redisFactory = new BasicRedisClientManager();
 			try
@@ -29,7 +29,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
 			{
 				Console.WriteLine("WARNING: Redis not started? \n" + rex.Message);
 			}
-			var mqHost = new BackgroundThreadMqHost(redisFactory, noOfRetries, null);
+			var mqHost = new RedisMqHost(redisFactory, noOfRetries, null);
 			return mqHost;
 		}
 
@@ -41,7 +41,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
 
 			mqHost.RegisterHandler<Incr>(m => {
 				called++;
-				return new Incr { Value = m.Body.Value + 1 };
+				return new Incr { Value = m.GetBody().Value + 1 };
 			});
 
 			mqHost.Start();

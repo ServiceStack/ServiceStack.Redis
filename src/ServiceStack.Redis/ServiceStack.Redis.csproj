@@ -110,7 +110,7 @@
     <Compile Include="Generic\RedisTypedPipeline.cs" />
     <Compile Include="Generic\RedisTypedCommandQueue.cs" />
     <Compile Include="IRedisClientFactory.cs" />
-    <Compile Include="Messaging\BackgroundThreadMqHost.cs" />
+    <Compile Include="Messaging\RedisMqHost.cs" />
     <Compile Include="Messaging\RedisMessageFactory.cs" />
     <Compile Include="RedisClientsManagerExtensions.cs" />
     <Compile Include="Pipeline\QueuedRedisCommand.cs" />

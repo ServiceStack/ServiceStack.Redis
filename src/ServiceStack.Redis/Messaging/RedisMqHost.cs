@@ -10,9 +10,9 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Messaging
 {
-	public class BackgroundThreadMqHost : IMessageService
+	public class RedisMqHost : IMessageService
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(BackgroundThreadMqHost));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(RedisMqHost));
         public const int DefaultRetryCount = 2; //Will be a total of 3 attempts
 
 		public IMessageFactory MessageFactory { get; private set; }
@@ -73,7 +73,7 @@ namespace ServiceStack.Redis.Messaging
             return new RedisMessageQueueClient(this.clientsManager, null);
         }
 
-        public BackgroundThreadMqHost(IRedisClientsManager clientsManager,
+        public RedisMqHost(IRedisClientsManager clientsManager,
             int retryCount, TimeSpan? requestTimeOut)
         {
             this.clientsManager = clientsManager;

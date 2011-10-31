@@ -883,7 +883,7 @@ namespace ServiceStack.Redis
         {
             AssertSetIdAndValue(setId, value);
 
-            return SendExpectInt(Commands.ZAdd, setId.ToUtf8Bytes(), score.ToUtf8Bytes(), value);
+            return SendExpectInt(Commands.ZAdd, setId.ToUtf8Bytes(), score.ToFastUtf8Bytes(), value);
         }
 
         public int ZRem(string setId, byte[] value)
@@ -897,7 +897,7 @@ namespace ServiceStack.Redis
         {
             AssertSetIdAndValue(setId, value);
 
-            return SendExpectDouble(Commands.ZIncrBy, setId.ToUtf8Bytes(), incrBy.ToUtf8Bytes(), value);
+			return SendExpectDouble(Commands.ZIncrBy, setId.ToUtf8Bytes(), incrBy.ToFastUtf8Bytes(), value);
         }
 
         public int ZRank(string setId, byte[] value)
@@ -960,7 +960,7 @@ namespace ServiceStack.Redis
 
             var cmdWithArgs = new List<byte[]>
            	{
-           		commandBytes, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes()
+           		commandBytes, setId.ToUtf8Bytes(), min.ToFastUtf8Bytes(), max.ToFastUtf8Bytes()
            	};
 
             if (skip.HasValue || take.HasValue)
@@ -1015,7 +1015,7 @@ namespace ServiceStack.Redis
                 throw new ArgumentNullException("setId");
 
             return SendExpectInt(Commands.ZRemRangeByScore, setId.ToUtf8Bytes(),
-                fromScore.ToUtf8Bytes(), toScore.ToUtf8Bytes());
+				fromScore.ToFastUtf8Bytes(), toScore.ToFastUtf8Bytes());
         }
 
         public int ZCard(string setId)

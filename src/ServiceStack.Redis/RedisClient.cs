@@ -249,7 +249,7 @@ namespace ServiceStack.Redis
 				if (resultBytes == null) continue;
 
 				var resultString = resultBytes.FromUtf8Bytes();
-				results.Add(resultString);
+				results.Add(resultString.FromJson<string>());
 			}
 
 			return results;
@@ -268,7 +268,7 @@ namespace ServiceStack.Redis
 				if (resultBytes == null) continue;
 
 				var resultString = resultBytes.FromUtf8Bytes();
-				var result = JsonSerializer.DeserializeFromString<T>(resultString);
+				var result = resultString.FromJson<T>();
 				results.Add(result);
 			}
 

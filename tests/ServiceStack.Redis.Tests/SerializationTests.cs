@@ -36,7 +36,7 @@ namespace ServiceStack.Redis.Tests
 
 			var bytesStr = Encoding.UTF8.GetString(bytes);
 			var fromTypeWithObject = JsonSerializer.DeserializeFromString<Tuple>(bytesStr);
-			var newObj = (CustomType)JsonSerializer.DeserializeFromString((string)fromTypeWithObject.Value, fromTypeWithObject.Type);
+			var newObj = fromTypeWithObject.Value as CustomType;
 
 			Assert.That(newObj.CustomId, Is.EqualTo(obj.CustomId));
 			Assert.That(newObj.CustomName, Is.EqualTo(obj.CustomName));

@@ -12,7 +12,7 @@ using ServiceStack.Text;
 namespace ServiceStack.Redis.Tests
 {
 	[TestFixture]
-	public class BackgroundThreadMqHostTests
+	public class RedisMqHostTests
 	{
 		public class Reverse
 		{
@@ -30,12 +30,12 @@ namespace ServiceStack.Redis.Tests
 			LogManager.LogFactory = new ConsoleLogFactory();
 		}
 
-		private static BackgroundThreadMqHost CreateMqHost()
+		private static RedisMqHost CreateMqHost()
 		{
 			return CreateMqHost(2);
 		}
 
-		private static BackgroundThreadMqHost CreateMqHost(int noOfRetries)
+		private static RedisMqHost CreateMqHost(int noOfRetries)
 		{
 			var redisFactory = new BasicRedisClientManager();
 			try
@@ -46,7 +46,7 @@ namespace ServiceStack.Redis.Tests
 			{
 				Console.WriteLine("WARNING: Redis not started? \n" + rex.Message);
 			}
-			var mqHost = new BackgroundThreadMqHost(redisFactory, noOfRetries, null);
+			var mqHost = new RedisMqHost(redisFactory, noOfRetries, null);
 			return mqHost;
 		}
 
@@ -69,7 +69,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Utils_publish_Reverse_messages()
         {
-            var mqHost = new BackgroundThreadMqHost(new BasicRedisClientManager(), 2, null);
+            var mqHost = new RedisMqHost(new BasicRedisClientManager(), 2, null);
             var mqClient = mqHost.CreateMessageQueueClient();
             Publish_4_messages(mqClient);
         }
@@ -77,7 +77,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Utils_publish_Rot13_messages()
         {
-            var mqHost = new BackgroundThreadMqHost(new BasicRedisClientManager(), 2, null);
+            var mqHost = new RedisMqHost(new BasicRedisClientManager(), 2, null);
             var mqClient = mqHost.CreateMessageQueueClient();
             Publish_4_Rot13_messages(mqClient);
         }
@@ -88,7 +88,7 @@ namespace ServiceStack.Redis.Tests
 			var reverseCalled = 0;
 
 			var mqHost = CreateMqHost();
-			mqHost.RegisterHandler<Reverse>(x => { reverseCalled++; return x.Body.Value.Reverse(); });
+			mqHost.RegisterHandler<Reverse>(x => { reverseCalled++; return x.GetBody().Value.Reverse(); });
 
 			var mqClient = mqHost.CreateMessageQueueClient();
 			Publish_4_messages(mqClient);
@@ -110,8 +110,8 @@ namespace ServiceStack.Redis.Tests
 			var reverseCalled = 0;
 			var rot13Called = 0;
 
-			mqHost.RegisterHandler<Reverse>(x => { reverseCalled++; return x.Body.Value.Reverse(); });
-			mqHost.RegisterHandler<Rot13>(x => { rot13Called++; return x.Body.Value.ToRot13(); });
+			mqHost.RegisterHandler<Reverse>(x => { reverseCalled++; return x.GetBody().Value.Reverse(); });
+			mqHost.RegisterHandler<Rot13>(x => { rot13Called++; return x.GetBody().Value.ToRot13(); });
 
 			var mqClient = mqHost.CreateMessageQueueClient();
 			mqClient.Publish(new Reverse { Value = "Hello" });
@@ -151,8 +151,8 @@ namespace ServiceStack.Redis.Tests
 		{
 			var mqHost = CreateMqHost();
 
-			mqHost.RegisterHandler<Reverse>(x => x.Body.Value.Reverse());
-			mqHost.RegisterHandler<Rot13>(x => x.Body.Value.ToRot13());
+			mqHost.RegisterHandler<Reverse>(x => x.GetBody().Value.Reverse());
+			mqHost.RegisterHandler<Rot13>(x => x.GetBody().Value.ToRot13());
 
 			5.Times(x => ThreadPool.QueueUserWorkItem(y => mqHost.Start()));
 			Thread.Sleep(1000);
@@ -179,7 +179,7 @@ namespace ServiceStack.Redis.Tests
 		{
 			var mqHost = CreateMqHost();
 
-			mqHost.RegisterHandler<Reverse>(x => x.Body.Value.Reverse());
+			mqHost.RegisterHandler<Reverse>(x => x.GetBody().Value.Reverse());
 			mqHost.Dispose();
 
 			try
@@ -195,7 +195,7 @@ namespace ServiceStack.Redis.Tests
 		{
 			var mqHost = CreateMqHost();
 
-			mqHost.RegisterHandler<Reverse>(x => x.Body.Value.Reverse());
+			mqHost.RegisterHandler<Reverse>(x => x.GetBody().Value.Reverse());
 			mqHost.Start();
 			Thread.Sleep(1000);
 
@@ -225,9 +225,9 @@ namespace ServiceStack.Redis.Tests
 			var reverseCalled = 0;
 			var rot13Called = 0;
 
-			mqHost.RegisterHandler<Reverse>(x => { reverseCalled++; return x.Body.Value.Reverse(); });
-			mqHost.RegisterHandler<Rot13>(x => { rot13Called++; return x.Body.Value.ToRot13(); });
-			mqHost.RegisterHandler<AlwaysThrows>(x => { throw new Exception("Always Throwing! " + x.Body.Value); });
+			mqHost.RegisterHandler<Reverse>(x => { reverseCalled++; return x.GetBody().Value.Reverse(); });
+			mqHost.RegisterHandler<Rot13>(x => { rot13Called++; return x.GetBody().Value.ToRot13(); });
+			mqHost.RegisterHandler<AlwaysThrows>(x => { throw new Exception("Always Throwing! " + x.GetBody().Value); });
 			mqHost.Start();
 
 			var mqClient = mqHost.CreateMessageQueueClient();
@@ -269,9 +269,9 @@ namespace ServiceStack.Redis.Tests
 			var called = 0;
 
 			mqHost.RegisterHandler<Incr>(m => {
-				Console.WriteLine("In Incr #" + m.Body.Value);
+				Console.WriteLine("In Incr #" + m.GetBody().Value);
 				called++;
-				return m.Body.Value > 0 ? new Incr { Value = m.Body.Value - 1 } : null;
+				return m.GetBody().Value > 0 ? new Incr { Value = m.GetBody().Value - 1 } : null;
 			});
 
 			mqHost.Start();
@@ -297,10 +297,10 @@ namespace ServiceStack.Redis.Tests
 			string messageReceived = null;
 
 			mqHost.RegisterHandler<Hello>(m =>
-				new HelloResponse { Result = "Hello, " + m.Body.Name });
+				new HelloResponse { Result = "Hello, " + m.GetBody().Name });
 
 			mqHost.RegisterHandler<HelloResponse>(m => {
-				messageReceived = m.Body.Result; return null;
+				messageReceived = m.GetBody().Result; return null;
 			});
 
 			mqHost.Start();
