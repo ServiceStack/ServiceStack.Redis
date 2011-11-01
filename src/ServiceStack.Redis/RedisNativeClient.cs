@@ -879,12 +879,19 @@ namespace ServiceStack.Redis
                 throw new ArgumentNullException("value");
         }
 
-        public int ZAdd(string setId, double score, byte[] value)
-        {
-            AssertSetIdAndValue(setId, value);
+		public int ZAdd(string setId, double score, byte[] value)
+		{
+			AssertSetIdAndValue(setId, value);
 
-            return SendExpectInt(Commands.ZAdd, setId.ToUtf8Bytes(), score.ToFastUtf8Bytes(), value);
-        }
+			return SendExpectInt(Commands.ZAdd, setId.ToUtf8Bytes(), score.ToFastUtf8Bytes(), value);
+		}
+
+		public int ZAdd(string setId, long score, byte[] value)
+		{
+			AssertSetIdAndValue(setId, value);
+
+			return SendExpectInt(Commands.ZAdd, setId.ToUtf8Bytes(), score.ToUtf8Bytes(), value);
+		}
 
         public int ZRem(string setId, byte[] value)
         {
@@ -893,12 +900,19 @@ namespace ServiceStack.Redis
             return SendExpectInt(Commands.ZRem, setId.ToUtf8Bytes(), value);
         }
 
-        public double ZIncrBy(string setId, double incrBy, byte[] value)
-        {
-            AssertSetIdAndValue(setId, value);
+		public double ZIncrBy(string setId, double incrBy, byte[] value)
+		{
+			AssertSetIdAndValue(setId, value);
 
 			return SendExpectDouble(Commands.ZIncrBy, setId.ToUtf8Bytes(), incrBy.ToFastUtf8Bytes(), value);
-        }
+		}
+
+		public double ZIncrBy(string setId, long incrBy, byte[] value)
+		{
+			AssertSetIdAndValue(setId, value);
+
+			return SendExpectDouble(Commands.ZIncrBy, setId.ToUtf8Bytes(), incrBy.ToUtf8Bytes(), value);
+		}
 
         public int ZRank(string setId, byte[] value)
         {
@@ -978,27 +992,75 @@ namespace ServiceStack.Redis
             return SendExpectMultiData(cmdWithArgs.ToArray());
         }
 
-        public byte[][] ZRangeByScore(string setId, double min, double max, int? skip, int? take)
-        {
-            return GetRangeByScore(Commands.ZRangeByScore, setId, min, max, skip, take, false);
-        }
+		private byte[][] GetRangeByScore(byte[] commandBytes,
+			string setId, long min, long max, int? skip, int? take, bool withScores)
+		{
+			if (setId == null)
+				throw new ArgumentNullException("setId");
 
-        public byte[][] ZRangeByScoreWithScores(string setId, double min, double max, int? skip, int? take)
-        {
-            return GetRangeByScore(Commands.ZRangeByScore, setId, min, max, skip, take, true);
-        }
+			var cmdWithArgs = new List<byte[]>
+           	{
+           		commandBytes, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes()
+           	};
 
-        public byte[][] ZRevRangeByScore(string setId, double min, double max, int? skip, int? take)
-        {
+			if (skip.HasValue || take.HasValue)
+			{
+				cmdWithArgs.Add(Commands.Limit);
+				cmdWithArgs.Add(skip.GetValueOrDefault(0).ToUtf8Bytes());
+				cmdWithArgs.Add(take.GetValueOrDefault(0).ToUtf8Bytes());
+			}
+
+			if (withScores)
+			{
+				cmdWithArgs.Add(Commands.WithScores);
+			}
+
+			return SendExpectMultiData(cmdWithArgs.ToArray());
+		}
+
+		public byte[][] ZRangeByScore(string setId, double min, double max, int? skip, int? take)
+		{
+			return GetRangeByScore(Commands.ZRangeByScore, setId, min, max, skip, take, false);
+		}
+
+		public byte[][] ZRangeByScore(string setId, long min, long max, int? skip, int? take)
+		{
+			return GetRangeByScore(Commands.ZRangeByScore, setId, min, max, skip, take, false);
+		}
+
+		public byte[][] ZRangeByScoreWithScores(string setId, double min, double max, int? skip, int? take)
+		{
+			return GetRangeByScore(Commands.ZRangeByScore, setId, min, max, skip, take, true);
+		}
+
+		public byte[][] ZRangeByScoreWithScores(string setId, long min, long max, int? skip, int? take)
+		{
+			return GetRangeByScore(Commands.ZRangeByScore, setId, min, max, skip, take, true);
+		}
+
+		public byte[][] ZRevRangeByScore(string setId, double min, double max, int? skip, int? take)
+		{
 			//Note: http://redis.io/commands/zrevrangebyscore has max, min in the wrong other
 			return GetRangeByScore(Commands.ZRevRangeByScore, setId, max, min, skip, take, false);
-        }
+		}
 
-        public byte[][] ZRevRangeByScoreWithScores(string setId, double min, double max, int? skip, int? take)
-        {
+		public byte[][] ZRevRangeByScore(string setId, long min, long max, int? skip, int? take)
+		{
+			//Note: http://redis.io/commands/zrevrangebyscore has max, min in the wrong other
+			return GetRangeByScore(Commands.ZRevRangeByScore, setId, max, min, skip, take, false);
+		}
+
+		public byte[][] ZRevRangeByScoreWithScores(string setId, double min, double max, int? skip, int? take)
+		{
 			//Note: http://redis.io/commands/zrevrangebyscore has max, min in the wrong other
 			return GetRangeByScore(Commands.ZRevRangeByScore, setId, max, min, skip, take, true);
-        }
+		}
+
+		public byte[][] ZRevRangeByScoreWithScores(string setId, long min, long max, int? skip, int? take)
+		{
+			//Note: http://redis.io/commands/zrevrangebyscore has max, min in the wrong other
+			return GetRangeByScore(Commands.ZRevRangeByScore, setId, max, min, skip, take, true);
+		}
 
         public int ZRemRangeByRank(string setId, int min, int max)
         {
@@ -1009,14 +1071,23 @@ namespace ServiceStack.Redis
                 min.ToUtf8Bytes(), max.ToUtf8Bytes());
         }
 
-        public int ZRemRangeByScore(string setId, double fromScore, double toScore)
-        {
-            if (setId == null)
-                throw new ArgumentNullException("setId");
+		public int ZRemRangeByScore(string setId, double fromScore, double toScore)
+		{
+			if (setId == null)
+				throw new ArgumentNullException("setId");
 
-            return SendExpectInt(Commands.ZRemRangeByScore, setId.ToUtf8Bytes(),
+			return SendExpectInt(Commands.ZRemRangeByScore, setId.ToUtf8Bytes(),
 				fromScore.ToFastUtf8Bytes(), toScore.ToFastUtf8Bytes());
-        }
+		}
+
+		public int ZRemRangeByScore(string setId, long fromScore, long toScore)
+		{
+			if (setId == null)
+				throw new ArgumentNullException("setId");
+
+			return SendExpectInt(Commands.ZRemRangeByScore, setId.ToUtf8Bytes(),
+				fromScore.ToUtf8Bytes(), toScore.ToUtf8Bytes());
+		}
 
         public int ZCard(string setId)
         {
