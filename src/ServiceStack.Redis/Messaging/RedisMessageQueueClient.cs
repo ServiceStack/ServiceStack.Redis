@@ -60,17 +60,23 @@ namespace ServiceStack.Redis.Messaging
 
 		public void Publish<T>(T messageBody)
 		{
-            if (typeof(IMessage<T>).IsAssignableFrom(typeof(T)))
-                Publish((IMessage<T>)messageBody);
+            if (typeof(IMessage).IsAssignableFrom(typeof(T)))
+                Publish((IMessage)messageBody);
             else
                 Publish<T>(new Message<T>(messageBody));
         }
 
-		public void Publish<T>(IMessage<T> message)
-		{
-			var messageBytes = message.ToBytes();
-			Publish(message.ToInQueueName(), messageBytes);
-		}
+        public void Publish(IMessage message)
+        {
+            var messageBytes = message.ToBytes();
+            Publish(new QueueNames(message.Body.GetType()).In, messageBytes);
+        }
+
+        public void Publish<T>(IMessage<T> message)
+        {
+            var messageBytes = message.ToBytes();
+            Publish(message.ToInQueueName(), messageBytes);
+        }
 
 		public void Publish(string queueName, byte[] messageBytes)
 		{
