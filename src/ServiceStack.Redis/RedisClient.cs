@@ -490,6 +490,7 @@ namespace ServiceStack.Redis
 
 			var entitiesList = entities.ToList();
 			var len = entitiesList.Count;
+			if (len == 0) return; 
 
 			var keys = new byte[len][];
 			var values = new byte[len][];

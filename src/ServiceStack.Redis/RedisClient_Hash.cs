@@ -61,6 +61,8 @@ namespace ServiceStack.Redis
 		public void SetRangeInHash(string hashId, IEnumerable<KeyValuePair<string, string>> keyValuePairs)
 		{
 			var keyValuePairsList = keyValuePairs.ToList();
+			if (keyValuePairsList.Count == 0) return;
+
 			var keys = new byte[keyValuePairsList.Count][];
 			var values = new byte[keyValuePairsList.Count][];
 
@@ -127,6 +129,7 @@ namespace ServiceStack.Redis
 
 		public List<string> GetValuesFromHash(string hashId, params string[] keys)
 		{
+			if (keys.Length == 0) return new List<string>();
 			var keyBytes = ConvertToBytes(keys);
 			var multiDataList = base.HMGet(hashId, keyBytes);
 			return multiDataList.ToStringList();
