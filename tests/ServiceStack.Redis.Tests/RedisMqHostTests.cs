@@ -11,7 +11,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
+    [TestFixture]
 	public class RedisMqHostTests
 	{
 		public class Reverse
