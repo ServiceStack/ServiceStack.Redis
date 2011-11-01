@@ -60,8 +60,11 @@ namespace ServiceStack.Redis.Messaging
 
 		public void Publish<T>(T messageBody)
 		{
-			Publish<T>(new Message<T>(messageBody));
-		}
+            if (typeof(IMessage<T>).IsAssignableFrom(typeof(T)))
+                Publish((IMessage<T>)messageBody);
+            else
+                Publish<T>(new Message<T>(messageBody));
+        }
 
 		public void Publish<T>(IMessage<T> message)
 		{
