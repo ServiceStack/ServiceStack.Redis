@@ -125,6 +125,7 @@
     <Compile Include="AdhocClientTests.cs" />
     <Compile Include="AlchemyClientTestsBase.cs" />
     <Compile Include="AlchemyNativeClientTests.cs" />
+    <Compile Include="Examples\TodoApp.cs" />
     <Compile Include="RedisMqHostSupportTests.cs" />
     <Compile Include="RedisMqHostTests.cs" />
     <Compile Include="Benchmarks\RedisMqHostBenchmarks.cs" />

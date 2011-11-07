@@ -28,8 +28,6 @@ namespace ServiceStack.Redis
 	public partial class PooledRedisClientManager
 		: IRedisClientCacheManager, ICacheClient
 	{
-		public const int DefaultCacheDb = 9;
-
 		public ICacheClient GetCacheClient()
 		{
 			return ConfigureRedisClient(this.GetClient());
@@ -42,14 +40,6 @@ namespace ServiceStack.Redis
 
 		private ICacheClient ConfigureRedisClient(IRedisClient client)
 		{
-			//Provide automatic partitioning of 'Redis Caches' from normal persisted data 
-			//which is on DB '0' by default.
-
-			var notUserSpecified = this.Db == RedisNativeClient.DefaultDb;
-			if (notUserSpecified)
-			{
-				client.Db = DefaultCacheDb;
-			}
 			return client;
 		}
 

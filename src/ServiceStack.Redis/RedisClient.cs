@@ -219,10 +219,12 @@ namespace ServiceStack.Redis
 		{
 			return new RedisTransaction(this);
 		}
-        public IRedisPipeline CreatePipeline()
+        
+		public IRedisPipeline CreatePipeline()
         {
             return new RedisAllPurposePipeline(this);
         }
+
 		public List<string> SearchKeys(string pattern)
 		{
 			var hasBug = IsPreVersion1_26;
@@ -241,6 +243,8 @@ namespace ServiceStack.Redis
 		public List<string> GetValues(List<string> keys)
 		{
 			if (keys == null) throw new ArgumentNullException("keys");
+			if (keys.Count == 0) return new List<string>();
+
 			var resultBytesArray = MGet(keys.ToArray());
 
 			var results = new List<string>();

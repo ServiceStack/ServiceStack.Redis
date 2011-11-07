@@ -1312,7 +1312,7 @@ namespace ServiceStack.Redis
 
         internal void DisposeConnection()
         {
-            if (IsDisposed) throw new ObjectDisposedException("Redis client already disposed");
+			if (IsDisposed) return;
             IsDisposed = true;
 
             if (socket == null) return;
