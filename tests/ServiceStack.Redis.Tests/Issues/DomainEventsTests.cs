@@ -53,7 +53,6 @@ namespace ServiceStack.Redis.Tests.Issues
             var client = new RedisClient("localhost");
             var users = client.As<AggregateEvents>();
 
-
             var userId = Guid.NewGuid();
 
             var eventsForUser = new AggregateEvents
@@ -64,10 +63,9 @@ namespace ServiceStack.Redis.Tests.Issues
 
             eventsForUser.Events.Add(new UserPromotedEvent { UserId = userId });
 
-
             users.Store(eventsForUser);
 
-            var all = users.GetAll(); // exception
+            var all = users.GetAll(); 
         }
 
         [Test]
