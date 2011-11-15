@@ -50,6 +50,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'STATIC_ONLY NO_EXPRESSIONS|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -126,6 +127,7 @@
     <Compile Include="AlchemyClientTestsBase.cs" />
     <Compile Include="AlchemyNativeClientTests.cs" />
     <Compile Include="Examples\TodoApp.cs" />
+    <Compile Include="Issues\DomainEventsTests.cs" />
     <Compile Include="RedisMqHostSupportTests.cs" />
     <Compile Include="RedisMqHostTests.cs" />
     <Compile Include="Benchmarks\RedisMqHostBenchmarks.cs" />

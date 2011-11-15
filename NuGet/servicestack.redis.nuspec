@@ -2,7 +2,7 @@
 <package> 
   <metadata> 
     <id>ServiceStack.Redis</id> 
-    <version>3.0.0</version> 
+    <version>3.0.5</version> 
     <authors>Demis Bellot</authors> 
     <owners>Demis Bellot</owners>
     <description>C# Redis Client for the fastest NoSQL datastore</description> 
