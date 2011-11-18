@@ -74,10 +74,10 @@ namespace ServiceStack.Redis.Messaging
         }
 
         public RedisMqHost(IRedisClientsManager clientsManager,
-            int retryCount, TimeSpan? requestTimeOut)
+            int? retryCount=0, TimeSpan? requestTimeOut=null)
         {
             this.clientsManager = clientsManager;
-            this.RetryCount = retryCount;
+            this.RetryCount = retryCount.GetValueOrDefault(DefaultRetryCount);
             this.RequestTimeOut = requestTimeOut;
 			this.MessageFactory = new RedisMessageFactory(clientsManager);
             this.ErrorHandler = ex => Log.Error("Exception in Background Thread: " + ex.Message, ex);

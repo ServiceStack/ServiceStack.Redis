@@ -112,6 +112,7 @@
     <Compile Include="IRedisClientFactory.cs" />
     <Compile Include="Messaging\RedisMqHost.cs" />
     <Compile Include="Messaging\RedisMessageFactory.cs" />
+    <Compile Include="Messaging\RedisMqHostPool.cs" />
     <Compile Include="RedisClientsManagerExtensions.cs" />
     <Compile Include="Pipeline\QueuedRedisCommand.cs" />
     <Compile Include="Pipeline\RedisCommand.cs" />
