@@ -53,9 +53,6 @@ namespace ServiceStack.Redis
 				if (isPreVersion1_26 == null)
 				{
 					isPreVersion1_26 = this.ServerVersion.CompareTo("1.2.6") <= 0;
-
-					//force version reload
-					log.DebugFormat("redis-server Version: {0}", isPreVersion1_26);
 				}
 			}
 			catch (SocketException ex)
