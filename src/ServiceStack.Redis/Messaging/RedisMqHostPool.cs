@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
+using System.Text;
+using ServiceStack.Common;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.Text;
@@ -24,9 +27,10 @@ namespace ServiceStack.Redis.Messaging
             this.RequestTimeOut = requestTimeOut;
             this.mqHostsBuilder = new List<IMessageService>();
             this.redisManager = redisManager;
-            
+            this.MessageFactory = new RedisMessageFactory(redisManager);
+
             this.ErrorHandler = (mqHost, ex) =>
-                Log.Error("Exception in Background Thread: {0} on mqHost: {1}".Fmt(ex.Message, ), ex);
+                Log.Error("Exception in Background Thread: {0} on mqHost: {1}".Fmt(ex.Message, ((RedisMqHost)mqHost).Title), ex);
         }
 
         public int NoOfThreadsPerService { get; set; }
@@ -34,31 +38,84 @@ namespace ServiceStack.Redis.Messaging
         public TimeSpan? RequestTimeOut { get; protected set; }
         public Action<IMessageService, Exception> ErrorHandler { get; set; }
 
-        protected List<IMessageService> mqHostsBuilder;
-        protected IMessageService[] mqHosts;
-        
-        public virtual void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn)
+        public long BgThreadCount
         {
-            var redisMqHost = new RedisMqHost(redisManager, this.RetryCount, this.RequestTimeOut);
-            redisMqHost.RegisterHandler(processMessageFn);
-            mqHostsBuilder.Add(redisMqHost);
+            get { return mqHosts.Sum(x => ((RedisMqHost) x).BgThreadCount); }
         }
 
-        public virtual void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn, Action<IMessage<T>, Exception> processExceptionEx)
+        protected List<IMessageService> mqHostsBuilder;
+        protected IMessageService[] mqHosts;
+
+        public virtual void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn, int? noOfThreads = null)
         {
-            var redisMqHost = new RedisMqHost(redisManager, this.RetryCount, this.RequestTimeOut);
-            redisMqHost.RegisterHandler(processMessageFn, processExceptionEx);
-            mqHostsBuilder.Add(redisMqHost);
+            (noOfThreads ?? this.NoOfThreadsPerService).Times(x =>
+            {
+                var redisMqHost = new RedisMqHost(redisManager, this.RetryCount, this.RequestTimeOut);
+                redisMqHost.RegisterHandler(processMessageFn);
+                mqHostsBuilder.Add(redisMqHost);
+            });
+        }
+
+        public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn)
+        {
+            RegisterHandler(processMessageFn, (int?)null);
+        }
+
+        public virtual void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn, Action<IMessage<T>, Exception> processExceptionEx, int? noOfThreads = null)
+        {
+            (noOfThreads ?? this.NoOfThreadsPerService).Times(x =>
+            {
+                var redisMqHost = new RedisMqHost(redisManager, this.RetryCount, this.RequestTimeOut);
+                redisMqHost.RegisterHandler(processMessageFn, processExceptionEx);
+                mqHostsBuilder.Add(redisMqHost);
+            });
+        }
+
+        public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn, Action<IMessage<T>, Exception> processExceptionEx)
+        {
+            RegisterHandler(processMessageFn, processExceptionEx, null);
+        }
+
+        public IMessageQueueClient CreateMessageQueueClient()
+        {
+            return new RedisMessageQueueClient(this.redisManager, null);
+        }
+
+        public virtual string GetStatus()
+        {
+            if (mqHosts == null) return null;
+            var statusSet = new HashSet<string>();
+            lock (mqHosts)
+            {
+                foreach (var mqHost in mqHosts)
+                {
+                    statusSet.Add(((RedisMqHost)mqHost).GetStatus());
+                }
+            }
+            var allStatuses = string.Join(",", statusSet.ToArray());
+            return allStatuses;
         }
 
         public virtual IMessageHandlerStats GetStats()
         {
-            throw new NotImplementedException();
+            if (mqHosts == null) return null;
+            lock (mqHosts)
+            {
+                var total = new MessageHandlerStats("All Handlers");
+                mqHosts.ToList().ForEach(x => total.Add(x.GetStats()));
+                return total;
+            }
         }
 
         public virtual string GetStatsDescription()
         {
-            throw new NotImplementedException();
+            if (mqHosts == null) return null;
+            lock (mqHosts)
+            {
+                var sb = new StringBuilder();
+                mqHosts.ToList().ForEach(x => sb.AppendFormat(x.GetStatsDescription() + "\n\n"));
+                return sb.ToString();
+            }
         }
 
         public virtual void Start()
@@ -69,7 +126,7 @@ namespace ServiceStack.Redis.Messaging
                 if (mqHostsBuilder.Count == 0)
                     throw new ConfigurationException("No Handler's were registered.");
 
-                mqHosts = mqHostsBuilder.ToArray(); 
+                mqHosts = mqHostsBuilder.ToArray();
             }
 
             foreach (var mqHost in mqHosts)
@@ -93,7 +150,7 @@ namespace ServiceStack.Redis.Messaging
             {
                 try
                 {
-                    mqHost.Start();
+                    mqHost.Stop();
                 }
                 catch (Exception ex)
                 {
@@ -102,10 +159,7 @@ namespace ServiceStack.Redis.Messaging
             }
         }
 
-        public virtual IMessageFactory MessageFactory
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public IMessageFactory MessageFactory { get; set; }
 
         public virtual void Dispose()
         {

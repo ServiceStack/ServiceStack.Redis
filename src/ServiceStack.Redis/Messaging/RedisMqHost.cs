@@ -89,6 +89,11 @@ namespace ServiceStack.Redis.Messaging
         private IMessageHandler[] messageHandlers;
         private string[] inQueueNames;
 
+	    public string Title
+	    {
+	        get { return string.Join(", ", inQueueNames); }
+	    }
+
         public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn)
         {
             RegisterHandler(processMessageFn, null);
@@ -272,6 +277,7 @@ namespace ServiceStack.Redis.Messaging
             {
                 var sb = new StringBuilder("#MQ HOST STATS:\n");
                 sb.AppendLine("===============");
+                sb.AppendLine("For: " + this.Title);
                 sb.AppendLine("Current Status: " + GetStatus());
                 sb.AppendLine("Listening On: " + string.Join(", ", inQueueNames));
                 sb.AppendLine("Times Started: " + Interlocked.CompareExchange(ref timesStarted, 0, 0));
