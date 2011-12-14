@@ -50,10 +50,13 @@ namespace ServiceStack.Redis
 
 		public PooledRedisClientManager() : this(RedisNativeClient.DefaultHost) { }
 
-		public PooledRedisClientManager(params string[] readWriteHosts)
-			: this(readWriteHosts, readWriteHosts)
-		{
-		}
+        public PooledRedisClientManager(int initialDb, params string[] readWriteHosts)
+            : this(readWriteHosts, readWriteHosts, initialDb) {}
+
+        public PooledRedisClientManager(params string[] readWriteHosts)
+            : this(readWriteHosts, readWriteHosts)
+        {
+        }
 
 		public PooledRedisClientManager(IEnumerable<string> readWriteHosts, IEnumerable<string> readOnlyHosts)
 			: this(readWriteHosts, readOnlyHosts, null)
