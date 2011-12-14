@@ -159,7 +159,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
             {
                 nonBlocking++;
                 return null;
-            }, 1);
+            }, 3);
 
             mqHost.RegisterHandler<IncrBlocking>(m =>
             {

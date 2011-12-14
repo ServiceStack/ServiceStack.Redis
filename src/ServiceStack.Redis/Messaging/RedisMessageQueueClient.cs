@@ -100,7 +100,9 @@ namespace ServiceStack.Redis.Messaging
 		public byte[] Get(string queueName, TimeSpan? timeOut)
 		{
 			var unblockingKeyAndValue = this.ReadOnlyClient.BRPop(queueName, (int) timeOut.GetValueOrDefault().TotalSeconds);
-			return unblockingKeyAndValue[1];
+            return unblockingKeyAndValue.Length != 2 
+                ? null 
+                : unblockingKeyAndValue[1];
 		}
 
 		public byte[] GetAsync(string queueName)
