@@ -36,9 +36,10 @@ namespace ServiceStack.Redis
 		public BasicRedisClientManager() : this(RedisNativeClient.DefaultHost) { }
 
 		public BasicRedisClientManager(params string[] readWriteHosts)
-			: this(readWriteHosts, readWriteHosts)
-		{
-		}
+			: this(readWriteHosts, readWriteHosts) {}
+
+		public BasicRedisClientManager(int initialDb, params string[] readWriteHosts)
+            : this(readWriteHosts, readWriteHosts, initialDb) {}
 
 		/// <summary>
 		/// Hosts can be an IP Address or Hostname in the format: host[:port]

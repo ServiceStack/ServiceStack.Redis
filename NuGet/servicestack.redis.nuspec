@@ -2,10 +2,13 @@
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>ServiceStack.Redis</id> 
-    <version>3.0.9</version> 
+    <version>3.1.3</version> 
     <authors>Demis Bellot</authors> 
     <owners>Demis Bellot</owners>
-    <description>C# Redis Client for the fastest NoSQL datastore</description> 
+    <description>
+		C# Redis Client for the worlds fastest distributed NoSQL datastore. Byte[], String and POCO Typed clients.
+		Thread-Safe Basic and Pooled client managers included.
+	</description> 
     <projectUrl>https://github.com/ServiceStack/ServiceStack.Redis</projectUrl>
     <licenseUrl>https://github.com/ServiceStack/ServiceStack.Redis/blob/master/LICENSE</licenseUrl>
     <iconUrl>http://www.servicestack.net/logo-100x100.png</iconUrl>
