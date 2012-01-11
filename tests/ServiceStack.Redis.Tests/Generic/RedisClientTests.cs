@@ -7,6 +7,7 @@ using Northwind.Common.DataModel;
 using NUnit.Framework;
 using ServiceStack.Common.Extensions;
 using ServiceStack.Common.Utils;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Generic
 {
@@ -190,6 +191,63 @@ namespace ServiceStack.Redis.Tests.Generic
 				AssertUnorderedListsAreEqual(employeeTerritories, NorthwindData.EmployeeTerritories);
 			}
 		}
+
+        [Test]
+        public void Can_Store_And_Get_Entities_As_Hashes()
+        {
+            var entity = NorthwindData.Customers[0];
+            using (var client = new RedisClient(TestConfig.SingleHost))
+            {
+                client.StoreAsHash(entity);
+                var fromDb = client.GetFromHash<Northwind.Common.DataModel.Customer>(entity.Id);
+
+                Assert.AreEqual(fromDb.Address, entity.Address);
+                Assert.AreEqual(fromDb.CompanyName, entity.CompanyName);
+                Assert.AreEqual(fromDb.Region, entity.Region);
+            }
+        }
+
+        private class ComplexShipper : Shipper
+        {
+            public ComplexShipper()
+            {
+                SomeIds = new List<long>();
+                Addresses = new Dictionary<string, string>();
+            }
+            public IList<long> SomeIds { get; set; }
+            public IDictionary<string, string> Addresses { get; set; }
+        }
+
+        [Test]
+        public void Can_Store_Complex_Entity_As_Hash()
+        {
+            var entity = new ComplexShipper()
+            {
+                CompanyName = "Test Company",
+                Phone = "0123456789",
+                SomeIds = new List<long>() { 123, 456, 789 },
+                Addresses =
+                    new Dictionary<string, string>()
+                        {
+                            { "Home", "1 Some Street, some town" },
+                            { "Work", "2 Office Street, City" }
+                        }
+            };
+            using (var client = new RedisClient(TestConfig.SingleHost))
+            {
+                entity.Id = (int)(client.As<ComplexShipper>().GetNextSequence());
+                client.As<ComplexShipper>().StoreAsHash(entity);
+
+                var fromDb = client.As<ComplexShipper>().GetFromHash(entity.Id);
+                Assert.AreEqual(entity.CompanyName, fromDb.CompanyName);
+                Assert.AreEqual(entity.Phone,fromDb.Phone);
+                Assert.AreEqual(entity.SomeIds, fromDb.SomeIds);
+                Assert.AreEqual(entity.Addresses, fromDb.Addresses);
+                var addressesSerialized = JsonSerializer.SerializeToString(entity.Addresses);
+                Assert.AreEqual(client.GetValueFromHash(entity.CreateUrn(), "Addresses"), addressesSerialized);
+            }
+        }
+
 
 	}
 }
