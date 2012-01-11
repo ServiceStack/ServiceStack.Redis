@@ -487,6 +487,20 @@ namespace ServiceStack.Redis
 			_StoreAll(entities);
 		}
 
+        public T GetFromHash<T>(object id)
+        {
+            var key = IdUtils.CreateUrn<T>(id);
+            return
+                GetAllEntriesFromHash(key).ToJson().FromJson<T>();
+        }
+
+        public void StoreAsHash<T>(T entity)
+        {
+            var key = string.Format(entity.CreateUrn());
+            SetRangeInHash(key, entity.ToJson().To<Dictionary<string, string>>());
+            RegisterTypeId(entity);
+        }
+
 		//Without the Generic Constraints
 		internal void _StoreAll<TEntity>(IEnumerable<TEntity> entities)
 		{
