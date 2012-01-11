@@ -348,6 +348,16 @@ namespace ServiceStack.Redis.Generic
 			return results;
 		}
 
+        public void StoreAsHash(T entity)
+        {
+            client.StoreAsHash(entity);
+        }
+
+        public T GetFromHash(object id)
+        {
+            return client.GetFromHash<T>(id);
+        }
+
 
 		#region Implementation of IBasicPersistenceProvider<T>
 
