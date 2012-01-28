@@ -23,8 +23,8 @@ namespace ServiceStack.Redis
 	public partial class BasicRedisClientManager
 		: IRedisClientsManager
 	{
-		private List<EndPoint> ReadWriteHosts { get; set; }
-		private List<EndPoint> ReadOnlyHosts { get; set; }
+		private List<RedisEndPoint> ReadWriteHosts { get; set; }
+		private List<RedisEndPoint> ReadOnlyHosts { get; set; }
 
 		private int readWriteHostsIndex;
 		private int readOnlyHostsIndex;
@@ -62,8 +62,8 @@ namespace ServiceStack.Redis
 		{
 			this.Db = initalDb;
 
-			ReadWriteHosts = readWriteHosts.ToIpEndPoints();
-			ReadOnlyHosts = readOnlyHosts.ToIpEndPoints();
+			ReadWriteHosts = readWriteHosts.ToRedisEndPoints();
+			ReadOnlyHosts = readOnlyHosts.ToRedisEndPoints();
 			
 			this.RedisClientFactory = Redis.RedisClientFactory.Instance;
 
@@ -91,6 +91,9 @@ namespace ServiceStack.Redis
 				client.Db = Db;
 			}
 
+            if (nextHost.RequiresAuth)
+                client.Password = nextHost.Password;
+
 			return client;
 		}
 
@@ -110,6 +113,8 @@ namespace ServiceStack.Redis
 				client.Db = Db;
 			}
 
+            if (nextHost.RequiresAuth)
+                client.Password = nextHost.Password;
 			return client;
 		}
 
