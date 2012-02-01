@@ -31,8 +31,8 @@ namespace ServiceStack.Redis
 
 		protected const int PoolSizeMultiplier = 10;
 
-		private List<EndPoint> ReadWriteHosts { get; set; }
-		private List<EndPoint> ReadOnlyHosts { get; set; }
+		private List<RedisEndPoint> ReadWriteHosts { get; set; }
+		private List<RedisEndPoint> ReadOnlyHosts { get; set; }
 
 		private RedisClient[] writeClients = new RedisClient[0];
 		protected int WritePoolIndex;
@@ -97,8 +97,8 @@ namespace ServiceStack.Redis
 				? config.DefaultDb.GetValueOrDefault(initalDb)
 				: initalDb;
 
-			ReadWriteHosts = readWriteHosts.ToIpEndPoints();
-			ReadOnlyHosts = readOnlyHosts.ToIpEndPoints();
+			ReadWriteHosts = readWriteHosts.ToRedisEndPoints();
+			ReadOnlyHosts = readOnlyHosts.ToRedisEndPoints();
 
 			this.RedisClientFactory = Redis.RedisClientFactory.Instance;
 
@@ -172,6 +172,9 @@ namespace ServiceStack.Redis
 					var client = RedisClientFactory.CreateRedisClient(
 						nextHost.Host, nextHost.Port);
 
+                    if (nextHost.RequiresAuth)
+                        client.Password = nextHost.Password;
+
 					client.Id = RedisClientCounter++;
 					client.ClientManager = this;
 
@@ -241,6 +244,9 @@ namespace ServiceStack.Redis
 					var nextHost = ReadOnlyHosts[nextIndex % ReadOnlyHosts.Count];
 					var client = RedisClientFactory.CreateRedisClient(
 						nextHost.Host, nextHost.Port);
+
+                    if (nextHost.RequiresAuth)
+                        client.Password = nextHost.Password;
 
 					client.ClientManager = this;
 
