@@ -51,7 +51,9 @@ namespace ServiceStack.Redis
 		public readonly static byte[] DecrBy = "DECRBY".ToUtf8Bytes();
 		public readonly static byte[] Append = "APPEND".ToUtf8Bytes();
 		public readonly static byte[] Substr = "SUBSTR".ToUtf8Bytes();
-
+		public readonly static byte[] GetBit = "GETBIT".ToUtf8Bytes();
+		public readonly static byte[] SetBit = "SETBIT".ToUtf8Bytes();
+		
 		public readonly static byte[] RPush = "RPUSH".ToUtf8Bytes();
 		public readonly static byte[] LPush = "LPUSH".ToUtf8Bytes();
 		public readonly static byte[] LLen = "LLEN".ToUtf8Bytes();
