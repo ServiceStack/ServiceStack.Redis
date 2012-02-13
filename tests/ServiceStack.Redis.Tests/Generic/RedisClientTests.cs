@@ -122,6 +122,18 @@ namespace ServiceStack.Redis.Tests.Generic
 				NorthwindData.OrderDetails.Count, sp.ElapsedMilliseconds,
 				NorthwindData.OrderDetails.Count / (double)sp.ElapsedMilliseconds);
 		}
+        
+        [Test]
+        public void Can_SetBit_And_GetBit()
+        {
+            const string key = "BitKey";
+            const int offset = 100;
+            using (var client = new RedisClient(TestConfig.SingleHost))
+            {
+                client.SetBit(key, offset, 1);
+                Assert.AreEqual(1,client.GetBit(key,offset));
+            }
+        }
 
 		[Test]
 		public void Can_StoreAll_and_GetAll_from_Northwind()
