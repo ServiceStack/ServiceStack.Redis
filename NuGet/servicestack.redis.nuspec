@@ -2,7 +2,7 @@
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>ServiceStack.Redis</id> 
-    <version>3.3.6</version> 
+    <version>3.4.9</version> 
     <authors>Demis Bellot</authors> 
     <owners>Demis Bellot</owners>
     <description>
@@ -14,7 +14,7 @@
     <iconUrl>http://www.servicestack.net/logo-100x100.png</iconUrl>
     <tags>Redis NoSQL Client Distributed Cache PubSub Messaging Transactions</tags>
     <language>en-US</language> 
-    <copyright>Liquidbit 2011 and contributors</copyright>
+    <copyright>ServiceStack 2012 and contributors</copyright>
     <dependencies>
       <dependency id="ServiceStack.Common" />
     </dependencies> 
