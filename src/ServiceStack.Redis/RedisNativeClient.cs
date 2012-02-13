@@ -390,13 +390,32 @@ namespace ServiceStack.Redis
 
             return SendExpectInt(Commands.Append, key.ToUtf8Bytes(), value);
         }
-
+        
         public byte[] Substr(string key, int fromIndex, int toIndex)
         {
             if (key == null)
                 throw new ArgumentNullException("key");
 
             return SendExpectData(Commands.Substr, key.ToUtf8Bytes(), fromIndex.ToUtf8Bytes(), toIndex.ToUtf8Bytes());
+        }
+
+        public int GetBit(string key, int offset)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
+
+            return SendExpectInt(Commands.GetBit, key.ToUtf8Bytes(), offset.ToUtf8Bytes());
+        }
+
+        public int SetBit(string key, int offset, int value)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
+
+            if (value > 1 || value < 0)
+                throw  new ArgumentException("value is out of range");
+
+            return SendExpectInt(Commands.SetBit, key.ToUtf8Bytes(), offset.ToUtf8Bytes(), value.ToUtf8Bytes());
         }
 
         public string RandomKey()
