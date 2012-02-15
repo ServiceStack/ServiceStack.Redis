@@ -62,7 +62,10 @@ namespace ServiceStack.Redis.Messaging
 		/// <summary>
 		/// Inject your own Reply Client Factory to handle custom Message.ReplyTo urls.
 		/// </summary>
-        public Func<string, IOneWayClient> ReplyClientFactory { get; set; }
+		public Func<string, IOneWayClient> ReplyClientFactory { get; set; }
+
+		public Func<IMessage, IMessage> RequestFilter { get; set; }
+		public Func<object, object> ResponseFilter { get; set; }
         
         public Action<Exception> ErrorHandler { get; set; }
 
@@ -113,8 +116,9 @@ namespace ServiceStack.Redis.Messaging
         {
             return new MessageHandlerFactory<T>(this, processMessageFn, processExceptionEx)
             {
+				RequestFilter = this.RequestFilter,
+				ResponseFilter = this.ResponseFilter,
                 RetryCount = RetryCount,
-				
             };
         }
 

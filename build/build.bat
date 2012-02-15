@@ -1,7 +1,7 @@
 REM SET BUILD=Debug
 SET BUILD=Release
 
-COPY ..\src\ServiceStack.Redis\bin\%BUILD%\ServiceStack.Redis.* ..\NuGet\lib
+COPY ..\src\ServiceStack.Redis\bin\%BUILD%\ServiceStack.Redis.* ..\NuGet\lib\net35
 
 COPY ..\src\ServiceStack.Redis\bin\%BUILD%\ServiceStack.* ..\..\ServiceStack\release\latest\ServiceStack.Redis
 
