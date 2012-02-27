@@ -67,6 +67,7 @@ namespace ServiceStack.Redis
 		public readonly static byte[] BLPop = "BLPOP".ToUtf8Bytes();
 		public readonly static byte[] BRPop = "BRPOP".ToUtf8Bytes();
 		public readonly static byte[] RPopLPush = "RPOPLPUSH".ToUtf8Bytes();
+        public readonly static byte[] BRPopLPush = "BRPOPLPUSH".ToUtf8Bytes();
 
 		public readonly static byte[] SAdd = "SADD".ToUtf8Bytes();
 		public readonly static byte[] SRem = "SREM".ToUtf8Bytes();

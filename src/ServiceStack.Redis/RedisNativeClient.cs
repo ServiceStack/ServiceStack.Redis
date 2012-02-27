@@ -885,6 +885,17 @@ namespace ServiceStack.Redis
             return SendExpectData(Commands.RPopLPush, fromListId.ToUtf8Bytes(), toListId.ToUtf8Bytes());
         }
 
+        public byte[] BRPopLPush(string fromListId, string toListId, int timeOutSecs)
+        {
+            if (fromListId == null)
+                throw new ArgumentNullException("fromListId");
+            if (toListId == null)
+                throw new ArgumentNullException("toListId");
+
+            byte[][] result= SendExpectMultiData(Commands.BRPopLPush, fromListId.ToUtf8Bytes(), toListId.ToUtf8Bytes(), timeOutSecs.ToUtf8Bytes());
+            return result.Length == 0 ? null : result[1];
+        }
+
         #endregion
 
 

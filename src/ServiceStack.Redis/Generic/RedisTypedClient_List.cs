@@ -187,5 +187,10 @@ namespace ServiceStack.Redis.Generic
 		{
 			return DeserializeValue(client.RPopLPush(fromList.Id, toList.Id));
 		}
+
+        public T BlockingPopAndPushItemBetweenLists(IRedisList<T> fromList, IRedisList<T> toList, TimeSpan? timeOut)
+		{
+            return DeserializeValue(client.BRPopLPush(fromList.Id, toList.Id, (int)timeOut.GetValueOrDefault().TotalSeconds));
+		}
 	}
 }
