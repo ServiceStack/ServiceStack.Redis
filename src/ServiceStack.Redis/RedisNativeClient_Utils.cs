@@ -54,6 +54,11 @@ namespace ServiceStack.Redis
 				{
 					isPreVersion1_26 = this.ServerVersion.CompareTo("1.2.6") <= 0;
 				}
+
+                if (ConnectionFilter != null)
+                {
+                    ConnectionFilter(this);
+                }
 			}
 			catch (SocketException ex)
 			{

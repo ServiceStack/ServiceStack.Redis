@@ -33,6 +33,8 @@ namespace ServiceStack.Redis
 
 		public int Db { get; private set; }
 
+        public Action<IRedisNativeClient> ConnectionFilter { get; set; }
+
 		public BasicRedisClientManager() : this(RedisNativeClient.DefaultHost) { }
 
 		public BasicRedisClientManager(params string[] readWriteHosts)
@@ -94,6 +96,8 @@ namespace ServiceStack.Redis
             if (nextHost.RequiresAuth)
                 client.Password = nextHost.Password;
 
+            client.ConnectionFilter = ConnectionFilter;
+
 			return client;
 		}
 
@@ -115,7 +119,10 @@ namespace ServiceStack.Redis
 
             if (nextHost.RequiresAuth)
                 client.Password = nextHost.Password;
-			return client;
+
+            client.ConnectionFilter = ConnectionFilter;
+
+            return client;
 		}
 
 		public void SetAll<T>(IDictionary<string, T> values)

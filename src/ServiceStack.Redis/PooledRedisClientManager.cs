@@ -48,6 +48,8 @@ namespace ServiceStack.Redis
 
 		public int Db { get; private set; }
 
+        public Action<IRedisNativeClient> ConnectionFilter { get; set; }
+
 		public PooledRedisClientManager() : this(RedisNativeClient.DefaultHost) { }
 
         public PooledRedisClientManager(int initialDb, params string[] readWriteHosts)
@@ -177,6 +179,7 @@ namespace ServiceStack.Redis
 
 					client.Id = RedisClientCounter++;
 					client.ClientManager = this;
+				    client.ConnectionFilter = ConnectionFilter;
 
 					writeClients[nextIndex] = client;
 
@@ -249,6 +252,7 @@ namespace ServiceStack.Redis
                         client.Password = nextHost.Password;
 
 					client.ClientManager = this;
+                    client.ConnectionFilter = ConnectionFilter;
 
 					readClients[nextIndex] = client;
 

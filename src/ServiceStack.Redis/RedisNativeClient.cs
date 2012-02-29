@@ -70,6 +70,7 @@ namespace ServiceStack.Redis
         public int SendTimeout { get; set; }
         public string Password { get; set; }
 
+        public Action<IRedisNativeClient> ConnectionFilter { get; set; }
 
         internal IRedisTransactionBase Transaction
         {
@@ -101,9 +102,7 @@ namespace ServiceStack.Redis
         }
 
         public RedisNativeClient(string host)
-            : this(host, DefaultPort)
-        {
-        }
+            : this(host, DefaultPort) {}
 
         public RedisNativeClient(string host, int port)
         {
@@ -116,12 +115,8 @@ namespace ServiceStack.Redis
         }
 
         public RedisNativeClient()
-            : this(DefaultHost, DefaultPort)
-        {
-        }
-
-
-
+            : this(DefaultHost, DefaultPort) {}
+        
         #region Common Operations
 
         int db;

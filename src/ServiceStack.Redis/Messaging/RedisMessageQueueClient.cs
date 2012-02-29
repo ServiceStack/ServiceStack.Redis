@@ -22,6 +22,8 @@ namespace ServiceStack.Redis.Messaging
 		private readonly Action onPublishedCallback;
 		private readonly IRedisClientsManager clientsManager;
 
+        public int MaxSuccessQueueSize { get; set; }
+
 		public RedisMessageQueueClient(IRedisClientsManager clientsManager)
 			: this(clientsManager, null) {}
 
@@ -30,6 +32,7 @@ namespace ServiceStack.Redis.Messaging
 		{
 			this.onPublishedCallback = onPublishedCallback;
 			this.clientsManager = clientsManager;
+		    this.MaxSuccessQueueSize = 100;
 		}
 
 		private IRedisNativeClient readWriteClient;
@@ -91,9 +94,8 @@ namespace ServiceStack.Redis.Messaging
 
 		public void Notify(string queueName, byte[] messageBytes)
 		{
-			const int maxSuccessQueueSize = 1000;
 			this.ReadWriteClient.LPush(queueName, messageBytes);
-			this.ReadWriteClient.LTrim(queueName, 0, maxSuccessQueueSize);
+            this.ReadWriteClient.LTrim(queueName, 0, this.MaxSuccessQueueSize);
 			this.ReadWriteClient.Publish(QueueNames.TopicOut, queueName.ToUtf8Bytes());
 		}
 
