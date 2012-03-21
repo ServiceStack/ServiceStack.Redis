@@ -325,6 +325,9 @@ namespace ServiceStack.Redis.Messaging
 
     	public virtual void Dispose()
         {
+            if (Interlocked.CompareExchange(ref status, 0, 0) == Disposed)
+                return;
+
             Stop();
 
             if (Interlocked.CompareExchange(ref status, Disposed, Stopped) != Stopped)
