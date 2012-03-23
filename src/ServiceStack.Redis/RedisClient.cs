@@ -497,7 +497,7 @@ namespace ServiceStack.Redis
         public void StoreAsHash<T>(T entity)
         {
             var key = string.Format(entity.CreateUrn());
-            SetRangeInHash(key, entity.ToJson().To<Dictionary<string, string>>());
+            SetRangeInHash(key, entity.ToJson().FromJson<Dictionary<string, string>>());
             RegisterTypeId(entity);
         }
 
