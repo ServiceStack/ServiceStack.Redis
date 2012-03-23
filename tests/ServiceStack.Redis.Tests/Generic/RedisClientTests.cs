@@ -213,9 +213,9 @@ namespace ServiceStack.Redis.Tests.Generic
                 client.StoreAsHash(entity);
                 var fromDb = client.GetFromHash<Northwind.Common.DataModel.Customer>(entity.Id);
 
-                Assert.AreEqual(fromDb.Address, entity.Address);
-                Assert.AreEqual(fromDb.CompanyName, entity.CompanyName);
-                Assert.AreEqual(fromDb.Region, entity.Region);
+                Assert.AreEqual(entity.Address, fromDb.Address);
+                Assert.AreEqual(entity.CompanyName,fromDb.CompanyName);
+                Assert.AreEqual(entity.Region,fromDb.Region);
             }
         }
 
@@ -256,7 +256,7 @@ namespace ServiceStack.Redis.Tests.Generic
                 Assert.AreEqual(entity.SomeIds, fromDb.SomeIds);
                 Assert.AreEqual(entity.Addresses, fromDb.Addresses);
                 var addressesSerialized = JsonSerializer.SerializeToString(entity.Addresses);
-                Assert.AreEqual(client.GetValueFromHash(entity.CreateUrn(), "Addresses"), addressesSerialized);
+                Assert.AreEqual(addressesSerialized,client.GetValueFromHash(entity.CreateUrn(), "Addresses"));
             }
         }
 
