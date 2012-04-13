@@ -56,6 +56,14 @@ namespace ServiceStack.Redis
 			Init();
 		}
 
+		public RedisClient(Uri uri)
+			: base(uri.Host, uri.Port)
+		{
+			var password = !string.IsNullOrEmpty(uri.UserInfo) ? uri.UserInfo.Split(':')[1] : null;
+			Password = password;
+			Init();
+		}
+
 		public void Init()
 		{
 			this.Lists = new RedisClientLists(this);
