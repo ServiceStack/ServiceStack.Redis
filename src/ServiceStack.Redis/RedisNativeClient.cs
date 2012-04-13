@@ -104,15 +104,19 @@ namespace ServiceStack.Redis
         public RedisNativeClient(string host)
             : this(host, DefaultPort) {}
 
-        public RedisNativeClient(string host, int port)
-        {
-            if (host == null)
-                throw new ArgumentNullException("host");
+		public RedisNativeClient(string host, int port)
+			: this(host, port, null) {}
 
-            Host = host;
-            Port = port;
-            SendTimeout = -1;
-        }
+		public RedisNativeClient(string host, int port, string password)
+		{
+			if (host == null)
+				throw new ArgumentNullException("host");
+
+			Host = host;
+			Port = port;
+			SendTimeout = -1;
+			Password = password;
+		}
 
         public RedisNativeClient()
             : this(DefaultHost, DefaultPort) {}

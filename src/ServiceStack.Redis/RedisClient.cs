@@ -50,6 +50,12 @@ namespace ServiceStack.Redis
 			Init();
 		}
 
+		public RedisClient(string host, int port, string password)
+			: base(host, port, password)
+		{
+			Init();
+		}
+
 		public void Init()
 		{
 			this.Lists = new RedisClientLists(this);
