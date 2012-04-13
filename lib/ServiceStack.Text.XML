@@ -185,6 +185,13 @@
             and parsing member names and enum values in a case-insensitive manner.
             </summary>
         </member>
+        <member name="F:ServiceStack.Text.JsConfig.tsThrowOnDeserializationError">
+            <summary>
+            Gets or sets a value indicating if the framework should throw serialization exceptions
+            or continue regardless of deserialization errors. If <see langword="true"/>  the framework
+            will throw; otherwise, it will parse as many fields as possible. The default is <see langword="false"/>.
+            </summary>
+        </member>
         <member name="F:ServiceStack.Text.JsConfig`1.ExcludeTypeInfo">
             <summary>
             Never emit type info for this type
@@ -211,6 +218,11 @@
         <member name="F:ServiceStack.Text.JsConfig`1.ExcludePropertyNames">
             <summary>
             Exclude specific properties of this type from being serialized
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Text.JsConfig`1.TreatValueAsRefTypes">
+            <summary>
+            Opt-in flag to set some Value Types to be treated as a Ref Type
             </summary>
         </member>
         <member name="T:ServiceStack.Text.TypeSerializer">
@@ -253,6 +265,11 @@
             Recursively prints the contents of any POCO object in a human-friendly, readable format
             </summary>
             <returns></returns>
+        </member>
+        <member name="T:ServiceStack.Text.WP.HashSet`1">
+            <summary>
+             A hashset implementation that uses an IDictionary
+            </summary>
         </member>
         <member name="M:ServiceStack.Text.Json.JsonTypeSerializer.WriteRawString(System.IO.TextWriter,System.String)">
             <summary>
@@ -427,6 +444,13 @@
             Parses the specified value.
             </summary>
             <param name="value">The value.</param>
+            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Text.Common.DateTimeSerializer.ParseWcfJsonDateOffset(System.String)">
+            <summary>
+            WCF Json format: /Date(unixts+0000)/
+            </summary>
+            <param name="wcfJsonDate"></param>
             <returns></returns>
         </member>
         <member name="M:ServiceStack.Text.Common.DateTimeSerializer.ParseWcfJsonDate(System.String)">
