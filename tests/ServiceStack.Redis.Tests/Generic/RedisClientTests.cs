@@ -260,6 +260,47 @@ namespace ServiceStack.Redis.Tests.Generic
             }
         }
 
+		public class Dummy
+		{
+			public int Id { get; set; }
+			public string Name { get; set; }
+		}
+
+		[Test]
+		public void Can_Delete()
+		{
+			var dto = new Dummy { Id = 1, Name = "Name" };
+			using (var client = new RedisClient(TestConfig.SingleHost))
+			{
+				client.Store(dto);
+
+				Assert.That(client.GetAllItemsFromSet("ids:Dummy").ToArray()[0], Is.EqualTo("1"));
+				Assert.That(client.GetById<Dummy>(1), Is.Not.Null);
+
+				client.Delete(dto);
+
+				Assert.That(client.GetAllItemsFromSet("ids:Dummy").Count, Is.EqualTo(0));
+				Assert.That(client.GetById<Dummy>(1), Is.Null);
+			}
+		}
+
+		[Test]
+		public void Can_DeleteById()
+		{
+			var dto = new Dummy { Id = 1, Name = "Name" };
+			using (var client = new RedisClient(TestConfig.SingleHost))
+			{
+				client.Store(dto);
+
+				Assert.That(client.GetAllItemsFromSet("ids:Dummy").ToArray()[0], Is.EqualTo("1"));
+				Assert.That(client.GetById<Dummy>(1), Is.Not.Null);
+
+				client.DeleteById<Dummy>(dto.Id);
+
+				Assert.That(client.GetAllItemsFromSet("ids:Dummy").Count, Is.EqualTo(0));
+				Assert.That(client.GetById<Dummy>(1), Is.Null);
+			}
+		}
 
 	}
 }
