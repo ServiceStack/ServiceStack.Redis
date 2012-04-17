@@ -30,7 +30,15 @@ namespace ServiceStack.Redis
 			};
 			try
 			{
-				socket.Connect(Host, Port);
+                if (ConnectTimeout == 0)
+                {
+                    socket.Connect(Host, Port);
+                }
+                else
+                {
+                    var connectResult = socket.BeginConnect(Host, Port, null, null);
+                    connectResult.AsyncWaitHandle.WaitOne(ConnectTimeout, true);
+                }
 
 				if (!socket.Connected)
 				{

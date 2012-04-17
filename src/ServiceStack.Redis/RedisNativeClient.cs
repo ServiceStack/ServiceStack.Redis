@@ -66,6 +66,7 @@ namespace ServiceStack.Redis
 
         public string Host { get; private set; }
         public int Port { get; private set; }
+        public int ConnectTimeout { get; set; }
         public int RetryTimeout { get; set; }
         public int RetryCount { get; set; }
         public int SendTimeout { get; set; }
