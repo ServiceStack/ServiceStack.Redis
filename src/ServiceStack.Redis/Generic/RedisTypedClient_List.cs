@@ -17,7 +17,7 @@ using ServiceStack.DesignPatterns.Model;
 
 namespace ServiceStack.Redis.Generic
 {
-	internal partial class RedisTypedClient<T>
+	public partial class RedisTypedClient<T>
 	{
 		const int FirstElement = 0;
 		const int LastElement = -1;

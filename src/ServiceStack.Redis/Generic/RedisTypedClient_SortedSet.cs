@@ -21,7 +21,7 @@ using ServiceStack.Common.Extensions;
 
 namespace ServiceStack.Redis.Generic
 {
-	internal partial class RedisTypedClient<T>
+	public partial class RedisTypedClient<T>
 	{
 		public IHasNamed<IRedisSortedSet<T>> SortedSets { get; set; }
 

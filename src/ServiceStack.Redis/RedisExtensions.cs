@@ -60,7 +60,7 @@ namespace ServiceStack.Redis
 
             var port = (hostParts.Length == 1)
                            ? RedisNativeClient.DefaultPort
-                           : int.Parse(hostParts[portIndex]);
+                           : Int32.Parse(hostParts[portIndex]);
 
             return new RedisEndPoint(hostParts[hostOrIpAddressIndex], port);
         }
@@ -114,5 +114,13 @@ namespace ServiceStack.Redis
 
             return bytes;
         }
+
+		public static byte[][] ToMultiByteArray(this string[] args)
+    	{
+    		var byteArgs = new byte[args.Length][];
+    		for (var i = 0; i < args.Length; ++i)
+    			byteArgs[i] = args[i].ToUtf8Bytes();
+    		return byteArgs;
+    	}
     }
 }

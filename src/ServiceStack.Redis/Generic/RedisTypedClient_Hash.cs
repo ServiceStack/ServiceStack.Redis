@@ -17,7 +17,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Generic
 {
-	internal partial class RedisTypedClient<T>
+	public partial class RedisTypedClient<T>
 	{
 		public IRedisHash<TKey, T> GetHash<TKey>(string hashId)
 		{

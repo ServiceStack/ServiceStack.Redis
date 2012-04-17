@@ -196,12 +196,12 @@ namespace ServiceStack.Redis
 
 		public bool ExpireEntryIn(string key, TimeSpan expireIn)
 		{
-			return Expire(key, (int)expireIn.TotalSeconds) == Success;
+			return Expire(key, (int)expireIn.TotalSeconds);
 		}
 
 		public bool ExpireEntryAt(string key, DateTime expireAt)
 		{
-			return ExpireAt(key, expireAt.ToUnixTime()) == Success;
+			return ExpireAt(key, expireAt.ToUnixTime());
 		}
 
 		public TimeSpan GetTimeToLive(string key)
@@ -600,32 +600,17 @@ namespace ServiceStack.Redis
 
 		public string GetEvalStr(string body, int numOfArgs, params string[] args)
 		{
-			var allArgs = new string[args.Count() + 1];
-			args.CopyTo(allArgs, 1);
-			allArgs[0] = numOfArgs.ToString();
-			var argsBytes = ConvertToBytes(allArgs);
-
-			return base.EvalStr(body, numOfArgs, argsBytes).FromUtf8Bytes();
+			return base.EvalStr(body, numOfArgs, args.ToMultiByteArray());
 		}
 
 		public int GetEvalInt(string body, int numOfArgs, params string[] args)
 		{
-			var allArgs = new string[args.Count() + 1];
-			args.CopyTo(allArgs, 1);
-			allArgs[0] = numOfArgs.ToString();
-			var argsBytes = ConvertToBytes(allArgs);
-
-			return base.EvalInt(body, numOfArgs, argsBytes);
+			return base.EvalInt(body, numOfArgs, args.ToMultiByteArray());
 		}
 
 		public List<string> GetEvalMultiData(string body, int numOfArgs, params string[] args)
 		{
-			var allArgs = new string[args.Count() + 1];
-			args.CopyTo(allArgs, 1);
-			allArgs[0] = numOfArgs.ToString();
-			var argsBytes = ConvertToBytes(allArgs);
-
-			return base.EvalMultiData(body, numOfArgs, argsBytes).ToStringList();
+			return base.Eval(body, numOfArgs, args.ToMultiByteArray()).ToStringList();
 		}
 
 		#endregion

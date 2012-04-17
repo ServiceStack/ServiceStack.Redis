@@ -27,13 +27,13 @@ namespace ServiceStack.Redis.Generic
 	/// Allows you to get Redis value operations to operate against POCO types.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	internal partial class RedisTypedClient<T>
+	public partial class RedisTypedClient<T>
 		: IRedisTypedClient<T>
 	{
 		readonly ITypeSerializer<T> serializer = new JsonSerializer<T>();
 		private readonly RedisClient client;
 
-		internal IRedisNativeClient NativeClient
+		public IRedisNativeClient NativeClient
 		{
 			get { return client; }
 		}
@@ -87,6 +87,7 @@ namespace ServiceStack.Redis.Generic
 				client.Transaction = value;
 			}
 		}
+
         public IRedisPipelineShared Pipeline
         {
             get
@@ -272,24 +273,24 @@ namespace ServiceStack.Redis.Generic
 
 		public bool ExpireEntryIn(string key, TimeSpan expireIn)
 		{
-			return client.Expire(key, (int)expireIn.TotalSeconds) == RedisNativeClient.Success;
+			return client.Expire(key, (int)expireIn.TotalSeconds);
 		}
 
 		public bool ExpireEntryAt(string key, DateTime expireAt)
 		{
-			return client.ExpireAt(key, expireAt.ToUnixTime()) == RedisNativeClient.Success;
+			return client.ExpireAt(key, expireAt.ToUnixTime());
 		}
 
 		public bool ExpireIn(object id, TimeSpan expireIn)
 		{
 			var key = IdUtils.CreateUrn<T>(id);
-			return client.Expire(key, (int)expireIn.TotalSeconds) == RedisNativeClient.Success;
+			return client.Expire(key, (int)expireIn.TotalSeconds);
 		}
 
 		public bool ExpireAt(object id, DateTime expireAt)
 		{
 			var key = IdUtils.CreateUrn<T>(id);
-			return client.ExpireAt(key, expireAt.ToUnixTime()) == RedisNativeClient.Success;
+			return client.ExpireAt(key, expireAt.ToUnixTime());
 		}
 
 		public TimeSpan GetTimeToLive(string key)

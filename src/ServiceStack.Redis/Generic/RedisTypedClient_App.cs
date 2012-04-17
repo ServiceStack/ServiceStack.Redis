@@ -6,7 +6,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Generic
 {
-	internal partial class RedisTypedClient<T>
+	public partial class RedisTypedClient<T>
 	{
 		private readonly static string RecentSortedSetKey;
 

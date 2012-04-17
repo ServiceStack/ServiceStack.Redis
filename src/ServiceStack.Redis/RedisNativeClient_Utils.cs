@@ -635,13 +635,11 @@ namespace ServiceStack.Redis
 
 		private static byte[][] MergeCommandWithArgs(byte[] cmd, params string[] args)
 		{
-		    var byteArgs = new byte[args.Length][];
-            for (var i = 0; i < args.Length; ++i)
-                byteArgs[i] = args[i].ToUtf8Bytes();
-		    return MergeCommandWithArgs(cmd, byteArgs);
-	
+			var byteArgs = args.ToMultiByteArray();
+			return MergeCommandWithArgs(cmd, byteArgs);
 		}
-        private static byte[][] MergeCommandWithArgs(byte[] cmd, params byte[][] args)
+
+		private static byte[][] MergeCommandWithArgs(byte[] cmd, params byte[][] args)
         {
             var mergedBytes = new byte[1 + args.Length][];
             mergedBytes[0] = cmd;
@@ -685,16 +683,16 @@ namespace ServiceStack.Redis
 			return SendExpectInt(cmdArgs);
 		}
 
-		public byte[] EvalStr(string body, int numberKeysInArgs, params byte[][] keys)
+		public string EvalStr(string body, int numberKeysInArgs, params byte[][] keys)
 		{
 			if (body == null)
 				throw new ArgumentNullException("body");
 
 			var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys);
-			return SendExpectData(cmdArgs);
+			return SendExpectData(cmdArgs).FromUtf8Bytes();
 		}
 
-		public byte[][] EvalMultiData(string body, int numberKeysInArgs, params byte[][] keys)
+		public byte[][] Eval(string body, int numberKeysInArgs, params byte[][] keys)
 		{
 			if (body == null)
 				throw new ArgumentNullException("body");
@@ -702,6 +700,31 @@ namespace ServiceStack.Redis
 			var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys);
 
 			return SendExpectMultiData(cmdArgs);
+		}
+
+		public byte[] ScriptLoad(string body)
+		{
+			if (body == null)
+				throw new ArgumentNullException("body");
+
+			var cmdArgs = MergeCommandWithArgs(Commands.Script, Commands.Load, body.ToUtf8Bytes());
+			return SendExpectData(cmdArgs);
+		}
+
+		public byte[][] ScriptExists(params byte[][] sha1Refs)
+		{
+			var keysAndValues = MergeCommandWithArgs(Commands.Script, Commands.Exists, sha1Refs);
+			return SendExpectMultiData(keysAndValues);
+		}
+
+		public void ScriptFlush()
+		{
+			SendExpectSuccess(Commands.Script, Commands.Flush);
+		}
+
+		public void ScriptKill()
+		{
+			SendExpectSuccess(Commands.Script, Commands.Kill);
 		}
 
 	}

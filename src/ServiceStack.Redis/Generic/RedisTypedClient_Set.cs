@@ -17,7 +17,7 @@ using ServiceStack.DesignPatterns.Model;
 
 namespace ServiceStack.Redis.Generic
 {
-	internal partial class RedisTypedClient<T>
+	public partial class RedisTypedClient<T>
 	{
 		public IHasNamed<IRedisSet<T>> Sets { get; set; }
 

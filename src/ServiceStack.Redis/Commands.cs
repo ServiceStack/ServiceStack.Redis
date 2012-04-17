@@ -13,12 +13,14 @@ namespace ServiceStack.Redis
 		public readonly static byte[] RandomKey = "RANDOMKEY".ToUtf8Bytes();
 		public readonly static byte[] Rename = "RENAME".ToUtf8Bytes();
 		public readonly static byte[] RenameNx = "RENAMENX".ToUtf8Bytes();
+		public readonly static byte[] PExpire = "PEXPIRE".ToUtf8Bytes();
+		public readonly static byte[] PExpireAt = "PEXPIREAT".ToUtf8Bytes();
 		public readonly static byte[] DbSize = "DBSIZE".ToUtf8Bytes();
 		public readonly static byte[] Expire = "EXPIRE".ToUtf8Bytes();
 		public readonly static byte[] ExpireAt = "EXPIREAT".ToUtf8Bytes();
 		public readonly static byte[] Ttl = "TTL".ToUtf8Bytes();
+		public readonly static byte[] PTtl = "PTTL".ToUtf8Bytes();
 		public readonly static byte[] Select = "SELECT".ToUtf8Bytes();
-		public readonly static byte[] Move = "MOVE".ToUtf8Bytes();
 		public readonly static byte[] FlushDb = "FLUSHDB".ToUtf8Bytes();
 		public readonly static byte[] FlushAll = "FLUSHALL".ToUtf8Bytes();
 		public readonly static byte[] Ping = "PING".ToUtf8Bytes();				
@@ -32,25 +34,43 @@ namespace ServiceStack.Redis
 
 		public readonly static byte[] Info = "INFO".ToUtf8Bytes();
 		public readonly static byte[] SlaveOf = "SLAVEOF".ToUtf8Bytes();
+		public readonly static byte[] No = "NO".ToUtf8Bytes();
+		public readonly static byte[] One = "ONE".ToUtf8Bytes();
+		public readonly static byte[] ResetStat = "RESETSTAT".ToUtf8Bytes();
+		public readonly static byte[] Time = "TIME".ToUtf8Bytes();
+		public readonly static byte[] Segfault = "SEGFAULT".ToUtf8Bytes();
+		public readonly static byte[] Dump = "DUMP".ToUtf8Bytes();
+		public readonly static byte[] Restore = "RESTORE".ToUtf8Bytes();
+		public readonly static byte[] Migrate = "MIGRATE".ToUtf8Bytes();
+		public readonly static byte[] Move = "MOVE".ToUtf8Bytes();
+		public readonly static byte[] Object = "OBJECT".ToUtf8Bytes();
+		public readonly static byte[] IdleTime = "IDLETIME".ToUtf8Bytes();
 		public readonly static byte[] Monitor = "MONITOR".ToUtf8Bytes();		//missing
 		public readonly static byte[] Debug = "DEBUG".ToUtf8Bytes();			//missing
 		public readonly static byte[] Config = "CONFIG".ToUtf8Bytes();			//missing
+		//public readonly static byte[] Get = "GET".ToUtf8Bytes();
+		//public readonly static byte[] Set = "SET".ToUtf8Bytes();
 
-
+		public readonly static byte[] StrLen = "STRLEN".ToUtf8Bytes();
 		public readonly static byte[] Set = "SET".ToUtf8Bytes();
 		public readonly static byte[] Get = "GET".ToUtf8Bytes();
 		public readonly static byte[] GetSet = "GETSET".ToUtf8Bytes();
 		public readonly static byte[] MGet = "MGET".ToUtf8Bytes();
 		public readonly static byte[] SetNx = "SETNX".ToUtf8Bytes();
 		public readonly static byte[] SetEx = "SETEX".ToUtf8Bytes();
+		public readonly static byte[] Persist = "PERSIST".ToUtf8Bytes();
+		public readonly static byte[] PSetEx = "PSETEX".ToUtf8Bytes();
 		public readonly static byte[] MSet = "MSET".ToUtf8Bytes();
 		public readonly static byte[] MSetNx = "MSETNX".ToUtf8Bytes();
 		public readonly static byte[] Incr = "INCR".ToUtf8Bytes();
 		public readonly static byte[] IncrBy = "INCRBY".ToUtf8Bytes();
+		public readonly static byte[] IncrByFloat = "INCRBYFLOAT".ToUtf8Bytes();
 		public readonly static byte[] Decr = "DECR".ToUtf8Bytes();
 		public readonly static byte[] DecrBy = "DECRBY".ToUtf8Bytes();
 		public readonly static byte[] Append = "APPEND".ToUtf8Bytes();
 		public readonly static byte[] Substr = "SUBSTR".ToUtf8Bytes();
+		public readonly static byte[] GetRange = "GETRANGE".ToUtf8Bytes();
+		public readonly static byte[] SetRange = "SETRANGE".ToUtf8Bytes();
 		public readonly static byte[] GetBit = "GETBIT".ToUtf8Bytes();
 		public readonly static byte[] SetBit = "SETBIT".ToUtf8Bytes();
 		
@@ -105,6 +125,7 @@ namespace ServiceStack.Redis
 		public readonly static byte[] HMSet = "HMSET".ToUtf8Bytes();
 		public readonly static byte[] HMGet = "HMGET".ToUtf8Bytes();
 		public readonly static byte[] HIncrBy = "HINCRBY".ToUtf8Bytes();
+		public readonly static byte[] HIncrByFloat = "HINCRBYFLOAT".ToUtf8Bytes();
 		public readonly static byte[] HExists = "HEXISTS".ToUtf8Bytes();
 		public readonly static byte[] HDel = "HDEL".ToUtf8Bytes();
 		public readonly static byte[] HLen = "HLEN".ToUtf8Bytes();
@@ -135,10 +156,11 @@ namespace ServiceStack.Redis
 		public readonly static byte[] Alpha = "ALPHA".ToUtf8Bytes();
 		public readonly static byte[] Store = "STORE".ToUtf8Bytes();
 
-        public readonly static byte[] Eval = "EVAL".ToUtf8Bytes();
-
-		//SLAVEOF NO ONE
-		public readonly static byte[] No = "NO".ToUtf8Bytes();
-		public readonly static byte[] One = "ONE".ToUtf8Bytes();
+		public readonly static byte[] Eval = "EVAL".ToUtf8Bytes();
+		public readonly static byte[] Script = "SCRIPT".ToUtf8Bytes();
+		public readonly static byte[] Load = "LOAD".ToUtf8Bytes();
+		//public readonly static byte[] Exists = "EXISTS".ToUtf8Bytes();
+		public readonly static byte[] Flush = "FLUSH".ToUtf8Bytes();
+		public readonly static byte[] Kill = "KILL".ToUtf8Bytes();
 	}
 }
