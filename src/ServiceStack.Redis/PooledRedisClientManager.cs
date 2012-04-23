@@ -29,7 +29,11 @@ namespace ServiceStack.Redis
 	{
 		private static readonly ILog Log = LogManager.GetLogger(typeof(PooledRedisClientManager));
 
-		protected const int PoolSizeMultiplier = 10;
+		private const string PoolTimeoutError =
+				   "Redis Timeout expired. The timeout period elapsed prior to obtaining a connection from the pool. This may have occurred because all pooled connections were in use.";
+
+		protected readonly int PoolSizeMultiplier = 10;
+		public int? PoolTimeOut { get; set; }
 
 		private List<RedisEndPoint> ReadWriteHosts { get; set; }
 		private List<RedisEndPoint> ReadOnlyHosts { get; set; }
@@ -51,6 +55,11 @@ namespace ServiceStack.Redis
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
 
 		public PooledRedisClientManager() : this(RedisNativeClient.DefaultHost) { }
+
+		public PooledRedisClientManager(int poolSize, int poolTimeOutSeconds, params string[] readWriteHosts)
+			: this(readWriteHosts, readWriteHosts, null, RedisNativeClient.DefaultDb, poolSize, poolTimeOutSeconds)
+		{
+		}
 
         public PooledRedisClientManager(int initialDb, params string[] readWriteHosts)
             : this(readWriteHosts, readWriteHosts, initialDb) {}
@@ -77,7 +86,7 @@ namespace ServiceStack.Redis
 			IEnumerable<string> readWriteHosts,
 			IEnumerable<string> readOnlyHosts,
 			RedisClientManagerConfig config)
-			: this(readWriteHosts, readOnlyHosts, config, RedisNativeClient.DefaultDb)
+			: this(readWriteHosts, readOnlyHosts, config, RedisNativeClient.DefaultDb, null, null)
 		{
 		}
 
@@ -85,7 +94,7 @@ namespace ServiceStack.Redis
 			IEnumerable<string> readWriteHosts,
 			IEnumerable<string> readOnlyHosts,
 			int initalDb)
-			: this(readWriteHosts, readOnlyHosts, null, initalDb)
+			: this(readWriteHosts, readOnlyHosts, null, initalDb, null, null)
 		{
 		}
 
@@ -93,7 +102,9 @@ namespace ServiceStack.Redis
 			IEnumerable<string> readWriteHosts,
 			IEnumerable<string> readOnlyHosts,
 			RedisClientManagerConfig config,
-			int initalDb)
+			int initalDb,
+			int? poolSizeMultiplier,
+			int? poolTimeOutSeconds)
 		{
 			this.Db = config != null
 				? config.DefaultDb.GetValueOrDefault(initalDb)
@@ -104,10 +115,18 @@ namespace ServiceStack.Redis
 
 			this.RedisClientFactory = Redis.RedisClientFactory.Instance;
 
+			this.PoolSizeMultiplier = poolSizeMultiplier ?? 10;
+
 			this.Config = config ?? new RedisClientManagerConfig {
 				MaxWritePoolSize = ReadWriteHosts.Count * PoolSizeMultiplier,
 				MaxReadPoolSize = ReadOnlyHosts.Count * PoolSizeMultiplier,
 			};
+
+			// if timeout provided, convert into milliseconds
+			this.PoolTimeOut = poolTimeOutSeconds != null
+				? poolTimeOutSeconds * 1000
+				: null;
+
 
 			if (this.Config.AutoStart)
 			{
@@ -133,7 +152,14 @@ namespace ServiceStack.Redis
 				RedisClient inActiveClient;
 				while ((inActiveClient = GetInActiveWriteClient()) == null)
 				{
-					Monitor.Wait(writeClients);
+					if (PoolTimeOut.HasValue)
+					{
+						// wait for a connection, cry out if made to wait too long
+						if (!Monitor.Wait(writeClients, PoolTimeOut.Value))
+							throw new TimeoutException(PoolTimeoutError);
+					}
+					else
+						Monitor.Wait(writeClients);
 				}
 
 				WritePoolIndex++;
