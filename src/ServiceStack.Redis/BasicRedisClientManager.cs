@@ -25,6 +25,7 @@ namespace ServiceStack.Redis
 	{
 		private List<RedisEndPoint> ReadWriteHosts { get; set; }
 		private List<RedisEndPoint> ReadOnlyHosts { get; set; }
+        public int? ConnectTimeout { get; set; }
 
 		private int readWriteHostsIndex;
 		private int readOnlyHostsIndex;
@@ -87,6 +88,11 @@ namespace ServiceStack.Redis
 			var client = RedisClientFactory.CreateRedisClient(
 				nextHost.Host, nextHost.Port);
 
+            if (this.ConnectTimeout != null)
+            {
+                client.ConnectTimeout = this.ConnectTimeout.Value;
+            }
+
 			//Set database to userSpecified if different
 			if (Db != RedisNativeClient.DefaultDb)
 			{
@@ -110,6 +116,11 @@ namespace ServiceStack.Redis
 			var nextHost = ReadOnlyHosts[readOnlyHostsIndex++ % ReadOnlyHosts.Count];
 			var client = RedisClientFactory.CreateRedisClient(
 				nextHost.Host, nextHost.Port);
+
+            if (this.ConnectTimeout != null)
+            {
+                client.ConnectTimeout = this.ConnectTimeout.Value;
+            }
 
 			//Set database to userSpecified if different
 			if (Db != RedisNativeClient.DefaultDb)

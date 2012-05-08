@@ -34,6 +34,7 @@ namespace ServiceStack.Redis
 
 		protected readonly int PoolSizeMultiplier = 10;
 		public int? PoolTimeOut { get; set; }
+        public int? ConnectTimeout { get; set; }
 
 		private List<RedisEndPoint> ReadWriteHosts { get; set; }
 		private List<RedisEndPoint> ReadOnlyHosts { get; set; }
@@ -165,6 +166,11 @@ namespace ServiceStack.Redis
 				WritePoolIndex++;
 				inActiveClient.Active = true;
 
+                if (this.ConnectTimeout != null)
+                {
+                    inActiveClient.ConnectTimeout = this.ConnectTimeout.Value;
+                }
+
 				//Reset database to default if changed
 				if (inActiveClient.Db != Db)
 				{
@@ -239,6 +245,11 @@ namespace ServiceStack.Redis
 
 				ReadPoolIndex++;
 				inActiveClient.Active = true;
+
+                if (this.ConnectTimeout != null)
+                {
+                    inActiveClient.ConnectTimeout = this.ConnectTimeout.Value;
+                }
 
 				//Reset database to default if changed
 				if (inActiveClient.Db != Db)
