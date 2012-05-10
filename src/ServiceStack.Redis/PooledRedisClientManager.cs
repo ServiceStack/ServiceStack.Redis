@@ -342,6 +342,32 @@ namespace ServiceStack.Redis
 			throw new NotSupportedException("Cannot add unknown client back to the pool");
 		}
 
+		/// <summary>
+		/// Disposes the read only client.
+		/// </summary>
+		/// <param name="client">The client.</param>
+		public void DisposeReadOnlyClient( RedisNativeClient client )
+		{
+			lock( readClients )
+			{
+				client.Active = false;
+				Monitor.PulseAll( readClients );
+			}
+		}
+
+		/// <summary>
+		/// Disposes the write client.
+		/// </summary>
+		/// <param name="client">The client.</param>
+		public void DisposeWriteClient( RedisNativeClient client )
+		{
+			lock( writeClients )
+			{
+				client.Active = false;
+				Monitor.PulseAll( writeClients );
+			}
+		}
+
 		public void Start()
 		{
 			if (writeClients.Length > 0 || readClients.Length > 0)
