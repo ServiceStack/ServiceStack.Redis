@@ -35,6 +35,8 @@ namespace ServiceStack.Redis
 		protected readonly int PoolSizeMultiplier = 10;
 		public int? PoolTimeOut { get; set; }
         public int? ConnectTimeout { get; set; }
+		public int? SocketSendTimeout { get; set; }
+		public int? SocketReceiveTimeout { get; set; }
 
 		private List<RedisEndPoint> ReadWriteHosts { get; set; }
 		private List<RedisEndPoint> ReadOnlyHosts { get; set; }
@@ -171,6 +173,15 @@ namespace ServiceStack.Redis
                     inActiveClient.ConnectTimeout = this.ConnectTimeout.Value;
                 }
 
+				if( this.SocketSendTimeout.HasValue )
+				{
+					inActiveClient.SendTimeout = this.SocketSendTimeout.Value;
+				}
+				if( this.SocketReceiveTimeout.HasValue )
+				{
+					inActiveClient.ReceiveTimeout = this.SocketReceiveTimeout.Value;
+				}
+
 				//Reset database to default if changed
 				if (inActiveClient.Db != Db)
 				{
@@ -250,6 +261,15 @@ namespace ServiceStack.Redis
                 {
                     inActiveClient.ConnectTimeout = this.ConnectTimeout.Value;
                 }
+
+				if( this.SocketSendTimeout.HasValue )
+				{
+					inActiveClient.SendTimeout = this.SocketSendTimeout.Value;
+				}
+				if( this.SocketReceiveTimeout.HasValue )
+				{
+					inActiveClient.ReceiveTimeout = this.SocketReceiveTimeout.Value;
+				}
 
 				//Reset database to default if changed
 				if (inActiveClient.Db != Db)
