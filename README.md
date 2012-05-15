@@ -4,6 +4,8 @@ for twitter updates.
 
 # An Open Source C# Client for Redis
 
+*The Redis client is an independent project and can be used with or without the ServiceStack webservices framework.*
+
 [Redis](http://code.google.com/p/redis/) is one of the fastest and most feature-rich key-value stores to come from the [NoSQL](http://en.wikipedia.org/wiki/NoSQL) movement.
 It is similar to memcached but the dataset is not volatile, and values can either be strings lists, sets, sorted sets or hashes.
 
