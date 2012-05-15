@@ -26,7 +26,8 @@ namespace ServiceStack.Redis
 		{
 			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
 			{
-				SendTimeout = SendTimeout
+				SendTimeout = SendTimeout,
+				ReceiveTimeout = ReceiveTimeout
 			};
 			try
 			{
@@ -163,8 +164,8 @@ namespace ServiceStack.Redis
 		{
 			HadExceptions = true;
             var throwEx = new RedisException(
-				string.Format("Unable to Connect: sPort: {0}",
-					clientPort), lastSocketException);
+				string.Format( "Unable to Connect to {0}:{1}, client Port: {2}",
+					Host, Port, clientPort), lastSocketException);
 			log.Error(throwEx.Message);
 			throw throwEx;
 		}
