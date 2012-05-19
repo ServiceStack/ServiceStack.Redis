@@ -122,5 +122,20 @@ namespace ServiceStack.Redis
     			byteArgs[i] = args[i].ToUtf8Bytes();
     		return byteArgs;
     	}
+
+        public static  byte[][] PrependByteArray(this byte[][] args, byte[] valueToPrepend)
+        {
+            var newArgs = new byte[args.Length + 1][];
+            newArgs[0] = valueToPrepend;
+            var i = 1;
+            foreach (var arg in args)
+                newArgs[i++] = arg;
+
+            return newArgs;
+        }
+        public static  byte[][] PrependByteArray(this byte[][] args, int valueToPrepend)
+        {
+            return args.PrependByteArray(valueToPrepend.ToUtf8Bytes());
+        }
     }
 }

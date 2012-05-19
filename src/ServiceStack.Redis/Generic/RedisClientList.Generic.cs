@@ -237,5 +237,10 @@ namespace ServiceStack.Redis.Generic
 		{
 			return client.PopAndPushItemBetweenLists(this, toList);
 		}
+
+		public T BlockingPopAndPush(IRedisList<T> toList, TimeSpan? timeOut)
+		{
+			return client.BlockingPopAndPushItemBetweenLists(this, toList, timeOut);
+		}
 	}
 }
