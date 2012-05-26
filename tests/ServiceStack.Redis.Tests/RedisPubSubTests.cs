@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Common.Extensions;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -174,5 +176,32 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(channelsSubscribed, Is.EqualTo(publishChannelCount));
 			Assert.That(channelsUnSubscribed, Is.EqualTo(publishChannelCount));
 		}
+
+		[Test]
+		public void Can_Subscribe_to_channel_pattern()
+		{
+			int msgs = 0;
+			using (var subscription = Redis.CreateSubscription())
+			{
+				subscription.OnMessage = (channel, msg) => {
+					Console.WriteLine("{0}: {1}", channel, msg + msgs++);
+					subscription.UnSubscribeFromChannelsMatching("CHANNEL1:TITLE*");
+				};
+
+				ThreadPool.QueueUserWorkItem(x =>
+				{
+					Thread.Sleep(100);
+					using (var redisClient = CreateRedisClient())
+					{
+						Log("Publishing msg...");
+						redisClient.Publish("CHANNEL1:TITLE1", "hello".ToUtf8Bytes());
+					}
+				});
+
+				Log("Start Listening On");
+				subscription.SubscribeToChannelsMatching("CHANNEL1:TITLE*");
+			}
+		}
+
 	}
 }
