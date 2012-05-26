@@ -150,6 +150,7 @@
     <Compile Include="BasicRedisClientManager.cs" />
     <Compile Include="BasicRedisClientManager.ICacheClient.cs" />
     <Compile Include="Commands.cs" />
+    <Compile Include="ConnectionUtils.cs" />
     <Compile Include="Generic\QueuedRedisTypedCommand.cs" />
     <Compile Include="Generic\RedisTypedClient_App.cs" />
     <Compile Include="Generic\RedisTypedPipeline.cs" />
@@ -158,6 +159,7 @@
     <Compile Include="Messaging\RedisMqHost.cs" />
     <Compile Include="Messaging\RedisMessageFactory.cs" />
     <Compile Include="Messaging\RedisMqHostPool.cs" />
+    <Compile Include="Messaging\RedisMqServer.cs" />
     <Compile Include="RedisClientsManagerExtensions.cs" />
     <Compile Include="Pipeline\QueuedRedisCommand.cs" />
     <Compile Include="Pipeline\RedisCommand.cs" />
