@@ -10,14 +10,25 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Messaging
 {
-	public class RedisMqHost : IMessageService
+    /// <summary>
+    /// Creates an MQ Host that processes all messages on a single background thread. 
+    /// i.e. If you register 3 handlers it will only create 1 background thread.
+    /// 
+    /// The same background thread that listens to the Redis MQ Subscription for new messages 
+    /// also cycles through each registered handler processing all pending messages one-at-a-time:
+    /// first in the message PriorityQ, then in the normal message InQ.
+    /// 
+    /// The Start/Stop methods are idempotent i.e. It's safe to call them repeatedly on multiple threads 
+    /// and the Redis MQ Host will only have Started/Stopped once.
+    /// </summary>
+    public class RedisMqHost : IMessageService
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RedisMqHost));
         public const int DefaultRetryCount = 2; //Will be a total of 3 attempts
 
-		public IMessageFactory MessageFactory { get; private set; }
+        public IMessageFactory MessageFactory { get; private set; }
 
-		readonly Random rand = new Random(Environment.TickCount);
+        readonly Random rand = new Random(Environment.TickCount);
         private void SleepBackOffMultiplier(int continuousErrorsCount)
         {
             if (continuousErrorsCount == 0) return;
@@ -33,16 +44,6 @@ namespace ServiceStack.Redis.Messaging
             Thread.Sleep(nextTry);
         }
 
-        //Control Commands
-        public const string StopCommand = "STOP";
-
-        //States
-        public const int Disposed = -1;
-        public const int Stopped = 0;
-        public const int Stopping = 1;
-        public const int Starting = 2;
-        public const int Started = 3;
-
         //Stats
         private long timesStarted = 0;
         private long noOfErrors = 0;
@@ -57,32 +58,32 @@ namespace ServiceStack.Redis.Messaging
         }
 
         public int RetryCount { get; protected set; }
-		public TimeSpan? RequestTimeOut { get; protected set; }
+        public TimeSpan? RequestTimeOut { get; protected set; }
 
-		/// <summary>
-		/// Inject your own Reply Client Factory to handle custom Message.ReplyTo urls.
-		/// </summary>
-		public Func<string, IOneWayClient> ReplyClientFactory { get; set; }
+        /// <summary>
+        /// Inject your own Reply Client Factory to handle custom Message.ReplyTo urls.
+        /// </summary>
+        public Func<string, IOneWayClient> ReplyClientFactory { get; set; }
 
-		public Func<IMessage, IMessage> RequestFilter { get; set; }
-		public Func<object, object> ResponseFilter { get; set; }
-        
+        public Func<IMessage, IMessage> RequestFilter { get; set; }
+        public Func<object, object> ResponseFilter { get; set; }
+
         public Action<Exception> ErrorHandler { get; set; }
 
         private readonly IRedisClientsManager clientsManager; //Thread safe redis client/conn factory
 
         public IMessageQueueClient CreateMessageQueueClient()
         {
-            return new RedisMessageQueueClient(this.clientsManager, null);
+            return new RedisMessageQueueClient(this.clientsManager);
         }
 
         public RedisMqHost(IRedisClientsManager clientsManager,
-            int? retryCount=0, TimeSpan? requestTimeOut=null)
+            int retryCount = DefaultRetryCount, TimeSpan? requestTimeOut = null)
         {
             this.clientsManager = clientsManager;
-            this.RetryCount = retryCount.GetValueOrDefault(DefaultRetryCount);
+            this.RetryCount = retryCount;
             this.RequestTimeOut = requestTimeOut;
-			this.MessageFactory = new RedisMessageFactory(clientsManager);
+            this.MessageFactory = new RedisMessageFactory(clientsManager);
             this.ErrorHandler = ex => Log.Error("Exception in Background Thread: " + ex.Message, ex);
         }
 
@@ -92,17 +93,17 @@ namespace ServiceStack.Redis.Messaging
         private IMessageHandler[] messageHandlers;
         private string[] inQueueNames;
 
-	    public string Title
-	    {
-	        get { return string.Join(", ", inQueueNames); }
-	    }
+        public string Title
+        {
+            get { return string.Join(", ", inQueueNames); }
+        }
 
         public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn)
         {
             RegisterHandler(processMessageFn, null);
         }
 
-		public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn, Action<IMessage<T>, Exception> processExceptionEx)
+        public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn, Action<IMessage<T>, Exception> processExceptionEx)
         {
             if (handlerMap.ContainsKey(typeof(T)))
             {
@@ -114,17 +115,16 @@ namespace ServiceStack.Redis.Messaging
 
         protected IMessageHandlerFactory CreateMessageHandlerFactory<T>(Func<IMessage<T>, object> processMessageFn, Action<IMessage<T>, Exception> processExceptionEx)
         {
-            return new MessageHandlerFactory<T>(this, processMessageFn, processExceptionEx)
-            {
-				RequestFilter = this.RequestFilter,
-				ResponseFilter = this.ResponseFilter,
+            return new MessageHandlerFactory<T>(this, processMessageFn, processExceptionEx) {
+                RequestFilter = this.RequestFilter,
+                ResponseFilter = this.ResponseFilter,
                 RetryCount = RetryCount,
             };
         }
 
         private void RunLoop()
         {
-            if (Interlocked.CompareExchange(ref status, Started, Starting) != Starting) return;
+            if (Interlocked.CompareExchange(ref status, WorkerStatus.Started, WorkerStatus.Starting) != WorkerStatus.Starting) return;
             Interlocked.Increment(ref timesStarted);
 
             try
@@ -136,12 +136,12 @@ namespace ServiceStack.Redis.Messaging
                     {
                         foreach (var handler in messageHandlers)
                         {
-                            if (Interlocked.CompareExchange(ref status, Stopped, Stopping) == Stopping)
+                            if (Interlocked.CompareExchange(ref status, WorkerStatus.Stopped, WorkerStatus.Stopping) == WorkerStatus.Stopping)
                             {
                                 Log.Debug("MQ Host is stopping, exiting RunLoop()...");
                                 return;
                             }
-                            if (Interlocked.CompareExchange(ref status, 0, 0) != Started)
+                            if (Interlocked.CompareExchange(ref status, 0, 0) != WorkerStatus.Started)
                             {
                                 Log.Error("MQ Host is in an invalid state '{0}', exiting RunLoop()...".Fmt(GetStatus()));
                                 return;
@@ -153,11 +153,11 @@ namespace ServiceStack.Redis.Messaging
                         Interlocked.CompareExchange(ref noOfContinuousErrors, 0, noOfContinuousErrors);
 
                         var cmd = mqClient.WaitForNotifyOnAny(QueueNames.TopicIn);
-                        if (cmd == StopCommand)
+                        if (cmd == WorkerStatus.StopCommand)
                         {
                             Log.Debug("Stop Command Issued");
-                            if (Interlocked.CompareExchange(ref status, Stopped, Started) != Started)
-                                Interlocked.CompareExchange(ref status, Stopped, Stopping);
+                            if (Interlocked.CompareExchange(ref status, WorkerStatus.Stopped, WorkerStatus.Started) != WorkerStatus.Started)
+                                Interlocked.CompareExchange(ref status, WorkerStatus.Stopped, WorkerStatus.Stopping);
 
                             return;
                         }
@@ -170,8 +170,8 @@ namespace ServiceStack.Redis.Messaging
                 Interlocked.Increment(ref noOfErrors);
                 Interlocked.Increment(ref noOfContinuousErrors);
 
-                if (Interlocked.CompareExchange(ref status, Stopped, Started) != Started)
-                    Interlocked.CompareExchange(ref status, Stopped, Stopping);
+                if (Interlocked.CompareExchange(ref status, WorkerStatus.Stopped, WorkerStatus.Started) != WorkerStatus.Started)
+                    Interlocked.CompareExchange(ref status, WorkerStatus.Stopped, WorkerStatus.Stopping);
 
                 if (this.ErrorHandler != null) this.ErrorHandler(ex);
             }
@@ -181,11 +181,11 @@ namespace ServiceStack.Redis.Messaging
 
         public virtual void Start()
         {
-            if (Interlocked.CompareExchange(ref status, 0, 0) == Started) return;
-            if (Interlocked.CompareExchange(ref status, 0, 0) == Disposed)
+            if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Started) return;
+            if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Disposed)
                 throw new ObjectDisposedException("MQ Host has been disposed");
 
-            if (Interlocked.CompareExchange(ref status, Starting, Stopped) == Stopped) //Should only be 1 thread past this point
+            if (Interlocked.CompareExchange(ref status, WorkerStatus.Starting, WorkerStatus.Stopped) == WorkerStatus.Stopped) //Should only be 1 thread past this point
             {
                 try
                 {
@@ -194,7 +194,7 @@ namespace ServiceStack.Redis.Messaging
                     if (this.messageHandlers == null || this.messageHandlers.Length == 0)
                     {
                         Log.Warn("Cannot start a MQ Host with no Message Handlers registered, ignoring.");
-                        Interlocked.CompareExchange(ref status, Stopped, Starting);
+                        Interlocked.CompareExchange(ref status, WorkerStatus.Stopped, WorkerStatus.Starting);
                         return;
                     }
 
@@ -202,8 +202,7 @@ namespace ServiceStack.Redis.Messaging
 
                     KillBgThreadIfExists();
 
-                    bgThread = new Thread(RunLoop)
-                    {
+                    bgThread = new Thread(RunLoop) {
                         IsBackground = true,
                         Name = "Redis MQ Host " + Interlocked.Increment(ref bgThreadCount)
                     };
@@ -251,15 +250,15 @@ namespace ServiceStack.Redis.Messaging
         {
             switch (Interlocked.CompareExchange(ref status, 0, 0))
             {
-                case Disposed:
+                case WorkerStatus.Disposed:
                     return "Disposed";
-                case Stopped:
+                case WorkerStatus.Stopped:
                     return "Stopped";
-                case Stopping:
+                case WorkerStatus.Stopping:
                     return "Stopping";
-                case Starting:
+                case WorkerStatus.Starting:
                     return "Starting";
-                case Started:
+                case WorkerStatus.Started:
                     return "Started";
             }
             return null;
@@ -300,10 +299,10 @@ namespace ServiceStack.Redis.Messaging
 
         public virtual void Stop()
         {
-            if (Interlocked.CompareExchange(ref status, 0, 0) == Disposed)
+            if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Disposed)
                 throw new ObjectDisposedException("MQ Host has been disposed");
 
-            if (Interlocked.CompareExchange(ref status, Stopping, Started) == Started)
+            if (Interlocked.CompareExchange(ref status, WorkerStatus.Stopping, WorkerStatus.Started) == WorkerStatus.Started)
             {
                 Log.Debug("Stopping MQ Host...");
 
@@ -312,7 +311,7 @@ namespace ServiceStack.Redis.Messaging
                 {
                     using (var redis = clientsManager.GetClient())
                     {
-                        redis.PublishMessage(QueueNames.TopicIn, StopCommand);
+                        redis.PublishMessage(QueueNames.TopicIn, WorkerStatus.StopCommand);
                     }
                 }
                 catch (Exception ex)
@@ -323,15 +322,15 @@ namespace ServiceStack.Redis.Messaging
             }
         }
 
-    	public virtual void Dispose()
+        public virtual void Dispose()
         {
-            if (Interlocked.CompareExchange(ref status, 0, 0) == Disposed)
+            if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Disposed)
                 return;
 
             Stop();
 
-            if (Interlocked.CompareExchange(ref status, Disposed, Stopped) != Stopped)
-                Interlocked.CompareExchange(ref status, Disposed, Stopping);
+            if (Interlocked.CompareExchange(ref status, WorkerStatus.Disposed, WorkerStatus.Stopped) != WorkerStatus.Stopped)
+                Interlocked.CompareExchange(ref status, WorkerStatus.Disposed, WorkerStatus.Stopping);
 
             try
             {
@@ -343,7 +342,6 @@ namespace ServiceStack.Redis.Messaging
                 if (this.ErrorHandler != null) this.ErrorHandler(ex);
             }
         }
-
     }
 
 }

@@ -209,6 +209,7 @@ namespace ServiceStack.Redis
 			return TimeSpan.FromSeconds(Ttl(key));
 		}
 
+        [Obsolete("Renamed to 'As'")]
 		public IRedisTypedClient<T> GetTypedClient<T>()
 		{
 			return new RedisTypedClient<T>(this);
@@ -241,15 +242,6 @@ namespace ServiceStack.Redis
 
 		public List<string> SearchKeys(string pattern)
 		{
-			var hasBug = IsPreVersion1_26;
-			if (hasBug)
-			{
-				var spaceDelimitedKeys = KeysV126(pattern).FromUtf8Bytes();
-				return spaceDelimitedKeys.IsNullOrEmpty()
-					? new List<string>()
-					: new List<string>(spaceDelimitedKeys.Split(' '));
-			}
-
 			var multiDataList = Keys(pattern);
 			return multiDataList.ToStringList();
 		}

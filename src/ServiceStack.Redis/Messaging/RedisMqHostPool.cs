@@ -10,6 +10,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Messaging
 {
+    [Obsolete("Will be removed. Use RedisMqServer")]
     public class RedisMqHostPool : IMessageService
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RedisMqHostPool));

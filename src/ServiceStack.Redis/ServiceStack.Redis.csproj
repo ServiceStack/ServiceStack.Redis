@@ -156,10 +156,12 @@
     <Compile Include="Generic\RedisTypedPipeline.cs" />
     <Compile Include="Generic\RedisTypedCommandQueue.cs" />
     <Compile Include="IRedisClientFactory.cs" />
+    <Compile Include="Messaging\MessageHandlerWorker.cs" />
     <Compile Include="Messaging\RedisMqHost.cs" />
     <Compile Include="Messaging\RedisMessageFactory.cs" />
     <Compile Include="Messaging\RedisMqHostPool.cs" />
     <Compile Include="Messaging\RedisMqServer.cs" />
+    <Compile Include="Messaging\WorkerStatus.cs" />
     <Compile Include="RedisClientsManagerExtensions.cs" />
     <Compile Include="Pipeline\QueuedRedisCommand.cs" />
     <Compile Include="Pipeline\RedisCommand.cs" />

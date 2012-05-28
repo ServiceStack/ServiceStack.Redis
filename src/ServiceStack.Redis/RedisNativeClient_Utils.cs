@@ -58,11 +58,6 @@ namespace ServiceStack.Redis
 				lastSocketException = null;
 				LastConnectedAtTimestamp = Stopwatch.GetTimestamp();
 
-				if (isPreVersion1_26 == null)
-				{
-					isPreVersion1_26 = this.ServerVersion.CompareTo("1.2.6") <= 0;
-				}
-
                 if (ConnectionFilter != null)
                 {
                     ConnectionFilter(this);

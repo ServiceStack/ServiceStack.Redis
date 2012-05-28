@@ -11,6 +11,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
+    [Obsolete("Will be removed")]
     [TestFixture]
 	public class RedisMqHostPoolTests
 	{
