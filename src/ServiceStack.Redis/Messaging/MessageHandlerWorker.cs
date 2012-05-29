@@ -11,11 +11,10 @@ namespace ServiceStack.Redis.Messaging
         private static readonly ILog Log = LogManager.GetLogger(typeof(MessageHandlerWorker));
 
         readonly object msgLock = new object();
-        private int totalMessagesProcessed = 0;
-        private int msgNotificationsReceived = 0;
 
         private readonly IMessageHandler messageHandler;
         private readonly IRedisClientsManager clientsManager;
+
         public string QueueName { get; set; }
 
         private int status;
@@ -27,6 +26,18 @@ namespace ServiceStack.Redis.Messaging
         private Thread bgThread;
         private int timesStarted = 0;
         public Action<MessageHandlerWorker, Exception> errorHandler { get; set; }
+
+        private int totalMessagesProcessed;
+        public int TotalMessagesProcessed
+        {
+            get { return totalMessagesProcessed; }
+        }
+
+        private int msgNotificationsReceived;
+        public int MsgNotificationsReceived
+        {
+            get { return msgNotificationsReceived; }
+        }
 
         public MessageHandlerWorker(
             IRedisClientsManager clientsManager, IMessageHandler messageHandler, string queueName,
@@ -100,10 +111,7 @@ namespace ServiceStack.Redis.Messaging
             }
             catch (Exception ex)
             {
-                var msg = ex.Message;
-                var stackTrace = ex.StackTrace;
-                Console.WriteLine("msg: {0}, {1}".Fmt(msg, stackTrace.Length));
-
+                //Ignore handling rare, but expected exceptions from KillBgThreadIfExists()
                 if (ex is ThreadInterruptedException || ex is ThreadAbortException)
                 {
                     Log.Warn("Received {0} in Worker: {1}".Fmt(ex.GetType().Name, QueueName));
@@ -115,6 +123,7 @@ namespace ServiceStack.Redis.Messaging
             }
             finally
             {
+                //If it's in an invalid state, Dispose() this worker.
                 if (Interlocked.CompareExchange(ref status, WorkerStatus.Stopped, WorkerStatus.Stopping) != WorkerStatus.Stopping)
                 {
                     Dispose();
