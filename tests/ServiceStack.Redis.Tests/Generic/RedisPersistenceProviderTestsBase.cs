@@ -76,5 +76,22 @@ namespace ServiceStack.Redis.Tests.Generic
 			Assert.That(fromIds, Is.EquivalentTo(expectedIds));
 		}
 
+        [Test]
+        public void Can_DeleteAll()
+        {
+            var tos = Factory.CreateList();
+            redis.StoreAll(tos);
+
+            var all = redis.GetAll();
+
+            Assert.That(all.Count, Is.EqualTo(tos.Count));
+
+            redis.DeleteAll();
+
+            all = redis.GetAll();
+
+            Assert.That(all.Count, Is.EqualTo(0));
+        }
+
 	}
 }
