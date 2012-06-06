@@ -63,7 +63,26 @@ namespace ServiceStack.Redis.Tests
                 Assert.That(Redis.GetValue(Key), Is.Null);
             }
         }
+        public class Article
+        {
+            public long Id { get; set; }
+            public string Name { get; set; }
+        }
 
+        [Test]
+        public void Can_create_article_with_autoincremental-id()
+        {
+            Article a = new Article() { Name = "I Love Writing Test" };
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.IncrementValue("id:article"), id => a.Id = id);
+                trans.QueueCommand(r => r.Store<Article>(a));
+                
+                trans.Commit();
+            }
+
+            Assert.That(Redis.Get<Article>("1").Id,Is.Equal("1"));
+        }
 		[Test]
 		public void Exception_in_atomic_transactions_discards_all_commands()
 		{
