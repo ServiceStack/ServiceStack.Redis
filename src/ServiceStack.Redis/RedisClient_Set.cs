@@ -86,7 +86,9 @@ namespace ServiceStack.Redis
 			if (items == null)
 				throw new ArgumentNullException("items");
 			if (items.Count == 0)
-				return;
+      				throw new ArgumentEmptyException("items");
+			//	return; 
+              
 
 			if (this.Transaction != null)
 			{
