@@ -33,6 +33,11 @@ namespace ServiceStack.Redis.Generic
 		readonly ITypeSerializer<T> serializer = new JsonSerializer<T>();
 		private readonly RedisClient client;
 
+        public IRedisClient RedisClient
+        {
+            get { return client; }
+        }
+
 		public IRedisNativeClient NativeClient
 		{
 			get { return client; }
@@ -140,7 +145,7 @@ namespace ServiceStack.Redis.Generic
 			return client.GetAllKeys();
 		}
 
-		public IRedisSet TypeIdsSet
+	    public IRedisSet TypeIdsSet
 		{
 			get
 			{
@@ -407,7 +412,7 @@ namespace ServiceStack.Redis.Generic
 			for (var i = 0; i < len; i++)
 			{
 				keys[i] = entitiesList[i].CreateUrn().ToUtf8Bytes();
-				values[i] = RedisClient.SerializeToUtf8Bytes(entitiesList[i]);
+				values[i] = Redis.RedisClient.SerializeToUtf8Bytes(entitiesList[i]);
 			}
 
 			client.MSet(keys, values);
@@ -433,7 +438,7 @@ namespace ServiceStack.Redis.Generic
 		{
 			if (ids == null) return;
 
-			var urnKeys = ids.ConvertAll(x => IdUtils.CreateUrn<T>(x));
+			var urnKeys = ids.ConvertAll(IdUtils.CreateUrn<T>);
 			this.RemoveEntry(urnKeys.ToArray());
 			client.RemoveTypeIds<T>(ids.ConvertAll(x => x.ToString()).ToArray());
 		}
@@ -468,6 +473,7 @@ namespace ServiceStack.Redis.Generic
             client.ResetSendBuffer();
         }
 
+        [Obsolete("Does nothing currently, RedisTypedClient will not be IDisposable in a future version")]
 	    public void Dispose() {}
 	}
 }

@@ -646,15 +646,6 @@ namespace ServiceStack.Redis
             SendExpectSuccess(Commands.FlushAll);
         }
 
-        //Old behaviour pre 1.3.7
-        public byte[] KeysV126(string pattern)
-        {
-            if (pattern == null)
-                throw new ArgumentNullException("pattern");
-
-            return SendExpectData(Commands.Keys, pattern.ToUtf8Bytes());
-        }
-
         public byte[][] Keys(string pattern)
         {
             if (pattern == null)
