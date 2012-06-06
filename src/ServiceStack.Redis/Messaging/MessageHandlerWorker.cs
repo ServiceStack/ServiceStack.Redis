@@ -64,6 +64,13 @@ namespace ServiceStack.Redis.Messaging
                 {
                     Monitor.Pulse(msgLock);
                 }
+
+                // Surprisingly this is marginally slower in Sleep/Wait benchmarks than just using the lock above?
+                //if (Monitor.TryEnter(msgLock)) //Don't block Master notifier thread, if worker is running.
+                //{
+                //    Monitor.Pulse(msgLock);
+                //    Monitor.Exit(msgLock);
+                //}
             }
         }
 
