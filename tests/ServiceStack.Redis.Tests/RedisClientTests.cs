@@ -384,8 +384,24 @@ namespace ServiceStack.Redis.Tests
 
             //cleanup
             Assert.IsTrue(distributedLock.Unlock(key, lockExpire, Redis));
+        }
 
- 
+        public class MyPoco
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        [Test]
+        public void Can_StoreObject()
+        {
+            object poco = new MyPoco { Id = 1, Name = "Test" };
+
+            Redis.StoreObject(poco);
+
+            Assert.That(Redis.Get<string>("urn:mypoco:1"), Is.EqualTo("{\"Id\":1,\"Name\":\"Test\"}"));
+
+            Assert.That(Redis.PopItemFromSet("ids:MyPoco"), Is.EqualTo("1"));
         }
 	}
 

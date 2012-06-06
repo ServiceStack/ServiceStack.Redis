@@ -83,10 +83,15 @@ namespace ServiceStack.Redis
 			return "seq:" + typeof(T).Name;
 		}
 
-		public string GetTypeIdsSetKey<T>()
-		{
-			return "ids:" + typeof(T).Name;
-		}
+        public string GetTypeIdsSetKey<T>()
+        {
+            return "ids:" + typeof(T).Name;
+        }
+
+        public string GetTypeIdsSetKey(Type type)
+        {
+            return "ids:" + type.Name;
+        }
 
 		public void RewriteAppendOnlyFileAsync()
 		{
@@ -215,12 +220,12 @@ namespace ServiceStack.Redis
 			return new RedisTypedClient<T>(this);
 		}
 
-		public IRedisTypedClient<T> As<T>()
-		{
-			return new RedisTypedClient<T>(this);
-		}
+        public IRedisTypedClient<T> As<T>()
+        {
+            return new RedisTypedClient<T>(this);
+        }
 
-		public IDisposable AcquireLock(string key)
+        public IDisposable AcquireLock(string key)
 		{
 			return new RedisLock(this, key, null);
 		}
@@ -368,23 +373,28 @@ namespace ServiceStack.Redis
 			return registeredTypeIdsWithinPipeline;
 		}
 
-		internal void RegisterTypeId<T>(T value)
-		{
-			var typeIdsSetKey = GetTypeIdsSetKey<T>();
-			var id = value.GetId().ToString();
+        internal void RegisterTypeId<T>(T value)
+        {
+            var typeIdsSetKey = GetTypeIdsSetKey<T>();
+            var id = value.GetId().ToString();
 
-			if (this.Pipeline != null)
-			{
-				var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
-				registeredTypeIdsWithinPipeline.Add(id);
-			}
-			else
-			{
-				this.AddItemToSet(typeIdsSetKey, id);
-			}
-		}
+            RegisterTypeId(typeIdsSetKey, id);
+        }
 
-		internal void RegisterTypeIds<T>(IEnumerable<T> values)
+        internal void RegisterTypeId(string typeIdsSetKey, string id)
+	    {
+	        if (this.Pipeline != null)
+	        {
+	            var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
+	            registeredTypeIdsWithinPipeline.Add(id);
+	        }
+	        else
+	        {
+	            this.AddItemToSet(typeIdsSetKey, id);
+	        }
+	    }
+
+	    internal void RegisterTypeIds<T>(IEnumerable<T> values)
 		{
 			var typeIdsSetKey = GetTypeIdsSetKey<T>();
 			var ids = values.ConvertAll(x => x.GetId().ToString());
@@ -475,19 +485,35 @@ namespace ServiceStack.Redis
 			return GetValues<T>(urnKeys);
 		}
 
-		public T Store<T>(T entity)
-			where T : class, new()
-		{
-			var urnKey = entity.CreateUrn();
-			var valueString = JsonSerializer.SerializeToString(entity);
+        public T Store<T>(T entity)
+            where T : class, new()
+        {
+            var urnKey = entity.CreateUrn();
+            var valueString = JsonSerializer.SerializeToString(entity);
 
-			this.SetEntry(urnKey, valueString);
-			RegisterTypeId(entity);
+            this.SetEntry(urnKey, valueString);
+            RegisterTypeId(entity);
 
-			return entity;
-		}
+            return entity;
+        }
 
-		public void StoreAll<TEntity>(IEnumerable<TEntity> entities)
+        public object StoreObject(object entity)
+        {
+            if (entity == null) throw new ArgumentNullException("entity");
+
+            var id = entity.GetObjectId();
+            var entityType = entity.GetType();
+            var urnKey = IdUtils.CreateUrn(entityType, id);
+            var valueString = JsonSerializer.SerializeToString(entity);
+
+            this.SetEntry(urnKey, valueString);
+
+            RegisterTypeId(GetTypeIdsSetKey(entityType), id.ToString());
+
+            return entity;
+        }
+
+        public void StoreAll<TEntity>(IEnumerable<TEntity> entities)
 			where TEntity : class, new()
 		{
 			_StoreAll(entities);
