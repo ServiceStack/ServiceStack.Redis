@@ -328,14 +328,6 @@ namespace ServiceStack.Redis
             if (value.Length > OneGb)
                 throw new ArgumentException("value exceeds 1G", "value");
 
-            var doesNotSupportSetEx = this.ServerVersion.CompareTo("1.3.9") <= 0;
-            if (doesNotSupportSetEx)
-            {
-                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value);
-                SendExpectSuccess(Commands.Expire, key.ToUtf8Bytes(), expireInSeconds.ToUtf8Bytes());
-                return;
-            }
-
             SendExpectSuccess(Commands.SetEx, key.ToUtf8Bytes(), expireInSeconds.ToUtf8Bytes(), value);
         }
 
@@ -680,12 +672,6 @@ namespace ServiceStack.Redis
 
         public void Watch(params string[] keys)
         {
-            var doesNotSupportSetEx = this.ServerVersion.CompareTo("2.1.0") < 0;
-            if (doesNotSupportSetEx)
-            {
-                throw new NotSupportedException("Watch is not supported for this version of the Redis server");
-            }
-
             if (keys == null)
                 throw new ArgumentNullException("keys");
             if (keys.Length == 0)
@@ -698,12 +684,6 @@ namespace ServiceStack.Redis
         }
         public void UnWatch()
         {
-            var doesNotSupportSetEx = this.ServerVersion.CompareTo("2.1.0") < 0;
-            if (doesNotSupportSetEx)
-            {
-                throw new NotSupportedException("Unwatch is not supported for this version of the Redis server");
-            }
-
             SendExpectCode(Commands.UnWatch);
         }
         internal void Multi()
