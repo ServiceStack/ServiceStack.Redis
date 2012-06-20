@@ -115,7 +115,7 @@ namespace ServiceStack.Redis.Tests
 				scores.Add(RedisClient.GetLexicalScore(x));
 			});
 
-			Assert.That(Redis.GetSortedSetCount(SetId, scores.Min(), scores.Max()), Is.EqualTo(scores.Count()));
+			Assert.That(Redis.GetSortedSetCount(SetId, scores.Min(), scores.Max()), Is.EqualTo(storeMembers.Count()));
 			Assert.That(Redis.GetSortedSetCount(SetId, scores.Min(), scores.Min()), Is.EqualTo(1));
 		}
 
