@@ -1234,6 +1234,22 @@ namespace ServiceStack.Redis
             return SendExpectInt(Commands.ZCard, setId.ToUtf8Bytes());
         }
 
+        public int ZCount(string setId, double min, double max)
+        {
+            if (setId == null)
+                throw new ArgumentNullException("setId");
+
+            return SendExpectInt(Commands.ZCount, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes());
+        }
+
+        public int ZCount(string setId, long min, long max)
+        {
+            if (setId == null)
+                throw new ArgumentNullException("setId");
+
+            return SendExpectInt(Commands.ZCount, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes());
+        }
+
         public double ZScore(string setId, byte[] value)
         {
             if (setId == null)

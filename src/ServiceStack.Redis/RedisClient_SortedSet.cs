@@ -385,6 +385,23 @@ namespace ServiceStack.Redis
 			return base.ZCard(setId);
 		}
 
+		public int GetSortedSetCount(string setId, string fromStringScore, string toStringScore)
+		{
+			var fromScore = GetLexicalScore(fromStringScore);
+			var toScore = GetLexicalScore(toStringScore);
+			return GetSortedSetCount(setId, fromScore, toScore);
+		}
+
+		public int GetSortedSetCount(string setId, double fromScore, double toScore)
+		{
+			return base.ZCount(setId, fromScore, toScore);
+		}
+
+		public int GetSortedSetCount(string setId, long fromScore, long toScore)
+		{
+			return base.ZCount(setId, fromScore, toScore);
+		}
+
 		public double GetItemScoreInSortedSet(string setId, string value)
 		{
 			return base.ZScore(setId, value.ToUtf8Bytes());

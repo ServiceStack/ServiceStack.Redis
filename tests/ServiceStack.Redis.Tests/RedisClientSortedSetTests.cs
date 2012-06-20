@@ -105,6 +105,21 @@ namespace ServiceStack.Redis.Tests
 		}
 
 		[Test]
+		public void Can_GetSetCountByScores()
+		{
+			var scores = new List<double>();
+
+			storeMembers.ForEach(x =>
+			{ 
+				Redis.AddItemToSortedSet(SetId, x);
+				scores.Add(RedisClient.GetLexicalScore(x));
+			});
+
+			Assert.That(Redis.GetSortedSetCount(SetId, scores.Min(), scores.Max()), Is.EqualTo(scores.Count()));
+			Assert.That(Redis.GetSortedSetCount(SetId, scores.Min(), scores.Min()), Is.EqualTo(1));
+		}
+
+		[Test]
 		public void Does_SortedSetContainsValue()
 		{
 			const string existingMember = "two";
