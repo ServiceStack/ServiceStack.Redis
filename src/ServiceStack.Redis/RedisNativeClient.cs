@@ -14,6 +14,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using ServiceStack.Logging;
 using ServiceStack.Redis;
@@ -969,12 +970,31 @@ namespace ServiceStack.Redis
             return SendExpectMultiData(Commands.BLPop, listId.ToUtf8Bytes(), timeOutSecs.ToUtf8Bytes());
         }
 
+        public byte[][] BLPop(string[] listIds, int timeOutSecs)
+        {
+            if (listIds == null)
+                throw new ArgumentNullException("listIds");
+            var args = new List<byte[]>();
+            args.Add(Commands.BLPop);
+            args.AddRange(listIds.Select(listId => listId.ToUtf8Bytes()));
+            args.Add(timeOutSecs.ToUtf8Bytes());            
+            return SendExpectMultiData(args.ToArray());
+        }
+
         public byte[] BLPopValue(string listId, int timeOutSecs)
         {
-            var blockingResponse = BLPop(listId, timeOutSecs);
+            var blockingResponse = BLPop(new[]{listId}, timeOutSecs);
             return blockingResponse.Length == 0
                 ? null
                 : blockingResponse[1];
+        }
+
+        public byte[][] BLPopValue(string[] listIds, int timeOutSecs)
+        {
+            var blockingResponse = BLPop(listIds, timeOutSecs);
+            return blockingResponse.Length == 0
+                ? null
+                : blockingResponse;
         }
 
         public byte[][] BRPop(string listId, int timeOutSecs)
@@ -985,12 +1005,31 @@ namespace ServiceStack.Redis
             return SendExpectMultiData(Commands.BRPop, listId.ToUtf8Bytes(), timeOutSecs.ToUtf8Bytes());
         }
 
+        public byte[][] BRPop(string[] listIds, int timeOutSecs)
+        {
+            if (listIds == null)
+                throw new ArgumentNullException("listIds");
+            var args = new List<byte[]>();
+            args.Add(Commands.BRPop);
+            args.AddRange(listIds.Select(listId => listId.ToUtf8Bytes()));
+            args.Add(timeOutSecs.ToUtf8Bytes());            
+            return SendExpectMultiData(args.ToArray());
+        }
+
         public byte[] BRPopValue(string listId, int timeOutSecs)
         {
-            var blockingResponse = BRPop(listId, timeOutSecs);
+            var blockingResponse = BRPop(new[]{listId}, timeOutSecs);
             return blockingResponse.Length == 0
                 ? null
                 : blockingResponse[1];
+        }
+
+        public byte[][] BRPopValue(string[] listIds, int timeOutSecs)
+        {
+            var blockingResponse = BRPop(listIds, timeOutSecs);
+            return blockingResponse.Length == 0
+                ? null
+                : blockingResponse;
         }
 
         public byte[] RPopLPush(string fromListId, string toListId)

@@ -124,10 +124,15 @@ namespace ServiceStack.Redis
 
 		public string BlockingRemoveStartFromList(string listId, TimeSpan? timeOut)
 		{
-			return base.BLPopValue(listId, (int)timeOut.GetValueOrDefault().TotalSeconds).FromUtf8Bytes();
+		    return BlockingDequeueItemFromList(listId, timeOut);
 		}
 
-		public string RemoveEndFromList(string listId)
+        public ItemRef BlockingRemoveStartFromLists(string[] listIds, TimeSpan? timeOut)
+        {
+            return BlockingDequeueItemFromLists(listIds, timeOut);
+        }
+
+	    public string RemoveEndFromList(string listId)
 		{
 			return base.RPop(listId).FromUtf8Bytes();
 		}
@@ -177,6 +182,14 @@ namespace ServiceStack.Redis
 			return BLPopValue(listId, (int)timeOut.GetValueOrDefault().TotalSeconds).FromUtf8Bytes();
 		}
 
+        public ItemRef BlockingDequeueItemFromLists(string[] listIds, TimeSpan? timeOut)
+        {
+            var value = BLPopValue(listIds, (int) timeOut.GetValueOrDefault().TotalSeconds);
+            if( value == null )
+                return null;
+			return new ItemRef{Id=value[0].FromUtf8Bytes(), Item= value[1].FromUtf8Bytes()};
+		}
+
 		public void PushItemToList(string listId, string value)
 		{
 			RPush(listId, value.ToUtf8Bytes());
@@ -190,6 +203,14 @@ namespace ServiceStack.Redis
 		public string BlockingPopItemFromList(string listId, TimeSpan? timeOut)
 		{
 			return BRPopValue(listId, (int)timeOut.GetValueOrDefault().TotalSeconds).FromUtf8Bytes();
+		}
+
+        public ItemRef BlockingPopItemFromLists(string[] listIds, TimeSpan? timeOut)
+        {
+            var value = BRPopValue(listIds, (int) timeOut.GetValueOrDefault().TotalSeconds);
+            if( value == null )
+                return null;
+			return new ItemRef{Id=value[0].FromUtf8Bytes(), Item= value[1].FromUtf8Bytes()};
 		}
 
 		public string PopAndPushItemBetweenLists(string fromListId, string toListId)
