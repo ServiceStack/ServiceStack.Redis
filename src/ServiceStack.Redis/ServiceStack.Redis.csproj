@@ -166,6 +166,9 @@
     <Compile Include="Pipeline\QueuedRedisCommand.cs" />
     <Compile Include="Pipeline\RedisCommand.cs" />
     <Compile Include="RedisEndpoint.cs" />
+    <Compile Include="ShardedConnectionPool.cs" />
+    <Compile Include="ShardedRedisClientManager.cs" />
+    <Compile Include="Support\ConsistenHash.cs" />
     <Compile Include="Support\Locking\IDistributedLock.cs" />
     <Compile Include="Support\OptimizedObjectSerializer.cs" />
     <Compile Include="Support\Queue\ISequentialData.cs" />
