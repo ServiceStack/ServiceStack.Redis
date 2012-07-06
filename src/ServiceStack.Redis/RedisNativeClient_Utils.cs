@@ -689,9 +689,9 @@ namespace ServiceStack.Redis
 		public int EvalInt(string body, int numberKeysInArgs, params byte[][] keys)
 		{
 			if (body == null)
-				throw new ArgumentNullException("body");
+				throw new ArgumentNullException("body");            
 
-			var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys);
+			var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
 
 			return SendExpectInt(cmdArgs);
 		}
@@ -701,7 +701,7 @@ namespace ServiceStack.Redis
 			if (body == null)
 				throw new ArgumentNullException("body");
 
-			var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys);
+		    var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
 			return SendExpectData(cmdArgs).FromUtf8Bytes();
 		}
 
@@ -710,7 +710,7 @@ namespace ServiceStack.Redis
 			if (body == null)
 				throw new ArgumentNullException("body");
 
-			var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys);
+            var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
 
 			return SendExpectMultiData(cmdArgs);
 		}

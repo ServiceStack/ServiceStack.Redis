@@ -222,5 +222,10 @@ namespace ServiceStack.Redis
 		{
 			return RPopLPush(fromListId, toListId).FromUtf8Bytes();
 		}
+
+		public string BlockingPopAndPushItemBetweenLists(string fromListId, string toListId, TimeSpan? timeOut)
+		{
+            return BRPopLPush(fromListId, toListId, (int)timeOut.GetValueOrDefault().TotalSeconds).FromUtf8Bytes();
+		}
 	}
 }
