@@ -71,6 +71,7 @@ namespace ServiceStack.Redis
         public int RetryTimeout { get; set; }
         public int RetryCount { get; set; }
         public int SendTimeout { get; set; }
+		public int ReceiveTimeout { get; set; }
         public string Password { get; set; }
 
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
@@ -118,6 +119,7 @@ namespace ServiceStack.Redis
             Host = host;
             Port = port;
             SendTimeout = -1;
+			ReceiveTimeout = -1;
             Password = password;
         }
 
