@@ -26,7 +26,8 @@ namespace ServiceStack.Redis
 		{
 			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
 			{
-				SendTimeout = SendTimeout
+				SendTimeout = SendTimeout,
+				ReceiveTimeout = ReceiveTimeout
 			};
 			try
 			{
