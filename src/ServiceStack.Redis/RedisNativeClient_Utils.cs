@@ -228,8 +228,18 @@ namespace ServiceStack.Redis
 		{
 			if ((cmdBufferIndex + cmdBytes.Length) > cmdBuffer.Length)
 			{
+				int requiredLength = cmdBufferIndex + cmdBytes.Length;
+				const int lohThreshold = 85000 - 1;
 				const int breathingSpaceToReduceReallocations = (32 * 1024);
-				var newLargerBuffer = new byte[cmdBufferIndex + cmdBytes.Length + breathingSpaceToReduceReallocations];
+				int newSize = lohThreshold;
+				if (requiredLength <= lohThreshold) {
+					if (requiredLength + breathingSpaceToReduceReallocations <= lohThreshold) {
+						newSize = requiredLength + breathingSpaceToReduceReallocations;
+					}
+				} else {
+					newSize = requiredLength + breathingSpaceToReduceReallocations;
+				}
+				var newLargerBuffer = new byte[newSize];
 				Buffer.BlockCopy(cmdBuffer, 0, newLargerBuffer, 0, cmdBuffer.Length);
 				cmdBuffer = newLargerBuffer;
 			}
