@@ -66,6 +66,11 @@ namespace ServiceStack.Redis
 		public List<string> GetRangeFromSortedList(string listId, int startingFrom, int endingAt)
 		{
 			var sortOptions = new SortOptions { Skip = startingFrom, Take = endingAt, SortAlpha = true };
+			return GetSortedItemsFromList(listId, sortOptions);
+		}
+
+		public List<string> GetSortedItemsFromList(string listId, SortOptions sortOptions)
+		{
 			var multiDataList = Sort(listId, sortOptions);
 			return multiDataList.ToStringList();
 		}

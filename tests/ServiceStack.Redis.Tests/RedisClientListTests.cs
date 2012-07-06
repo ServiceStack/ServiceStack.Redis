@@ -357,7 +357,14 @@ namespace ServiceStack.Redis.Tests
 			}
 		}
 
+		[Test]
+		public void Can_AddRangeToList_and_GetSortedItems()
+		{
+			Redis.PrependRangeToList(ListId, storeMembers);
 
+			var members = Redis.GetSortedItemsFromList(ListId, new SortOptions { SortAlpha = true, SortDesc = true, Skip = 1, Take = 2 });
+			AssertAreEqual(members, storeMembers.OrderByDescending(s => s).Skip(1).Take(2).ToList());
+		}
 	}
 
 }
