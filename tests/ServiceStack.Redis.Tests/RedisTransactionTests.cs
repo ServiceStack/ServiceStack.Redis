@@ -55,7 +55,7 @@ namespace ServiceStack.Redis.Tests
                     trans.QueueCommand(r => r.Set(Key,value1));
                     var success = trans.Commit();
                     Assert.False(success);
-                    Assert.AreEqual(Redis.GetValue(Key), value1);
+                    Assert.AreEqual(value1, Redis.Get<string>(Key));
                 }
             }
             catch (NotSupportedException ignore)
