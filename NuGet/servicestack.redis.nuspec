@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <id>ServiceStack.Redis</id> 
-    <version>3.8.4</version> 
+    <id>ServiceStack.Redis</id>
+    <title>C# Redis client for the Redis NoSQL DB</title>
+    <version>3.8.5</version> 
     <authors>Demis Bellot</authors> 
     <owners>Demis Bellot</owners>
     <description>
