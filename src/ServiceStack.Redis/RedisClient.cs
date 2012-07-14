@@ -38,6 +38,16 @@ namespace ServiceStack.Redis
 			Init();
 		}
 
+        public static Func<RedisClient> NewFactoryFn = () => new RedisClient();
+
+        /// <summary>
+        /// Creates a new instance of the Redis Client from NewFactoryFn. 
+        /// </summary>
+        public static RedisClient New()
+        {
+            return NewFactoryFn();
+        }
+
 		public RedisClient(string host)
 			: base(host)
 		{
