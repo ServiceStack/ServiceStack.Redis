@@ -3,7 +3,7 @@
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>ServiceStack.Redis</id>
     <title>C# Redis client for the Redis NoSQL DB</title>
-    <version>3.8.5</version> 
+    <version>3.8.7</version> 
     <authors>Demis Bellot</authors> 
     <owners>Demis Bellot</owners>
     <description>
