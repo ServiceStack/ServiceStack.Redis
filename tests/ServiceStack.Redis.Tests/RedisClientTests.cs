@@ -403,6 +403,37 @@ namespace ServiceStack.Redis.Tests
 
             Assert.That(Redis.PopItemFromSet("ids:MyPoco"), Is.EqualTo("1"));
         }
+
+        [Test]
+        public void Can_store_multiple_keys()
+        {
+            var keys = 5.Times(x => "key" + x);
+            var vals = 5.Times(x => "val" + x);
+
+            var redis = RedisClient.New();
+
+            redis.SetAll(keys, vals);
+
+            var all = redis.GetValues(keys);
+            Assert.AreEqual(vals, all);
+        }
+
+        [Test]
+        public void Can_store_Dictionary()
+        {
+            var keys = 5.Times(x => "key" + x);
+            var vals = 5.Times(x => "val" + x);
+            var map = new Dictionary<string, string>();
+            keys.ForEach(x => map[x] = "val" + x);
+
+            var redis = RedisClient.New();
+
+            redis.SetAll(map);
+
+            var all = redis.GetValuesMap(keys);
+            Assert.AreEqual(map, all);
+        }
+
 	}
 
 }

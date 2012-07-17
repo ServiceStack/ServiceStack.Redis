@@ -113,14 +113,55 @@ namespace ServiceStack.Redis
 			return SearchKeys("*");
 		}
 
-		public void SetEntry(string key, string value)
-		{
-			var bytesValue = value != null
-				? value.ToUtf8Bytes()
-				: null;
+        public void SetEntry(string key, string value)
+        {
+            var bytesValue = value != null
+                ? value.ToUtf8Bytes()
+                : null;
 
-			Set(key, bytesValue);
-		}
+            Set(key, bytesValue);
+        }
+
+        public void SetAll(IEnumerable<string> keys, IEnumerable<string> values)
+        {
+            if (keys == null || values == null) return;
+            var keyArray = keys.ToArray();
+            var valueArray = values.ToArray();
+
+            if (keyArray.Length != valueArray.Length)
+                throw new Exception("Key length != Value Length. {0}/{1}".Fmt(keyArray.Length, valueArray.Length));
+            
+            if (keyArray.Length == 0) return;
+
+            var keyBytes = new byte[keyArray.Length][];
+            var valBytes = new byte[keyArray.Length][];
+            for (int i = 0; i < keyArray.Length; i++)
+            {
+                keyBytes[i] = keyArray[i].ToUtf8Bytes();
+                valBytes[i] = valueArray[i].ToUtf8Bytes();
+            }
+
+            base.MSet(keyBytes, valBytes);
+        }
+
+        public void SetAll(Dictionary<string, string> map)
+        {
+            if (map == null || map.Count == 0) return;
+
+            var keyBytes = new byte[map.Count][];
+            var valBytes = new byte[map.Count][];
+
+            var i = 0;
+            foreach (var key in map.Keys)
+            {
+                var val = map[key];
+                keyBytes[i] = key.ToUtf8Bytes();
+                valBytes[i] = val.ToUtf8Bytes();
+                i++;
+            }
+
+            base.MSet(keyBytes, valBytes);
+        }
 
 		public void SetEntry(string key, string value, TimeSpan expireIn)
 		{
