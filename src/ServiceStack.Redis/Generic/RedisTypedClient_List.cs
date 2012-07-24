@@ -153,7 +153,7 @@ namespace ServiceStack.Redis.Generic
 
 		public void EnqueueItemOnList(IRedisList<T> fromList, T item)
 		{
-			client.LPush(fromList.Id, SerializeValue(item));
+			client.RPush(fromList.Id, SerializeValue(item));
 		}
 
 		public T DequeueItemFromList(IRedisList<T> fromList)
