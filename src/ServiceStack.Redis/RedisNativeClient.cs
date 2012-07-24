@@ -618,7 +618,7 @@ namespace ServiceStack.Redis
 
         public void Shutdown()
         {
-            SendExpectSuccess(Commands.Shutdown);
+            SendCommand(Commands.Shutdown);
         }
 
         public void BgRewriteAof()
