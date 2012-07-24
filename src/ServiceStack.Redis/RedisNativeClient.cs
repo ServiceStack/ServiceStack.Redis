@@ -1374,6 +1374,13 @@ namespace ServiceStack.Redis
             return SendExpectInt(Commands.HIncrBy, hashId.ToUtf8Bytes(), key, incrementBy.ToString().ToUtf8Bytes());
         }
 
+        public int HIncrby(string hashId, byte[] key, long incrementBy)
+        {
+            AssertHashIdAndKey(hashId, key);
+
+            return SendExpectInt(Commands.HIncrBy, hashId.ToUtf8Bytes(), key, incrementBy.ToString().ToUtf8Bytes());
+        }
+
     	public double HIncrbyFloat(string hashId, byte[] key, double incrementBy)
     	{
 			AssertHashIdAndKey(hashId, key);

@@ -76,12 +76,17 @@ namespace ServiceStack.Redis
 			base.HMSet(hashId, keys, values);
 		}
 
-		public int IncrementValueInHash(string hashId, string key, int incrementBy)
-		{
-			return base.HIncrby(hashId, key.ToUtf8Bytes(), incrementBy);
-		}
+        public int IncrementValueInHash(string hashId, string key, int incrementBy)
+        {
+            return base.HIncrby(hashId, key.ToUtf8Bytes(), incrementBy);
+        }
 
-		public string GetValueFromHash(string hashId, string key)
+        public int IncrementValueInHash(string hashId, string key, long incrementBy)
+        {
+            return base.HIncrby(hashId, key.ToUtf8Bytes(), incrementBy);
+        }
+
+        public string GetValueFromHash(string hashId, string key)
 		{
 			return base.HGet(hashId, key.ToUtf8Bytes()).FromUtf8Bytes();
 		}
