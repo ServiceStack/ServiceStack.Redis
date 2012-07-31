@@ -42,9 +42,13 @@ namespace ServiceStack.Redis
 		{
 			return client;
 		}
-
-
+        
 		#region Implementation of ICacheClient
+        
+        public ICacheClient AsCacheClient()
+        {
+            return new RedisClientManagerCacheClient(this);
+        }
 
 		public bool Remove(string key)
 		{
@@ -183,5 +187,4 @@ namespace ServiceStack.Redis
 		}
 		#endregion
 	}
-
 }
