@@ -162,6 +162,7 @@
     <Compile Include="Messaging\RedisMqHostPool.cs" />
     <Compile Include="Messaging\RedisMqServer.cs" />
     <Compile Include="Messaging\WorkerStatus.cs" />
+    <Compile Include="RedisClientManagerCacheClient.cs" />
     <Compile Include="RedisClientsManagerExtensions.cs" />
     <Compile Include="Pipeline\QueuedRedisCommand.cs" />
     <Compile Include="Pipeline\RedisCommand.cs" />
