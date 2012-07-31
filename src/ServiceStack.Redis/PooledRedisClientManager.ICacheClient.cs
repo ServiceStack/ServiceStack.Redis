@@ -32,7 +32,7 @@ namespace ServiceStack.Redis
 
 		public ICacheClient GetReadOnlyCacheClient()
 		{
-			return new RedisClientManagerCacheClient(this) { ReadOnly = true;};
+			return new RedisClientManagerCacheClient(this) { ReadOnly = true };
 		}
 	}
 }

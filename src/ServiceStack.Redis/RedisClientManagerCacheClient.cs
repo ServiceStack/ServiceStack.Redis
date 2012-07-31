@@ -50,7 +50,7 @@ namespace ServiceStack.Redis
 
         public bool Remove(string key)
         {
-            using (IRedisClient client = GetClient())
+            using (var client = GetClient())
             {
                 return client.Remove(key);
             }
