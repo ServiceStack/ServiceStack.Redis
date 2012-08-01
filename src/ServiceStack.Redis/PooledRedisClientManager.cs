@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using ServiceStack.CacheAccess;
 using ServiceStack.Common.Web;
 using ServiceStack.Logging;
 
@@ -417,11 +418,11 @@ namespace ServiceStack.Redis
 			Dispose(false);
 		}
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
 		protected virtual void Dispose(bool disposing)
 		{
