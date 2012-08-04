@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Common.Extensions;
 using ServiceStack.Text;
@@ -232,6 +234,18 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(stringDoubleMap.EquivalentTo(map));
 			Console.WriteLine(map.Dump());
 		}
+
+        [Test]
+        public void Can_WorkInSortedSetUnderDifferentCulture()
+        {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("ru-RU");
+            Redis.AddItemToSortedSet(SetId, "key", 123.22);
+
+            var map = Redis.GetAllWithScoresFromSortedSet(SetId);
+
+            Assert.AreEqual(123.22, map["key"]);
+        }
+
 
 		[Ignore("Not implemented yet")]
 		[Test]
