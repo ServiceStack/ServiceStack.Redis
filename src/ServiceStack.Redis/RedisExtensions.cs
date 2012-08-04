@@ -34,7 +34,7 @@ namespace ServiceStack.Redis
                 string[] hostParts;
                 if (host.Contains("@"))
                 {
-                    hostParts = host.Split('@');
+                    hostParts = host.SplitOnLast('@');
                     var password = hostParts[0];
                     hostParts = hostParts[1].Split(':');
                     endpoint = GetRedisEndPoint(hostParts);

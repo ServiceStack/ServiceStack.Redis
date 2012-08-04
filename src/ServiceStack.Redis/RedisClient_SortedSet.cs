@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using ServiceStack.DesignPatterns.Model;
 using ServiceStack.Redis.Support;
@@ -218,7 +219,7 @@ namespace ServiceStack.Redis
 			{
 				var key = multiDataList[i].FromUtf8Bytes();
 				double value;
-				double.TryParse(multiDataList[i + 1].FromUtf8Bytes(), out value);
+                double.TryParse(multiDataList[i + 1].FromUtf8Bytes(), NumberStyles.Any, CultureInfo.InvariantCulture, out value);
 				map[key] = value;
 			}
 
