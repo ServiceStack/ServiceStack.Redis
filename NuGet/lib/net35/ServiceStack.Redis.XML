@@ -190,6 +190,11 @@
             </summary>
             <param name="command"></param>
         </member>
+        <member name="M:ServiceStack.Redis.RedisClient.New">
+            <summary>
+            Creates a new instance of the Redis Client from NewFactoryFn. 
+            </summary>
+        </member>
         <member name="T:ServiceStack.Redis.Generic.RedisTypedClient`1">
             <summary>
             Allows you to get Redis value operations to operate against POCO types.
@@ -428,6 +433,11 @@
         <member name="T:ServiceStack.Redis.RedisCommand">
             <summary>
             Redis command that does not get queued
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Redis.RedisClientManagerCacheClient.Dispose">
+            <summary>
+            Ignore dispose on RedisClientsManager, which should be registered as a singleton
             </summary>
         </member>
         <member name="T:ServiceStack.Redis.Generic.QueuedRedisTypedCommand`1">
@@ -973,6 +983,29 @@
             Wrap the common redis set operations under a ICollection[string] interface.
             </summary>
         </member>
+        <member name="M:ServiceStack.Redis.Support.ConsistentHash`1.AddTarget(`0,System.Int32)">
+            <summary>
+             Adds a node and maps points across the circle
+            </summary>
+            <param name="node"> node to add </param>
+            <param name="weight"> An arbitrary number, specifies how often it occurs relative to other targets. </param>
+        </member>
+        <member name="M:ServiceStack.Redis.Support.ConsistentHash`1.ModifiedBinarySearch(System.UInt64[],System.UInt64)">
+            <summary>
+              A variation of Binary Search algorithm. Given a number, matches the next highest number from the sorted array. 
+              If a higher number does not exist, then the first number in the array is returned.
+            </summary>
+            <param name="sortedArray"> a sorted array to perform the search </param>
+            <param name="val"> number to find the next highest number against </param>
+            <returns> next highest number </returns>
+        </member>
+        <member name="M:ServiceStack.Redis.Support.ConsistentHash`1.Md5Hash(System.String)">
+            <summary>
+              Given a key, generates an unsigned 64 bit hash code using MD5
+            </summary>
+            <param name="key"> </param>
+            <returns> </returns>
+        </member>
         <member name="T:ServiceStack.Redis.RedisException">
             <summary>
             Redis-specific exception. Thrown if unable to connect to Redis server due to socket exception, for example.
@@ -1074,10 +1107,9 @@
             1 master and multiple replicated read slaves.
             </summary>
             <summary>
-            For more interoperabilty I'm also implementing the ICacheClient on
-            this cache client manager which has the affect of calling 
-            GetCacheClient() for all write operations and GetReadOnlyCacheClient() 
-            for the read ones.
+            For interoperabilty GetCacheClient() and GetReadOnlyCacheClient()
+            return an ICacheClient wrapper around the redis manager which has the affect of calling 
+            GetClient() for all write operations and GetReadOnlyClient() for the read ones.
             
             This works well for master-slave replication scenarios where you have 
             1 master that replicates to multiple read slaves.
@@ -1116,6 +1148,18 @@
             Called within a lock
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Redis.PooledRedisClientManager.DisposeReadOnlyClient(ServiceStack.Redis.RedisNativeClient)">
+            <summary>
+            Disposes the read only client.
+            </summary>
+            <param name="client">The client.</param>
+        </member>
+        <member name="M:ServiceStack.Redis.PooledRedisClientManager.DisposeWriteClient(ServiceStack.Redis.RedisNativeClient)">
+            <summary>
+            Disposes the write client.
+            </summary>
+            <param name="client">The client.</param>
         </member>
         <member name="T:ServiceStack.Redis.PooledRedisClientManager.DisposablePooledClient`1">
             <summary>
@@ -1158,6 +1202,52 @@
         <member name="T:ServiceStack.Redis.Generic.RedisClientHash`2">
             <summary>
             Wrap the common redis set operations under a ICollection[string] interface.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Redis.Messaging.RedisMqServer">
+            <summary>
+            Creates a Redis MQ Server that processes each message on its own background thread.
+            i.e. if you register 3 handlers it will create 7 background threads:
+              - 1 listening to the Redis MQ Subscription, getting notified of each new message
+              - 3x1 Normal InQ for each message handler
+              - 3x1 PriorityQ for each message handler
+            
+            When RedisMqServer Starts it creates a background thread subscribed to the Redis MQ Topic that
+            listens for new incoming messages. It also starts 2 background threads for each message type:
+             - 1 for processing the services Priority Queue and 1 processing the services normal Inbox Queue.
+            
+            Priority Queue's can be enabled on a message-per-message basis by specifying types in the 
+            OnlyEnablePriortyQueuesForTypes property. The DisableAllPriorityQueues property disables all Queues.
+            
+            The Start/Stop methods are idempotent i.e. It's safe to call them repeatedly on multiple threads 
+            and the Redis MQ Server will only have Started or Stopped once.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Redis.Messaging.RedisMqServer.RequestFilter">
+            <summary>
+            Execute global transformation or custom logic before a request is processed.
+            Must be thread-safe.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Redis.Messaging.RedisMqServer.ResponseFilter">
+            <summary>
+            Execute global transformation or custom logic on the response.
+            Must be thread-safe.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Redis.Messaging.RedisMqServer.ErrorHandler">
+            <summary>
+            Execute global error handler logic. Must be thread-safe.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Redis.Messaging.RedisMqServer.OnlyEnablePriortyQueuesForTypes">
+            <summary>
+            If you only want to enable priority queue handlers (and threads) for specific msg types
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Redis.Messaging.RedisMqServer.DisableAllPriorityQueues">
+            <summary>
+            Don't listen on any Priority Queues
             </summary>
         </member>
         <member name="T:ServiceStack.Redis.BasicRedisClientManager">
@@ -1262,6 +1352,39 @@
             </summary>
             <param name="newWorkItem"></param>
         </member>
+        <member name="T:ServiceStack.Redis.ShardedConnectionPool">
+            <summary>
+            Provides a redis connection pool that can be sharded
+            </summary>
+        </member>
+        <member name="F:ServiceStack.Redis.ShardedConnectionPool.name">
+            <summary>
+            logical name
+            </summary>
+        </member>
+        <member name="F:ServiceStack.Redis.ShardedConnectionPool.weight">
+            <summary>
+            An arbitrary weight relative to other nodes
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Redis.ShardedConnectionPool.#ctor(System.String,System.Int32,System.String[])">
+            <param name="name">logical name</param>
+            <param name="weight">An arbitrary weight relative to other nodes</param>
+            <param name="readWriteHosts">redis nodes</param>
+        </member>
+        <member name="T:ServiceStack.Redis.ShardedRedisClientManager">
+            <summary>
+            Provides sharding of redis client connections.
+            uses consistent hashing to distribute keys across connection pools
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Redis.ShardedRedisClientManager.GetConnectionPool(System.String)">
+            <summary>
+            maps a key to a redis connection pool
+            </summary>
+            <param name="key">key to map</param>
+            <returns>a redis connection pool</returns>
+        </member>
         <member name="T:ServiceStack.Redis.Support.Queue.Implementation.RedisSimpleWorkQueue`1">
             <summary>
             simple distributed work item queue 
@@ -1288,6 +1411,19 @@
             <summary>
             Provide the factory implementation for creating a RedisCacheClient that 
             can be mocked and used by different 'Redis Client Managers' 
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Redis.Messaging.RedisMqHost">
+            <summary>
+            Creates an MQ Host that processes all messages on a single background thread. 
+            i.e. If you register 3 handlers it will only create 1 background thread.
+            
+            The same background thread that listens to the Redis MQ Subscription for new messages 
+            also cycles through each registered handler processing all pending messages one-at-a-time:
+            first in the message PriorityQ, then in the normal message InQ.
+            
+            The Start/Stop methods are idempotent i.e. It's safe to call them repeatedly on multiple threads 
+            and the Redis MQ Host will only have Started/Stopped once.
             </summary>
         </member>
         <member name="P:ServiceStack.Redis.Messaging.RedisMqHost.ReplyClientFactory">
