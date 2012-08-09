@@ -34,5 +34,5 @@ obj/
 _ReSharper*/
 [Tt]est[Rr]esult*
 App_Data/
-
-build/ServiceStack.Redis.dll
+NuGet/
+build/
