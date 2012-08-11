@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Redis.Messaging;
 
 namespace ServiceStack.Redis.Tests.Benchmarks
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class RedisMqHostBenchmarks
 	{
 		public class Incr
@@ -32,7 +33,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
 			}
 			catch (RedisException rex)
 			{
-				Console.WriteLine("WARNING: Redis not started? \n" + rex.Message);
+				Debug.WriteLine("WARNING: Redis not started? \n" + rex.Message);
 			}
 			var mqHost = new RedisMqHost(redisFactory, noOfRetries, null);
 			return mqHost;
@@ -57,7 +58,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
 
             Thread.Sleep(10000);
 
-            Console.WriteLine("Times called: " + called);
+            Debug.WriteLine("Times called: " + called);
         }
 
         [Test]
@@ -81,7 +82,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
 
             Thread.Sleep(10000);
 
-            Console.WriteLine("Times called: " + called);
+            Debug.WriteLine("Times called: " + called);
         }
 
 	}

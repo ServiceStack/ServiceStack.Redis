@@ -1,11 +1,12 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Common.Extensions;
 
 namespace ServiceStack.Redis.Tests.Examples
 {
-	[TestFixture]
+    [TestFixture, Explicit, Category("Integration")]
 	public class SimplePubSub
 	{
 		const string ChannelName = "CHANNEL";
@@ -31,15 +32,15 @@ namespace ServiceStack.Redis.Tests.Examples
 			{
 				subscription.OnSubscribe = channel =>
 				{
-					Console.WriteLine("Subscribed to '{0}'", channel);
+					Debug.WriteLine(String.Format("Subscribed to '{0}'", channel));
 				};
 				subscription.OnUnSubscribe = channel =>
 				{
-					Console.WriteLine("UnSubscribed from '{0}'", channel);
+					Debug.WriteLine(String.Format("UnSubscribed from '{0}'", channel));
 				};
 				subscription.OnMessage = (channel, msg) =>
 				{
-					Console.WriteLine("Received '{0}' from channel '{1}'", msg, channel);
+					Debug.WriteLine(String.Format("Received '{0}' from channel '{1}'", msg, channel));
 
 					//As soon as we've received all 5 messages, disconnect by unsubscribing to all channels
 					if (++messagesReceived == PublishMessageCount)
@@ -51,24 +52,24 @@ namespace ServiceStack.Redis.Tests.Examples
 				ThreadPool.QueueUserWorkItem(x =>
 				{
 					Thread.Sleep(200);
-					Console.WriteLine("Begin publishing messages...");
+					Debug.WriteLine("Begin publishing messages...");
 
 					using (var redisPublisher = new RedisClient(TestConfig.SingleHost))
 					{
 						for (var i = 1; i <= PublishMessageCount; i++)
 						{
 							var message = MessagePrefix + i;
-							Console.WriteLine("Publishing '{0}' to '{1}'", message, ChannelName);
+							Debug.WriteLine(String.Format("Publishing '{0}' to '{1}'", message, ChannelName));
 							redisPublisher.PublishMessage(ChannelName, message);
 						}
 					}
 				});
 
-				Console.WriteLine("Started Listening On '{0}'", ChannelName);
+				Debug.WriteLine(String.Format("Started Listening On '{0}'", ChannelName));
 				subscription.SubscribeToChannels(ChannelName); //blocking
 			}
 
-			Console.WriteLine("EOF");
+			Debug.WriteLine("EOF");
 
 			/*Output: 
 			Started Listening On 'CHANNEL'
@@ -105,16 +106,16 @@ namespace ServiceStack.Redis.Tests.Examples
 						var messagesReceived = 0;
 						subscription.OnSubscribe = channel =>
 						{
-							Console.WriteLine("Client #{0} Subscribed to '{1}'", clientNo, channel);
+							Debug.WriteLine(String.Format("Client #{0} Subscribed to '{1}'", clientNo, channel));
 						};
 						subscription.OnUnSubscribe = channel =>
 						{
-							Console.WriteLine("Client #{0} UnSubscribed from '{1}'", clientNo, channel);
+							Debug.WriteLine(String.Format("Client #{0} UnSubscribed from '{1}'", clientNo, channel));
 						};
 						subscription.OnMessage = (channel, msg) =>
 						{
-							Console.WriteLine("Client #{0} Received '{1}' from channel '{2}'", 
-								clientNo, msg, channel);
+							Debug.WriteLine(String.Format("Client #{0} Received '{1}' from channel '{2}'", 
+								clientNo, msg, channel));
 
 							if (++messagesReceived == PublishMessageCount)
 							{
@@ -122,23 +123,23 @@ namespace ServiceStack.Redis.Tests.Examples
 							}
 						};
 
-						Console.WriteLine("Client #{0} started Listening On '{1}'", clientNo, ChannelName);
+						Debug.WriteLine(String.Format("Client #{0} started Listening On '{1}'", clientNo, ChannelName));
 						subscription.SubscribeToChannels(ChannelName); //blocking
 					}
 
-					Console.WriteLine("Client #{0} EOF", clientNo);
+					Debug.WriteLine(String.Format("Client #{0} EOF", clientNo));
 				});
 			}
 
 			using (var redisClient = new RedisClient(TestConfig.SingleHost))
 			{
 				Thread.Sleep(500);
-				Console.WriteLine("Begin publishing messages...");
+				Debug.WriteLine("Begin publishing messages...");
 
 				for (var i = 1; i <= PublishMessageCount; i++)
 				{
 					var message = MessagePrefix + i;
-					Console.WriteLine("Publishing '{0}' to '{1}'", message, ChannelName);
+					Debug.WriteLine(String.Format("Publishing '{0}' to '{1}'", message, ChannelName));
 					redisClient.PublishMessage(ChannelName, message);
 				}
 			}

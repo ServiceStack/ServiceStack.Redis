@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -8,7 +9,7 @@ using ServiceStack.Common.Extensions;
 
 namespace ServiceStack.Redis.Tests.Examples
 {
-	[TestFixture]
+    [TestFixture, Explicit, Category("Integration")]
 	public class SimpleLocks
 	{
 		[TestFixtureSetUp]
@@ -34,14 +35,14 @@ namespace ServiceStack.Redis.Tests.Examples
 					var redisClient = new RedisClient(TestConfig.SingleHost);
 					using (redisClient.AcquireLock("testlock"))
 					{
-						Console.WriteLine("client {0} acquired lock", clientNo);
+						Debug.WriteLine(String.Format("client {0} acquired lock", clientNo));
 						var counter = redisClient.Get<int>("atomic-counter");
 
 						//Add an artificial delay to demonstrate locking behaviour
 						Thread.Sleep(100);
 
 						redisClient.Set("atomic-counter", counter + 1);
-						Console.WriteLine("client {0} released lock", clientNo);
+						Debug.WriteLine(String.Format("client {0} released lock", clientNo));
 					}
 				};
 
@@ -56,7 +57,7 @@ namespace ServiceStack.Redis.Tests.Examples
 			using (var redisClient = new RedisClient(TestConfig.SingleHost))
 			{
 				var counter = redisClient.Get<int>("atomic-counter");
-				Console.WriteLine("atomic-counter after 1sec: {0}", counter);
+				Debug.WriteLine(String.Format("atomic-counter after 1sec: {0}", counter));
 			}
 		}
 
@@ -89,10 +90,10 @@ namespace ServiceStack.Redis.Tests.Examples
 			catch (TimeoutException tex)
 			{
 				var timeTaken = DateTime.Now - now;
-				Console.WriteLine("After '{0}', Received TimeoutException: '{1}'", timeTaken, tex.Message);
+				Debug.WriteLine(String.Format("After '{0}', Received TimeoutException: '{1}'", timeTaken, tex.Message));
 
 				var counter = redisClient.Get<int>("atomic-counter");
-				Console.WriteLine("atomic-counter remains at '{0}'", counter);
+				Debug.WriteLine(String.Format("atomic-counter remains at '{0}'", counter));
 			}
 		}
 

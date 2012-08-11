@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using ServiceStack.Common;
@@ -290,7 +291,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 	#endregion
 
 
-	[TestFixture]
+    [TestFixture, Explicit, Category("Integration")]
 	public class BlogPostBestPractice
 	{
 		readonly RedisClient redisClient = new RedisClient(TestConfig.SingleHost);
@@ -369,7 +370,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 			var mythzBlogPostIds = mythz.GetBlogs().SelectMany(x => x.BlogPostIds);
 			var mythzBlogPosts = repository.GetBlogPosts(mythzBlogPostIds);
 
-			Console.WriteLine(mythzBlogPosts.Dump());
+			Debug.WriteLine(mythzBlogPosts.Dump());
 			/* Output:
 			[
 				{
@@ -427,7 +428,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 		public void Show_a_list_of_blogs()
 		{
 			var blogs = repository.GetAllBlogs();
-			Console.WriteLine(blogs.Dump());
+			Debug.WriteLine(blogs.Dump());
 			/* Output: 
 			[
 				{
@@ -473,8 +474,8 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 			var recentPosts = repository.GetRecentBlogPosts();
 			var recentComments = repository.GetRecentBlogPostComments();
 
-			Console.WriteLine("Recent Posts:\n" + recentPosts.Dump());
-			Console.WriteLine("Recent Comments:\n" + recentComments.Dump());
+			Debug.WriteLine("Recent Posts:\n" + recentPosts.Dump());
+			Debug.WriteLine("Recent Comments:\n" + recentComments.Dump());
 			/* 
 			Recent Posts:
 			[
@@ -611,7 +612,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 		{
 			//Tags are maintained in the repository
 			var tagCloud = repository.GetTopTags(5);
-			Console.WriteLine(tagCloud.Dump());
+			Debug.WriteLine(tagCloud.Dump());
 			/* Output:
 			[
 				[
@@ -643,7 +644,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 		{
 			//Categories are maintained in the repository
 			var allCategories = repository.GetAllCategories();
-			Console.WriteLine(allCategories.Dump());
+			Debug.WriteLine(allCategories.Dump());
 			/* Output:
 			[
 				DocumentDB,
@@ -659,7 +660,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 		{
 			var postId = 1;
 			var blogPost = repository.GetBlogPost(postId);
-			Console.WriteLine(blogPost.Dump());
+			Debug.WriteLine(blogPost.Dump());
 			/* Output:
 			{
 				Id: 1,
@@ -704,7 +705,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 			repository.StoreBlogPost(blogPost);
 
 			var refreshBlogPost = repository.GetBlogPost(postId);
-			Console.WriteLine(refreshBlogPost.Dump());
+			Debug.WriteLine(refreshBlogPost.Dump());
 			/* Output:
 			{
 				Id: 1,
@@ -745,7 +746,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 		public void Show_all_Posts_for_a_Category()
 		{
 			var documentDbPosts = repository.GetBlogPostsByCategory("DocumentDB");
-			Console.WriteLine(documentDbPosts.Dump());
+			Debug.WriteLine(documentDbPosts.Dump());
 			/* Output:
 			[
 				{

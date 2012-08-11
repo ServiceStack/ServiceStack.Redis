@@ -11,7 +11,7 @@ using ServiceStack.Logging.Support.Logging;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class UserSessionTests
 	{
 		static UserSessionTests()

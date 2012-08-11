@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Common.Extensions;
@@ -184,7 +185,7 @@ namespace ServiceStack.Redis.Tests
 			using (var subscription = Redis.CreateSubscription())
 			{
 				subscription.OnMessage = (channel, msg) => {
-					Console.WriteLine("{0}: {1}", channel, msg + msgs++);
+					Debug.WriteLine(String.Format("{0}: {1}", channel, msg + msgs++));
 					subscription.UnSubscribeFromChannelsMatching("CHANNEL1:TITLE*");
 				};
 

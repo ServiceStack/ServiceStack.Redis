@@ -1,17 +1,18 @@
 using System;
+using System.Diagnostics;
 using System.Text;
 using NUnit.Framework;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class RedisClientTestsBase
 	{
 		protected RedisClient Redis;
 
 		protected void Log(string fmt, params object[] args)
 		{
-			Console.WriteLine("{0}", string.Format(fmt, args).Trim());
+			Debug.WriteLine("{0}", string.Format(fmt, args).Trim());
 		}
 
 		[SetUp]

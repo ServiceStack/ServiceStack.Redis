@@ -11,7 +11,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Generic
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class RedisClientTests
 	{
 		[TestFixtureSetUp]
@@ -101,9 +101,9 @@ namespace ServiceStack.Redis.Tests.Generic
 				var orderDetails = client.GetAll<OrderDetail>();
 				AssertUnorderedListsAreEqual(orderDetails, NorthwindData.OrderDetails);
 			}
-			Console.WriteLine("\nWrote {0:#,#} in {1:#,#}ms: {2:#,#.##}: items/ms",
+			Debug.WriteLine(String.Format("\nWrote {0:#,#} in {1:#,#}ms: {2:#,#.##}: items/ms",
 				NorthwindData.OrderDetails.Count, sp.ElapsedMilliseconds,
-				NorthwindData.OrderDetails.Count / (double)sp.ElapsedMilliseconds);
+				NorthwindData.OrderDetails.Count / (double)sp.ElapsedMilliseconds));
 		}
 
 		[Test]
@@ -118,9 +118,9 @@ namespace ServiceStack.Redis.Tests.Generic
 				var orderDetails = typedClient.GetAll();
 				AssertUnorderedListsAreEqual(orderDetails, NorthwindData.OrderDetails);
 			}
-			Console.WriteLine("\nWrote {0:#,#} in {1:#,#}ms: {2:#,#.##}: items/ms",
+			Debug.WriteLine(String.Format("\nWrote {0:#,#} in {1:#,#}ms: {2:#,#.##}: items/ms",
 				NorthwindData.OrderDetails.Count, sp.ElapsedMilliseconds,
-				NorthwindData.OrderDetails.Count / (double)sp.ElapsedMilliseconds);
+				NorthwindData.OrderDetails.Count / (double)sp.ElapsedMilliseconds));
 		}
         
         [Test]
@@ -168,8 +168,8 @@ namespace ServiceStack.Redis.Tests.Generic
 				client.StoreAll(NorthwindData.Territories);
 				client.StoreAll(NorthwindData.EmployeeTerritories);
 
-				Console.WriteLine("Took {0}ms to store the entire Northwind database ({1} records)",
-					(DateTime.Now - before).TotalMilliseconds, totalRecords);
+				Debug.WriteLine(String.Format("Took {0}ms to store the entire Northwind database ({1} records)",
+					(DateTime.Now - before).TotalMilliseconds, totalRecords));
 
 
 				before = DateTime.Now;
@@ -186,8 +186,8 @@ namespace ServiceStack.Redis.Tests.Generic
 				var territories = client.GetAll<Territory>();
 				var employeeTerritories = client.GetAll<EmployeeTerritory>();
 
-				Console.WriteLine("Took {0}ms to get the entire Northwind database ({1} records)",
-					(DateTime.Now - before).TotalMilliseconds, totalRecords);
+				Debug.WriteLine(String.Format("Took {0}ms to get the entire Northwind database ({1} records)",
+					(DateTime.Now - before).TotalMilliseconds, totalRecords));
 
 
 				AssertUnorderedListsAreEqual(categories, NorthwindData.Categories);

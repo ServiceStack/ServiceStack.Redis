@@ -1,4 +1,5 @@
 using System;
+using NUnit.Framework;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Redis.Tests.Support;
 
@@ -16,6 +17,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
+    [TestFixture]
 	public class RedisClientListTestsString
 		: RedisClientListTestsBase<string>
 	{
@@ -27,6 +29,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
+    [TestFixture]
 	public class RedisClientListTestsShipper
 		: RedisClientListTestsBase<Shipper>
 	{
@@ -38,6 +41,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
+    [TestFixture]
 	public class RedisClientListTestsInt
 		: RedisClientListTestsBase<int>
 	{
@@ -49,6 +53,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
+    [TestFixture]
 	public class RedisClientListTestsCustomType
 		: RedisClientSetTestsBase<CustomType>
 	{

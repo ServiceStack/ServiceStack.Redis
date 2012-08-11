@@ -352,7 +352,7 @@ namespace ServiceStack.Redis
 				}
 			}
 			
-			//Console.WriteLine("Couldn't find {0} client with Id: {1}, readclients: {2}, writeclients: {3}",
+			//Debug.WriteLine("Couldn't find {0} client with Id: {1}, readclients: {2}, writeclients: {3}",
 			//    client.IsDisposed ? "Disposed" : "Undisposed",
 			//    client.Id,
 			//    string.Join(", ", readClients.ToList().ConvertAll(x => x != null ? x.Id.ToString() : "").ToArray()),

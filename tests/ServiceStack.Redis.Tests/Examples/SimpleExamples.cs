@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
@@ -7,7 +8,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Examples
 {
-	[TestFixture]
+    [TestFixture, Explicit, Category("Integration")]
 	public class SimpleExamples
 	{
 		readonly RedisClient redisClient = new RedisClient(TestConfig.SingleHost);
@@ -27,7 +28,7 @@ namespace ServiceStack.Redis.Tests.Examples
 				redisUsers.Store(new User { Id = redisUsers.GetNextSequence(), Name = "mythz" });
 
 				var allUsers = redisUsers.GetAll();
-				Console.WriteLine(allUsers.Dump());
+				Debug.WriteLine(allUsers.Dump());
 			}
 			/*Output
 			[
@@ -84,7 +85,7 @@ namespace ServiceStack.Redis.Tests.Examples
 				var blogs = redisBlogs.GetAll();
 
 				//Recursively print the values of the POCO (For T.Dump() Extension method see: http://www.servicestack.net/mythz_blog/?p=202)
-				Console.WriteLine(blogs.Dump());
+				Debug.WriteLine(blogs.Dump());
 			}
 			/*Output
 			[

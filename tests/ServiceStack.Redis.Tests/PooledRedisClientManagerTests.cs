@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
@@ -7,7 +8,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class PooledRedisClientManagerTests
 	{
 		readonly string[] testReadWriteHosts = new[] {
@@ -327,7 +328,7 @@ namespace ServiceStack.Redis.Tests
 
 			WaitHandle.WaitAll(clientAsyncResults.ConvertAll(x => x.AsyncWaitHandle).ToArray());
 
-			Console.WriteLine(TypeSerializer.SerializeToString(clientUsageMap));
+			Debug.WriteLine(TypeSerializer.SerializeToString(clientUsageMap));
 
 			var hostCount = 0;
 			foreach (var entry in clientUsageMap)
@@ -355,7 +356,7 @@ namespace ServiceStack.Redis.Tests
 					hostCountMap[client.Host] = ++hostCount;
 				}
 
-				Console.WriteLine("Client '{0}' is using '{1}'", clientNo, client.Host);
+				Debug.WriteLine(String.Format("Client '{0}' is using '{1}'", clientNo, client.Host));
 			}
 		}
 

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using NUnit.Framework;
 using ServiceStack.Common.Utils;
@@ -7,7 +8,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class AdhocClientTests
 	{
 		[Test]
@@ -48,24 +49,24 @@ namespace ServiceStack.Redis.Tests
 
 			var hex = BitConverter.ToString(cmdBytes);
 
-			Console.WriteLine(hex);
+			Debug.WriteLine(hex);
 
-			Console.WriteLine(BitConverter.ToString("G".ToUtf8Bytes()));
-			Console.WriteLine(BitConverter.ToString("E".ToUtf8Bytes()));
-			Console.WriteLine(BitConverter.ToString("T".ToUtf8Bytes()));
-			Console.WriteLine(BitConverter.ToString("2".ToUtf8Bytes()));
-			Console.WriteLine(BitConverter.ToString("\r".ToUtf8Bytes()));
-			Console.WriteLine(BitConverter.ToString("\n".ToUtf8Bytes()));
+			Debug.WriteLine(BitConverter.ToString("G".ToUtf8Bytes()));
+			Debug.WriteLine(BitConverter.ToString("E".ToUtf8Bytes()));
+			Debug.WriteLine(BitConverter.ToString("T".ToUtf8Bytes()));
+			Debug.WriteLine(BitConverter.ToString("2".ToUtf8Bytes()));
+			Debug.WriteLine(BitConverter.ToString("\r".ToUtf8Bytes()));
+			Debug.WriteLine(BitConverter.ToString("\n".ToUtf8Bytes()));
 
 			var bytes = new[] { (byte)'\r', (byte)'\n', (byte)'0', (byte)'9', };
-			Console.WriteLine(BitConverter.ToString(bytes));
+			Debug.WriteLine(BitConverter.ToString(bytes));
 		}
 
 		[Test]
 		public void Convert_int()
 		{
 			var test = 1234;
-			Console.WriteLine(BitConverter.ToString(1234.ToString().ToUtf8Bytes()));
+			Debug.WriteLine(BitConverter.ToString(1234.ToString().ToUtf8Bytes()));
 		}
 
 		private static byte[] GetCmdBytes1(char cmdPrefix, int noOfLines)
@@ -95,13 +96,13 @@ namespace ServiceStack.Redis.Tests
 			var res1 = GetCmdBytes1('$', 1234);
 			var res2 = GetCmdBytes2('$', 1234);
 
-			Console.WriteLine(BitConverter.ToString(res1));
-			Console.WriteLine(BitConverter.ToString(res2));
+			Debug.WriteLine(BitConverter.ToString(res1));
+			Debug.WriteLine(BitConverter.ToString(res2));
 
 			var ticks1 = PerfUtils.Measure(1000000, () => GetCmdBytes1('$', 2));
 			var ticks2 = PerfUtils.Measure(1000000, () => GetCmdBytes2('$', 2));
 
-			Console.WriteLine("{0} : {1} = {2}", ticks1, ticks2, ticks1 / (double)ticks2);
+			Debug.WriteLine(String.Format("{0} : {1} = {2}", ticks1, ticks2, ticks1 / (double)ticks2));
 		}
 
 	}

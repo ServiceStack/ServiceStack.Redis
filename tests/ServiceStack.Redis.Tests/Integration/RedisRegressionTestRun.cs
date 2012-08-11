@@ -10,7 +10,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Integration
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class RedisRegressionTestRun
 	{
 		private static string testData;
@@ -45,7 +45,7 @@ namespace ServiceStack.Redis.Tests.Integration
 
 			WaitHandle.WaitAll(clientAsyncResults.ConvertAll(x => x.AsyncWaitHandle).ToArray());
 
-			Console.WriteLine("Completed in {0} ticks", (Stopwatch.GetTimestamp() - before));
+			Debug.WriteLine(String.Format("Completed in {0} ticks", (Stopwatch.GetTimestamp() - before)));
 		}
 
 		[Test]
@@ -66,7 +66,7 @@ namespace ServiceStack.Redis.Tests.Integration
 				}
 			}
 
-			Console.WriteLine("Completed in {0} ticks", (Stopwatch.GetTimestamp() - before));
+			Debug.WriteLine(String.Format("Completed in {0} ticks", (Stopwatch.GetTimestamp() - before)));
 		}
 
 		private static void UseClientAsync(IRedisClientsManager manager, int clientNo)
@@ -85,7 +85,7 @@ namespace ServiceStack.Redis.Tests.Integration
 			{
 				host = client.Host;
 
-				Console.WriteLine("Client '{0}' is using '{1}'", clientNo, client.Host);
+				Debug.WriteLine(String.Format("Client '{0}' is using '{1}'", clientNo, client.Host));
 				var differentDbs = new[] { 1, 0, 2 };
 
 				foreach (var db in differentDbs)
@@ -111,12 +111,12 @@ namespace ServiceStack.Redis.Tests.Integration
 			}
 			catch (NullReferenceException ex)
 			{
-				Console.WriteLine("NullReferenceException StackTrace: \n" + ex.StackTrace);
+				Debug.WriteLine("NullReferenceException StackTrace: \n" + ex.StackTrace);
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine("\t[ERROR@{0}]: {1} => {2}",
-					host, ex.GetType().Name, ex.Message);
+				Debug.WriteLine(String.Format("\t[ERROR@{0}]: {1} => {2}",
+					host, ex.GetType().Name, ex.Message));
 			}
 		}
 
@@ -124,15 +124,15 @@ namespace ServiceStack.Redis.Tests.Integration
 		{
 			if (resultData.IsNullOrEmpty())
 			{
-				Console.WriteLine("\tERROR@[{0}] NULL", db);
+				Debug.WriteLine(String.Format("\tERROR@[{0}] NULL", db));
 				return;
 			}
 
-			Console.WriteLine("\t[{0}] {1} => {2} len {3} {4} len",
+			Debug.WriteLine(String.Format("\t[{0}] {1} => {2} len {3} {4} len",
 			  db,
 			  testClientKey,
 			  testData.Length,
-			  testData.Length == resultData.Length ? "==" : "!=", resultData.Length);
+			  testData.Length == resultData.Length ? "==" : "!=", resultData.Length));
 		}
 	}
 

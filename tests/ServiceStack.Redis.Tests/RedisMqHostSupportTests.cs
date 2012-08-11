@@ -5,7 +5,7 @@ using ServiceStack.Redis.Messaging;
 
 namespace ServiceStack.Redis.Tests
 {
-    [TestFixture]
+    [TestFixture, Category("Integration")]
     public class RedisMqHostSupportTests
     {
         [Test]

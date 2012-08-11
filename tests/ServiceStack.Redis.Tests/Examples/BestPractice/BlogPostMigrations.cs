@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using NUnit.Framework;
 using ServiceStack.Common.Extensions;
 using ServiceStack.Text;
@@ -51,7 +52,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice.New
 
 namespace ServiceStack.Redis.Tests.Examples.BestPractice
 {
-	[TestFixture]
+    [TestFixture, Explicit, Category("Integration")]
 	public class BlogPostMigrations
 	{
 		readonly RedisClient redisClient = new RedisClient(TestConfig.SingleHost);
@@ -78,7 +79,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 
 				//Print out the data in the list of 'New.BlogPost' populated from old 'BlogPost' type
 				//Note: renamed fields are lost 
-				Console.WriteLine(allBlogPosts.Dump());
+				Debug.WriteLine(allBlogPosts.Dump());
 				/*Output:
 				[
 					{
@@ -210,7 +211,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 				//Read out the newly stored blogposts
 				var refreshedNewBlogPosts = redisNewBlogPosts.GetAll();
 				//Note: data renamed fields are successfully migrated to the new schema
-				Console.WriteLine(refreshedNewBlogPosts.Dump());
+				Debug.WriteLine(refreshedNewBlogPosts.Dump());
 				/*
 				[
 					{

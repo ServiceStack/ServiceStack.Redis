@@ -3,7 +3,7 @@
 namespace ServiceStack.Redis.Tests
 {
 
-	[TestFixture]
+    [TestFixture, Category("Integration")]
 	public class AlchemyNativeClientTests: AlchemyClientTestsBase
 	{
         [Test]
