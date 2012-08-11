@@ -12,16 +12,12 @@ using ServiceStack.Text;
 namespace ServiceStack.Redis.Tests.Generic
 {
 	[TestFixture, Category("Integration")]
-	public class RedisClientTests
+    public class RedisClientTests : RedisClientTestsBase
 	{
 		[TestFixtureSetUp]
 		public void TestFixture()
 		{
 			NorthwindData.LoadData(false);
-			using (var redis = new RedisClient(TestConfig.SingleHost))
-			{
-				redis.FlushAll();
-			}
 		}
 
 		[Test]

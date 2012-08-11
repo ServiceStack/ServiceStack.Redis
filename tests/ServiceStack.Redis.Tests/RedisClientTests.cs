@@ -22,6 +22,7 @@ namespace ServiceStack.Redis.Tests
 			Redis.SetEntry("key", Value);
 			var valueBytes = Redis.Get("key");
 			var valueString = GetString(valueBytes);
+		    Redis.Remove("key");
 
 			Assert.That(valueString, Is.EqualTo(Value));
 		}
@@ -32,6 +33,7 @@ namespace ServiceStack.Redis.Tests
 			Redis.SetEntry("key with space", Value);
 			var valueBytes = Redis.Get("key with space");
 			var valueString = GetString(valueBytes);
+            Redis.Remove("key with space");
 
 			Assert.That(valueString, Is.EqualTo(Value));
 		}

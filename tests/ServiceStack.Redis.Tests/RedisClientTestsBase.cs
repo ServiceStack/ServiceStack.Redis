@@ -8,6 +8,7 @@ namespace ServiceStack.Redis.Tests
 	[TestFixture, Category("Integration")]
 	public class RedisClientTestsBase
 	{
+	    protected string CleanMask = null;
 		protected RedisClient Redis;
 
 		protected void Log(string fmt, params object[] args)
@@ -18,15 +19,19 @@ namespace ServiceStack.Redis.Tests
 		[SetUp]
 		public virtual void OnBeforeEachTest()
 		{
-			if (Redis != null) Redis.Dispose();
 			Redis = new RedisClient(TestConfig.SingleHost);
-			Redis.FlushDb();
 		}
+
+        [TearDown]
+        public virtual void TearDown()
+        {
+            if (CleanMask != null) Redis.SearchKeys(CleanMask).ForEach(t => Redis.Del(t));
+            Redis.Dispose();
+        }
 
 		public RedisClient GetRedisClient()
 		{
 			var client = new RedisClient(TestConfig.SingleHost);
-			client.FlushDb();
 			return client;
 		}
 

@@ -6,7 +6,7 @@ using ServiceStack.Redis.Messaging;
 
 namespace ServiceStack.Redis.Tests.Benchmarks
 {
-	[TestFixture, Category("Integration")]
+	[TestFixture, Category("Integration"), Explicit]
 	public class RedisMqHostBenchmarks
 	{
 		public class Incr

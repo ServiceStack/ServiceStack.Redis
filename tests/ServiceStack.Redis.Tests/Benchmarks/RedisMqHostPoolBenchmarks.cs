@@ -7,7 +7,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Benchmarks
 {
-    [TestFixture, Category("Integration")]
+    [TestFixture, Category("Integration"), Explicit]
     public class RedisMqHostPoolBenchmarks
     {
         public class Incr
