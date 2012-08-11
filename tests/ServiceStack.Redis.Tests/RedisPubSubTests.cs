@@ -8,7 +8,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class RedisPubSubTests
 		: RedisClientTestsBase
 	{

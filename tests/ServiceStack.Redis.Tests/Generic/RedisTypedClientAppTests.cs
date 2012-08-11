@@ -76,6 +76,8 @@ namespace ServiceStack.Redis.Tests.Generic
 			base.OnBeforeEachTest();
 
 			redisQuestions = base.Redis.GetTypedClient<Question>();
+		    redisQuestions.Db = 10;
+		    redisQuestions.FlushDb();
 
 			q1Answers = new List<Answer>
           	{
