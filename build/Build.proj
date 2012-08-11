@@ -13,9 +13,9 @@
     </DoBuildSolutionsDependsOn>
   </PropertyGroup>
 
-  <Target Name="Default" DependsOnTargets="$(DoBuildSolutionsDependsOn);UnitTestsWithoutIntegration" />
+  <Target Name="Default" DependsOnTargets="$(DoBuildSolutionsDependsOn)" />
 
-  <Target Name="UnitTestsWithoutIntegration">
+  <Target Name="UnitTestsWithoutIntegration" DependsOnTargets="$(DoBuildSolutionsDependsOn)">
       <Exec Command="$(BuildSolutionDir)/lib/tests/nunit-console-x86.exe /exclude:Integration $(BuildSolutionDir)/tests/ServiceStack.Redis.Tests/bin/Debug/ServiceStack.Redis.Tests.dll"/>
   </Target>
 
