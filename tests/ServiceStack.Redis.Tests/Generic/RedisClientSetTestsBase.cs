@@ -8,7 +8,6 @@ using System.Linq;
 
 namespace ServiceStack.Redis.Tests.Generic
 {
-	[TestFixture]
 	public abstract class RedisClientSetTestsBase<T>
 	{
 		private const string SetId = "testset";

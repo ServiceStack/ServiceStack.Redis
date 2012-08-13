@@ -1,9 +1,11 @@
+using NUnit.Framework;
 using ServiceStack.Messaging;
 using ServiceStack.Messaging.Tests;
 using ServiceStack.Redis.Messaging;
 
 namespace ServiceStack.Redis.Tests.Messaging
 {
+    [Category("Integration")]
 	public class RedisTransientMessagingHostTests
 		: TransientServiceMessagingTests
 	{

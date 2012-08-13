@@ -1,9 +1,11 @@
 using System;
+using NUnit.Framework;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Redis.Tests.Support;
 
 namespace ServiceStack.Redis.Tests.Generic
 {
+    [TestFixture]
 	public class RedisClientHashTestsModelWithFieldsOfDifferentTypes
 		: RedisClientHashTestsBase<ModelWithFieldsOfDifferentTypes>
 	{
@@ -16,6 +18,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
+    [TestFixture]
 	public class RedisClientHashTestsString
 		: RedisClientHashTestsBase<string>
 	{
@@ -27,6 +30,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
+    [TestFixture]
 	public class RedisClientHashTestsShipper
 		: RedisClientHashTestsBase<Shipper>
 	{
@@ -38,6 +42,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
+    [TestFixture]
 	public class RedisClientHashTestsInt
 		: RedisClientHashTestsBase<int>
 	{
@@ -49,6 +54,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
+    [TestFixture]
 	public class RedisClientHashTestsCustomType
 		: RedisClientSetTestsBase<CustomType>
 	{

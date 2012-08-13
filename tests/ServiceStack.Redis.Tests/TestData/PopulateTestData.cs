@@ -6,17 +6,20 @@ namespace ServiceStack.Redis.Tests.TestData
 	/// <summary>
 	/// Simple class to populate redis with some test data
 	/// </summary>
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class PopulateTestData
 		: RedisClientTestsBase
 	{
-		private const int RedisDb = 0;
+		const string StringId = "urn:populatetest:string";
+        const string ListId = "urn:populatetest:list";
+        const string SetId = "urn:populatetest:set";
+        const string SortedSetId = "urn:populatetest:zset";
+        const string HashId = "urn:populatetest:hash";
 
-		const string StringId = "urn:test:string";
-		const string ListId = "urn:test:list";
-		const string SetId = "urn:test:set";
-		const string SortedSetId = "urn:test:zset";
-		const string HashId = "urn:test:hash";
+        public PopulateTestData()
+        {
+            CleanMask = "urn:populatetest:*";
+        }
 
 		private readonly List<string> items = new List<string> { "one", "two", "three", "four" };
 		private readonly Dictionary<string, string> map = new Dictionary<string, string> {
@@ -25,12 +28,6 @@ namespace ServiceStack.Redis.Tests.TestData
 						{"C","three"},
 						{"D","four"},
 					};
-
-		public override void OnBeforeEachTest()
-		{
-			if (Redis != null) Redis.Dispose();
-			Redis = new RedisClient(TestConfig.SingleHost) { Db = RedisDb };
-		}
 
 		[Test]
 		public void Populate_Strings()

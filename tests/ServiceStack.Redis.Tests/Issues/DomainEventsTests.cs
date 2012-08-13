@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using NUnit.Framework;
 using ServiceStack.Text;
 
@@ -74,9 +75,9 @@ namespace ServiceStack.Redis.Tests.Issues
             var userId = Guid.NewGuid();
             var dto = (DomainEvent)new UserPromotedEvent { UserId = userId };
             var json = dto.ToJson();
-            Console.WriteLine(json);
+            Debug.WriteLine(json);
             var userPromoEvent = json.FromJson<DomainEvent>();
-            Console.WriteLine(userPromoEvent.Dump());
+            Debug.WriteLine(userPromoEvent.Dump());
             //var domainEvent = 
         }
     }

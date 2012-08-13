@@ -5,7 +5,7 @@ using ServiceStack.Redis.Generic;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class ValueTypeExamples
 	{
 		[SetUp]

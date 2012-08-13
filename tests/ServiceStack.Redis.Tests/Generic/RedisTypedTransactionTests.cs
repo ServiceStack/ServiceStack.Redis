@@ -19,6 +19,11 @@ namespace ServiceStack.Redis.Tests.Generic
 		private IRedisTypedClient<Shipper> typedClient;
 		private Shipper model;
 
+        public RedisTypedTransactionTests()
+        {
+            CleanMask = "multitest*";
+        }
+
 		public override void OnBeforeEachTest()
 		{
 			base.OnBeforeEachTest();
@@ -26,7 +31,6 @@ namespace ServiceStack.Redis.Tests.Generic
 			typedClient = Redis.GetTypedClient<Shipper>();			
 			model = modelFactory.CreateInstance(1);
 		}
-
 
 		[Test]
 		public void Can_call_single_operation_in_transaction()

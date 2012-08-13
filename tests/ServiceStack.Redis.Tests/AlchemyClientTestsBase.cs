@@ -1,17 +1,18 @@
 using System;
+using System.Diagnostics;
 using System.Text;
 using NUnit.Framework;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class AlchemyClientTestsBase
 	{
 		protected RedisNativeClient.AlchemyNativeClient Alchemy;
 
 		protected void Log(string fmt, params object[] args)
 		{
-			Console.WriteLine("{0}", string.Format(fmt, args).Trim());
+			Debug.WriteLine(String.Format("{0}", string.Format(fmt, args).Trim()));
 		}
 
 		[SetUp]

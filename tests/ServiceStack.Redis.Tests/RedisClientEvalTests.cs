@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class RedisClientEvalTests
 		: RedisClientTestsBase
 	{

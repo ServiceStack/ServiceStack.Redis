@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using NUnit.Framework;
 
 namespace ServiceStack.Redis.Tests
@@ -19,9 +20,9 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(RedisClient.GetLexicalScore(nextMinScore),
 				Is.LessThan(RedisClient.GetLexicalScore(maxScore)));
 
-			Console.WriteLine("Lexical Score of '{0}' is: {1}", minScore, RedisClient.GetLexicalScore(minScore));
-			Console.WriteLine("Lexical Score of '{0}' is: {1}", nextMinScore, RedisClient.GetLexicalScore(nextMinScore));
-			Console.WriteLine("Lexical Score of '{0}' is: {1}", maxScore, RedisClient.GetLexicalScore(maxScore));
+			Debug.WriteLine(String.Format("Lexical Score of '{0}' is: {1}", minScore, RedisClient.GetLexicalScore(minScore)));
+			Debug.WriteLine(String.Format("Lexical Score of '{0}' is: {1}", nextMinScore, RedisClient.GetLexicalScore(nextMinScore)));
+			Debug.WriteLine(String.Format("Lexical Score of '{0}' is: {1}", maxScore, RedisClient.GetLexicalScore(maxScore)));
 		}
 	}
 

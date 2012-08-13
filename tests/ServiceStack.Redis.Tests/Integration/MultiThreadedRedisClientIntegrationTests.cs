@@ -42,7 +42,7 @@ namespace ServiceStack.Redis.Tests.Integration
 
 			WaitHandle.WaitAll(clientAsyncResults.ConvertAll(x => x.AsyncWaitHandle).ToArray());
 
-			Console.WriteLine("Time Taken: {0}", (Stopwatch.GetTimestamp() - before) / 1000);
+			Debug.WriteLine(String.Format("Time Taken: {0}", (Stopwatch.GetTimestamp() - before) / 1000));
 		}
 
 		[Test]
@@ -61,7 +61,7 @@ namespace ServiceStack.Redis.Tests.Integration
 				}
 			}
 
-			Console.WriteLine("Time Taken: {0}", (Stopwatch.GetTimestamp() - before) / 1000);
+			Debug.WriteLine(String.Format("Time Taken: {0}", (Stopwatch.GetTimestamp() - before) / 1000));
 		}
 
 		private void UseClientAsync(RedisClient client, int clientNo)
@@ -92,12 +92,12 @@ namespace ServiceStack.Redis.Tests.Integration
 			}
 			catch (NullReferenceException ex)
 			{
-				Console.WriteLine("NullReferenceException StackTrace: \n" + ex.StackTrace);
+				Debug.WriteLine("NullReferenceException StackTrace: \n" + ex.StackTrace);
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine("\t[ERROR@{0}]: {1} => {2}",
-					host, ex.GetType().Name, ex.Message);
+				Debug.WriteLine(String.Format("\t[ERROR@{0}]: {1} => {2}",
+					host, ex.GetType().Name, ex.Message));
 			}
 		}
 

@@ -10,9 +10,14 @@ namespace ServiceStack.Redis.Tests
 	public class RedisClientListTests
 		: RedisClientTestsBase
 	{
-		const string ListId = "testlist";
-		const string ListId2 = "testlist2";
+		const string ListId = "rcl_testlist";
+        const string ListId2 = "rcl_testlist2";
 		private List<string> storeMembers;
+
+        public RedisClientListTests()
+        {
+            CleanMask = "rcl_testlist*";
+        }
 
 		public override void OnBeforeEachTest()
 		{

@@ -7,7 +7,7 @@ using ServiceStack.DesignPatterns.Model;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class RedisBasicPersistenceProviderTests
 		: RedisClientTestsBase
 	{

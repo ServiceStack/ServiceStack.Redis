@@ -10,6 +10,7 @@
 //
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using ServiceStack.Common.Tests.Models;
@@ -40,8 +41,8 @@ namespace ServiceStack.Redis.Tests
 				StringSplitOptions.RemoveEmptyEntries)
 				.ToList().ConvertAll(x => x.Replace("{", "").Replace("}", ""));
 
-			Console.WriteLine("\n" + message);
-			prettyLines.ForEach(Console.WriteLine);
+			Debug.WriteLine("\n" + message);
+			foreach(var l in prettyLines) Debug.WriteLine(l);
 		}
 
 		[Test]

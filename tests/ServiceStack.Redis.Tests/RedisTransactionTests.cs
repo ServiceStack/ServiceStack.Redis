@@ -8,10 +8,16 @@ namespace ServiceStack.Redis.Tests
 	public class RedisTransactionTests
 		: RedisClientTestsBase
 	{
-		private const string Key = "multitest";
-		private const string ListKey = "multitest-list";
-		private const string SetKey = "multitest-set";
-		private const string SortedSetKey = "multitest-sortedset";
+		private const string Key = "rdtmultitest";
+        private const string ListKey = "rdtmultitest-list";
+        private const string SetKey = "rdtmultitest-set";
+        private const string SortedSetKey = "rdtmultitest-sortedset";
+
+        public override void TearDown()
+        {
+            CleanMask = Key + "*";
+            base.TearDown();
+        }
 
 		[Test]
 		public void Can_call_single_operation_in_transaction()

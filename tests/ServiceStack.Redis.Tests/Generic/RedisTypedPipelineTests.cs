@@ -10,10 +10,15 @@ namespace ServiceStack.Redis.Tests.Generic
 	public class RedisTypedPipelineTests
 		: RedisClientTestsBase
 	{
-		private const string Key = "multitest";
-		private const string ListKey = "multitest-list";
-		private const string SetKey = "multitest-set";
-		private const string SortedSetKey = "multitest-sortedset";
+        public RedisTypedPipelineTests()
+        {
+            CleanMask = "gmultitest*";
+        }
+
+		private const string Key = "gmultitest";
+		private const string ListKey = "gmultitest-list";
+		private const string SetKey = "gmultitest-set";
+		private const string SortedSetKey = "gmultitest-sortedset";
 
 		readonly ShipperFactory modelFactory = new ShipperFactory();
 		private IRedisTypedClient<Shipper> typedClient;

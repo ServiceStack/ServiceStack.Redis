@@ -23,7 +23,7 @@ namespace ServiceStack.Redis.Tests
 				LoadNorthwindData(client);
 			}
 
-			Console.WriteLine("stopWatch.ElapsedMilliseconds: " + stopWatch.ElapsedMilliseconds);
+			Debug.WriteLine("stopWatch.ElapsedMilliseconds: " + stopWatch.ElapsedMilliseconds);
 		}
 
 		private static void LoadNorthwindData(IBasicPersistenceProvider persistenceProvider)
