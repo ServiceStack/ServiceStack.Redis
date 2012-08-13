@@ -7,7 +7,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [TestFixture]
+    [TestFixture, Category("Integration")]
     public class RedisMqServerSpinServerTests
     {
         public class Counters
@@ -105,12 +105,12 @@ namespace ServiceStack.Redis.Tests
 
             Thread.Sleep(SpinFor);
 
-            Console.WriteLine(counter.Dump());
+            Debug.WriteLine(counter.Dump());
 
-            Console.WriteLine("Disposing...");
+            Debug.WriteLine("Disposing...");
             mqServer.Dispose();
 
-            Console.WriteLine(counter.Dump());
+            Debug.WriteLine(counter.Dump());
         }
     }
 }

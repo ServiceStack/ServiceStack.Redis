@@ -8,10 +8,16 @@ namespace ServiceStack.Redis.Tests
 	public class RedisPipelineTests
 		: RedisClientTestsBase
 	{
-		private const string Key = "multitest";
-		private const string ListKey = "multitest-list";
-		private const string SetKey = "multitest-set";
-		private const string SortedSetKey = "multitest-sortedset";
+		private const string Key = "pipemultitest";
+        private const string ListKey = "pipemultitest-list";
+        private const string SetKey = "pipemultitest-set";
+        private const string SortedSetKey = "pipemultitest-sortedset";
+
+        public override void TearDown()
+        {
+            CleanMask = Key + "*";
+            base.TearDown();
+        }
 
 		[Test]
 		public void Can_call_single_operation_in_pipeline()
@@ -115,7 +121,7 @@ namespace ServiceStack.Redis.Tests
         public void Can_call_multiple_setexs_in_pipeline()
         {
             Assert.That(Redis.GetValue(Key), Is.Null);
-            var keys = new[] {"key1", "key2", "key3"};
+            var keys = new[] {Key + "key1", Key + "key2", Key + "key3"};
             var values = new[] { "1","2","3" };
             var pipeline = Redis.CreatePipeline();
           
@@ -221,7 +227,7 @@ namespace ServiceStack.Redis.Tests
             var temp = new byte[1];
             using (var pipeline = Redis.CreatePipeline())
             {
-                pipeline.QueueCommand(r => ((RedisNativeClient)r).SetEx("key",5,temp));
+                pipeline.QueueCommand(r => ((RedisNativeClient)r).SetEx(Key + "key",5,temp));
                 pipeline.Flush();
             }
         }
@@ -261,7 +267,7 @@ namespace ServiceStack.Redis.Tests
             {
                 pipeline.QueueCommand(r => r.IncrementValue(Key));
                 pipeline.QueueCommand(r => r.IncrementValue(KeySquared));
-                pipeline.QueueCommand(r => ((RedisNativeClient)r).Watch("FOO"));
+                pipeline.QueueCommand(r => ((RedisNativeClient)r).Watch(Key + "FOO"));
                 pipeline.Flush();
 
                 Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));

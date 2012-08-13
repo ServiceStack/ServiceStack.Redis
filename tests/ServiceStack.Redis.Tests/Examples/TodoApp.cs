@@ -2,7 +2,7 @@
 
 namespace ServiceStack.Redis.Tests.Examples
 {
-	[TestFixture]
+    [TestFixture, Explicit, Category("Integration")]
 	public class TodoApp
 	{
 		[SetUp]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Redis.Messaging;
@@ -6,7 +7,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [TestFixture]
+    [TestFixture, Category("Integration")]
     public class RedisMqServerSleepServerTests
     {
         public class Counters
@@ -101,12 +102,12 @@ namespace ServiceStack.Redis.Tests
 
             Thread.Sleep(SleepFor);
 
-            Console.WriteLine(counter.Dump());
+            Debug.WriteLine(counter.Dump());
 
-            Console.WriteLine("Disposing...");
+            Debug.WriteLine("Disposing...");
             mqServer.Dispose();
 
-            Console.WriteLine(counter.Dump());
+            Debug.WriteLine(counter.Dump());
         }
     }
 }

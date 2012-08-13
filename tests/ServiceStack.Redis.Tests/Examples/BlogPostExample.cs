@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using ServiceStack.Common.Extensions;
@@ -63,7 +64,7 @@ namespace ServiceStack.Redis.Tests.Examples
 	}
 
 
-	[TestFixture]
+    [TestFixture, Explicit, Category("Integration")]
 	public class BlogPostExample
 	{
 		readonly RedisClient redisClient = new RedisClient(TestConfig.SingleHost);
@@ -172,7 +173,7 @@ namespace ServiceStack.Redis.Tests.Examples
 			using (var redisBlogs = redisClient.GetTypedClient<Blog>())
 			{
 				var blogs = redisBlogs.GetAll();
-				Console.WriteLine(blogs.Dump());
+				Debug.WriteLine(blogs.Dump());
 			}
 			/* Output: 
 			[
@@ -240,7 +241,7 @@ namespace ServiceStack.Redis.Tests.Examples
 				recentComments.Trim(0, 2);
 
 				//Print out the last 3 posts:
-				Console.WriteLine(recentPosts.GetAll().Dump());
+				Debug.WriteLine(recentPosts.GetAll().Dump());
 				/* Output: 
 				[
 					{
@@ -321,7 +322,7 @@ namespace ServiceStack.Redis.Tests.Examples
 				]
 				*/
 
-				Console.WriteLine(recentComments.GetAll().Dump());
+				Debug.WriteLine(recentComments.GetAll().Dump());
 				/* Output:
 				[
 					{
@@ -358,7 +359,7 @@ namespace ServiceStack.Redis.Tests.Examples
 
 				//Show top 5 most popular tags with their scores
 				var tagCloud = redisClient.GetRangeWithScoresFromSortedSetDesc("urn:TagCloud", 0, 4);
-				Console.WriteLine(tagCloud.Dump());
+				Debug.WriteLine(tagCloud.Dump());
 			}
 			/* Output:
 			[
@@ -400,7 +401,7 @@ namespace ServiceStack.Redis.Tests.Examples
 				}
 
 				var uniqueCategories = redisClient.GetAllItemsFromSet("urn:Categories");
-				Console.WriteLine(uniqueCategories.Dump());
+				Debug.WriteLine(uniqueCategories.Dump());
 				/* Output:
 				[
 					DocumentDB,
@@ -422,7 +423,7 @@ namespace ServiceStack.Redis.Tests.Examples
 			{
 				var selectedBlogPost = redisBlogPosts.GetById(postId.ToString());
 
-				Console.WriteLine(selectedBlogPost.Dump());
+				Debug.WriteLine(selectedBlogPost.Dump());
 				/* Output:
 				{
 					Id: 1,
@@ -468,7 +469,7 @@ namespace ServiceStack.Redis.Tests.Examples
 				redisBlogPosts.Store(blogPost);
 
 				var refreshBlogPost = redisBlogPosts.GetById(postId.ToString());
-				Console.WriteLine(refreshBlogPost.Dump());
+				Debug.WriteLine(refreshBlogPost.Dump());
 				/* Output:
 				{
 					Id: 1,
@@ -527,7 +528,7 @@ namespace ServiceStack.Redis.Tests.Examples
 				//(i.e. the DocumentDB Category posts)
 				var documentDbPosts = redisBlogPosts.GetByIds(documentDbPostIds);
 
-				Console.WriteLine(documentDbPosts.Dump());
+				Debug.WriteLine(documentDbPosts.Dump());
 				/* Output:
 				[
 					{

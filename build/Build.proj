@@ -1,0 +1,36 @@
+<Project DefaultTargets="Default"
+    xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="4.0">
+
+  <PropertyGroup>
+    <BuildSolutionDir>$(MSBuildProjectDirectory)/..</BuildSolutionDir>
+    <Configuration Condition="$(Configuration) == ''">Debug</Configuration>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DoBuildSolutionsDependsOn>
+      BeforeBuildSolutions;
+      BuildSolutions
+    </DoBuildSolutionsDependsOn>
+  </PropertyGroup>
+
+  <Target Name="Default" DependsOnTargets="$(DoBuildSolutionsDependsOn)" />
+
+  <Target Name="UnitTestsWithoutIntegration" DependsOnTargets="$(DoBuildSolutionsDependsOn)">
+      <Exec Command="$(BuildSolutionDir)/lib/tests/nunit-console-x86.exe /exclude:Integration $(BuildSolutionDir)/tests/ServiceStack.Redis.Tests/bin/Debug/ServiceStack.Redis.Tests.dll"/>
+  </Target>
+
+  <Target Name="UnitTests" DependsOnTargets="$(DoBuildSolutionsDependsOn)">
+      <Exec Command="$(BuildSolutionDir)/lib/tests/nunit-console-x86.exe $(BuildSolutionDir)/tests/ServiceStack.Redis.Tests/bin/Debug/ServiceStack.Redis.Tests.dll"/>
+  </Target>
+
+  <Target Name="BeforeBuildSolutions">
+    <Message Text="*****Before building solution*****" Importance="high"/>
+    <!--<Copy SourceFiles="Test/ci.app.config" DestinationFiles="Test/app.config" />-->
+  </Target>
+
+  <Target Name="BuildSolutions">
+    <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis.sln" Targets="Build"
+   Properties="Configuration=$(Configuration)" />
+  </Target>
+
+</Project>

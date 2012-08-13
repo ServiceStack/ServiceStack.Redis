@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Redis.Generic;
 
 namespace ServiceStack.Redis.Tests.Generic
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class RedisTypedClientTests
 	{
 		public class CacheRecord
@@ -31,7 +32,7 @@ namespace ServiceStack.Redis.Tests.Generic
 
 		protected void Log(string fmt, params object[] args)
 		{
-			Console.WriteLine("{0}", string.Format(fmt, args).Trim());
+			Debug.WriteLine("{0}", string.Format(fmt, args).Trim());
 		}
 
 		[SetUp]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -11,7 +12,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [TestFixture]
+    [TestFixture, Category("Integration")]
     public class RedisMqServerTests
     {
         public class Reverse
@@ -39,7 +40,7 @@ namespace ServiceStack.Redis.Tests
             }
             catch (RedisException rex)
             {
-                Console.WriteLine("WARNING: Redis not started? \n" + rex.Message);
+                Debug.WriteLine("WARNING: Redis not started? \n" + rex.Message);
             }
             var mqHost = new RedisMqServer(redisFactory, noOfRetries);
             return mqHost;
@@ -132,7 +133,7 @@ namespace ServiceStack.Redis.Tests
             Thread.Sleep(3000);
             Assert.That(mqHost.GetStatus(), Is.EqualTo("Started"));
 
-            Console.WriteLine("\n" + mqHost.GetStats());
+            Debug.WriteLine("\n" + mqHost.GetStats());
 
             Assert.That(mqHost.GetStats().TotalMessagesProcessed, Is.EqualTo(5));
             Assert.That(reverseCalled, Is.EqualTo(3));
@@ -164,7 +165,7 @@ namespace ServiceStack.Redis.Tests
 
             Assert.That(mqHost.BgThreadCount, Is.EqualTo(2));
 
-            Console.WriteLine(mqHost.GetStats());
+            Debug.WriteLine(mqHost.GetStats());
 
             mqHost.Dispose();
         }
@@ -243,7 +244,7 @@ namespace ServiceStack.Redis.Tests
 
             Thread.Sleep(5000);
 
-            Console.WriteLine(mqHost.GetStatsDescription());
+            Debug.WriteLine(mqHost.GetStatsDescription());
 
             Assert.That(mqHost.GetStats().TotalMessagesFailed, Is.EqualTo((1 + 5) * totalRetries));
             Assert.That(mqHost.GetStats().TotalMessagesProcessed, Is.EqualTo(6));
@@ -265,7 +266,7 @@ namespace ServiceStack.Redis.Tests
 
             mqHost.RegisterHandler<Incr>(m =>
             {
-                Console.WriteLine("In Incr #" + m.GetBody().Value);
+                Debug.WriteLine("In Incr #" + m.GetBody().Value);
                 called++;
                 return m.GetBody().Value > 0 ? new Incr { Value = m.GetBody().Value - 1 } : null;
             });
@@ -326,16 +327,16 @@ namespace ServiceStack.Redis.Tests
                 foreach (var queueName in queueNames)
                 {
                     var msgName = "msg:" + i++;
-                    Console.WriteLine("SEND " + msgName);
+                    Debug.WriteLine("SEND " + msgName);
                     client.PrependItemToList(queueName, msgName);
                 }
             });
 
             var server = RedisClient.New();
             noOf.Times(x => {
-                Console.WriteLine("Blocking... " + x);
+                Debug.WriteLine("Blocking... " + x);
                 var result = server.BlockingDequeueItemFromLists(queueNames, TimeSpan.FromSeconds(3));
-                Console.WriteLine("RECV: " + result.Dump());
+                Debug.WriteLine("RECV: " + result.Dump());
             });
         }
 

@@ -9,7 +9,7 @@ namespace ServiceStack.Redis.Tests
 	public class RedisClientHashTests
 		: RedisClientTestsBase
 	{
-		private const string HashId = "testhash";
+		private const string HashId = "rchtesthash";
 
 		Dictionary<string, string> stringMap;
 		Dictionary<string, int> stringIntMap;
@@ -24,6 +24,12 @@ namespace ServiceStack.Redis.Tests
      			{"one",1}, {"two",2}, {"three",3}, {"four",4}
      		};
 		}
+
+        public override void TearDown()
+        {
+            CleanMask = HashId + "*";
+            base.TearDown();
+        }
 
 		[Test]
 		public void Can_SetItemInHash_and_GetAllFromHash()
@@ -228,7 +234,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_hash_set()
         {
-            var key = "key";
+            var key = HashId + "key";
             var field = GetBytes("foo");
             var value = GetBytes("value");
             Assert.AreEqual(Redis.HDel(key, field),0);
@@ -239,7 +245,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_hash_multi_set_and_get()
         {
-            const string Key = "multitest";
+            const string Key = HashId + "multitest";
             Assert.That(Redis.GetValue(Key), Is.Null);
             var fields = new Dictionary<string,string> { {"field1", "1"},{"field2","2"}, {"field3","3"} };
            

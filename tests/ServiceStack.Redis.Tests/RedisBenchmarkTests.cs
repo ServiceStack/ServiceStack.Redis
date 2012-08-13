@@ -29,7 +29,7 @@ namespace ServiceStack.Redis.Tests
                 ((RedisNativeClient)Redis).Set(key + i.ToString(), temp);
             }
             sw.Stop();
-            Console.WriteLine(String.Format("Time for {0} Set(key,value) operations: {1} ms", total, sw.ElapsedMilliseconds));
+            Debug.WriteLine(String.Format("Time for {0} Set(key,value) operations: {1} ms", total, sw.ElapsedMilliseconds));
 
             for (int i = 0; i < total; ++i)
             {
@@ -44,7 +44,7 @@ namespace ServiceStack.Redis.Tests
 
             }
             sw.Stop();
-            Console.WriteLine(String.Format("Time for pipelining {0} Set(key,value) operations: {1} ms", total, sw.ElapsedMilliseconds));
+            Debug.WriteLine(String.Format("Time for pipelining {0} Set(key,value) operations: {1} ms", total, sw.ElapsedMilliseconds));
 
 
         }
@@ -102,7 +102,7 @@ namespace ServiceStack.Redis.Tests
             }
 
 
-            Console.WriteLine(String.Format("Time to call {0} SMembers and MGet operations: {1} ms", count, sw.ElapsedMilliseconds));
+            Debug.WriteLine(String.Format("Time to call {0} SMembers and MGet operations: {1} ms", count, sw.ElapsedMilliseconds));
             var opt = new SortOptions() {SortPattern = "nosort", GetPattern = "*"};
 
             sw = Stopwatch.StartNew();
@@ -117,7 +117,7 @@ namespace ServiceStack.Redis.Tests
             }
 
 
-            Console.WriteLine(String.Format("Time to call {0} sort operations: {1} ms", count, sw.ElapsedMilliseconds));
+            Debug.WriteLine(String.Format("Time to call {0} sort operations: {1} ms", count, sw.ElapsedMilliseconds));
 
 
         }

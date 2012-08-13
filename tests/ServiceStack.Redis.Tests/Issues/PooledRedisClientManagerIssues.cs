@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
 
@@ -25,12 +26,12 @@ namespace ServiceStack.Redis.Tests.Issues
 				}
 				catch(NotSupportedException nse)
 				{
-					Console.WriteLine(redisClient.ToString());
+					Debug.WriteLine(redisClient.ToString());
 					Assert.Fail(nse.Message);
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine(e.Message);
+					Debug.WriteLine(e.Message);
 				}
 				Thread.Sleep(10);
 			}
@@ -48,11 +49,11 @@ namespace ServiceStack.Redis.Tests.Issues
 					threads[i] = new Thread(Stuff);
 					threads[i].Start();
 				}
-				Console.WriteLine("running, waiting 10secs..");
+				Debug.WriteLine("running, waiting 10secs..");
 				Thread.Sleep(10000);
 				using (var redisClient = (RedisClient)pool.GetClient())
 				{
-					Console.WriteLine("shutdown Redis!");
+					Debug.WriteLine("shutdown Redis!");
 					redisClient.Shutdown();
 				}
 			}
@@ -62,7 +63,7 @@ namespace ServiceStack.Redis.Tests.Issues
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine(e.Message);
+				Debug.WriteLine(e.Message);
 			}
 			
 			Thread.Sleep(5000);

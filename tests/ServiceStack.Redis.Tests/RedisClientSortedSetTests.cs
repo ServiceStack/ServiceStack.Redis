@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -9,7 +10,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class RedisClientSortedSetTests
 		: RedisClientTestsBase
 	{
@@ -232,7 +233,7 @@ namespace ServiceStack.Redis.Tests
 			var map = Redis.GetAllWithScoresFromSortedSet(SetId);
 
 			Assert.That(stringDoubleMap.EquivalentTo(map));
-			Console.WriteLine(map.Dump());
+			Debug.WriteLine(map.Dump());
 		}
 
         [Test]

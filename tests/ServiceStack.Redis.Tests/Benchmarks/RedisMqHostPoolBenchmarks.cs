@@ -7,7 +7,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Benchmarks
 {
-    [TestFixture]
+    [TestFixture, Category("Integration"), Explicit]
     public class RedisMqHostPoolBenchmarks
     {
         public class Incr
@@ -29,7 +29,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
             }
             catch (RedisException rex)
             {
-                Console.WriteLine("WARNING: Redis not started? \n" + rex.Message);
+                Debug.WriteLine("WARNING: Redis not started? \n" + rex.Message);
             }
             var mqHost = new RedisMqHostPool(redisFactory)
             {
@@ -57,7 +57,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
 
             Thread.Sleep(10000);
 
-            Console.WriteLine("Times called: " + called);
+            Debug.WriteLine("Times called: " + called);
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
 
             Thread.Sleep(10000);
 
-            Console.WriteLine("Times called: " + called);
+            Debug.WriteLine("Times called: " + called);
         }
 
         [Test]
@@ -113,7 +113,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
 
             Thread.Sleep(10000);
 
-            Console.WriteLine("Times called: non-blocking: {0}, blocking: {1}".Fmt(nonBlocking, blocking));
+            Debug.WriteLine("Times called: non-blocking: {0}, blocking: {1}".Fmt(nonBlocking, blocking));
         }
 
         [Test]
@@ -142,7 +142,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
                 Thread.Sleep(SendEvery);
             }
 
-            Console.WriteLine("Times called: blocking: {0}".Fmt(blocking));
+            Debug.WriteLine("Times called: blocking: {0}".Fmt(blocking));
         }
 
         [Test]
@@ -185,7 +185,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
                 }
             }
 
-            Console.WriteLine("Times called: non-blocking: {0}, blocking: {1}".Fmt(nonBlocking, blocking));
+            Debug.WriteLine("Times called: non-blocking: {0}, blocking: {1}".Fmt(nonBlocking, blocking));
         }
 
     }

@@ -5,6 +5,7 @@ using ServiceStack.Redis.Tests.Support;
 
 namespace ServiceStack.Redis.Tests.Generic
 {
+    [TestFixture]
 	public class RedisClientSetTestsModelWithFieldsOfDifferentTypes
 		: RedisClientSetTestsBase<ModelWithFieldsOfDifferentTypes>
 	{
@@ -17,7 +18,8 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
-	public class RedisClientSetTestsString
+    [TestFixture]
+    public class RedisClientSetTestsString
 		: RedisClientSetTestsBase<string>
 	{
 		private readonly IModelFactory<string> factory = new BuiltInsFactory();
@@ -28,7 +30,8 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
-	public class RedisClientSetTestsShipper
+    [TestFixture]
+    public class RedisClientSetTestsShipper
 		: RedisClientSetTestsBase<Shipper>
 	{
 		private readonly IModelFactory<Shipper> factory = new ShipperFactory();
@@ -39,7 +42,8 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
-	public class RedisClientSetTestsInt
+    [TestFixture]
+    public class RedisClientSetTestsInt
 		: RedisClientSetTestsBase<int>
 	{
 		private readonly IModelFactory<int> factory = new IntFactory();
@@ -50,7 +54,8 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
-	public class RedisClientSetTestsCustomType
+    [TestFixture]
+    public class RedisClientSetTestsCustomType
 		: RedisClientSetTestsBase<CustomType>
 	{
 		private readonly IModelFactory<CustomType> factory = new CustomTypeFactory();

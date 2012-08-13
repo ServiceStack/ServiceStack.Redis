@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
@@ -9,7 +10,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
+	[TestFixture, Category("Integration")]
 	public class RedisClientTests
 		: RedisClientTestsBase
 	{
@@ -21,6 +22,7 @@ namespace ServiceStack.Redis.Tests
 			Redis.SetEntry("key", Value);
 			var valueBytes = Redis.Get("key");
 			var valueString = GetString(valueBytes);
+		    Redis.Remove("key");
 
 			Assert.That(valueString, Is.EqualTo(Value));
 		}
@@ -31,6 +33,7 @@ namespace ServiceStack.Redis.Tests
 			Redis.SetEntry("key with space", Value);
 			var valueBytes = Redis.Get("key with space");
 			var valueString = GetString(valueBytes);
+            Redis.Remove("key with space");
 
 			Assert.That(valueString, Is.EqualTo(Value));
 		}
@@ -285,13 +288,13 @@ namespace ServiceStack.Redis.Tests
 		{
 			using (client.AcquireLock("testlock"))
 			{
-				Console.WriteLine("client {0} acquired lock", clientNo);
+				Debug.WriteLine(String.Format("client {0} acquired lock", clientNo));
 				var val = client.Get<int>("key");
 
 				Thread.Sleep(200);
 
 				client.Set("key", val + 1);
-				Console.WriteLine("client {0} released lock", clientNo);
+				Debug.WriteLine(String.Format("client {0} released lock", clientNo));
 			}
 		}
 

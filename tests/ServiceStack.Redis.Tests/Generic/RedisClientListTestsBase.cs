@@ -260,8 +260,8 @@ namespace ServiceStack.Redis.Tests.Generic
 			var expected = storeMembers.Skip(1).Take(3).ToList();
 
 			//Uncomment to view list contents
-			//Console.WriteLine(range.Dump());
-			//Console.WriteLine(expected.Dump());
+			//Debug.WriteLine(range.Dump());
+			//Debug.WriteLine(expected.Dump());
 
 			Factory.AssertListsAreEqual(range, expected);
 		}
