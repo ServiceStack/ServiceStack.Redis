@@ -39,6 +39,11 @@ namespace ServiceStack.Redis
 		public int? SocketSendTimeout { get; set; }
 		public int? SocketReceiveTimeout { get; set; }
 
+        /// <summary>
+        /// Gets or sets object key prefix.
+        /// </summary>
+        public string NamespacePrefix { get; set; }
+
 		private List<RedisEndPoint> ReadWriteHosts { get; set; }
 		private List<RedisEndPoint> ReadOnlyHosts { get; set; }
 
@@ -183,6 +188,8 @@ namespace ServiceStack.Redis
 					inActiveClient.ReceiveTimeout = this.SocketReceiveTimeout.Value;
 				}
 
+                inActiveClient.NamespacePrefix = NamespacePrefix;
+
 				//Reset database to default if changed
 				if (inActiveClient.Db != Db)
 				{
@@ -223,6 +230,7 @@ namespace ServiceStack.Redis
 
 					client.Id = RedisClientCounter++;
 					client.ClientManager = this;
+                    client.NamespacePrefix = NamespacePrefix;
 				    client.ConnectionFilter = ConnectionFilter;
 
 					writeClients[nextIndex] = client;
@@ -271,6 +279,8 @@ namespace ServiceStack.Redis
 				{
 					inActiveClient.ReceiveTimeout = this.SocketReceiveTimeout.Value;
 				}
+
+                inActiveClient.NamespacePrefix = NamespacePrefix;
 
 				//Reset database to default if changed
 				if (inActiveClient.Db != Db)
