@@ -39,6 +39,30 @@ namespace ServiceStack.Redis.Tests
 			actualList.ForEach(x => Assert.That(x, Is.EqualTo(expectedList.Dequeue())));
 		}
 
+        [Test]
+        public void Can_PopAndPushItemBetweenLists()
+        {
+            Redis.AddItemToList(ListId, "1");
+            Redis.PopAndPushItemBetweenLists(ListId, ListId2);
+        }
+
+        [Test]
+        public void Can_BlockingPopAndPushItemBetweenLists()
+        {
+            Redis.AddItemToList(ListId, "A");
+            Redis.AddItemToList(ListId, "B");
+            var r = Redis.BlockingPopAndPushItemBetweenLists(ListId, ListId2, new TimeSpan(0, 0, 1));
+
+            Assert.That(r, Is.EqualTo("B"));
+        }
+
+        [Test]
+        public void Can_Timeout_BlockingPopAndPushItemBetweenLists()
+        {
+            var r = Redis.BlockingPopAndPushItemBetweenLists(ListId, ListId2, new TimeSpan(0, 0, 1));
+            Assert.That(r, Is.Null);
+        }
+
 		[Test]
 		public void Can_AddToList_and_GetAllFromList()
 		{

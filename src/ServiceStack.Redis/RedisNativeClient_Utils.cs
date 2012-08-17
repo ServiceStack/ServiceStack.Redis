@@ -497,54 +497,58 @@ namespace ServiceStack.Redis
 
 		private byte[] ReadData()
 		{
-			string r = ReadLine();
-
-			Log("R: {0}", r);
-			if (r.Length == 0)
-				throw CreateResponseError("Zero length respose");
-
-			char c = r[0];
-			if (c == '-')
-				throw CreateResponseError(r.StartsWith("-ERR") ? r.Substring(5) : r.Substring(1));
-
-			if (c == '$')
-			{
-				if (r == "$-1")
-					return null;
-				int count;
-
-				if (Int32.TryParse(r.Substring(1), out count))
-				{
-					var retbuf = new byte[count];
-
-					var offset = 0;
-					while (count > 0)
-					{
-						var readCount = Bstream.Read(retbuf, offset, count);
-						if (readCount <= 0)
-							throw CreateResponseError("Unexpected end of Stream");
-
-						offset += readCount;
-						count -= readCount;
-					}
-
-					if (Bstream.ReadByte() != '\r' || Bstream.ReadByte() != '\n')
-						throw CreateResponseError("Invalid termination");
-
-					return retbuf;
-				}
-				throw CreateResponseError("Invalid length");
-			}
-
-			if (c == ':')
-			{
-				//match the return value
-				return r.Substring(1).ToUtf8Bytes();
-			}
-			throw CreateResponseError("Unexpected reply: " + r);
+		    var r = ReadLine();
+		    return ParseSingleLine(r);
 		}
 
-		private byte[][] ReadMultiData()
+	    private byte[] ParseSingleLine(string r)
+	    {
+	        Log("R: {0}", r);
+	        if (r.Length == 0)
+	            throw CreateResponseError("Zero length respose");
+
+	        char c = r[0];
+	        if (c == '-')
+	            throw CreateResponseError(r.StartsWith("-ERR") ? r.Substring(5) : r.Substring(1));
+
+	        if (c == '$')
+	        {
+	            if (r == "$-1")
+	                return null;
+	            int count;
+
+	            if (Int32.TryParse(r.Substring(1), out count))
+	            {
+	                var retbuf = new byte[count];
+
+	                var offset = 0;
+	                while (count > 0)
+	                {
+	                    var readCount = Bstream.Read(retbuf, offset, count);
+	                    if (readCount <= 0)
+	                        throw CreateResponseError("Unexpected end of Stream");
+
+	                    offset += readCount;
+	                    count -= readCount;
+	                }
+
+	                if (Bstream.ReadByte() != '\r' || Bstream.ReadByte() != '\n')
+	                    throw CreateResponseError("Invalid termination");
+
+	                return retbuf;
+	            }
+	            throw CreateResponseError("Invalid length");
+	        }
+
+	        if (c == ':')
+	        {
+	            //match the return value
+	            return r.Substring(1).ToUtf8Bytes();
+	        }
+	        throw CreateResponseError("Unexpected reply: " + r);
+	    }
+
+	    private byte[][] ReadMultiData()
 		{
 			int c = SafeReadByte();
 			if (c == -1)
@@ -552,27 +556,38 @@ namespace ServiceStack.Redis
 
 			var s = ReadLine();
 			Log("R: " + s);
-			if (c == '-')
-				throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
-			if (c == '*')
-			{
-				int count;
-				if (int.TryParse(s, out count))
-				{
-					if (count == -1)
-					{
-						//redis is in an invalid state
-						return new byte[0][];
-					}
 
-					var result = new byte[count][];
+            switch(c)
+            {
+                // Some commands like BRPOPLPUSH may return Bulk Reply instead of Multi-bulk
+                case '$': 
+                    var t = new byte[2][];
+                    t[1] = ParseSingleLine(string.Concat(char.ToString((char)c), s));
+                    return t;
 
-					for (int i = 0; i < count; i++)
-						result[i] = ReadData();
+                case '-':
+    				throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
 
-					return result;
-				}
-			}
+                case '*':
+				    int count;
+				    if (int.TryParse(s, out count))
+				    {
+					    if (count == -1)
+					    {
+						    //redis is in an invalid state
+						    return new byte[0][];
+					    }
+
+					    var result = new byte[count][];
+
+					    for (int i = 0; i < count; i++)
+						    result[i] = ReadData();
+
+					    return result;
+				    }
+                    break;
+            }
+
 			throw CreateResponseError("Unknown reply on multi-request: " + c + s);
 		}
 
