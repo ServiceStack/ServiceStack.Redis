@@ -57,7 +57,7 @@ namespace ServiceStack.Redis.Tests
         }
 
         [Test]
-        public void Can_CanTimeoutBlockingPopAndPushItemBetweenLists()
+        public void Can_Timeout_BlockingPopAndPushItemBetweenLists()
         {
             var r = Redis.BlockingPopAndPushItemBetweenLists(ListId, ListId2, new TimeSpan(0, 0, 1));
             Assert.That(r, Is.Null);
