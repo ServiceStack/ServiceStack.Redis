@@ -16,7 +16,7 @@ namespace ServiceStack.Redis.Generic
 		public void StoreRelatedEntities<TChild>(object parentId, List<TChild> children) 
 		{
 			var childRefKey = GetChildReferenceSetKey<TChild>(parentId);
-			var childKeys = children.ConvertAll(x => string.Concat(client.NamespacePrefix, x.CreateUrn()));
+            var childKeys = children.ConvertAll(x => client.UrnKey(x));
 
 			using (var trans = client.CreateTransaction())
 			{
@@ -65,7 +65,7 @@ namespace ServiceStack.Redis.Generic
 
 		public void AddToRecentsList(T value)
 		{
-			var key = string.Concat(client.NamespacePrefix, value.CreateUrn());
+            var key = client.UrnKey(value);
 			var nowScore = DateTime.UtcNow.ToUnixTime();
 			client.AddItemToSortedSet(RecentSortedSetKey, key, nowScore);
 		}

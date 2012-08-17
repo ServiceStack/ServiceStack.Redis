@@ -511,7 +511,7 @@ namespace ServiceStack.Redis
 
 		public T GetById<T>(object id) where T : class, new()
 		{
-			var key = string.Concat(NamespacePrefix, IdUtils.CreateUrn<T>(id));
+            var key = UrnKey<T>(id);
 			var valueString = this.GetValue(key);
 			var value = JsonSerializer.DeserializeFromString<T>(valueString);
 			return value;
@@ -523,7 +523,7 @@ namespace ServiceStack.Redis
 			if (ids == null || ids.Count == 0)
 				return new List<T>();
 
-			var urnKeys = ids.ConvertAll(x => string.Concat(NamespacePrefix, IdUtils.CreateUrn<T>(x)));
+			var urnKeys = ids.ConvertAll(x => UrnKey<T>(x));
 			return GetValues<T>(urnKeys);
 		}
 
@@ -532,14 +532,14 @@ namespace ServiceStack.Redis
 		{
 			var typeIdsSetKy = this.GetTypeIdsSetKey<T>();
 			var allTypeIds = this.GetAllItemsFromSet(typeIdsSetKy);
-			var urnKeys = allTypeIds.ConvertAll(x => string.Concat(NamespacePrefix, IdUtils.CreateUrn<T>(x)));
+			var urnKeys = allTypeIds.ConvertAll(x => UrnKey<T>(x));
 			return GetValues<T>(urnKeys);
 		}
 
         public T Store<T>(T entity)
             where T : class, new()
         {
-            var urnKey = string.Concat(NamespacePrefix, entity.CreateUrn());
+            var urnKey = UrnKey(entity);
             var valueString = JsonSerializer.SerializeToString(entity);
 
             this.SetEntry(urnKey, valueString);
@@ -554,7 +554,7 @@ namespace ServiceStack.Redis
 
             var id = entity.GetObjectId();
             var entityType = entity.GetType();
-            var urnKey = string.Concat(NamespacePrefix, IdUtils.CreateUrn(entityType, id));
+            var urnKey = UrnKey(entityType, id);
             var valueString = JsonSerializer.SerializeToString(entity);
 
             this.SetEntry(urnKey, valueString);
@@ -572,14 +572,14 @@ namespace ServiceStack.Redis
 
         public T GetFromHash<T>(object id)
         {
-            var key = string.Concat(NamespacePrefix, IdUtils.CreateUrn<T>(id));
+            var key = UrnKey<T>(id);
             return
                 GetAllEntriesFromHash(key).ToJson().FromJson<T>();
         }
 
         public void StoreAsHash<T>(T entity)
         {
-            var key = string.Concat(NamespacePrefix, entity.CreateUrn());
+            var key = UrnKey(entity);
             SetRangeInHash(key, entity.ToJson().FromJson<Dictionary<string, string>>());
             RegisterTypeId(entity);
         }
@@ -598,7 +598,7 @@ namespace ServiceStack.Redis
 
 			for (var i = 0; i < len; i++)
 			{
-				keys[i] = string.Concat(NamespacePrefix, entitiesList[i].CreateUrn()).ToUtf8Bytes();
+				keys[i] = UrnKey(entitiesList[i]).ToUtf8Bytes();
 				values[i] = SerializeToUtf8Bytes(entitiesList[i]);
 			}
 
@@ -618,7 +618,7 @@ namespace ServiceStack.Redis
 
 			for (var i = 0; i < len; i++)
 			{
-				keys[i] = string.Concat(NamespacePrefix, entitiesList[i].CreateUrn()).ToUtf8Bytes();
+				keys[i] = UrnKey(entitiesList[i]).ToUtf8Bytes();
 				values[i] = SerializeToUtf8Bytes(entitiesList[i]);
 			}
 
@@ -633,14 +633,14 @@ namespace ServiceStack.Redis
 		public void Delete<T>(T entity)
 			where T : class, new()
 		{
-			var urnKey = string.Concat(NamespacePrefix, entity.CreateUrn());
+			var urnKey = UrnKey(entity);
 			this.Remove(urnKey);
 			this.RemoveTypeIds(entity);
 		}
 
 		public void DeleteById<T>(object id) where T : class, new()
 		{
-			var urnKey = string.Concat(NamespacePrefix, IdUtils.CreateUrn<T>(id));
+			var urnKey = UrnKey<T>(id);
 			this.Remove(urnKey);
 			this.RemoveTypeIds<T>(id.ToString());
 		}
@@ -649,7 +649,7 @@ namespace ServiceStack.Redis
 		{
 			if (ids == null) return;
 
-			var urnKeys = ids.ConvertAll(x => string.Concat(NamespacePrefix, IdUtils.CreateUrn<T>(x)));
+			var urnKeys = ids.ConvertAll(UrnKey<T>);
 			this.RemoveEntry(urnKeys.ToArray());
 			this.RemoveTypeIds<T>(ids.ConvertAll(x => x.ToString()).ToArray());
 		}
@@ -658,10 +658,42 @@ namespace ServiceStack.Redis
 		{
 			var typeIdsSetKey = this.GetTypeIdsSetKey<T>();
 			var ids = this.GetAllItemsFromSet(typeIdsSetKey);
-			var urnKeys = ids.ConvertAll(x => string.Concat(NamespacePrefix, IdUtils.CreateUrn<T>(x)));
+            var urnKeys = ids.ConvertAll(UrnKey<T>);
 			this.RemoveEntry(urnKeys.ToArray());
 			this.Remove(typeIdsSetKey);
 		}
+        
+        /// <summary>
+        /// Returns key with automatic object id detection in provided value with <typeparam name="T">generic type</typeparam>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        internal string UrnKey<T>(T value)
+        {
+            return string.Concat(NamespacePrefix, value.CreateUrn());
+        }
+
+        /// <summary>
+        /// Returns key with explicit object id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        internal string UrnKey<T>(object id)
+        {
+            return string.Concat(NamespacePrefix, IdUtils.CreateUrn<T>(id));
+        }
+
+        /// <summary>
+        /// Returns key with explicit object type and id.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        internal string UrnKey(Type type, object id)
+        {
+            return string.Concat(NamespacePrefix, IdUtils.CreateUrn(type, id));
+        }
+
 
 		#endregion
 
