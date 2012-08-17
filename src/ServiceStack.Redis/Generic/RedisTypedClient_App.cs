@@ -8,22 +8,15 @@ namespace ServiceStack.Redis.Generic
 {
 	public partial class RedisTypedClient<T>
 	{
-		private readonly static string RecentSortedSetKey;
-
-		static RedisTypedClient()
+		private string GetChildReferenceSetKey<TChild>(object parentId)
 		{
-			RecentSortedSetKey = "recent:" + typeof(T).Name;
-		}
-
-		private static string GetChildReferenceSetKey<TChild>(object parentId)
-		{
-			return "ref:" + typeof(T).Name + "/" + typeof(TChild).Name + ":" + parentId;
+			return string.Concat(client.NamespacePrefix, "ref:", typeof(T).Name, "/", typeof(TChild).Name, ":", parentId);
 		}
 
 		public void StoreRelatedEntities<TChild>(object parentId, List<TChild> children) 
 		{
 			var childRefKey = GetChildReferenceSetKey<TChild>(parentId);
-			var childKeys = children.ConvertAll(x => x.CreateUrn());
+            var childKeys = children.ConvertAll(x => client.UrnKey(x));
 
 			using (var trans = client.CreateTransaction())
 			{
@@ -72,7 +65,7 @@ namespace ServiceStack.Redis.Generic
 
 		public void AddToRecentsList(T value)
 		{
-			var key = value.CreateUrn();
+            var key = client.UrnKey(value);
 			var nowScore = DateTime.UtcNow.ToUnixTime();
 			client.AddItemToSortedSet(RecentSortedSetKey, key, nowScore);
 		}

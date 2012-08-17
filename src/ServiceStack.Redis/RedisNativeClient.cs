@@ -67,6 +67,11 @@ namespace ServiceStack.Redis
 
         public string Host { get; private set; }
         public int Port { get; private set; }
+
+        /// <summary>
+        /// Gets or sets object key prefix.
+        /// </summary>
+        public string NamespacePrefix { get; set; }
         public int ConnectTimeout { get; set; }
         public int RetryTimeout { get; set; }
         public int RetryCount { get; set; }

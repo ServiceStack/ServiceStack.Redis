@@ -56,9 +56,11 @@ namespace ServiceStack.Redis.Generic
 
 			this.SequenceKey = client.GetTypeSequenceKey<T>();
 			this.TypeIdsSetKey = client.GetTypeIdsSetKey<T>();
-			this.TypeLockKey = "lock:" + typeof(T).Name; 
+			this.TypeLockKey = string.Concat(client.NamespacePrefix, "lock:", typeof(T).Name);
+            this.RecentSortedSetKey = string.Concat(client.NamespacePrefix, "recent:", typeof(T).Name);
 		}
 
+        private readonly string RecentSortedSetKey;
 		public string TypeIdsSetKey { get; set; }
 		public string TypeLockKey { get; set; }
 
@@ -288,13 +290,13 @@ namespace ServiceStack.Redis.Generic
 
 		public bool ExpireIn(object id, TimeSpan expireIn)
 		{
-			var key = IdUtils.CreateUrn<T>(id);
+			var key = client.UrnKey<T>(id);
 			return client.Expire(key, (int)expireIn.TotalSeconds);
 		}
 
 		public bool ExpireAt(object id, DateTime expireAt)
 		{
-			var key = IdUtils.CreateUrn<T>(id);
+			var key = client.UrnKey<T>(id);
 			return client.ExpireAt(key, expireAt.ToUnixTime());
 		}
 
@@ -369,7 +371,7 @@ namespace ServiceStack.Redis.Generic
 
 		public T GetById(object id)
 		{
-			var key = IdUtils.CreateUrn<T>(id);
+			var key = client.UrnKey<T>(id);
 			return this.GetValue(key);
 		}
 
@@ -377,7 +379,7 @@ namespace ServiceStack.Redis.Generic
 		{
 			if (ids != null)
 			{
-				var urnKeys = ids.ConvertAll(x => IdUtils.CreateUrn<T>(x));
+                var urnKeys = ids.ConvertAll(x => client.UrnKey<T>(x));
 				if (urnKeys.Count != 0)
 					return GetValues(urnKeys);
 			}
@@ -393,7 +395,7 @@ namespace ServiceStack.Redis.Generic
 
 		public T Store(T entity)
 		{
-			var urnKey = entity.CreateUrn();
+            var urnKey = client.UrnKey(entity);
 			this.SetEntry(urnKey, entity);
 
 			return entity;
@@ -411,7 +413,7 @@ namespace ServiceStack.Redis.Generic
 
 			for (var i = 0; i < len; i++)
 			{
-				keys[i] = entitiesList[i].CreateUrn().ToUtf8Bytes();
+                keys[i] = client.UrnKey(entitiesList[i]).ToUtf8Bytes();
 				values[i] = Redis.RedisClient.SerializeToUtf8Bytes(entitiesList[i]);
 			}
 
@@ -421,14 +423,14 @@ namespace ServiceStack.Redis.Generic
 
 		public void Delete(T entity)
 		{
-			var urnKey = entity.CreateUrn();
+            var urnKey = client.UrnKey(entity);
 			this.RemoveEntry(urnKey);
 			client.RemoveTypeIds(entity);
 		}
 
 		public void DeleteById(object id)
 		{
-			var urnKey = IdUtils.CreateUrn<T>(id);
+			var urnKey = client.UrnKey<T>(id);
 
 			this.RemoveEntry(urnKey);
 			client.RemoveTypeIds<T>(id.ToString());
@@ -438,7 +440,7 @@ namespace ServiceStack.Redis.Generic
 		{
 			if (ids == null) return;
 
-			var urnKeys = ids.ConvertAll(IdUtils.CreateUrn<T>);
+			var urnKeys = ids.ConvertAll(t => client.UrnKey<T>(t));
 			this.RemoveEntry(urnKeys.ToArray());
 			client.RemoveTypeIds<T>(ids.ConvertAll(x => x.ToString()).ToArray());
 		}

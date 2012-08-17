@@ -27,6 +27,10 @@ namespace ServiceStack.Redis
 		private List<RedisEndPoint> ReadOnlyHosts { get; set; }
         public int? ConnectTimeout { get; set; }
 
+        /// <summary>
+        /// Gets or sets object key prefix.
+        /// </summary>
+        public string NamespacePrefix { get; set; }
 		private int readWriteHostsIndex;
 		private int readOnlyHostsIndex;
 
@@ -102,6 +106,7 @@ namespace ServiceStack.Redis
             if (nextHost.RequiresAuth)
                 client.Password = nextHost.Password;
 
+            client.NamespacePrefix = NamespacePrefix;
             client.ConnectionFilter = ConnectionFilter;
 
 			return client;
@@ -131,6 +136,7 @@ namespace ServiceStack.Redis
             if (nextHost.RequiresAuth)
                 client.Password = nextHost.Password;
 
+            client.NamespacePrefix = NamespacePrefix;
             client.ConnectionFilter = ConnectionFilter;
 
             return client;

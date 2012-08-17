@@ -40,10 +40,24 @@ namespace ServiceStack.Redis.Tests.Generic
 		{
 			if (Redis != null) Redis.Dispose();
 			Redis = new RedisClient(TestConfig.SingleHost);
-			Redis.FlushDb();
+		    Redis.NamespacePrefix = "RedisTypedClientTests:";
 			RedisTyped = Redis.As<CacheRecord>();
 		}
 
+        [TearDown]
+        public virtual void TearDown()
+        {
+            Redis.SearchKeys(Redis.NamespacePrefix + "*").ForEach(t => Redis.Del(t));
+        }
+
+        [Test]
+        public void Can_Store_with_Prefix()
+        {
+            var expected = new CacheRecord() {Id = "123"};
+            RedisTyped.Store(expected);
+            var current = Redis.Get<CacheRecord>("RedisTypedClientTests:urn:cacherecord:123");
+            Assert.AreEqual(expected.Id, current.Id);
+        }
 
 		[Test]
 		public void Can_Expire()
