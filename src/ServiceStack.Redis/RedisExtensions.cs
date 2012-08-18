@@ -103,7 +103,7 @@ namespace ServiceStack.Redis
 
         public static byte[] ToFastUtf8Bytes(this double value)
         {
-            return FastToUtf8Bytes(value.ToString("G", CultureInfo.InvariantCulture));
+            return FastToUtf8Bytes(value.ToString("R", CultureInfo.InvariantCulture));
         }
 
         private static byte[] FastToUtf8Bytes(string strVal)

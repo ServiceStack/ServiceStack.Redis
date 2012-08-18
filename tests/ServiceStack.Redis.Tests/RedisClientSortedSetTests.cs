@@ -14,7 +14,7 @@ namespace ServiceStack.Redis.Tests
 	public class RedisClientSortedSetTests
 		: RedisClientTestsBase
 	{
-		private const string SetId = "testzset";
+        private const string SetId = "RedisClientSortedSetTests_testzset";
 		private List<string> storeMembers;
 
 		Dictionary<string, double> stringDoubleMap;
@@ -22,6 +22,7 @@ namespace ServiceStack.Redis.Tests
 		public override void OnBeforeEachTest()
 		{
 			base.OnBeforeEachTest();
+            Redis.NamespacePrefix = "RedisClientSortedSetTests";
 			storeMembers = new List<string> { "one", "two", "three", "four" };
 
 			stringDoubleMap = new Dictionary<string, double> {
@@ -68,7 +69,7 @@ namespace ServiceStack.Redis.Tests
 			var members = Redis.GetAllItemsFromSortedSet(SetId);
 
 			storeMembers.Sort((x, y) => x.CompareTo(y));
-			Assert.That(members.EquivalentTo(storeMembers), Is.True);
+			Assert.That(members.EquivalentTo(storeMembers));
 		}
 
 		[Test]

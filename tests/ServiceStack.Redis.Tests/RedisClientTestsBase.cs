@@ -25,6 +25,7 @@ namespace ServiceStack.Redis.Tests
         [TearDown]
         public virtual void TearDown()
         {
+            if (Redis.NamespacePrefix != null && CleanMask == null) CleanMask = Redis.NamespacePrefix + "*";
             if (CleanMask != null) Redis.SearchKeys(CleanMask).ForEach(t => Redis.Del(t));
             Redis.Dispose();
         }
