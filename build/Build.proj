@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <BuildSolutionDir>$(MSBuildProjectDirectory)/..</BuildSolutionDir>
-    <Configuration Condition="$(Configuration) == ''">Debug</Configuration>
+    <Configuration Condition="$(Configuration) == ''">Release</Configuration>
   </PropertyGroup>
 
   <PropertyGroup>
