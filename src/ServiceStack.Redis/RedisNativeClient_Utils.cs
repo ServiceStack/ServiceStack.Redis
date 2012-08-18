@@ -459,7 +459,7 @@ namespace ServiceStack.Redis
 
 			var s = ReadLine();
 
-			Log("R: " + s);
+			Log("R: {0}", s);
 
 			if (c == '-')
 				throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
@@ -481,7 +481,7 @@ namespace ServiceStack.Redis
 
 			var s = ReadLine();
 
-			Log("R: " + s);
+			Log("R: {0}", s);
 
 			if (c == '-')
 				throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
@@ -555,7 +555,7 @@ namespace ServiceStack.Redis
 				throw CreateResponseError("No more data");
 
 			var s = ReadLine();
-			Log("R: " + s);
+			Log("R: {0}", s);
 
             switch(c)
             {
@@ -598,7 +598,7 @@ namespace ServiceStack.Redis
 				throw CreateResponseError("No more data");
 
 			var s = ReadLine();
-			Log("R: " + s);
+			Log("R: {0}", s);
 			if (c == '-')
 				throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
 			if (c == '*')
