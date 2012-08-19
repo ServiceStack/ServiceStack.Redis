@@ -12,13 +12,20 @@ namespace ServiceStack.Redis.Tests
 	public class RedisPubSubTests
 		: RedisClientTestsBase
 	{
+        public override void OnBeforeEachTest()
+        {
+            base.OnBeforeEachTest();
+            Redis.NamespacePrefix = "RedisPubSubTests";
+        }
+
 		[Test]
 		public void Can_Subscribe_and_Publish_single_message()
 		{
-			const string channelName = "CHANNEL";
+			const string channelName = "CHANNEL1";
 			const string message = "Hello, World!";
+		    var key = PrefixedKey("Can_Subscribe_and_Publish_single_message");
 
-			Redis.IncrementValue("CanUseNormalClient");
+            Redis.IncrementValue(key);
 
 			using (var subscription = Redis.CreateSubscription())
 			{
@@ -54,19 +61,20 @@ namespace ServiceStack.Redis.Tests
 			}
 
 			Log("Using as normal client again...");
-			Redis.IncrementValue("CanUseNormalClient");
-			Assert.That(Redis.Get<int>("CanUseNormalClient"), Is.EqualTo(2));
+            Redis.IncrementValue(key);
+            Assert.That(Redis.Get<int>(key), Is.EqualTo(2));
 		}
 
 		[Test]
 		public void Can_Subscribe_and_Publish_multiple_message()
 		{
-			const string channelName = "CHANNEL";
+			const string channelName = "CHANNEL2";
 			const string messagePrefix = "MESSAGE ";
+            string key = PrefixedKey("Can_Subscribe_and_Publish_multiple_message");
 			const int publishMessageCount = 5;
 			var messagesReceived = 0;
 
-			Redis.IncrementValue("CanUseNormalClient");
+            Redis.IncrementValue(key);
 
 			using (var subscription = Redis.CreateSubscription())
 			{
@@ -110,8 +118,8 @@ namespace ServiceStack.Redis.Tests
 			}
 
 			Log("Using as normal client again...");
-			Redis.IncrementValue("CanUseNormalClient");
-			Assert.That(Redis.Get<int>("CanUseNormalClient"), Is.EqualTo(2));
+            Redis.IncrementValue(key);
+            Assert.That(Redis.Get<int>(key), Is.EqualTo(2));
 
 			Assert.That(messagesReceived, Is.EqualTo(publishMessageCount));
 		}
@@ -119,9 +127,10 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_Subscribe_and_Publish_message_to_multiple_channels()
 		{
-			const string channelPrefix = "CHANNEL ";
+			const string channelPrefix = "CHANNEL3 ";
 			const string message = "MESSAGE";
 			const int publishChannelCount = 5;
+            var key = PrefixedKey("Can_Subscribe_and_Publish_message_to_multiple_channels");
 
 			var channels = new List<string>();
 			publishChannelCount.Times(i => channels.Add(channelPrefix + i));
@@ -130,7 +139,7 @@ namespace ServiceStack.Redis.Tests
 			var channelsSubscribed = 0;
 			var channelsUnSubscribed = 0;
 
-			Redis.IncrementValue("CanUseNormalClient");
+			Redis.IncrementValue(key);
 
 			using (var subscription = Redis.CreateSubscription())
 			{
@@ -170,8 +179,8 @@ namespace ServiceStack.Redis.Tests
 			}
 
 			Log("Using as normal client again...");
-			Redis.IncrementValue("CanUseNormalClient");
-			Assert.That(Redis.Get<int>("CanUseNormalClient"), Is.EqualTo(2));
+            Redis.IncrementValue(key);
+            Assert.That(Redis.Get<int>(key), Is.EqualTo(2));
 
 			Assert.That(messagesReceived, Is.EqualTo(publishChannelCount));
 			Assert.That(channelsSubscribed, Is.EqualTo(publishChannelCount));
@@ -186,7 +195,7 @@ namespace ServiceStack.Redis.Tests
 			{
 				subscription.OnMessage = (channel, msg) => {
 					Debug.WriteLine(String.Format("{0}: {1}", channel, msg + msgs++));
-					subscription.UnSubscribeFromChannelsMatching("CHANNEL1:TITLE*");
+					subscription.UnSubscribeFromChannelsMatching("CHANNEL4:TITLE*");
 				};
 
 				ThreadPool.QueueUserWorkItem(x =>
@@ -195,12 +204,12 @@ namespace ServiceStack.Redis.Tests
 					using (var redisClient = CreateRedisClient())
 					{
 						Log("Publishing msg...");
-						redisClient.Publish("CHANNEL1:TITLE1", "hello".ToUtf8Bytes());
+						redisClient.Publish("CHANNEL4:TITLE1", "hello".ToUtf8Bytes());
 					}
 				});
 
 				Log("Start Listening On");
-				subscription.SubscribeToChannelsMatching("CHANNEL1:TITLE*");
+				subscription.SubscribeToChannelsMatching("CHANNEL4:TITLE*");
 			}
 		}
 
