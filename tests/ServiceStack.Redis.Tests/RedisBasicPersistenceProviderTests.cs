@@ -54,6 +54,7 @@ namespace ServiceStack.Redis.Tests
 		{
 			base.OnBeforeEachTest();
 
+            Redis.NamespacePrefix = "RedisBasicPersistenceProviderTests";
 			testModels = new List<TestModel>();
 			5.Times(i => testModels.Add(
 				new TestModel { Id = Guid.NewGuid(), Name = "Name" + i, Age = 20 + i }));
@@ -133,7 +134,7 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(allModels, Is.EquivalentTo(testModels));
 
 			//Test internal TestModelIdsSetKey state
-			var idsRemaining = Redis.GetAllItemsFromSet(TestModelIdsSetKey)
+			var idsRemaining = Redis.GetAllItemsFromSet(Redis.NamespacePrefix + TestModelIdsSetKey)
 				.OrderBy(x => x).ConvertAll(x => new Guid(x));
 
 			var testModelIds = testModels.OrderBy(x => x.Id).ConvertAll(x => x.Id);
@@ -176,7 +177,7 @@ namespace ServiceStack.Redis.Tests
 
 
 			//Test internal TestModelIdsSetKey state
-			var idsRemaining = Redis.GetAllItemsFromSet(TestModelIdsSetKey)
+			var idsRemaining = Redis.GetAllItemsFromSet(Redis.NamespacePrefix + TestModelIdsSetKey)
 				.OrderBy(x => x).ConvertAll(x => new Guid(x));
 
 			var testModelIds = testModels.OrderBy(x => x.Id).ConvertAll(x => x.Id);

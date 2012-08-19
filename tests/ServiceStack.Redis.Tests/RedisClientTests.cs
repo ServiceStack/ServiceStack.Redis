@@ -16,6 +16,12 @@ namespace ServiceStack.Redis.Tests
 	{
 		const string Value = "Value";
 
+        public override void OnBeforeEachTest()
+        {
+            base.OnBeforeEachTest();
+            Redis.NamespacePrefix = "RedisClientTests";
+        }
+
 		[Test]
 		public void Can_Set_and_Get_string()
 		{
@@ -131,9 +137,10 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_get_RandomKey()
 		{
+		    Redis.Db = 15; 
 			var keysMap = new Dictionary<string, string>();
 
-			10.Times(i => keysMap.Add("key" + i, "val" + i));
+			10.Times(i => keysMap.Add(Redis.NamespacePrefix + "key" + i, "val" + i));
 
 			Redis.SetAll(keysMap);
 
@@ -225,6 +232,8 @@ namespace ServiceStack.Redis.Tests
 		public void Can_Quit()
 		{
 			Redis.Quit();
+		    Redis.NamespacePrefix = null;
+		    CleanMask = null;
 		}
 
 		[Test]
@@ -272,28 +281,30 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_AcquireLock()
 		{
-			Redis.IncrementValue("key"); //1
+            var key = PrefixedKey("AcquireLockKey");
+            var lockKey = PrefixedKey("Can_AcquireLock");
+            Redis.IncrementValue(key); //1
 
 			var asyncResults = 5.TimesAsync(i =>
-				IncrementKeyInsideLock(i, new RedisClient(TestConfig.SingleHost)));
+				IncrementKeyInsideLock(key, lockKey, i, new RedisClient(TestConfig.SingleHost) { NamespacePrefix = Redis.NamespacePrefix }));
 
 			asyncResults.WaitAll(TimeSpan.FromSeconds(5));
 
-			var val = Redis.Get<int>("key");
+            var val = Redis.Get<int>(key);
 
 			Assert.That(val, Is.EqualTo(1 + 5));
 		}
 
-		private static void IncrementKeyInsideLock(int clientNo, IRedisClient client)
+		private void IncrementKeyInsideLock(String key, String lockKey, int clientNo, IRedisClient client)
 		{
-			using (client.AcquireLock("testlock"))
+            using (client.AcquireLock(lockKey))
 			{
-				Debug.WriteLine(String.Format("client {0} acquired lock", clientNo));
-				var val = client.Get<int>("key");
+                Debug.WriteLine(String.Format("client {0} acquired lock", clientNo));
+                var val = client.Get<int>(key);
 
 				Thread.Sleep(200);
 
-				client.Set("key", val + 1);
+				client.Set(key, val + 1);
 				Debug.WriteLine(String.Format("client {0} released lock", clientNo));
 			}
 		}
@@ -301,9 +312,10 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_AcquireLock_TimeOut()
 		{
-
-			Redis.IncrementValue("key"); //1
-			var acquiredLock = Redis.AcquireLock("testlock");
+            var key = PrefixedKey("AcquireLockKeyTimeOut");
+		    var lockKey = PrefixedKey("Can_AcquireLock_TimeOut");
+            Redis.IncrementValue(key); //1
+            var acquiredLock = Redis.AcquireLock(lockKey);
 			var waitFor = TimeSpan.FromMilliseconds(1000);
 			var now = DateTime.Now;
 
@@ -311,15 +323,15 @@ namespace ServiceStack.Redis.Tests
 			{
 				using (var client = new RedisClient(TestConfig.SingleHost))
 				{
-					using (client.AcquireLock("testlock", waitFor))
+					using (client.AcquireLock(lockKey, waitFor))
 					{
-						Redis.IncrementValue("key"); //2
+                        Redis.IncrementValue(key); //2
 					}
 				}
 			}
 			catch (TimeoutException tex)
 			{
-				var val = Redis.Get<int>("key");
+                var val = Redis.Get<int>(key);
 				Assert.That(val, Is.EqualTo(1));
 
 				var timeTaken = DateTime.Now - now;
@@ -402,9 +414,9 @@ namespace ServiceStack.Redis.Tests
 
             Redis.StoreObject(poco);
 
-            Assert.That(Redis.Get<string>("urn:mypoco:1"), Is.EqualTo("{\"Id\":1,\"Name\":\"Test\"}"));
+            Assert.That(Redis.GetValue(Redis.NamespacePrefix + "urn:mypoco:1"), Is.EqualTo("{\"Id\":1,\"Name\":\"Test\"}"));
 
-            Assert.That(Redis.PopItemFromSet("ids:MyPoco"), Is.EqualTo("1"));
+            Assert.That(Redis.PopItemFromSet(Redis.NamespacePrefix + "ids:MyPoco"), Is.EqualTo("1"));
         }
 
         [Test]
