@@ -12,7 +12,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [TestFixture, Category("Integration")]
+    [TestFixture, Category("Integration"), Explicit]
 	public class RedisMqHostTests
 	{
 		public class Reverse
@@ -237,8 +237,8 @@ namespace ServiceStack.Redis.Tests
 			mqClient.Publish(new Reverse { Value = "World" });
 			mqClient.Publish(new Rot13 { Value = "ServiceStack" });
 
-			Thread.Sleep(3000);
-			Assert.That(mqHost.GetStats().TotalMessagesFailed, Is.EqualTo(1 * totalRetries));
+            Thread.Sleep(3000);
+		    Assert.That(mqHost.GetStats().TotalMessagesFailed, Is.EqualTo(1 * totalRetries));
 			Assert.That(mqHost.GetStats().TotalMessagesProcessed, Is.EqualTo(2 + 1));
 
 			5.Times(x => mqClient.Publish(new AlwaysThrows { Value = "#" + x }));
