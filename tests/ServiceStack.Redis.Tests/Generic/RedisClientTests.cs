@@ -252,12 +252,12 @@ namespace ServiceStack.Redis.Tests.Generic
 
             Redis.Store(dto);
 
-            Assert.That(Redis.GetAllItemsFromSet("ids:Dummy").ToArray()[0], Is.EqualTo("1"));
+            Assert.That(Redis.GetAllItemsFromSet(Redis.NamespacePrefix + "ids:Dummy").ToArray()[0], Is.EqualTo("1"));
             Assert.That(Redis.GetById<Dummy>(1), Is.Not.Null);
 
             Redis.Delete(dto);
 
-            Assert.That(Redis.GetAllItemsFromSet("ids:Dummy").Count, Is.EqualTo(0));
+            Assert.That(Redis.GetAllItemsFromSet(Redis.NamespacePrefix + "ids:Dummy").Count, Is.EqualTo(0));
             Assert.That(Redis.GetById<Dummy>(1), Is.Null);
 		}
 
@@ -267,12 +267,12 @@ namespace ServiceStack.Redis.Tests.Generic
 			var dto = new Dummy { Id = 1, Name = "Name" };
             Redis.Store(dto);
 
-            Assert.That(Redis.GetAllItemsFromSet("ids:Dummy").ToArray()[0], Is.EqualTo("1"));
+            Assert.That(Redis.GetAllItemsFromSet(Redis.NamespacePrefix + "ids:Dummy").ToArray()[0], Is.EqualTo("1"));
             Assert.That(Redis.GetById<Dummy>(1), Is.Not.Null);
 
             Redis.DeleteById<Dummy>(dto.Id);
 
-            Assert.That(Redis.GetAllItemsFromSet("ids:Dummy").Count, Is.EqualTo(0));
+            Assert.That(Redis.GetAllItemsFromSet(Redis.NamespacePrefix + "ids:Dummy").Count, Is.EqualTo(0));
             Assert.That(Redis.GetById<Dummy>(1), Is.Null);
 		}
 
