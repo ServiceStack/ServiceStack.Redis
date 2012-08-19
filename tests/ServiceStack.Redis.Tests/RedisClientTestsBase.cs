@@ -30,6 +30,11 @@ namespace ServiceStack.Redis.Tests
             Redis.Dispose();
         }
 
+        protected string PrefixedKey(string key)
+        {
+            return string.Concat(Redis.NamespacePrefix, key);
+        }
+
 		public RedisClient GetRedisClient()
 		{
 			var client = new RedisClient(TestConfig.SingleHost);
