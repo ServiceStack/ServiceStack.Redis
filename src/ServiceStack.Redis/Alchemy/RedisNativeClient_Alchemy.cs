@@ -34,8 +34,7 @@ namespace ServiceStack.Redis
             /// <param name="columnDefinitions"></param>
             public void CreateTable(byte[] tablename, byte[] columnDefinitions)
             {
-                var columnDefinitionsString = "(" + columnDefinitions + ")";
-                var cmdWithArgs = new byte[4][] { Alchemy.Commands.Create, Keywords.Table, tablename, columnDefinitionsString.ToUtf8Bytes() };
+                var cmdWithArgs = new byte[4][] { Alchemy.Commands.Create, Keywords.Table, tablename, AddRoundBrackets(columnDefinitions) };
                 SendExpectSuccess(cmdWithArgs);
             }
             /// <summary>
@@ -56,8 +55,7 @@ namespace ServiceStack.Redis
             /// <param name="column"></param>
             public void CreateIndex(byte[] indexname, byte[] tablename, byte[] column)
             {
-                var columnString = "(" + column + ")";
-                var cmdWithArgs = new byte[6][] { Alchemy.Commands.Create, Keywords.Index, indexname, Keywords.On, tablename, columnString.ToUtf8Bytes() };
+                var cmdWithArgs = new byte[6][] { Alchemy.Commands.Create, Keywords.Index, indexname, Keywords.On, tablename, AddRoundBrackets(column) };
                 SendExpectSuccess(cmdWithArgs);
             }
             /// <summary>
@@ -123,8 +121,7 @@ namespace ServiceStack.Redis
             /// <param name="valuesList"></param>
             public void Insert(byte[] tablename, byte[] valuesList)
             {
-                var valuesListString = "(" + valuesList + ")";
-                var cmdWithArgs = new byte[5][] { Alchemy.Commands.Insert, Keywords.Into, tablename, Keywords.Values, valuesListString.ToUtf8Bytes() };
+                var cmdWithArgs = new byte[5][] { Alchemy.Commands.Insert, Keywords.Into, tablename, Keywords.Values, AddRoundBrackets(valuesList) };
                 SendExpectSuccess(cmdWithArgs);
 
             }
@@ -135,8 +132,7 @@ namespace ServiceStack.Redis
             /// <param name="valuesList"></param>
             public void InsertReturnSize(byte[] tablename, byte[] valuesList)
             {
-                var valuesListString = "(" + valuesList + ")";
-                var cmdWithArgs = new byte[7][] { Alchemy.Commands.Insert, Keywords.Into, tablename, Keywords.Values, valuesListString.ToUtf8Bytes(), Keywords.Return, Keywords.Size };
+                var cmdWithArgs = new byte[7][] { Alchemy.Commands.Insert, Keywords.Into, tablename, Keywords.Values, AddRoundBrackets(valuesList), Keywords.Return, Keywords.Size };
                 SendCommand(cmdWithArgs);
 
             }
@@ -200,6 +196,11 @@ namespace ServiceStack.Redis
             {
                 var cmdWithArgs = new byte[2][] { Alchemy.Commands.Lua, command };
                 SendExpectSuccess(cmdWithArgs);
+            }
+
+            private static byte [] AddRoundBrackets(byte [] value)
+            {
+                return string.Concat("(", value.FromUtf8Bytes(), ")").ToUtf8Bytes();
             }
         }
     }
