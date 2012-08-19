@@ -6,17 +6,33 @@ namespace ServiceStack.Redis.Tests
     [TestFixture, Category("Integration")]
 	public class AlchemyNativeClientTests: AlchemyClientTestsBase
 	{
+        public override void OnBeforeEachTest()
+        {
+            const string tableName = "foo";
+            const string columnDefinitions = "id INT, val FLOAT, name TEXT";
+            Alchemy.CreateTable(GetBytes(tableName), GetBytes(columnDefinitions));
+
+            base.OnBeforeEachTest();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            const string tableName = "foo";
+            Alchemy.DropTable(GetBytes(tableName));
+        }
+
         [Test]
         public void Can_CreateTable()
         {
-            const string tableName = "foo";
+            const string tableName = "foo_test";
             const string columnDefinitions = "id INT, val FLOAT, name TEXT";
             Alchemy.CreateTable	(GetBytes(tableName), GetBytes(columnDefinitions));
         }
         [Test]
         public void Can_DropTable()
         {
-            const string tableName = "foo";
+            const string tableName = "foo_test";
             Alchemy.DropTable(GetBytes(tableName));
         }
         [Test]
