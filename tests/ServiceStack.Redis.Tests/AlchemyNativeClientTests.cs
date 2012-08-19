@@ -8,18 +8,11 @@ namespace ServiceStack.Redis.Tests
 	{
         public override void OnBeforeEachTest()
         {
+            base.OnBeforeEachTest();
+
             const string tableName = "foo";
             const string columnDefinitions = "id INT, val FLOAT, name TEXT";
             Alchemy.CreateTable(GetBytes(tableName), GetBytes(columnDefinitions));
-
-            base.OnBeforeEachTest();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            const string tableName = "foo";
-            Alchemy.DropTable(GetBytes(tableName));
         }
 
         [Test]
@@ -32,7 +25,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_DropTable()
         {
-            const string tableName = "foo_test";
+            const string tableName = "foo";
             Alchemy.DropTable(GetBytes(tableName));
         }
         [Test]
