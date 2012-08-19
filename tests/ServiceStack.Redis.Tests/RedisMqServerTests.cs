@@ -12,7 +12,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [TestFixture, Category("Integration")]
+    [TestFixture, Category("Integration"), Ignore]
     public class RedisMqServerTests
     {
         public class Reverse
