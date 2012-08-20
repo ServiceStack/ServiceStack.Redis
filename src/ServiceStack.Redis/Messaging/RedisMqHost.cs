@@ -334,7 +334,7 @@ namespace ServiceStack.Redis.Messaging
 
             try
             {
-                Thread.Sleep(100); //give it a small chance to die gracefully
+                bgThread.Join(500); //give it a small chance to die gracefully
                 KillBgThreadIfExists();
             }
             catch (Exception ex)

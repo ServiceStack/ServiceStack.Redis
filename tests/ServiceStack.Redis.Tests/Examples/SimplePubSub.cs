@@ -9,7 +9,7 @@ namespace ServiceStack.Redis.Tests.Examples
     [TestFixture, Explicit, Category("Integration")]
 	public class SimplePubSub
 	{
-		const string ChannelName = "CHANNEL";
+        const string ChannelName = "SimplePubSubCHANNEL";
 		const string MessagePrefix = "MESSAGE ";
 		const int PublishMessageCount = 5;
 

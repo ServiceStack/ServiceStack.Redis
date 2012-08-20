@@ -21,7 +21,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_Subscribe_and_Publish_single_message()
 		{
-			const string channelName = "CHANNEL1";
+			var channelName = PrefixedKey("CHANNEL1");
 			const string message = "Hello, World!";
 		    var key = PrefixedKey("Can_Subscribe_and_Publish_single_message");
 
@@ -49,6 +49,7 @@ namespace ServiceStack.Redis.Tests
 
 				ThreadPool.QueueUserWorkItem(x =>
 				{
+                    Thread.Sleep(100); // to be sure that we have subscribers
 					using (var redisClient = CreateRedisClient())
 					{
 						Log("Publishing '{0}' to '{1}'", message, channelName);
@@ -68,7 +69,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_Subscribe_and_Publish_multiple_message()
 		{
-			const string channelName = "CHANNEL2";
+			var channelName = PrefixedKey("CHANNEL2");
 			const string messagePrefix = "MESSAGE ";
             string key = PrefixedKey("Can_Subscribe_and_Publish_multiple_message");
 			const int publishMessageCount = 5;
@@ -102,6 +103,8 @@ namespace ServiceStack.Redis.Tests
 
 				ThreadPool.QueueUserWorkItem(x =>
 				{
+                    Thread.Sleep(100); // to be sure that we have subscribers
+
 					using (var redisClient = CreateRedisClient())
 					{
 						for (var i = 0; i < publishMessageCount; i++)
@@ -127,7 +130,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_Subscribe_and_Publish_message_to_multiple_channels()
 		{
-			const string channelPrefix = "CHANNEL3 ";
+			var channelPrefix = PrefixedKey("CHANNEL3 ");
 			const string message = "MESSAGE";
 			const int publishChannelCount = 5;
             var key = PrefixedKey("Can_Subscribe_and_Publish_message_to_multiple_channels");
@@ -164,6 +167,8 @@ namespace ServiceStack.Redis.Tests
 
 				ThreadPool.QueueUserWorkItem(x =>
 				{
+                    Thread.Sleep(100); // to be sure that we have subscribers
+
 					using (var redisClient = CreateRedisClient())
 					{
 						foreach (var channel in channels)
@@ -195,21 +200,22 @@ namespace ServiceStack.Redis.Tests
 			{
 				subscription.OnMessage = (channel, msg) => {
 					Debug.WriteLine(String.Format("{0}: {1}", channel, msg + msgs++));
-					subscription.UnSubscribeFromChannelsMatching("CHANNEL4:TITLE*");
+					subscription.UnSubscribeFromChannelsMatching(PrefixedKey("CHANNEL4:TITLE*"));
 				};
 
 				ThreadPool.QueueUserWorkItem(x =>
 				{
-					Thread.Sleep(100);
+                    Thread.Sleep(100); // to be sure that we have subscribers
+
 					using (var redisClient = CreateRedisClient())
 					{
 						Log("Publishing msg...");
-						redisClient.Publish("CHANNEL4:TITLE1", "hello".ToUtf8Bytes());
+						redisClient.Publish(PrefixedKey("CHANNEL4:TITLE1"), "hello".ToUtf8Bytes());
 					}
 				});
 
 				Log("Start Listening On");
-				subscription.SubscribeToChannelsMatching("CHANNEL4:TITLE*");
+				subscription.SubscribeToChannelsMatching(PrefixedKey("CHANNEL4:TITLE*"));
 			}
 		}
 

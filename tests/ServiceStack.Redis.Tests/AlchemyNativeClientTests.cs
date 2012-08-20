@@ -6,17 +6,27 @@ namespace ServiceStack.Redis.Tests
     [TestFixture, Category("Integration")]
 	public class AlchemyNativeClientTests: AlchemyClientTestsBase
 	{
-        [Test]
-        public void Can_CreateTable()
+        public override void OnBeforeEachTest()
         {
+            base.OnBeforeEachTest();
+
             const string tableName = "foo";
             const string columnDefinitions = "id INT, val FLOAT, name TEXT";
-            Alchemy.CreateTable	(GetBytes(tableName), GetBytes(columnDefinitions));
+            Alchemy.CreateTable(GetBytes(tableName), GetBytes(columnDefinitions));
         }
-        [Test]
-        public void Can_DropTable()
+
+        [TearDown]
+        public void TearDown()
         {
-            const string tableName = "foo";
+            Alchemy.DropTable(GetBytes("foo"));
+        }
+
+        [Test]
+        public void Can_CreateDropTable()
+        {
+            const string tableName = "foo_test";
+            const string columnDefinitions = "id INT, val FLOAT, name TEXT";
+            Alchemy.CreateTable	(GetBytes(tableName), GetBytes(columnDefinitions));
             Alchemy.DropTable(GetBytes(tableName));
         }
         [Test]
@@ -46,9 +56,8 @@ namespace ServiceStack.Redis.Tests
         public void Can_Dump()
         {
             const string tableName = "foo";
+            IntsertData();
             byte[][] results = Alchemy.Dump(GetBytes(tableName));
-     
-            
         }
         [Test]
         public void Can_DumpToMysql()
@@ -61,28 +70,33 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_DumpToFile()
         {
+            IntsertData();
             const string tableName = "foo";
             const string fileName = "foo.sql";
             Alchemy.DumpToFile(GetBytes(tableName), GetBytes(fileName));
-      
-
         }
         [Test]
         public void Can_Insert()
         {
-            const string tableName = "foo";
-            const string values = "2,2.2222222,two";
-            Alchemy.Insert(GetBytes(tableName), GetBytes(values));
- 
+            IntsertData();
         }
-        [Test]
+
+        private void IntsertData()
+        {
+            const string tableName = "foo";
+            const string values = "2,2.2222222,'two'";
+            Alchemy.Insert(GetBytes(tableName), GetBytes(values));
+        }
+
+        [Test, Ignore]
         public void Can_InsertReturnSize()
         {
             const string tableName = "foo";
-            const string values = "2,2.2222222,two";
+            const string values = "2,2.2222222,'two'";
             Alchemy.InsertReturnSize(GetBytes(tableName), GetBytes(values));
         }
-        [Test]
+
+        [Test, Ignore]
         public void Can_Select()
         {
             const string columnList = "*";
@@ -91,14 +105,12 @@ namespace ServiceStack.Redis.Tests
             Alchemy.Select(GetBytes(columnList), GetBytes(tableName), GetBytes(whereClause));
 
         }
-        [Test]
+        [Test, Ignore]
         public void Can_ScanSelect()
         {
             const string columnList = "*";
             const string tableName = "foo";
             Alchemy.ScanSelect(GetBytes(columnList), GetBytes(tableName), null);
-      
-
         }
 
         [Test]
@@ -118,7 +130,8 @@ namespace ServiceStack.Redis.Tests
             Alchemy.Delete( GetBytes(tableName), GetBytes(whereClause));
   
         }
-        [Test]
+
+        [Test, Ignore]
         public void Can_Lua()
         {
             const string luaCommand = "return select('*','foo','id = 1');";
