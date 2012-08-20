@@ -12,7 +12,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [TestFixture, Category("Integration"), Ignore]
+    [TestFixture, Category("Integration")]
     public class RedisMqServerTests
     {
         public class Reverse
@@ -28,6 +28,7 @@ namespace ServiceStack.Redis.Tests
         [TestFixtureSetUp]
         public void TestFixtureSetUp()
         {
+
             LogManager.LogFactory = new ConsoleLogFactory();
         }
 
@@ -68,6 +69,7 @@ namespace ServiceStack.Redis.Tests
             var mqHost = new RedisMqHost(new BasicRedisClientManager(), 2);
             var mqClient = mqHost.CreateMessageQueueClient();
             Publish_4_messages(mqClient);
+            mqHost.Stop();
         }
 
         [Test]
@@ -76,6 +78,7 @@ namespace ServiceStack.Redis.Tests
             var mqHost = new RedisMqHost(new BasicRedisClientManager(), 2);
             var mqClient = mqHost.CreateMessageQueueClient();
             Publish_4_Rot13_messages(mqClient);
+            mqHost.Stop();
         }
 
         [Test]

@@ -12,9 +12,11 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [TestFixture, Category("Integration"), Ignore]
+    [TestFixture, Category("Integration")]
 	public class RedisMqHostTests
-	{
+    {
+        private RedisMqHost mqHost;
+
 		public class Reverse
 		{
 			public string Value { get; set; }
@@ -30,6 +32,12 @@ namespace ServiceStack.Redis.Tests
 		{
 			LogManager.LogFactory = new ConsoleLogFactory();
 		}
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (mqHost != null) mqHost.Dispose();
+        }
 
 		private static RedisMqHost CreateMqHost()
 		{
@@ -70,9 +78,10 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Utils_publish_Reverse_messages()
         {
-            var mqHost = new RedisMqHost(new BasicRedisClientManager(), 2, null);
+            mqHost = new RedisMqHost(new BasicRedisClientManager(), 2, null);
             var mqClient = mqHost.CreateMessageQueueClient();
             Publish_4_messages(mqClient);
+            mqHost.Dispose();
         }
 
         [Test]
@@ -81,6 +90,7 @@ namespace ServiceStack.Redis.Tests
             var mqHost = new RedisMqHost(new BasicRedisClientManager(), 2, null);
             var mqClient = mqHost.CreateMessageQueueClient();
             Publish_4_Rot13_messages(mqClient);
+            mqHost.Dispose();
         }
 
 		[Test]
@@ -88,7 +98,7 @@ namespace ServiceStack.Redis.Tests
 		{
 			var reverseCalled = 0;
 
-			var mqHost = CreateMqHost();
+			mqHost = CreateMqHost();
 			mqHost.RegisterHandler<Reverse>(x => { reverseCalled++; return x.GetBody().Value.Reverse(); });
 
 			var mqClient = mqHost.CreateMessageQueueClient();
@@ -106,7 +116,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Does_process_all_messages_and_Starts_Stops_correctly_with_multiple_threads_racing()
 		{
-			var mqHost = CreateMqHost();
+			mqHost = CreateMqHost();
 
 			var reverseCalled = 0;
 			var rot13Called = 0;
@@ -131,7 +141,7 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(mqHost.GetStatus(), Is.EqualTo("Started"));
 
 			5.Times(x => ThreadPool.QueueUserWorkItem(y => mqHost.Stop()));
-			Thread.Sleep(1000);
+			Thread.Sleep(2000);
 			Assert.That(mqHost.GetStatus(), Is.EqualTo("Stopped"));
 
 			10.Times(x => ThreadPool.QueueUserWorkItem(y => mqHost.Start()));
@@ -150,7 +160,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Only_allows_1_BgThread_to_run_at_a_time()
 		{
-			var mqHost = CreateMqHost();
+			mqHost = CreateMqHost();
 
 			mqHost.RegisterHandler<Reverse>(x => x.GetBody().Value.Reverse());
 			mqHost.RegisterHandler<Rot13>(x => x.GetBody().Value.ToRot13());
@@ -178,7 +188,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Cannot_Start_a_Disposed_MqHost()
 		{
-			var mqHost = CreateMqHost();
+			mqHost = CreateMqHost();
 
 			mqHost.RegisterHandler<Reverse>(x => x.GetBody().Value.Reverse());
 			mqHost.Dispose();
@@ -194,7 +204,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Cannot_Stop_a_Disposed_MqHost()
 		{
-			var mqHost = CreateMqHost();
+			mqHost = CreateMqHost();
 
 			mqHost.RegisterHandler<Reverse>(x => x.GetBody().Value.Reverse());
 			mqHost.Start();
@@ -221,7 +231,7 @@ namespace ServiceStack.Redis.Tests
 			var retryCount = 3;
 			var totalRetries = 1 + retryCount; //in total, inc. first try
 
-			var mqHost = CreateMqHost(retryCount);
+			mqHost = CreateMqHost(retryCount);
 
 			var reverseCalled = 0;
 			var rot13Called = 0;
@@ -230,24 +240,26 @@ namespace ServiceStack.Redis.Tests
 			mqHost.RegisterHandler<Rot13>(x => { rot13Called++; return x.GetBody().Value.ToRot13(); });
 			mqHost.RegisterHandler<AlwaysThrows>(x => { throw new Exception("Always Throwing! " + x.GetBody().Value); });
 			mqHost.Start();
+            Thread.Sleep(3000);
 
 			var mqClient = mqHost.CreateMessageQueueClient();
-			mqClient.Publish(new AlwaysThrows { Value = "1st" });
-			mqClient.Publish(new Reverse { Value = "Hello" });
-			mqClient.Publish(new Reverse { Value = "World" });
-			mqClient.Publish(new Rot13 { Value = "ServiceStack" });
+            mqClient.Publish(new Reverse { Value = "Hello" });
+            mqClient.Publish(new Reverse { Value = "World" });
+            mqClient.Publish(new Rot13 { Value = "ServiceStack" });
+            mqClient.Publish(new AlwaysThrows { Value = "1st" });
 
             Thread.Sleep(3000);
+
 		    Assert.That(mqHost.GetStats().TotalMessagesFailed, Is.EqualTo(1 * totalRetries));
 			Assert.That(mqHost.GetStats().TotalMessagesProcessed, Is.EqualTo(2 + 1));
 
+            mqClient.Publish(new Reverse { Value = "Hello" });
+            mqClient.Publish(new Reverse { Value = "World" });
+            mqClient.Publish(new Rot13 { Value = "ServiceStack" });
+
 			5.Times(x => mqClient.Publish(new AlwaysThrows { Value = "#" + x }));
 
-			mqClient.Publish(new Reverse { Value = "Hello" });
-			mqClient.Publish(new Reverse { Value = "World" });
-			mqClient.Publish(new Rot13 { Value = "ServiceStack" });
-
-			Thread.Sleep(5000);
+			Thread.Sleep(10000);
 
 			Debug.WriteLine(mqHost.GetStatsDescription());
 
@@ -256,6 +268,8 @@ namespace ServiceStack.Redis.Tests
 
 			Assert.That(reverseCalled, Is.EqualTo(2 + 2));
 			Assert.That(rot13Called, Is.EqualTo(1 + 1));
+
+            mqHost.Dispose();
 		}
 
 		public class Incr
@@ -266,7 +280,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_receive_and_process_same_reply_responses()
 		{
-			var mqHost = CreateMqHost();
+			mqHost = CreateMqHost();
 			var called = 0;
 
 			mqHost.RegisterHandler<Incr>(m => {
@@ -293,7 +307,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_receive_and_process_standard_request_reply_combo()
 		{
-			var mqHost = CreateMqHost();
+			mqHost = CreateMqHost();
 
 			string messageReceived = null;
 

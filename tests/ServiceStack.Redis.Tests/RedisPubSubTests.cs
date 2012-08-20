@@ -49,6 +49,7 @@ namespace ServiceStack.Redis.Tests
 
 				ThreadPool.QueueUserWorkItem(x =>
 				{
+                    Thread.Sleep(100); // to be sure that we have subscribers
 					using (var redisClient = CreateRedisClient())
 					{
 						Log("Publishing '{0}' to '{1}'", message, channelName);
@@ -102,6 +103,8 @@ namespace ServiceStack.Redis.Tests
 
 				ThreadPool.QueueUserWorkItem(x =>
 				{
+                    Thread.Sleep(100); // to be sure that we have subscribers
+
 					using (var redisClient = CreateRedisClient())
 					{
 						for (var i = 0; i < publishMessageCount; i++)
@@ -164,6 +167,8 @@ namespace ServiceStack.Redis.Tests
 
 				ThreadPool.QueueUserWorkItem(x =>
 				{
+                    Thread.Sleep(100); // to be sure that we have subscribers
+
 					using (var redisClient = CreateRedisClient())
 					{
 						foreach (var channel in channels)
@@ -200,7 +205,8 @@ namespace ServiceStack.Redis.Tests
 
 				ThreadPool.QueueUserWorkItem(x =>
 				{
-					Thread.Sleep(100);
+                    Thread.Sleep(100); // to be sure that we have subscribers
+
 					using (var redisClient = CreateRedisClient())
 					{
 						Log("Publishing msg...");
