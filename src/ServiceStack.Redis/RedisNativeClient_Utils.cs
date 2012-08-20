@@ -204,7 +204,7 @@ namespace ServiceStack.Redis
 			}
 			catch (SocketException ex)
 			{
-				cmdBufferIndex = 0;
+                cmdBuffer.Clear();
 				return HandleSocketException(ex);
 			}
 			return true;
@@ -222,44 +222,26 @@ namespace ServiceStack.Redis
 			}
 		}
 
-		byte[] cmdBuffer = new byte[32 * 1024];
-		int cmdBufferIndex = 0;
+        System.Collections.Generic.IList<ArraySegment<byte>> cmdBuffer = new System.Collections.Generic.List<ArraySegment<byte>>();
 
 		public void WriteToSendBuffer(byte[] cmdBytes)
 		{
-			if ((cmdBufferIndex + cmdBytes.Length) > cmdBuffer.Length)
-			{
-				int requiredLength = cmdBufferIndex + cmdBytes.Length;
-				const int lohThreshold = 85000 - 1;
-				const int breathingSpaceToReduceReallocations = (32 * 1024);
-				int newSize = lohThreshold;
-				if (requiredLength <= lohThreshold) {
-					if (requiredLength + breathingSpaceToReduceReallocations <= lohThreshold) {
-						newSize = requiredLength + breathingSpaceToReduceReallocations;
-					}
-				} else {
-					newSize = requiredLength + breathingSpaceToReduceReallocations;
-				}
-				var newLargerBuffer = new byte[newSize];
-				Buffer.BlockCopy(cmdBuffer, 0, newLargerBuffer, 0, cmdBuffer.Length);
-				cmdBuffer = newLargerBuffer;
-			}
-
-			Buffer.BlockCopy(cmdBytes, 0, cmdBuffer, cmdBufferIndex, cmdBytes.Length);
-			cmdBufferIndex += cmdBytes.Length;
+            var copyOfBytes = new byte[cmdBytes.Length];
+            Buffer.BlockCopy(cmdBytes, 0, copyOfBytes, 0, cmdBytes.Length);
+            cmdBuffer.Add(new ArraySegment<byte>(copyOfBytes));
 		}
 
 		public void FlushSendBuffer()
 		{
-			socket.Send(cmdBuffer, cmdBufferIndex, SocketFlags.None);
-			cmdBufferIndex = 0;
+			socket.Send(cmdBuffer, SocketFlags.None);
+            cmdBuffer.Clear();
 		}
         /// <summary>
         /// reset buffer index in send buffer
         /// </summary>
         public void ResetSendBuffer()
         {
-            cmdBufferIndex = 0;
+            cmdBuffer.Clear();
         }
 
 		private int SafeReadByte()
