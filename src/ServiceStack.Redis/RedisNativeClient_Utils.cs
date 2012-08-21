@@ -233,9 +233,16 @@ namespace ServiceStack.Redis
 
 		public void FlushSendBuffer()
 		{
-			foreach (var buffer in cmdBuffer)
+			if (Env.IsMono)
 			{
-				socket.Send(buffer.Array, buffer.Array.Length, SocketFlags.None);
+				foreach (var buffer in cmdBuffer)
+				{
+					socket.Send(buffer.Array, buffer.Array.Length, SocketFlags.None);
+				}
+			}
+			else
+			{
+				socket.Send(cmdBuffer, SocketFlags.None);
 			}
             cmdBuffer.Clear();
 		}
