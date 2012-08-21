@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRecord xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Results>
+    <UnitTestResult>
+      <TestDate>2012-08-21T14:26:14</TestDate>
+      <Passed>0</Passed>
+      <Errors>0</Errors>
+      <Failures>0</Failures>
+      <Inconclusive>0</Inconclusive>
+      <NotRunnable>0</NotRunnable>
+      <Skipped>0</Skipped>
+      <Ignored>0</Ignored>
+      <Time />
+      <Message>Method not found: 'ServiceStack.Redis.Tests.Benchmarks.RedisMqHostPoolBenchmarks.CreateMqHostPool'.</Message>
+      <StackTrace>  at System.Runtime.Remoting.Proxies.RealProxy.PrivateInvoke (System.Runtime.Remoting.Proxies.RealProxy rp, IMessage msg, System.Exception&amp; exc, System.Object[]&amp; out_args) [0x001f0] in /private/tmp/monobuild/build/BUILD/mono-2.10.9/mcs/class/corlib/System.Runtime.Remoting.Proxies/RealProxy.cs:247 </StackTrace>
+    </UnitTestResult>
+  </Results>
+</TestRecord>
