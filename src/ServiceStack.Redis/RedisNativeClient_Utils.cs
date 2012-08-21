@@ -233,7 +233,10 @@ namespace ServiceStack.Redis
 
 		public void FlushSendBuffer()
 		{
-			socket.Send(cmdBuffer, SocketFlags.None);
+			foreach (var buffer in cmdBuffer)
+			{
+				socket.Send(buffer.Array, buffer.Array.Length, SocketFlags.None);
+			}
             cmdBuffer.Clear();
 		}
         /// <summary>
