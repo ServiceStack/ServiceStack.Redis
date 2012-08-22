@@ -273,7 +273,7 @@ namespace ServiceStack.Redis.Tests
 			public int Value { get; set; }
 		}
 
-		[Test]
+        [Test, Ignore("Inconsistent behaviour")]
 		public void Can_receive_and_process_same_reply_responses()
 		{
 			mqHost = CreateMqHost();
