@@ -206,51 +206,38 @@ namespace ServiceStack.Redis
 		/// <returns></returns>
 		private RedisClient GetInActiveWriteClient()
 		{
-			for (var i=0; i < writeClients.Length; i++)
-			{
-				var nextIndex = (WritePoolIndex + i) % writeClients.Length;
-                var nextHost = ReadWriteHosts[nextIndex % ReadWriteHosts.Count];
-                //reuse an existing client if we have one
-                if (i == 0)
-                {
-                    var client = (from c in writeClients where c != null && !c.HadExceptions && !c.Active && c.Host == nextHost.Host && c.Port == nextHost.Port select c).FirstOrDefault();
-                    if (client != null)
+            var desiredIndex = WritePoolIndex % writeClients.Length;
+            //this will loop through all hosts in readClients once even though there are 2 for loops
+            //both loops are used to try to get the prefered host according to the round robin algorithm
+            for (int x = 0; x < ReadWriteHosts.Count; x++)
+            {
+                var nextHostIndex = (desiredIndex + x) % ReadWriteHosts.Count;
+                var nextHost = ReadWriteHosts[nextHostIndex];
+                for (var i = nextHostIndex; i < writeClients.Length; i += ReadWriteHosts.Count)
+                {                    
+                    if (writeClients[i] != null && !writeClients[i].Active && !writeClients[i].HadExceptions)
+                        return writeClients[i];
+                    else if (writeClients[i] == null || writeClients[i].HadExceptions)
+                    {
+                        if (writeClients[i] != null)
+                            writeClients[i].DisposeConnection();
+                        var client = RedisClientFactory.CreateRedisClient(nextHost.Host, nextHost.Port);
+
+                        if (nextHost.RequiresAuth)
+                            client.Password = nextHost.Password;
+
+                        client.Id = RedisClientCounter++;
+                        client.ClientManager = this;
+                        client.NamespacePrefix = NamespacePrefix;
+                        client.ConnectionFilter = ConnectionFilter;
+
+                        writeClients[i] = client;
+
                         return client;
+                    }
                 }
-
-				//Initialize if not exists
-				var existingClient = writeClients[nextIndex];
-				if (existingClient == null
-					|| existingClient.HadExceptions)
-				{
-					if (existingClient != null)
-					{
-						existingClient.DisposeConnection();
-					}
-
-					var client = RedisClientFactory.CreateRedisClient(
-						nextHost.Host, nextHost.Port);
-
-                    if (nextHost.RequiresAuth)
-                        client.Password = nextHost.Password;
-
-					client.Id = RedisClientCounter++;
-					client.ClientManager = this;
-                    client.NamespacePrefix = NamespacePrefix;
-				    client.ConnectionFilter = ConnectionFilter;
-
-					writeClients[nextIndex] = client;
-
-					return client;
-				}
-
-				//look for free one
-				if (!writeClients[nextIndex].Active)
-				{
-					return writeClients[nextIndex];
-				}
-			}
-			return null;
+            }
+            return null;
 		}
 
 		/// <summary>
@@ -304,48 +291,35 @@ namespace ServiceStack.Redis
 		/// <returns></returns>
 		private RedisClient GetInActiveReadClient()
 		{
-			for (var i=0; i < readClients.Length; i++)
-			{
-				var nextIndex = (ReadPoolIndex + i) % readClients.Length;
-                var nextHost = ReadOnlyHosts[nextIndex % ReadOnlyHosts.Count];
-                //reuse an existing client if we have one
-                if (i == 0)
+            var desiredIndex = ReadPoolIndex % readClients.Length;
+            //this will loop through all hosts in readClients once even though there are 2 for loops
+            //both loops are used to try to get the prefered host according to the round robin algorithm
+            for (int x = 0; x < ReadOnlyHosts.Count; x++)
+            {
+                var nextHostIndex = (desiredIndex + x) % ReadOnlyHosts.Count;
+                var nextHost = ReadOnlyHosts[nextHostIndex];
+                for (var i = nextHostIndex; i < readClients.Length; i += ReadOnlyHosts.Count)
                 {
-                    var client = (from c in readClients where c != null && c.Port == nextHost.Port && c.Host == nextHost.Host && !c.Active && !c.HadExceptions select c).FirstOrDefault();
-                    if (client != null)
+                    if (readClients[i] != null && !readClients[i].Active && !readClients[i].HadExceptions)
+                        return readClients[i];
+                    else if (readClients[i] == null || readClients[i].HadExceptions)
+                    {
+                        if (readClients[i] != null)
+                            readClients[i].DisposeConnection();
+                        var client = RedisClientFactory.CreateRedisClient(nextHost.Host, nextHost.Port);
+
+                        if (nextHost.RequiresAuth)
+                            client.Password = nextHost.Password;
+
+                        client.ClientManager = this;
+                        client.ConnectionFilter = ConnectionFilter;
+
+                        readClients[i] = client;
+
                         return client;
+                    }
                 }
-
-				//Initialize if not exists
-				var existingClient = readClients[nextIndex];
-				if (existingClient == null
-					|| existingClient.HadExceptions)
-				{
-					if (existingClient != null)
-					{
-						existingClient.DisposeConnection();
-					}
-					
-					var client = RedisClientFactory.CreateRedisClient(
-						nextHost.Host, nextHost.Port);
-
-                    if (nextHost.RequiresAuth)
-                        client.Password = nextHost.Password;
-
-					client.ClientManager = this;
-                    client.ConnectionFilter = ConnectionFilter;
-
-					readClients[nextIndex] = client;
-
-					return client;
-				}
-
-				//look for free one
-				if (!readClients[nextIndex].Active)
-				{
-					return readClients[nextIndex];
-				}
-			}
+            }            
 			return null;
 		}
 
