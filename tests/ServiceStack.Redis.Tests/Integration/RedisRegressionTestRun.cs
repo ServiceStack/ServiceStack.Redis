@@ -10,8 +10,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Integration
 {
-    [Ignore("Hanging")]
-	[TestFixture, Category("Integration")]
+ 	[TestFixture, Category("Integration")]
 	public class RedisRegressionTestRun
 	{
 		private static string testData;
@@ -113,11 +112,13 @@ namespace ServiceStack.Redis.Tests.Integration
 			catch (NullReferenceException ex)
 			{
 				Debug.WriteLine("NullReferenceException StackTrace: \n" + ex.StackTrace);
-			}
+                Assert.Fail("NullReferenceException");
+            }
 			catch (Exception ex)
 			{
 				Debug.WriteLine(String.Format("\t[ERROR@{0}]: {1} => {2}",
-					host, ex.GetType().Name, ex.Message));
+					host, ex.GetType().Name, ex));
+                Assert.Fail("Exception");
 			}
 		}
 
