@@ -10,6 +10,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Integration
 {
+    [Ignore("Hanging")]
 	[TestFixture, Category("Integration")]
 	public class RedisRegressionTestRun
 	{

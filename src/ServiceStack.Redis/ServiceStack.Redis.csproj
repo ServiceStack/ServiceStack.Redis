@@ -149,6 +149,7 @@
     <Compile Include="Alchemy\IAlchemyNativeClient.cs" />
     <Compile Include="BasicRedisClientManager.cs" />
     <Compile Include="BasicRedisClientManager.ICacheClient.cs" />
+    <Compile Include="BufferPool.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="ConnectionUtils.cs" />
     <Compile Include="Generic\QueuedRedisTypedCommand.cs" />

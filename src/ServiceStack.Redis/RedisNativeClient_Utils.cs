@@ -222,36 +222,89 @@ namespace ServiceStack.Redis
 			}
 		}
 
-        System.Collections.Generic.IList<ArraySegment<byte>> cmdBuffer = new System.Collections.Generic.List<ArraySegment<byte>>();
+        //System.Collections.Generic.IList<ArraySegment<byte>> cmdBuffer = new System.Collections.Generic.List<ArraySegment<byte>>();
 
-		public void WriteToSendBuffer(byte[] cmdBytes)
-		{
-            var copyOfBytes = new byte[cmdBytes.Length];
-            Buffer.BlockCopy(cmdBytes, 0, copyOfBytes, 0, cmdBytes.Length);
-            cmdBuffer.Add(new ArraySegment<byte>(copyOfBytes));
+        //public void WriteToSendBuffer(byte[] cmdBytes)
+        //{
+        //    var copyOfBytes = new byte[cmdBytes.Length];
+        //    Buffer.BlockCopy(cmdBytes, 0, copyOfBytes, 0, cmdBytes.Length);
+        //    cmdBuffer.Add(new ArraySegment<byte>(copyOfBytes));
+        //}
+
+	    readonly System.Collections.Generic.IList<ArraySegment<byte>> cmdBuffer = new System.Collections.Generic.List<ArraySegment<byte>>();
+        byte[] currentBuffer = BufferPool.GetBuffer();
+	    int currentBufferIndex;
+
+        public void WriteToSendBuffer(byte[] cmdBytes)
+        {
+            if (CouldAddToCurrentBuffer(cmdBytes)) return;
+
+            PushCurrentBuffer();
+
+            if (CouldAddToCurrentBuffer(cmdBytes)) return;
+
+            var bytesCopied = 0;
+            while (bytesCopied < cmdBytes.Length)
+            {
+                var copyOfBytes = BufferPool.GetBuffer();
+                var bytesToCopy = cmdBytes.Length > copyOfBytes.Length ? copyOfBytes.Length : cmdBytes.Length;
+                Buffer.BlockCopy(cmdBytes, bytesCopied, copyOfBytes, 0, bytesToCopy);
+                cmdBuffer.Add(new ArraySegment<byte>(copyOfBytes, 0, bytesToCopy));
+                bytesCopied += bytesToCopy;
+            }
         }
 
-		public void FlushSendBuffer()
+	    private bool CouldAddToCurrentBuffer(byte[] cmdBytes)
+	    {
+	        if (cmdBytes.Length + currentBufferIndex < BufferPool.BufferLength)
+	        {
+                Buffer.BlockCopy(cmdBytes, 0, currentBuffer, currentBufferIndex, cmdBytes.Length);
+	            currentBufferIndex += cmdBytes.Length;
+	            return true;
+	        }
+	        return false;
+	    }
+
+	    private void PushCurrentBuffer()
+	    {
+	        cmdBuffer.Add(new ArraySegment<byte>(currentBuffer, 0, currentBufferIndex));
+	        currentBuffer = BufferPool.GetBuffer();
+	        currentBufferIndex = 0;
+	    }
+
+	    public void FlushSendBuffer()
 		{
-			if (Env.IsMono)
-			{
-				foreach (var buffer in cmdBuffer)
-				{
-					socket.Send(buffer.Array, buffer.Array.Length, SocketFlags.None);
-				}
-			}
-			else
-			{
-				socket.Send(cmdBuffer, SocketFlags.None);
-			}
-            cmdBuffer.Clear();
+            if (currentBufferIndex > 0) 
+                PushCurrentBuffer();
+
+            if (!Env.IsMono)
+            {
+                socket.Send(cmdBuffer); //Optimized for Windows
+            }
+            else
+            {
+                //Throws 'Message to Large' SocketException
+                foreach (var segment in cmdBuffer)
+                {
+                    var buffer = segment.Array;
+                    socket.Send(buffer, segment.Offset, segment.Count, SocketFlags.None);
+                }
+            }
+	        ResetSendBuffer();
 		}
+
         /// <summary>
         /// reset buffer index in send buffer
         /// </summary>
         public void ResetSendBuffer()
         {
-            cmdBuffer.Clear();
+            currentBufferIndex = 0;
+            for (int i = cmdBuffer.Count - 1; i >= 0; i--)
+            {
+                var buffer = cmdBuffer[i].Array;
+                BufferPool.ReleaseBufferToPool(ref buffer);
+                cmdBuffer.RemoveAt(i);
+            }
         }
 
 		private int SafeReadByte()
