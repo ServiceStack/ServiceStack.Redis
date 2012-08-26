@@ -315,7 +315,7 @@ namespace ServiceStack.Redis
 				if (resultBytes == null) continue;
 
 				var resultString = resultBytes.FromUtf8Bytes();
-				results.Add(resultString.FromJson<string>());
+				results.Add(resultString);
 			}
 
 			return results;
