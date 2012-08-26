@@ -247,7 +247,7 @@ namespace ServiceStack.Redis
             while (bytesCopied < cmdBytes.Length)
             {
                 var copyOfBytes = BufferPool.GetBuffer();
-                var bytesToCopy = cmdBytes.Length > copyOfBytes.Length ? copyOfBytes.Length : cmdBytes.Length;
+                var bytesToCopy = Math.Min(cmdBytes.Length - bytesCopied, copyOfBytes.Length);
                 Buffer.BlockCopy(cmdBytes, bytesCopied, copyOfBytes, 0, bytesToCopy);
                 cmdBuffer.Add(new ArraySegment<byte>(copyOfBytes, 0, bytesToCopy));
                 bytesCopied += bytesToCopy;
