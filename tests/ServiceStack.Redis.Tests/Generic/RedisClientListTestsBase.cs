@@ -99,15 +99,33 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 
 		[Test]
-		public void Can_DequeueFromList()
+        public void Can_BlockingDequeueItemFromList()
 		{
 			var storeMembers = Factory.CreateList();
 			storeMembers.ForEach(x => redis.AddItemToList(List, x));
 
-			var item1 = redis.DequeueItemFromList(List);
+            var item1 = redis.BlockingDequeueItemFromList(List, new TimeSpan(0, 0, 1));
 
 			Factory.AssertIsEqual(item1, (T)storeMembers.First());
 		}
+
+        [Test]
+        public void Can_BlockingDequeueItemFromList_Timeout()
+        {
+            var item1 = redis.BlockingDequeueItemFromList(List, new TimeSpan(0, 0, 1));
+            Assert.AreEqual(item1, default(T));
+        }
+
+        [Test]
+        public void Can_DequeueFromList()
+        {
+            var storeMembers = Factory.CreateList();
+            storeMembers.ForEach(x => redis.AddItemToList(List, x));
+
+            var item1 = redis.DequeueItemFromList(List);
+
+            Factory.AssertIsEqual(item1, (T)storeMembers.First());
+        }
 
 		[Test]
 		public void Can_MoveBetweenLists()
