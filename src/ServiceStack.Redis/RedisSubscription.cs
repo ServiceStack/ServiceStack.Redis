@@ -13,6 +13,7 @@ namespace ServiceStack.Redis
 		public int SubscriptionCount { get; private set; }
 		public bool IsPSubscription { get; private set; }
 
+        private const int MsgIndex = 2;
 		private static readonly byte[] SubscribeWord = "subscribe".ToUtf8Bytes();
 		private static readonly byte[] PSubscribeWord = "psubscribe".ToUtf8Bytes();
 		private static readonly byte[] UnSubscribeWord = "unsubscribe".ToUtf8Bytes();
@@ -47,7 +48,7 @@ namespace ServiceStack.Redis
 		public void SubscribeToChannelsMatching(params string[] patterns)
 		{
 			var multiBytes = redisClient.PSubscribe(patterns);
-			ParseSubscriptionResults(multiBytes);
+            ParseSubscriptionResults(multiBytes);
 
 			while (this.SubscriptionCount > 0)
 			{
@@ -58,8 +59,7 @@ namespace ServiceStack.Redis
 
 		private void ParseSubscriptionResults(byte[][] multiBytes)
 		{
-			int componentsPerMsg = IsPSubscription ? 4 : 3;
-			int msgIndex = IsPSubscription ? 3 : 2;
+            int componentsPerMsg = IsPSubscription ? 4 : 3;
 			for (var i = 0; i < multiBytes.Length; i += componentsPerMsg)
 			{
 				var messageType = multiBytes[i];
@@ -69,7 +69,7 @@ namespace ServiceStack.Redis
 				{
 					IsPSubscription = PSubscribeWord.AreEqual(messageType);
 
-					this.SubscriptionCount = int.Parse(multiBytes[i + msgIndex].FromUtf8Bytes());
+                    this.SubscriptionCount = int.Parse(multiBytes[i + MsgIndex].FromUtf8Bytes());
 
 					activeChannels.Add(channel);
 
@@ -93,7 +93,7 @@ namespace ServiceStack.Redis
 				else if (MessageWord.AreEqual(messageType)
 					|| PMessageWord.AreEqual(messageType))
 				{
-					var message = multiBytes[i + msgIndex].FromUtf8Bytes();
+                    var message = multiBytes[i + MsgIndex].FromUtf8Bytes();
 					
 					if (this.OnMessage != null)
 					{

@@ -219,5 +219,34 @@ namespace ServiceStack.Redis.Tests
 			}
 		}
 
+        [Test]
+        public void Can_Subscribe_to_multiplechannel_pattern()
+        {
+            var channels = new[] {PrefixedKey("CHANNEL5:TITLE*"), PrefixedKey("CHANNEL5:BODY*")};
+            int msgs = 0;
+            using (var subscription = Redis.CreateSubscription())
+            {
+                subscription.OnMessage = (channel, msg) =>
+                {
+                    Debug.WriteLine(String.Format("{0}: {1}", channel, msg + msgs++));
+                    subscription.UnSubscribeFromChannelsMatching(channels);
+                };
+
+                ThreadPool.QueueUserWorkItem(x =>
+                {
+                    Thread.Sleep(100); // to be sure that we have subscribers
+
+                    using (var redisClient = CreateRedisClient())
+                    {
+                        Log("Publishing msg...");
+                        redisClient.Publish(PrefixedKey("CHANNEL5:BODY"), "hello".ToUtf8Bytes());
+                    }
+                });
+
+                Log("Start Listening On");
+                subscription.SubscribeToChannelsMatching(channels);
+            }
+        }
+
 	}
 }
