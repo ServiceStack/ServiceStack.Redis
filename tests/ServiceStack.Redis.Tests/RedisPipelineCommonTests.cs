@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using NUnit.Framework;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -28,6 +31,19 @@ namespace ServiceStack.Redis.Tests
 			Thread.Sleep(TimeSpan.FromSeconds(2));
 			Assert.That(Redis.GetValue("key"), Is.Null);
 		}
+
+        [Test, ExpectedException(typeof(InvalidOperationException))]
+        public void Can_SetAll_and_Publish_in_atomic_transaction()
+        {
+            var messages = new Dictionary<string, string> { { "a", "a" }, { "b", "b" } };
+            using (var pipeline = Redis.CreatePipeline())
+            {
+                pipeline.QueueCommand(c => c.SetAll(messages.ToDictionary(t => t.Key, t => Encoding.UTF8.GetBytes(t.Value))));
+                pipeline.QueueCommand(c => c.PublishMessage("uc", "b"));
+
+                pipeline.Flush();
+            }
+        }
 
 		[Test]
 		public void Can_Pop_priority_message_from_SortedSet_and_Add_to_workq_in_atomic_transaction()

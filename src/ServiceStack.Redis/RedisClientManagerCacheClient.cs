@@ -162,9 +162,9 @@ namespace ServiceStack.Redis
 
         public void SetAll<T>(IDictionary<string, T> values)
         {
-            foreach (var entry in values)
+            using (var client = GetClient())
             {
-                Set(entry.Key, entry.Value);
+                client.SetAll(values);
             }
         }
     }

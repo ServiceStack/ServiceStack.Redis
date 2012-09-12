@@ -180,7 +180,8 @@ namespace ServiceStack.Redis
 
 		public void SetAll<T>(IDictionary<string, T> values)
 		{
-			foreach (var entry in values)
+            if (Pipeline != null) throw new InvalidOperationException("SetAll can't be used in Pipeline mode. Queue Set method for each key.");
+            foreach (var entry in values)
 			{
 				Set(entry.Key, entry.Value);
 			}
