@@ -32,13 +32,13 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(Redis.GetValue("key"), Is.Null);
 		}
 
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [Test]
         public void Can_SetAll_and_Publish_in_atomic_transaction()
         {
             var messages = new Dictionary<string, string> { { "a", "a" }, { "b", "b" } };
             using (var pipeline = Redis.CreatePipeline())
             {
-                pipeline.QueueCommand(c => c.SetAll(messages.ToDictionary(t => t.Key, t => Encoding.UTF8.GetBytes(t.Value))));
+                pipeline.QueueCommand(c => c.SetAll(messages.ToDictionary(t => t.Key, t => t.Value)));
                 pipeline.QueueCommand(c => c.PublishMessage("uc", "b"));
 
                 pipeline.Flush();

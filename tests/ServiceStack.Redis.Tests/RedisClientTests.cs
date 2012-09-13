@@ -471,6 +471,36 @@ namespace ServiceStack.Redis.Tests
             Assert.AreEqual(map, all);
         }
 
+        [Test]
+        public void Can_store_Dictionary_as_objects()
+        {
+            var map = new Dictionary<string, object>();
+            map["key_a"] = "123";
+            map["key_b"] = null;
+
+            var redis = RedisClient.New();
+            redis.SetAll(map);
+
+            Assert.That(redis.Get<string>("key_a"), Is.EqualTo("123"));
+            Assert.That(redis.Get("key_b"), Is.EqualTo(""));
+        }
+
+
+        [Test]
+        public void Can_store_Dictionary_as_bytes()
+        {
+            var map = new Dictionary<string, byte[]>();
+            map["key_a"] = "123".ToUtf8Bytes();
+            map["key_b"] = null;
+
+            var redis = RedisClient.New();
+            redis.SetAll(map);
+
+            Assert.That(redis.Get<string>("key_a"), Is.EqualTo("123"));
+            Assert.That(redis.Get("key_b"), Is.EqualTo(""));
+        }
+
+
 	}
 
 }

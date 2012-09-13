@@ -180,12 +180,28 @@ namespace ServiceStack.Redis
 
 		public void SetAll<T>(IDictionary<string, T> values)
 		{
-            if (Pipeline != null) throw new InvalidOperationException("SetAll can't be used in Pipeline mode. Queue Set method for each key.");
-            foreach (var entry in values)
+            var keys = values.Keys.ToArray();
+            var valBytes = new byte[values.Count][];
+            var isBytes = typeof(T) == typeof(byte[]);
+
+		    var i = 0;
+            foreach (var value in values.Values)
 			{
-				Set(entry.Key, entry.Value);
+                if (!isBytes)
+                {
+                    var t = JsonSerializer.SerializeToString(value);
+                    if (t != null)
+                        valBytes[i] = t.ToUtf8Bytes();
+                    else
+                        valBytes[i] = new byte[]{};
+                }
+                else
+			        valBytes[i] = (byte[])(object)value ?? new byte[]{};
+			    i++;
 			}
-		}
+       
+            MSet(keys, valBytes);
+        }
 
 	}
 
