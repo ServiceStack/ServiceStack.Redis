@@ -222,15 +222,6 @@ namespace ServiceStack.Redis
 			}
 		}
 
-        //System.Collections.Generic.IList<ArraySegment<byte>> cmdBuffer = new System.Collections.Generic.List<ArraySegment<byte>>();
-
-        //public void WriteToSendBuffer(byte[] cmdBytes)
-        //{
-        //    var copyOfBytes = new byte[cmdBytes.Length];
-        //    Buffer.BlockCopy(cmdBytes, 0, copyOfBytes, 0, cmdBytes.Length);
-        //    cmdBuffer.Add(new ArraySegment<byte>(copyOfBytes));
-        //}
-
 	    readonly System.Collections.Generic.IList<ArraySegment<byte>> cmdBuffer = new System.Collections.Generic.List<ArraySegment<byte>>();
         byte[] currentBuffer = BufferPool.GetBuffer();
 	    int currentBufferIndex;
@@ -283,7 +274,7 @@ namespace ServiceStack.Redis
             }
             else
             {
-                //Throws 'Message to Large' SocketException
+                //Sendling IList<ArraySegment> Throws 'Message to Large' SocketException in Mono
                 foreach (var segment in cmdBuffer)
                 {
                     var buffer = segment.Array;
