@@ -10,5 +10,23 @@ namespace ServiceStack.Redis.Messaging
 
         //Control Commands
         public const string StopCommand = "STOP";
+
+        public static string ToString(int workerStatus)
+        {
+            switch (workerStatus)
+            {
+                case Disposed:
+                    return "Disposed";
+                case Stopped:
+                    return "Stopped";
+                case Stopping:
+                    return "Stopping";
+                case Starting:
+                    return "Starting";
+                case Started:
+                    return "Started";
+            }
+            return "Unknown";
+        }
     }
 }

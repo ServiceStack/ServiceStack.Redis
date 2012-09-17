@@ -454,5 +454,10 @@ namespace ServiceStack.Redis.Messaging
                 return sb.ToString();
             }
         }
+
+        public List<string> WorkerThreadsStatus()
+        {
+            return workers.ToList().ConvertAll(x => x.GetStatus());
+        }
     }
 }

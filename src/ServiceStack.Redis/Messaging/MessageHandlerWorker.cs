@@ -76,7 +76,8 @@ namespace ServiceStack.Redis.Messaging
 
         public void Start()
         {
-            if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Started) return;
+            if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Started)
+                return;
             if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Disposed)
                 throw new ObjectDisposedException("MQ Host has been disposed");
 
@@ -197,6 +198,12 @@ namespace ServiceStack.Redis.Messaging
         public IMessageHandlerStats GetStats()
         {
             return messageHandler.GetStats();
+        }
+
+        public string GetStatus()
+        {
+            return "[Worker: {0}, Status: {1}, ThreadStatus: {2}]"
+                .Fmt(QueueName, WorkerStatus.ToString(status), bgThread.ThreadState);
         }
     }
 }
