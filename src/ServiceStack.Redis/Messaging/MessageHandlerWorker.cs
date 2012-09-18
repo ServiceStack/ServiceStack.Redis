@@ -25,7 +25,14 @@ namespace ServiceStack.Redis.Messaging
 
         private Thread bgThread;
         private int timesStarted = 0;
+        private bool receivedNewMsgs = false;
         public Action<MessageHandlerWorker, Exception> errorHandler { get; set; }
+
+        private DateTime lastMsgProcessed;
+        public DateTime LastMsgProcessed
+        {
+            get { return lastMsgProcessed; }
+        }
 
         private int totalMessagesProcessed;
         public int TotalMessagesProcessed
@@ -60,10 +67,21 @@ namespace ServiceStack.Redis.Messaging
             
             if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Started)
             {
-                lock (msgLock)
+                if (Monitor.TryEnter(msgLock))
                 {
                     Monitor.Pulse(msgLock);
+                    Monitor.Exit(msgLock);
                 }
+                else
+                {
+                    receivedNewMsgs = true;
+                }
+
+                //Original
+                //lock (msgLock)
+                //{
+                //    Monitor.Pulse(msgLock);
+                //}
 
                 // Surprisingly this is marginally slower in Sleep/Wait benchmarks than just using the lock above?
                 //if (Monitor.TryEnter(msgLock)) //Don't block Master notifier thread, if worker is running.
@@ -94,6 +112,12 @@ namespace ServiceStack.Redis.Messaging
             }
         }
 
+        public void ForceRestart()
+        {
+            KillBgThreadIfExists();
+            Start();
+        }
+
         private void Run()
         {
             if (Interlocked.CompareExchange(ref status, WorkerStatus.Started, WorkerStatus.Starting) != WorkerStatus.Starting) return;
@@ -105,15 +129,21 @@ namespace ServiceStack.Redis.Messaging
                 {
                     while (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Started)
                     {
+                        receivedNewMsgs = false;
+
                         using (var mqClient = new RedisMessageQueueClient(clientsManager))
                         {
                             var msgsProcessedThisTime = messageHandler.ProcessQueue(mqClient, QueueName,
                                 () => Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Started);
                             
                             totalMessagesProcessed += msgsProcessedThisTime;
+
+                            if (msgsProcessedThisTime > 0)
+                                lastMsgProcessed = DateTime.UtcNow;
                         }
 
-                        Monitor.Wait(msgLock);
+                        if (!receivedNewMsgs) 
+                            Monitor.Wait(msgLock);
                     }
                 }
             }
@@ -172,6 +202,7 @@ namespace ServiceStack.Redis.Messaging
                     }
                 }
                 bgThread = null;
+                status = WorkerStatus.Stopped;
             }
         }
 
@@ -202,8 +233,8 @@ namespace ServiceStack.Redis.Messaging
 
         public string GetStatus()
         {
-            return "[Worker: {0}, Status: {1}, ThreadStatus: {2}]"
-                .Fmt(QueueName, WorkerStatus.ToString(status), bgThread.ThreadState);
+            return "[Worker: {0}, Status: {1}, ThreadStatus: {2}, LastMsgAt: {3}]"
+                .Fmt(QueueName, WorkerStatus.ToString(status), bgThread.ThreadState, LastMsgProcessed);
         }
     }
 }
