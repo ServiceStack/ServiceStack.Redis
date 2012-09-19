@@ -1,10 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Default"
     xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="4.0">
+  <Import Project="$(MSBuildProjectDirectory)/Build.tasks" />
+
+    <PropertyGroup>
+        <MajorVersion>3</MajorVersion>
+        <MinorVersion>9</MinorVersion>
+        <PatchVersion>$(BUILD_NUMBER)</PatchVersion>
+    </PropertyGroup>
 
   <PropertyGroup>
     <BuildSolutionDir>$(MSBuildProjectDirectory)/..</BuildSolutionDir>
+    <SourcesDir>$(BuildSolutionDir)/src</SourcesDir>
     <Configuration Condition="$(Configuration) == ''">Release</Configuration>
+    <NuGetPath>$(BuildSolutionDir)/src/.nuget/nuget.exe</NuGetPath>
+    <NuGetPackageDir>$(BuildSolutionDir)/NuGet/</NuGetPackageDir>
+    <NuGetBasePath>$(MSBuildProjectDirectory)</NuGetBasePath>
+    <NuGetPackageLibDir>$(BuildSolutionDir)/NuGet/lib</NuGetPackageLibDir>
+    <NuGetPackageDescription>$(BuildSolutionDir)/NuGet/stackexpress.redis.nuspec</NuGetPackageDescription>
+    <Version>$(MajorVersion).$(MinorVersion).$(PatchVersion).0</Version>
+    <UnstableTag Condition="$(RELEASE) == ''">-unstable</UnstableTag>
+    <PackageVersion>$(MajorVersion).$(MinorVersion).$(PatchVersion)$(UnstableTag)</PackageVersion>
   </PropertyGroup>
+
+
+  <ItemGroup>
+      <NugetPackageFilesToDelete Include="$(NuGetPackageDir)/*.nupkg"/>
+  </ItemGroup>
+
 
   <PropertyGroup>
     <DoBuildSolutionsDependsOn>
@@ -33,4 +56,26 @@
    Properties="Configuration=$(Configuration)" />
   </Target>
 
+  <Target Name="NuGetPack">
+
+    <!-- Update Versino -->
+    <ItemGroup>
+        <RegexTransform Include="$(SourcesDir)/**/AssemblyInfo.cs">
+            <Find>\d+\.\d+\.\d+\.\d+</Find>
+            <ReplaceWith>$(Version)</ReplaceWith>
+        </RegexTransform>
+    </ItemGroup>
+
+    <RegexTransform Items="@(RegexTransform)" />
+
+    <Delete Files="@(NugetPackageFilesToDelete)" />
+
+    <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis/ServiceStack.Redis.csproj"
+             Targets="Build"
+             Properties="BuildPackage=true;Version=$(PackageVersion);OutputPath=$(NuGetPackageDir)/lib/net35;Configuration=$(Configuration)" />
+ 
+    <Exec Command="&quot;$(NuGetPath)&quot; pack &quot;$(NuGetPackageDescription)&quot; -OutputDirectory &quot;$(NuGetPackageDir)&quot; -Version $(PackageVersion)"
+            LogStandardErrorAsError="true" />
+
+  </Target>
 </Project>
