@@ -304,13 +304,26 @@ namespace ServiceStack.Redis.Messaging
             }
         }
 
-        void StartWorkerThreads()
+        public void StartAll()
+        {
+            Log.Debug("Starting Redis MQ Server Master RunLoop and all worker threads...");
+            Start();
+            Array.ForEach(workers, x => x.Start());
+        }
+
+        public void StartWorkerThreads()
         {
             Log.Debug("Starting all Redis MQ Server worker threads...");
             Array.ForEach(workers, x => x.Start());
         }
 
-        void StopWorkerThreads()
+        public void ForceRestartWorkerThreads()
+        {
+            Log.Debug("ForceRestart all Redis MQ Server worker threads...");
+            Array.ForEach(workers, x => x.ForceRestart());
+        }
+
+        public void StopWorkerThreads()
         {
             Log.Debug("Stopping all Redis MQ Server worker threads...");
             Array.ForEach(workers, x => x.Stop());
@@ -453,6 +466,11 @@ namespace ServiceStack.Redis.Messaging
                 }
                 return sb.ToString();
             }
+        }
+
+        public List<string> WorkerThreadsStatus()
+        {
+            return workers.ToList().ConvertAll(x => x.GetStatus());
         }
     }
 }
