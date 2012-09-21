@@ -441,15 +441,21 @@ namespace ServiceStack.Redis.Generic
 			if (ids == null) return;
 
 			var urnKeys = ids.ConvertAll(t => client.UrnKey<T>(t));
-			this.RemoveEntry(urnKeys.ToArray());
-			client.RemoveTypeIds<T>(ids.ConvertAll(x => x.ToString()).ToArray());
+            if (urnKeys.Count > 0)
+            {
+                this.RemoveEntry(urnKeys.ToArray());
+                client.RemoveTypeIds<T>(ids.ConvertAll(x => x.ToString()).ToArray());
+            }
 		}
 
 		public void DeleteAll()
 		{
 			var urnKeys = client.GetAllItemsFromSet(this.TypeIdsSetKey);
-			this.RemoveEntry(urnKeys.ToArray());
-			this.RemoveEntry(this.TypeIdsSetKey);
+            if (urnKeys.Count > 0)
+            {
+                this.RemoveEntry(urnKeys.ToArray());
+                this.RemoveEntry(this.TypeIdsSetKey);
+            }
 		}
 
 		#endregion

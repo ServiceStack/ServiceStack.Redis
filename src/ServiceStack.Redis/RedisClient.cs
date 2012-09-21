@@ -647,7 +647,7 @@ namespace ServiceStack.Redis
 
 		public void DeleteByIds<T>(ICollection ids) where T : class, new()
 		{
-			if (ids == null) return;
+			if (ids == null || ids.Count == 0) return;
 
 			var urnKeys = ids.ConvertAll(UrnKey<T>);
 			this.RemoveEntry(urnKeys.ToArray());
@@ -658,9 +658,12 @@ namespace ServiceStack.Redis
 		{
 			var typeIdsSetKey = this.GetTypeIdsSetKey<T>();
 			var ids = this.GetAllItemsFromSet(typeIdsSetKey);
-            var urnKeys = ids.ConvertAll(UrnKey<T>);
-			this.RemoveEntry(urnKeys.ToArray());
-			this.Remove(typeIdsSetKey);
+            if (ids.Count > 0)
+            {
+                var urnKeys = ids.ConvertAll(UrnKey<T>);
+                this.RemoveEntry(urnKeys.ToArray());
+                this.Remove(typeIdsSetKey);
+            }
 		}
         
         /// <summary>
