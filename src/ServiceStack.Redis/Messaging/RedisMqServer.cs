@@ -174,7 +174,12 @@ namespace ServiceStack.Redis.Messaging
 
         public void Start()
         {
-            if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Started) return;
+            if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Started)
+            {
+                //Start any stopped worker threads
+                StartWorkerThreads();
+                return;
+            }
             if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Disposed)
                 throw new ObjectDisposedException("MQ Host has been disposed");
 
@@ -302,13 +307,6 @@ namespace ServiceStack.Redis.Messaging
                     Log.Warn("Could not send STOP message to bg thread: " + ex.Message);
                 }
             }
-        }
-
-        public void StartAll()
-        {
-            Log.Debug("Starting Redis MQ Server Master RunLoop and all worker threads...");
-            Start();
-            Array.ForEach(workers, x => x.Start());
         }
 
         public void StartWorkerThreads()

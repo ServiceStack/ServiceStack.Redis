@@ -66,7 +66,56 @@ namespace ServiceStack.Redis.Tests
             Assert.That(Redis.Get<int>(key), Is.EqualTo(2));
 		}
 
-		[Test]
+        [Test]
+        public void Can_Subscribe_and_Publish_single_message_using_wildcard()
+        {
+            var channelWildcard = PrefixedKey("CHANNEL.*");
+            var channelName = PrefixedKey("CHANNEL.1");
+            const string message = "Hello, World!";
+            var key = PrefixedKey("Can_Subscribe_and_Publish_single_message");
+
+            Redis.IncrementValue(key);
+
+            using (var subscription = Redis.CreateSubscription())
+            {
+                subscription.OnSubscribe = channel =>
+                {
+                    Log("Subscribed to '{0}'", channelWildcard);
+                    Assert.That(channel, Is.EqualTo(channelWildcard));
+                };
+                subscription.OnUnSubscribe = channel =>
+                {
+                    Log("UnSubscribed from '{0}'", channelWildcard);
+                    Assert.That(channel, Is.EqualTo(channelWildcard));
+                };
+                subscription.OnMessage = (channel, msg) =>
+                {
+                    Log("Received '{0}' from channel '{1}'", msg, channel);
+                    Assert.That(channel, Is.EqualTo(channelWildcard));
+                    Assert.That(msg, Is.EqualTo(message), "we should get the message, not the channel");
+                    subscription.UnSubscribeFromAllChannels();
+                };
+
+                ThreadPool.QueueUserWorkItem(x =>
+                {
+                    Thread.Sleep(100); // to be sure that we have subscribers
+                    using (var redisClient = CreateRedisClient())
+                    {
+                        Log("Publishing '{0}' to '{1}'", message, channelName);
+                        redisClient.PublishMessage(channelName, message);
+                    }
+                });
+
+                Log("Start Listening On " + channelName);
+                subscription.SubscribeToChannelsMatching(channelWildcard); //blocking
+            }
+
+            Log("Using as normal client again...");
+            Redis.IncrementValue(key);
+            Assert.That(Redis.Get<int>(key), Is.EqualTo(2));
+        }
+
+        [Test]
 		public void Can_Subscribe_and_Publish_multiple_message()
 		{
 			var channelName = PrefixedKey("CHANNEL2");
