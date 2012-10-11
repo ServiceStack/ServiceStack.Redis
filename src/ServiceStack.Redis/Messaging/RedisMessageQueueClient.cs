@@ -72,7 +72,7 @@ namespace ServiceStack.Redis.Messaging
         public void Publish(IMessage message)
         {
             var messageBytes = message.ToBytes();
-            Publish(new QueueNames(message.Body.GetType()).In, messageBytes);
+            Publish(message.ToInQueueName(), messageBytes);
         }
 
         public void Publish<T>(IMessage<T> message)
