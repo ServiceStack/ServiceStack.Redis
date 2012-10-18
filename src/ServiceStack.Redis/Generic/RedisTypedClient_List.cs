@@ -155,17 +155,17 @@ namespace ServiceStack.Redis.Generic
 
 		public void EnqueueItemOnList(IRedisList<T> fromList, T item)
 		{
-			client.RPush(fromList.Id, SerializeValue(item));
+			client.LPush(fromList.Id, SerializeValue(item));
 		}
 
 		public T DequeueItemFromList(IRedisList<T> fromList)
 		{
-			return DeserializeValue(client.LPop(fromList.Id));
+			return DeserializeValue(client.RPop(fromList.Id));
 		}
 
 		public T BlockingDequeueItemFromList(IRedisList<T> fromList, TimeSpan? timeOut)
 		{
-			var unblockingKeyAndValue = client.BLPop(fromList.Id, (int)timeOut.GetValueOrDefault().TotalSeconds);
+			var unblockingKeyAndValue = client.BRPop(fromList.Id, (int)timeOut.GetValueOrDefault().TotalSeconds);
             return unblockingKeyAndValue.Length == 0
                 ? default(T)
                 : DeserializeValue(unblockingKeyAndValue[1]);
