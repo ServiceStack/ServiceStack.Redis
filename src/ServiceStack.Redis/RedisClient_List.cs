@@ -129,12 +129,16 @@ namespace ServiceStack.Redis
 
 		public string BlockingRemoveStartFromList(string listId, TimeSpan? timeOut)
 		{
-		    return BlockingDequeueItemFromList(listId, timeOut);
+            return BLPopValue(listId, (int)timeOut.GetValueOrDefault().TotalSeconds).FromUtf8Bytes();
+
 		}
 
         public ItemRef BlockingRemoveStartFromLists(string[] listIds, TimeSpan? timeOut)
         {
-            return BlockingDequeueItemFromLists(listIds, timeOut);
+            var value = BLPopValue(listIds, (int)timeOut.GetValueOrDefault().TotalSeconds);
+            if (value == null)
+                return null;
+            return new ItemRef { Id = value[0].FromUtf8Bytes(), Item = value[1].FromUtf8Bytes() };
         }
 
 	    public string RemoveEndFromList(string listId)
@@ -174,22 +178,22 @@ namespace ServiceStack.Redis
 
 		public void EnqueueItemOnList(string listId, string value)
 		{
-			RPush(listId, value.ToUtf8Bytes());
+			LPush(listId, value.ToUtf8Bytes());
 		}
 
 		public string DequeueItemFromList(string listId)
 		{
-			return LPop(listId).FromUtf8Bytes();
+			return RPop(listId).FromUtf8Bytes();
 		}
 
 		public string BlockingDequeueItemFromList(string listId, TimeSpan? timeOut)
 		{
-			return BLPopValue(listId, (int)timeOut.GetValueOrDefault().TotalSeconds).FromUtf8Bytes();
+			return BRPopValue(listId, (int)timeOut.GetValueOrDefault().TotalSeconds).FromUtf8Bytes();
 		}
 
         public ItemRef BlockingDequeueItemFromLists(string[] listIds, TimeSpan? timeOut)
         {
-            var value = BLPopValue(listIds, (int) timeOut.GetValueOrDefault().TotalSeconds);
+            var value = BRPopValue(listIds, (int) timeOut.GetValueOrDefault().TotalSeconds);
             if( value == null )
                 return null;
 			return new ItemRef{Id=value[0].FromUtf8Bytes(), Item= value[1].FromUtf8Bytes()};

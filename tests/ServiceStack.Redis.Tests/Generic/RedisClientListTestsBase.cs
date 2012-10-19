@@ -119,12 +119,56 @@ namespace ServiceStack.Redis.Tests.Generic
         [Test]
         public void Can_DequeueFromList()
         {
+
+            var queue = new Queue<T>();
             var storeMembers = Factory.CreateList();
-            storeMembers.ForEach(x => redis.AddItemToList(List, x));
+            storeMembers.ForEach(x => queue.Enqueue(x));
+            storeMembers.ForEach(x => redis.EnqueueItemOnList(List, x));
 
             var item1 = redis.DequeueItemFromList(List);
 
-            Factory.AssertIsEqual(item1, (T)storeMembers.First());
+            Factory.AssertIsEqual(item1, queue.Dequeue());
+        }
+
+        [Test]
+        public void PopAndPushSameAsDequeue()
+        {
+            var queue = new Queue<T>();
+            var storeMembers = Factory.CreateList();
+            storeMembers.ForEach(x => queue.Enqueue(x));
+            storeMembers.ForEach(x => redis.EnqueueItemOnList(List, x));
+
+            var item1 = redis.PopAndPushItemBetweenLists(List, List2);
+            Assert.That(item1, Is.EqualTo(queue.Dequeue()));
+        }
+
+        [Test]
+        public void Can_ClearList()
+        {
+            var storeMembers = Factory.CreateList();
+            storeMembers.ForEach(x => redis.EnqueueItemOnList(List, x));
+
+            var count = redis.GetAllItemsFromList(List).Count;
+            Assert.That(count, Is.EqualTo(storeMembers.Count));
+
+            redis.RemoveAllFromList(List);
+            count = redis.GetAllItemsFromList(List).Count;
+            Assert.That(count, Is.EqualTo(0));
+
+        }
+
+        [Test]
+        public void Can_ClearListWithOneItem()
+        {
+            var storeMembers = Factory.CreateList();
+            redis.EnqueueItemOnList(List, storeMembers[0]);
+
+            var count = redis.GetAllItemsFromList(List).Count;
+            Assert.That(count, Is.EqualTo(1));
+
+            redis.RemoveAllFromList(List);
+            count = redis.GetAllItemsFromList(List).Count;
+            Assert.That(count, Is.EqualTo(0));
         }
 
 		[Test]

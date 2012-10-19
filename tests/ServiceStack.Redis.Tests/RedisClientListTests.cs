@@ -160,6 +160,17 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(item1, Is.EqualTo(queue.Dequeue()));
 		}
 
+        [Test]
+        public void PopAndPushSameAsDequeue()
+        {
+            var queue = new Queue<string>();
+            storeMembers.ForEach(queue.Enqueue);
+            storeMembers.ForEach(x => Redis.EnqueueItemOnList(ListId, x));
+
+            var item1 = Redis.PopAndPushItemBetweenLists(ListId, ListId2);
+            Assert.That(item1, Is.EqualTo(queue.Dequeue()));            
+        }
+
 		[Test]
 		public void Can_BlockingDequeueFromList()
 		{
