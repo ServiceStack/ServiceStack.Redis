@@ -119,7 +119,7 @@ namespace ServiceStack.Redis.Generic
 
 		public void RemoveAllFromList(IRedisList<T> fromList)
 		{
-			client.LTrim(fromList.Id, LastElement, FirstElement);
+			client.LTrim(fromList.Id, int.MaxValue, FirstElement);
 		}
 
 		public void TrimList(IRedisList<T> fromList, int keepStartingFrom, int keepEndingAt)
