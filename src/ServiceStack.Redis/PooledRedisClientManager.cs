@@ -423,21 +423,32 @@ namespace ServiceStack.Redis
 
 		protected virtual void Dispose(bool disposing)
 		{
+            if (Interlocked.Increment(ref disposeAttempts) > 1) return;
+
 			if (disposing)
 			{
 				// get rid of managed resources
 			}
 
-			// get rid of unmanaged resources
-			for (var i = 0; i < writeClients.Length; i++)
+			try
 			{
-				Dispose(writeClients[i]);
+			    // get rid of unmanaged resources
+			    for (var i = 0; i < writeClients.Length; i++)
+			    {
+				    Dispose(writeClients[i]);
+			    }
+			    for (var i = 0; i < readClients.Length; i++)
+			    {
+				    Dispose(readClients[i]);
+			    }
 			}
-			for (var i = 0; i < readClients.Length; i++)
+			catch (Exception ex)
 			{
-				Dispose(readClients[i]);
+				Log.Error("Error when trying to dispose of PooledRedisClientManager", ex);
 			}
 		}
+
+	    private int disposeAttempts = 0;
 
 		protected void Dispose(RedisClient redisClient)
 		{
