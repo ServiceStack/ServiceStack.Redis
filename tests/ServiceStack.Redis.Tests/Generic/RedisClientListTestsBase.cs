@@ -142,35 +142,6 @@ namespace ServiceStack.Redis.Tests.Generic
             Assert.That(item1, Is.EqualTo(queue.Dequeue()));
         }
 
-        [Test]
-        public void Can_ClearList()
-        {
-            var storeMembers = Factory.CreateList();
-            storeMembers.ForEach(x => redis.EnqueueItemOnList(List, x));
-
-            var count = redis.GetAllItemsFromList(List).Count;
-            Assert.That(count, Is.EqualTo(storeMembers.Count));
-
-            redis.RemoveAllFromList(List);
-            count = redis.GetAllItemsFromList(List).Count;
-            Assert.That(count, Is.EqualTo(0));
-
-        }
-
-        [Test]
-        public void Can_ClearListWithOneItem()
-        {
-            var storeMembers = Factory.CreateList();
-            redis.EnqueueItemOnList(List, storeMembers[0]);
-
-            var count = redis.GetAllItemsFromList(List).Count;
-            Assert.That(count, Is.EqualTo(1));
-
-            redis.RemoveAllFromList(List);
-            count = redis.GetAllItemsFromList(List).Count;
-            Assert.That(count, Is.EqualTo(0));
-        }
-
 		[Test]
 		public void Can_MoveBetweenLists()
 		{
