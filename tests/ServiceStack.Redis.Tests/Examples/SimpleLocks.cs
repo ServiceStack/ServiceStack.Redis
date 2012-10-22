@@ -97,6 +97,20 @@ namespace ServiceStack.Redis.Tests.Examples
 			}
 		}
 
+        [Test]
+        public void SimulateLockTimeout()
+        {
+            var redisClient = new RedisClient(TestConfig.SingleHost);
+            var waitFor = TimeSpan.FromMilliseconds(20);
+
+            var loc = redisClient.AcquireLock("testlock",waitFor);
+            Thread.Sleep(40); //should have lock expire
+            using(var newloc = redisClient.AcquireLock("testlock", waitFor))
+            {
+                
+            }
+        }
+
 	}
 
 
