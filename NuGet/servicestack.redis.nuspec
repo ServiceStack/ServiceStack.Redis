@@ -20,4 +20,8 @@
       <dependency id="ServiceStack.Common" />
     </dependencies> 
   </metadata> 
+  <files>
+      <file src="..\lib\**\*.*" target="lib" />
+      <file src="..\src\ServiceStack.Redis\**\*.cs" target="src" />
+  </files>
 </package>

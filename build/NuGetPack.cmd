@@ -1,1 +1,1 @@
-nuget pack ..\NuGet\servicestack.redis.nuspec
+nuget pack ..\NuGet\servicestack.redis.nuspec -symbols
