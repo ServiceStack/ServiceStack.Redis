@@ -23,7 +23,7 @@ namespace ServiceStack.Redis
                         //Calculate a unix time for when the lock should expire
                         TimeSpan realSpan = timeOut ?? new TimeSpan(365, 0, 0, 0); //if nothing is passed in the timeout hold for a year
 				        DateTime expireTime = DateTime.UtcNow.Add(realSpan);
-				        string lockString = (expireTime.ToUnixTime() + 1).ToString();
+				        string lockString = (expireTime.ToUnixTimeMs() + 1).ToString();
                         
                         //Try to set the lock, if it does not exist this will succeed and the lock is obtained
 				        var nx = redisClient.SetEntryIfNotExists(key, lockString);
@@ -38,8 +38,9 @@ namespace ServiceStack.Redis
                         if (!long.TryParse(lockExpireString, out lockExpireTime))
                             return false;
                         //If the expire time is greater than the current time then we can't let the lock go yet
-                        if (lockExpireTime > DateTime.UtcNow.ToUnixTime())
+                        if (lockExpireTime > DateTime.UtcNow.ToUnixTimeMs())
                             return false;
+
                         //If the expire time is less than the current time then it wasn't released properly and we can attempt to 
                         //acquire the lock. This is done by setting the lock to our timeout string AND checking to make sure
                         //that what is returned is the old timeout string in order to account for a possible race condition.
