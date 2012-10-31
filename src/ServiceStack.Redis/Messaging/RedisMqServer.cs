@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using ServiceStack.Common;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.Service;
@@ -95,8 +96,11 @@ namespace ServiceStack.Redis.Messaging
         private readonly Dictionary<Type, IMessageHandlerFactory> handlerMap
             = new Dictionary<Type, IMessageHandlerFactory>();
 
+        private readonly Dictionary<Type, int> handlerThreadCountMap
+            = new Dictionary<Type, int>();
+
         private MessageHandlerWorker[] workers;
-        private Dictionary<string, int> queueWorkerIndexMap;
+        private Dictionary<string, int[]> queueWorkerIndexMap;
 
 
         public RedisMqServer(IRedisClientsManager clientsManager,
@@ -111,10 +115,20 @@ namespace ServiceStack.Redis.Messaging
 
         public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn)
         {
-            RegisterHandler(processMessageFn, null);
+            RegisterHandler(processMessageFn, null, noOfThreads:1);
+        }
+
+        public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn, int noOfThreads)
+        {
+            RegisterHandler(processMessageFn, null, noOfThreads);
         }
 
         public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn, Action<IMessage<T>, Exception> processExceptionEx)
+        {
+            RegisterHandler(processMessageFn, processExceptionEx, noOfThreads: 1);
+        }
+
+        public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn, Action<IMessage<T>, Exception> processExceptionEx, int noOfThreads)
         {
             if (handlerMap.ContainsKey(typeof(T)))
             {
@@ -122,6 +136,7 @@ namespace ServiceStack.Redis.Messaging
             }
 
             handlerMap[typeof(T)] = CreateMessageHandlerFactory(processMessageFn, processExceptionEx);
+            handlerThreadCountMap[typeof(T)] = noOfThreads;
         }
 
         protected IMessageHandlerFactory CreateMessageHandlerFactory<T>(Func<IMessage<T>, object> processMessageFn, Action<IMessage<T>, Exception> processExceptionEx)
@@ -139,35 +154,50 @@ namespace ServiceStack.Redis.Messaging
             {
                 var workerBuilder = new List<MessageHandlerWorker>();
 
-                foreach (var handlerFactory in handlerMap)
+                foreach (var entry in handlerMap)
                 {
-                    var msgType = handlerFactory.Key;
+                    var msgType = entry.Key;
+                    var handlerFactory = entry.Value;
+                    
                     var queueNames = new QueueNames(msgType);
+                    var noOfThreads = handlerThreadCountMap[msgType];
 
                     if (OnlyEnablePriortyQueuesForTypes == null
                         || OnlyEnablePriortyQueuesForTypes.Any(x => x == msgType))
                     {
-                        workerBuilder.Add(new MessageHandlerWorker(
-                            clientsManager, 
-                            handlerFactory.Value.CreateMessageHandler(), 
-                            queueNames.Priority, 
-                            WorkerErrorHandler));
+                        noOfThreads.Times(i =>
+                            workerBuilder.Add(new MessageHandlerWorker(
+                                clientsManager,
+                                handlerFactory.CreateMessageHandler(),
+                                queueNames.Priority,
+                                WorkerErrorHandler)));
                     }
 
-                    workerBuilder.Add(new MessageHandlerWorker(
-                        clientsManager, 
-                        handlerFactory.Value.CreateMessageHandler(), 
-                        queueNames.In, 
-                        WorkerErrorHandler));
+                    noOfThreads.Times(i =>
+                        workerBuilder.Add(new MessageHandlerWorker(
+                            clientsManager,
+                            handlerFactory.CreateMessageHandler(),
+                            queueNames.In,
+                            WorkerErrorHandler)));
                 }
 
                 workers = workerBuilder.ToArray();
 
-                queueWorkerIndexMap = new Dictionary<string, int>();
+                queueWorkerIndexMap = new Dictionary<string, int[]>();
                 for (var i = 0; i < workers.Length; i++)
                 {
                     var worker = workers[i];
-                    queueWorkerIndexMap[worker.QueueName] = i;
+
+                    int[] workerIds;
+                    if (!queueWorkerIndexMap.TryGetValue(worker.QueueName, out workerIds))
+                    {
+                        queueWorkerIndexMap[worker.QueueName] = new[] { i };
+                    }
+                    else
+                    {
+                        workerIds = new List<int>(workerIds) { i }.ToArray();
+                        queueWorkerIndexMap[worker.QueueName] = workerIds;
+                    }
                 }
             }
         }
@@ -254,11 +284,13 @@ namespace ServiceStack.Redis.Messaging
 
                             if (!string.IsNullOrEmpty(msg))
                             {
-                                int workerIndex;
-                                if (queueWorkerIndexMap.TryGetValue(msg, out workerIndex))
+                                int[] workerIndexes;
+                                if (queueWorkerIndexMap.TryGetValue(msg, out workerIndexes))
                                 {
-                                    var worker = workers[workerIndex];
-                                    worker.NotifyNewMessage();
+                                    foreach (var workerIndex in workerIndexes)
+                                    {
+                                        workers[workerIndex].NotifyNewMessage();
+                                    }
                                 }
                             }
                         };

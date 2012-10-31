@@ -267,8 +267,7 @@ namespace ServiceStack.Redis.Tests
             var mqHost = CreateMqServer();
             var called = 0;
 
-            mqHost.RegisterHandler<Incr>(m =>
-            {
+            mqHost.RegisterHandler<Incr>(m => {
                 Debug.WriteLine("In Incr #" + m.GetBody().Value);
                 called++;
                 return m.GetBody().Value > 0 ? new Incr { Value = m.GetBody().Value - 1 } : null;
@@ -299,8 +298,7 @@ namespace ServiceStack.Redis.Tests
             mqHost.RegisterHandler<Hello>(m =>
                 new HelloResponse { Result = "Hello, " + m.GetBody().Name });
 
-            mqHost.RegisterHandler<HelloResponse>(m =>
-            {
+            mqHost.RegisterHandler<HelloResponse>(m => {
                 messageReceived = m.GetBody().Result; return null;
             });
 
@@ -322,8 +320,7 @@ namespace ServiceStack.Redis.Tests
             const int noOf = 5;
             var queueNames = noOf.Times(x => "queue:" + x).ToArray();
 
-            ThreadPool.QueueUserWorkItem(state =>
-            {
+            ThreadPool.QueueUserWorkItem(state => {
                 Thread.Sleep(100);
                 var i = 0;
                 var client = RedisClient.New();
@@ -343,5 +340,55 @@ namespace ServiceStack.Redis.Tests
             });
         }
 
+        public class Wait
+        {
+            public int ForMs { get; set; }
+        }
+
+        [Test]
+        public void Can_handle_requests_concurrently_in_2_threads()
+        {
+            RunHandlerOnMultipleThreads(noOfThreads: 2, msgs: 10);
+        }
+
+        [Test]
+        public void Can_handle_requests_concurrently_in_3_threads()
+        {
+            RunHandlerOnMultipleThreads(noOfThreads: 3, msgs: 10);
+        }
+
+        [Test]
+        public void Can_handle_requests_concurrently_in_4_threads()
+        {
+            RunHandlerOnMultipleThreads(noOfThreads: 4, msgs: 10);
+        }
+
+        private static void RunHandlerOnMultipleThreads(int noOfThreads, int msgs)
+        {
+            var timesCalled = 0;
+            var mqHost = CreateMqServer();
+            mqHost.RegisterHandler<Wait>(m => {
+                timesCalled++;
+                Thread.Sleep(m.GetBody().ForMs);
+                return null;
+            }, noOfThreads);
+
+            mqHost.Start();
+
+            var mqClient = mqHost.CreateMessageQueueClient();
+
+            var dto = new Wait { ForMs = 100 };
+            msgs.Times(i => mqClient.Publish(dto));
+
+            const double buffer = 1.1;
+
+            var sleepForMs = (int)((msgs * 100 / (double)noOfThreads) * buffer);
+            "Sleeping for {0}ms...".Print(sleepForMs);
+            Thread.Sleep(sleepForMs);
+
+            mqHost.Dispose();
+
+            Assert.That(timesCalled, Is.EqualTo(msgs));
+        }
     }
 }
