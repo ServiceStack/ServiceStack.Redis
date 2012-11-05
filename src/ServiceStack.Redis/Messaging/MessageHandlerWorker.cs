@@ -176,24 +176,29 @@ namespace ServiceStack.Redis.Messaging
 
         private void KillBgThreadIfExists()
         {
-            if (bgThread != null && bgThread.IsAlive)
+            try
             {
-                //give it a small chance to die gracefully
-                if (!bgThread.Join(500))
+                if (bgThread != null && bgThread.IsAlive)
                 {
-                    //Ideally we shouldn't get here, but lets try our hardest to clean it up
-                    Log.Warn("Interrupting previous Background Worker: " + bgThread.Name);
-                    bgThread.Interrupt();
-                    if (!bgThread.Join(TimeSpan.FromSeconds(3)))
+                    //give it a small chance to die gracefully
+                    if (!bgThread.Join(500))
                     {
-                        Log.Warn(bgThread.Name + " just wont die, so we're now aborting it...");
-                        bgThread.Abort();
+                        //Ideally we shouldn't get here, but lets try our hardest to clean it up
+                        Log.Warn("Interrupting previous Background Worker: " + bgThread.Name);
+                        bgThread.Interrupt();
+                        if (!bgThread.Join(TimeSpan.FromSeconds(3)))
+                        {
+                            Log.Warn(bgThread.Name + " just wont die, so we're now aborting it...");
+                            bgThread.Abort();
+                        }
                     }
                 }
             }
-
-            bgThread = null;
-            status = WorkerStatus.Stopped;
+            finally
+            {
+                bgThread = null;
+                status = WorkerStatus.Stopped;
+            }
         }
 
         public virtual void Dispose()
