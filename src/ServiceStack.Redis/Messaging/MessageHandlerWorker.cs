@@ -76,19 +76,6 @@ namespace ServiceStack.Redis.Messaging
                 {
                     receivedNewMsgs = true;
                 }
-
-                //Original
-                //lock (msgLock)
-                //{
-                //    Monitor.Pulse(msgLock);
-                //}
-
-                // Surprisingly this is marginally slower in Sleep/Wait benchmarks than just using the lock above?
-                //if (Monitor.TryEnter(msgLock)) //Don't block Master notifier thread, if worker is running.
-                //{
-                //    Monitor.Pulse(msgLock);
-                //    Monitor.Exit(msgLock);
-                //}
             }
         }
 
@@ -98,6 +85,8 @@ namespace ServiceStack.Redis.Messaging
                 return;
             if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Disposed)
                 throw new ObjectDisposedException("MQ Host has been disposed");
+            if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Stopping)
+                KillBgThreadIfExists();
 
             if (Interlocked.CompareExchange(ref status, WorkerStatus.Starting, WorkerStatus.Stopped) == WorkerStatus.Stopped)
             {
@@ -201,9 +190,10 @@ namespace ServiceStack.Redis.Messaging
                         bgThread.Abort();
                     }
                 }
-                bgThread = null;
-                status = WorkerStatus.Stopped;
             }
+
+            bgThread = null;
+            status = WorkerStatus.Stopped;
         }
 
         public virtual void Dispose()
