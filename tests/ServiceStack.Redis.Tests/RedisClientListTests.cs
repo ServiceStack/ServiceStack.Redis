@@ -405,6 +405,26 @@ namespace ServiceStack.Redis.Tests
 			var members = Redis.GetSortedItemsFromList(ListId, new SortOptions { SortAlpha = true, SortDesc = true, Skip = 1, Take = 2 });
 			AssertAreEqual(members, storeMembers.OrderByDescending(s => s).Skip(1).Take(2).ToList());
 		}
+
+        public class Test
+        {
+            public string A { get; set; }
+        }
+
+        [Test]
+        public void RemoveAll_removes_all_items_from_Named_List()
+        {
+            var redis = Redis.As<Test>();
+
+            var clientesRepo = redis.Lists["repo:Client:Test"];
+
+            Assert.IsTrue(clientesRepo.Count == 0, "Count 1 = " + clientesRepo.Count);
+            clientesRepo.Add(new Test() { A = "Test" });
+            Assert.IsTrue(clientesRepo.Count == 1, "Count 2 = " + clientesRepo.Count);
+            clientesRepo.RemoveAll();
+            Assert.IsTrue(clientesRepo.Count == 0, "Count 3 = " + clientesRepo.Count);
+        }
+
 	}
 
 }
