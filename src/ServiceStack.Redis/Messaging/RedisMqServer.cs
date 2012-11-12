@@ -312,7 +312,8 @@ namespace ServiceStack.Redis.Messaging
 
                 StopWorkerThreads();
 
-                if (this.ErrorHandler != null) this.ErrorHandler(ex);
+                if (this.ErrorHandler != null) 
+                    this.ErrorHandler(ex);
             }
         }
 
@@ -338,6 +339,15 @@ namespace ServiceStack.Redis.Messaging
                     if (this.ErrorHandler != null) this.ErrorHandler(ex);
                     Log.Warn("Could not send STOP message to bg thread: " + ex.Message);
                 }
+            }
+        }
+
+        public void NotifyAll()
+        {
+            Log.Debug("Notifying all worker threads to check for new messages...");
+            foreach (var worker in workers)
+            {
+                worker.NotifyNewMessage();
             }
         }
 
