@@ -396,6 +396,19 @@ namespace ServiceStack.Redis
             return GetBytes(key);
         }
 
+        public object[] Slowlog(int ? top)
+        {
+            if (top.HasValue)
+                return SendExpectDeeplyNestedMultiData(Commands.Slowlog, Commands.Get, top.Value.ToUtf8Bytes());
+            else
+                return SendExpectDeeplyNestedMultiData(Commands.Slowlog, Commands.Get);
+        }
+
+        public void SlowlogReset()
+        {
+            SendExpectSuccess(Commands.Slowlog, "RESET".ToUtf8Bytes());
+        }
+
         public byte[] GetBytes(string key)
         {
             if (key == null)

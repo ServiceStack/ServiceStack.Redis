@@ -164,5 +164,6 @@ namespace ServiceStack.Redis
 		//public readonly static byte[] Exists = "EXISTS".ToUtf8Bytes();
 		public readonly static byte[] Flush = "FLUSH".ToUtf8Bytes();
 		public readonly static byte[] Kill = "KILL".ToUtf8Bytes();
+        public readonly static byte[] Slowlog = "SLOWLOG".ToUtf8Bytes();
 	}
 }

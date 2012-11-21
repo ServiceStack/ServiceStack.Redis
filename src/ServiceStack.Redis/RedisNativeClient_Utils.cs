@@ -404,6 +404,19 @@ namespace ServiceStack.Redis
 			return ReadMultiData();
 		}
 
+        private object [] SendExpectDeeplyNestedMultiData(params byte[][] cmdWithBinaryArgs)
+        {
+            if (!SendCommand(cmdWithBinaryArgs))
+                throw CreateConnectionError();
+
+            if (Pipeline != null)
+            {
+                throw new NotSupportedException("Pipeline is not supported.");
+            }
+
+            return ReadDeeplyNestedMultiData();
+        }
+
 		[Conditional("DEBUG")]
 		protected void Log(string fmt, params object[] args)
 		{
@@ -626,6 +639,49 @@ namespace ServiceStack.Redis
 
 			throw CreateResponseError("Unknown reply on multi-request: " + c + s);
 		}
+        
+        private object [] ReadDeeplyNestedMultiData()
+        {
+            return (object[])ReadDeeplyNestedMultiDataItem();
+        }
+
+        private object ReadDeeplyNestedMultiDataItem()
+        {
+            int c = SafeReadByte();
+            if (c == -1)
+                throw CreateResponseError("No more data");
+
+            var s = ReadLine();
+            Log("R: {0}", s);
+
+            switch (c)
+            {
+                case '$':
+                    return ParseSingleLine(string.Concat(char.ToString((char)c), s));
+
+                case '-':
+                    throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
+
+                case '*':
+                    int count;
+                    if (int.TryParse(s, out count))
+                    {
+                        var array = new object[count];
+                        for(int i = 0; i < count; i++)
+                        {
+                            array[i] = ReadDeeplyNestedMultiDataItem();
+                        }
+
+                        return array;
+                    }
+                    break;
+                    
+                default:
+                    return s;
+            }
+
+            throw CreateResponseError("Unknown reply on multi-request: " + c + s);
+        }
 
 		internal int ReadMultiDataResultCount()
 		{

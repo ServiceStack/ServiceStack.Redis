@@ -167,6 +167,7 @@
     <Compile Include="RedisClientsManagerExtensions.cs" />
     <Compile Include="Pipeline\QueuedRedisCommand.cs" />
     <Compile Include="Pipeline\RedisCommand.cs" />
+    <Compile Include="RedisClient_Slowlog.cs" />
     <Compile Include="RedisEndpoint.cs" />
     <Compile Include="ShardedConnectionPool.cs" />
     <Compile Include="ShardedRedisClientManager.cs" />

@@ -500,6 +500,28 @@ namespace ServiceStack.Redis.Tests
             Assert.That(redis.Get("key_b"), Is.EqualTo(""));
         }
 
+        [Test]
+        public void Should_reset_slowlog()
+        {
+            var redis = RedisClient.New();
+            redis.SlowlogReset();
+        }
+
+        [Test]
+        public void Can_get_showlog()
+        {
+            var redis = RedisClient.New();
+            var log = redis.GetSlowlog(10);
+
+            foreach (var t in log)
+            {
+                Console.WriteLine(t.Id);
+                Console.WriteLine(t.Duration);
+                Console.WriteLine(t.Timestamp);
+                Console.WriteLine(string.Join(":", t.Arguments));
+            }
+        }
+
 
 	}
 
