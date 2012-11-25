@@ -90,7 +90,13 @@ namespace ServiceStack.Redis.Generic
 
 		public bool Remove(T item)
 		{
-			return client.RemoveItemFromList(this, item) > 0;
+            var index = this.IndexOf(item);
+            if (index != -1)
+            {
+                this.RemoveAt(index);
+                return true;
+            }
+            return false;
 		}
 
 		public int Count
