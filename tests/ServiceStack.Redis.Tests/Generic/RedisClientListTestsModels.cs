@@ -64,7 +64,6 @@ namespace ServiceStack.Redis.Tests.Generic
 			get { return factory; }
 		}
 	}
-
 	//public class RedisClientListTestsDateTime
 	//    : RedisClientListTestsBase<DateTime>
 	//{
