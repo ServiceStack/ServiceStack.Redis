@@ -66,6 +66,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
+
 	//public class RedisClientSetTestsDateTime
 	//    : RedisClientSetTestsBase<DateTime>
 	//{
