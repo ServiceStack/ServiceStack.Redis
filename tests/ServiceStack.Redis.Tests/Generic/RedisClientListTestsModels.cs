@@ -65,6 +65,18 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
 	}
 
+    [TestFixture]
+    public class RedisClientlistTestCustomType_Failing
+        : RedisClientListTestsBase<CustomType>
+    {
+        private readonly IModelFactory<CustomType> factory = new CustomTypeFactory();
+
+        protected override IModelFactory<CustomType> Factory
+        {
+            get { return factory; }
+        }
+    }
+
 	//public class RedisClientListTestsDateTime
 	//    : RedisClientListTestsBase<DateTime>
 	//{
