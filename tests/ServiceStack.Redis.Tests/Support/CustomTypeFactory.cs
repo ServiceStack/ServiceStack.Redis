@@ -12,8 +12,8 @@ namespace ServiceStack.Redis.Tests.Support
 
 		public override void AssertIsEqual(CustomType actual, CustomType expected)
 		{
-			Assert.AreEqual(actual.CustomId, Is.EqualTo(expected.CustomId));
-			Assert.AreEqual(actual.CustomName, Is.EqualTo(expected.CustomName));
+			Assert.AreEqual(actual.CustomId, expected.CustomId);
+			Assert.AreEqual(actual.CustomName, expected.CustomName);
 		}
 
 		public override CustomType CreateInstance(int i)
