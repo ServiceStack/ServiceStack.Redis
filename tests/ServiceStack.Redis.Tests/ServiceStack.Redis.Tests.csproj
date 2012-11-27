@@ -172,6 +172,7 @@
     <Compile Include="AlchemyNativeClientTests.cs" />
     <Compile Include="Benchmarks\RedisMqHostPoolBenchmarks.cs" />
     <Compile Include="DiagnosticTests.cs" />
+    <Compile Include="Generic\RedisClientListTestExtra.cs" />
     <Compile Include="RedisExtensionTests.cs" />
     <Compile Include="RedisMqServerSpinServerTests.cs" />
     <Compile Include="RedisMqServerSleepServerTests.cs" />
