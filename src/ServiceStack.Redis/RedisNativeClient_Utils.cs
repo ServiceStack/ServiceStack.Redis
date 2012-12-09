@@ -303,7 +303,7 @@ namespace ServiceStack.Redis
 			return Bstream.ReadByte();
 		}
 
-		private void SendExpectSuccess(params byte[][] cmdWithBinaryArgs)
+		protected void SendExpectSuccess(params byte[][] cmdWithBinaryArgs)
 		{
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
@@ -316,7 +316,7 @@ namespace ServiceStack.Redis
 			ExpectSuccess();
 		}
 
-		private int SendExpectInt(params byte[][] cmdWithBinaryArgs)
+        protected int SendExpectInt(params byte[][] cmdWithBinaryArgs)
 		{
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
@@ -329,7 +329,7 @@ namespace ServiceStack.Redis
 			return ReadInt();
 		}
 
-		private long SendExpectLong(params byte[][] cmdWithBinaryArgs)
+        protected long SendExpectLong(params byte[][] cmdWithBinaryArgs)
 		{
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
@@ -342,7 +342,7 @@ namespace ServiceStack.Redis
 			return ReadLong();
 		}
 
-		private byte[] SendExpectData(params byte[][] cmdWithBinaryArgs)
+        protected byte[] SendExpectData(params byte[][] cmdWithBinaryArgs)
 		{
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
@@ -355,13 +355,13 @@ namespace ServiceStack.Redis
 			return ReadData();
 		}
 
-		private string SendExpectString(params byte[][] cmdWithBinaryArgs)
+        protected string SendExpectString(params byte[][] cmdWithBinaryArgs)
 		{
 			var bytes = SendExpectData(cmdWithBinaryArgs);
 			return bytes.FromUtf8Bytes();
 		}
 
-		private double SendExpectDouble(params byte[][] cmdWithBinaryArgs)
+        protected double SendExpectDouble(params byte[][] cmdWithBinaryArgs)
 		{
 		    var bytes = SendExpectData(cmdWithBinaryArgs);
 		    return bytes == null ? Double.NaN : ParseDouble(bytes);
@@ -377,7 +377,7 @@ namespace ServiceStack.Redis
 			return d;
 		}
 
-		private string SendExpectCode(params byte[][] cmdWithBinaryArgs)
+        protected string SendExpectCode(params byte[][] cmdWithBinaryArgs)
 		{
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
@@ -391,7 +391,7 @@ namespace ServiceStack.Redis
 			return ExpectCode();
 		}
 
-		private byte[][] SendExpectMultiData(params byte[][] cmdWithBinaryArgs)
+        protected byte[][] SendExpectMultiData(params byte[][] cmdWithBinaryArgs)
 		{
 			if (!SendCommand(cmdWithBinaryArgs))
 				throw CreateConnectionError();
@@ -404,7 +404,7 @@ namespace ServiceStack.Redis
 			return ReadMultiData();
 		}
 
-        private object [] SendExpectDeeplyNestedMultiData(params byte[][] cmdWithBinaryArgs)
+        protected object[] SendExpectDeeplyNestedMultiData(params byte[][] cmdWithBinaryArgs)
         {
             if (!SendCommand(cmdWithBinaryArgs))
                 throw CreateConnectionError();
