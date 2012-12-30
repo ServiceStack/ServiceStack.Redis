@@ -152,7 +152,9 @@
     <Compile Include="BufferPool.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="ConnectionUtils.cs" />
+    <Compile Include="Generic\ManagedListGeneric.cs" />
     <Compile Include="Generic\QueuedRedisTypedCommand.cs" />
+    <Compile Include="Generic\RedisClientsManagerExtensionsGeneric.cs" />
     <Compile Include="Generic\RedisTypedClient_App.cs" />
     <Compile Include="Generic\RedisTypedPipeline.cs" />
     <Compile Include="Generic\RedisTypedCommandQueue.cs" />
