@@ -362,10 +362,24 @@ namespace ServiceStack.Redis
 		}
 
         protected double SendExpectDouble(params byte[][] cmdWithBinaryArgs)
-		{
-		    var bytes = SendExpectData(cmdWithBinaryArgs);
-		    return bytes == null ? Double.NaN : ParseDouble(bytes);
-		}
+        {
+            if (!SendCommand(cmdWithBinaryArgs))
+                throw CreateConnectionError();
+
+            if (Pipeline != null)
+            {
+                Pipeline.CompleteDoubleQueuedCommand(ReadDouble);
+                return Double.NaN;
+            }
+
+            return ReadDouble();
+        }
+
+        public double ReadDouble()
+        {
+            var bytes = ReadData();
+            return (bytes == null) ? double.NaN : ParseDouble(bytes);
+        }
 
 	    public static double ParseDouble(byte[] doubleBytes)
 		{
