@@ -14,15 +14,23 @@ namespace ServiceStack.Redis.Tests
 	public class RedisClientSortedSetTests
 		: RedisClientTestsBase
 	{
-        private const string SetId = "RedisClientSortedSetTests_testzset";
+		private const string SetIdSuffix = "testzset";
 		private List<string> storeMembers;
+
+		private string SetId
+		{
+			get
+			{
+				return PrefixedKey(SetIdSuffix);
+			}
+		}
 
 		Dictionary<string, double> stringDoubleMap;
 
 		public override void OnBeforeEachTest()
 		{
 			base.OnBeforeEachTest();
-            Redis.NamespacePrefix = "RedisClientSortedSetTests";
+			Redis.NamespacePrefix = "RedisClientSortedSetTests";
 			storeMembers = new List<string> { "one", "two", "three", "four" };
 
 			stringDoubleMap = new Dictionary<string, double> {
@@ -155,9 +163,9 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_Store_IntersectBetweenSets()
 		{
-			const string set1Name = "testintersectset1";
-			const string set2Name = "testintersectset2";
-			const string storeSetName = "testintersectsetstore";
+			string set1Name = PrefixedKey("testintersectset1");
+			string set2Name = PrefixedKey("testintersectset2");
+			string storeSetName = PrefixedKey("testintersectsetstore");
 			var set1Members = new List<string> { "one", "two", "three", "four", "five" };
 			var set2Members = new List<string> { "four", "five", "six", "seven" };
 
@@ -174,9 +182,9 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_Store_UnionBetweenSets()
 		{
-			const string set1Name = "testunionset1";
-			const string set2Name = "testunionset2";
-			const string storeSetName = "testunionsetstore";
+			string set1Name = PrefixedKey("testunionset1");
+			string set2Name = PrefixedKey("testunionset2");
+			string storeSetName = PrefixedKey("testunionsetstore");
 			var set1Members = new List<string> { "one", "two", "three", "four", "five" };
 			var set2Members = new List<string> { "four", "five", "six", "seven" };
 

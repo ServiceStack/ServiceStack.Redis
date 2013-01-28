@@ -8,14 +8,23 @@ namespace ServiceStack.Redis.Tests
 	public class RedisClientSetTests
 		: RedisClientTestsBase
 	{
-		private const string SetId = "testset";
+		private const string SetIdSuffix = "testset";
 		private List<string> storeMembers;
 
-		[SetUp]
-		public override void  OnBeforeEachTest()
+		private string SetId
 		{
- 			 base.OnBeforeEachTest();
-			 storeMembers = new List<string> { "one", "two", "three", "four" };
+			get
+			{
+				return this.PrefixedKey(SetIdSuffix);
+			}
+		}
+
+		[SetUp]
+		public override void OnBeforeEachTest()
+		{
+			base.OnBeforeEachTest();
+			Redis.NamespacePrefix = "RedisClientSetTests";
+			storeMembers = new List<string> { "one", "two", "three", "four" };
 		}
 
 		[Test]
@@ -64,8 +73,8 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_MoveBetweenSets()
 		{
-			const string fromSetId = "testmovefromset";
-			const string toSetId = "testmovetoset";
+			string fromSetId = PrefixedKey("testmovefromset");
+			string toSetId = PrefixedKey("testmovetoset");
 			const string moveMember = "four";
 			var fromSetIdMembers = new List<string> { "one", "two", "three", "four" };
 			var toSetIdMembers = new List<string> { "five", "six", "seven" };
@@ -110,8 +119,8 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_IntersectBetweenSets()
 		{
-			const string set1Name = "testintersectset1";
-			const string set2Name = "testintersectset2";
+			string set1Name = PrefixedKey("testintersectset1");
+			string set2Name = PrefixedKey("testintersectset2");
 			var set1Members = new List<string> { "one", "two", "three", "four", "five" };
 			var set2Members = new List<string> { "four", "five", "six", "seven" };
 
@@ -126,9 +135,9 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_Store_IntersectBetweenSets()
 		{
-			const string set1Name = "testintersectset1";
-			const string set2Name = "testintersectset2";
-			const string storeSetName = "testintersectsetstore";
+			string set1Name = PrefixedKey("testintersectset1");
+			string set2Name = PrefixedKey("testintersectset2");
+			string storeSetName = PrefixedKey("testintersectsetstore");
 			var set1Members = new List<string> { "one", "two", "three", "four", "five" };
 			var set2Members = new List<string> { "four", "five", "six", "seven" };
 
@@ -145,8 +154,8 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_UnionBetweenSets()
 		{
-			const string set1Name = "testunionset1";
-			const string set2Name = "testunionset2";
+			string set1Name = PrefixedKey("testunionset1");
+			string set2Name = PrefixedKey("testunionset2");
 			var set1Members = new List<string> { "one", "two", "three", "four", "five" };
 			var set2Members = new List<string> { "four", "five", "six", "seven" };
 
@@ -162,9 +171,9 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_Store_UnionBetweenSets()
 		{
-			const string set1Name = "testunionset1";
-			const string set2Name = "testunionset2";
-			const string storeSetName = "testunionsetstore";
+			string set1Name = PrefixedKey("testunionset1");
+			string set2Name = PrefixedKey("testunionset2");
+			string storeSetName = PrefixedKey("testunionsetstore");
 			var set1Members = new List<string> { "one", "two", "three", "four", "five" };
 			var set2Members = new List<string> { "four", "five", "six", "seven" };
 
@@ -182,9 +191,9 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_DiffBetweenSets()
 		{
-			const string set1Name = "testdiffset1";
-			const string set2Name = "testdiffset2";
-			const string set3Name = "testdiffset3";
+			string set1Name = PrefixedKey("testdiffset1");
+			string set2Name = PrefixedKey("testdiffset2");
+			string set3Name = PrefixedKey("testdiffset3");
 			var set1Members = new List<string> { "one", "two", "three", "four", "five" };
 			var set2Members = new List<string> { "four", "five", "six", "seven" };
 			var set3Members = new List<string> { "one", "five", "seven", "eleven" };
@@ -202,10 +211,10 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_Store_DiffBetweenSets()
 		{
-			const string set1Name = "testdiffset1";
-			const string set2Name = "testdiffset2";
-			const string set3Name = "testdiffset3";
-			const string storeSetName = "testdiffsetstore";
+			string set1Name = PrefixedKey("testdiffset1");
+			string set2Name = PrefixedKey("testdiffset2");
+			string set3Name = PrefixedKey("testdiffset3");
+			string storeSetName = PrefixedKey("testdiffsetstore");
 			var set1Members = new List<string> { "one", "two", "three", "four", "five" };
 			var set2Members = new List<string> { "four", "five", "six", "seven" };
 			var set3Members = new List<string> { "one", "five", "seven", "eleven" };
