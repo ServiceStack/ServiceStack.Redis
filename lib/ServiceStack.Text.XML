@@ -177,7 +177,12 @@
             The object represented by this instance
             </summary>
         </member>
-        <member name="F:ServiceStack.Text.JsConfig.tsEmitCamelCaseNames">
+        <member name="F:ServiceStack.Text.JsConfig.sTimeSpanHandler">
+            <summary>
+            Sets which format to use when serializing TimeSpans
+            </summary>
+        </member>
+        <member name="F:ServiceStack.Text.JsConfig.sEmitCamelCaseNames">
             <summary>
             <see langword="true"/> if the <see cref="T:ServiceStack.Text.Common.ITypeSerializer"/> is configured
             to take advantage of <see cref="T:System.CLSCompliantAttribute"/> specification,
@@ -185,7 +190,7 @@
             and parsing member names and enum values in a case-insensitive manner.
             </summary>
         </member>
-        <member name="F:ServiceStack.Text.JsConfig.tsEmitLowercaseUnderscoreNames">
+        <member name="F:ServiceStack.Text.JsConfig.sEmitLowercaseUnderscoreNames">
             <summary>
             <see langword="true"/> if the <see cref="T:ServiceStack.Text.Common.ITypeSerializer"/> is configured
             to support web-friendly serialized formats, ie emitting lowercase_underscore_casing for JSON
@@ -196,33 +201,33 @@
             Define how property names are mapped during deserialization
             </summary>
         </member>
-        <member name="F:ServiceStack.Text.JsConfig.tsThrowOnDeserializationError">
+        <member name="F:ServiceStack.Text.JsConfig.sThrowOnDeserializationError">
             <summary>
             Gets or sets a value indicating if the framework should throw serialization exceptions
             or continue regardless of deserialization errors. If <see langword="true"/>  the framework
             will throw; otherwise, it will parse as many fields as possible. The default is <see langword="false"/>.
             </summary>
         </member>
-        <member name="F:ServiceStack.Text.JsConfig.tsAlwaysUseUtc">
+        <member name="F:ServiceStack.Text.JsConfig.sAlwaysUseUtc">
             <summary>
             Gets or sets a value indicating if the framework should always convert <see cref="T:System.DateTime"/> to UTC format instead of local time. 
             </summary>
         </member>
-        <member name="P:ServiceStack.Text.JsConfig.TimeSpanHandler">
+        <member name="F:ServiceStack.Text.JsConfig.sIncludePublicFields">
             <summary>
-            Sets which format to use when serializing TimeSpans
+            If set to true, Interface types will be prefered over concrete types when serializing.
+            </summary>
+        </member>
+        <member name="F:ServiceStack.Text.JsConfig.sModelFactory">
+            <summary>
+            Set this to enable your own type construction provider.
+            This is helpful for integration with IoC containers where you need to call the container constructor.
+            Return null if you don't know how to construct the type and the parameterless constructor will be used.
             </summary>
         </member>
         <member name="P:ServiceStack.Text.JsConfig.PreferInterfaces">
             <summary>
             If set to true, Interface types will be prefered over concrete types when serializing.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Text.JsConfig.ModelFactory">
-            <summary>
-            Set this to enable your own type construction provider.
-            This is helpful for integration with IoC containers where you need to call the container constructor.
-            Return null if you don't know how to construct the type and the parameterless constructor will be used.
             </summary>
         </member>
         <member name="F:ServiceStack.Text.JsConfig`1.IncludeTypeInfo">
