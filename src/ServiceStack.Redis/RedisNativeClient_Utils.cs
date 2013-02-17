@@ -15,6 +15,7 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using ServiceStack.Text;
 
@@ -808,41 +809,93 @@ namespace ServiceStack.Redis
 			return keyBytes;
 		}
 
-		public int EvalInt(string body, int numberKeysInArgs, params byte[][] keys)
+        protected byte[][] MergeAndConvertToBytes(string[] keys, string[] args)
 		{
-			if (body == null)
-				throw new ArgumentNullException("body");            
+		    if (keys == null)
+                keys = new string[0];
+            if (args == null)
+                args = new string[0];
 
-			var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
+            var keysLength = keys.Length;
+            var merged = new string[keysLength + args.Length];
+            for (var i = 0; i < merged.Length; i++)
+            {
+                merged[i] = i < keysLength ? keys[i] : args[i - keysLength];
+            }
 
-			return SendExpectInt(cmdArgs);
+            return ConvertToBytes(merged);
 		}
 
-		public string EvalStr(string body, int numberKeysInArgs, params byte[][] keys)
+        public int EvalInt(string luaBody, int numberKeysInArgs, params byte[][] keys)
+        {
+            if (luaBody == null)
+                throw new ArgumentNullException("luaBody");
+
+            var cmdArgs = MergeCommandWithArgs(Commands.Eval, luaBody.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
+            return SendExpectInt(cmdArgs);
+        }
+
+        public int EvalShaInt(string sha1, int numberKeysInArgs, params byte[][] keys)
+        {
+            if (sha1 == null)
+                throw new ArgumentNullException("sha1");
+
+            var cmdArgs = MergeCommandWithArgs(Commands.EvalSha, sha1.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
+            return SendExpectInt(cmdArgs);
+        }
+
+        public string EvalStr(string luaBody, int numberKeysInArgs, params byte[][] keys)
+        {
+            if (luaBody == null)
+                throw new ArgumentNullException("luaBody");
+
+            var cmdArgs = MergeCommandWithArgs(Commands.Eval, luaBody.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
+            return SendExpectData(cmdArgs).FromUtf8Bytes();
+        }
+
+        public string EvalShaStr(string sha1, int numberKeysInArgs, params byte[][] keys)
+        {
+            if (sha1 == null)
+                throw new ArgumentNullException("sha1");
+
+            var cmdArgs = MergeCommandWithArgs(Commands.EvalSha, sha1.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
+            return SendExpectData(cmdArgs).FromUtf8Bytes();
+        }
+
+        public byte[][] Eval(string luaBody, int numberKeysInArgs, params byte[][] keys)
+        {
+            if (luaBody == null)
+                throw new ArgumentNullException("luaBody");
+
+            var cmdArgs = MergeCommandWithArgs(Commands.Eval, luaBody.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
+            return SendExpectMultiData(cmdArgs);
+        }
+
+        public byte[][] EvalSha(string sha1, int numberKeysInArgs, params byte[][] keys)
+        {
+            if (sha1 == null)
+                throw new ArgumentNullException("sha1");
+
+            var cmdArgs = MergeCommandWithArgs(Commands.EvalSha, sha1.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
+            return SendExpectMultiData(cmdArgs);
+        }
+
+	    public string CalculateSha1(string luaBody)
+	    {
+            if (luaBody == null)
+                throw new ArgumentNullException("luaBody");
+
+            byte[] buffer = Encoding.UTF8.GetBytes(luaBody);
+            var cryptoTransformSHA1 = new SHA1CryptoServiceProvider();
+            return BitConverter.ToString(cryptoTransformSHA1.ComputeHash(buffer)).Replace("-", "");
+        }
+
+	    public byte[] ScriptLoad(string luaBody)
 		{
-			if (body == null)
-				throw new ArgumentNullException("body");
+			if (luaBody == null)
+				throw new ArgumentNullException("luaBody");
 
-		    var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
-			return SendExpectData(cmdArgs).FromUtf8Bytes();
-		}
-
-		public byte[][] Eval(string body, int numberKeysInArgs, params byte[][] keys)
-		{
-			if (body == null)
-				throw new ArgumentNullException("body");
-
-            var cmdArgs = MergeCommandWithArgs(Commands.Eval, body.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
-
-			return SendExpectMultiData(cmdArgs);
-		}
-
-		public byte[] ScriptLoad(string body)
-		{
-			if (body == null)
-				throw new ArgumentNullException("body");
-
-			var cmdArgs = MergeCommandWithArgs(Commands.Script, Commands.Load, body.ToUtf8Bytes());
+			var cmdArgs = MergeCommandWithArgs(Commands.Script, Commands.Load, luaBody.ToUtf8Bytes());
 			return SendExpectData(cmdArgs);
 		}
 

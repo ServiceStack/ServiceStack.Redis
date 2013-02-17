@@ -9,7 +9,7 @@ namespace ServiceStack.Redis
         /// Interface to Alchemy DB
         /// http://code.google.com/p/alchemydatabase/
         /// </summary>
-        public class AlchemyNativeClient : RedisNativeClient,IAlchemyNativeClient
+        public class AlchemyNativeClient : RedisNativeClient, IAlchemyNativeClient
         {
 
             public AlchemyNativeClient(string host)

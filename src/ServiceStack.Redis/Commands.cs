@@ -158,7 +158,8 @@ namespace ServiceStack.Redis
 		public readonly static byte[] Alpha = "ALPHA".ToUtf8Bytes();
 		public readonly static byte[] Store = "STORE".ToUtf8Bytes();
 
-		public readonly static byte[] Eval = "EVAL".ToUtf8Bytes();
+        public readonly static byte[] Eval = "EVAL".ToUtf8Bytes();
+        public readonly static byte[] EvalSha = "EVALSHA".ToUtf8Bytes();
 		public readonly static byte[] Script = "SCRIPT".ToUtf8Bytes();
 		public readonly static byte[] Load = "LOAD".ToUtf8Bytes();
 		//public readonly static byte[] Exists = "EXISTS".ToUtf8Bytes();

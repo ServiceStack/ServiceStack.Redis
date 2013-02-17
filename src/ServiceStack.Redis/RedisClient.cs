@@ -81,8 +81,8 @@ namespace ServiceStack.Redis
 			this.SortedSets = new RedisClientSortedSets(this);
 			this.Hashes = new RedisClientHashes(this);
 		}
-
-		public string this[string key]
+        
+	    public string this[string key]
 		{
 			get { return GetValue(key); }
 			set { SetEntry(key, value); }
@@ -702,20 +702,98 @@ namespace ServiceStack.Redis
 
 		#region LUA EVAL
 
-		public string GetEvalStr(string body, int numOfArgs, params string[] args)
-		{
-			return base.EvalStr(body, numOfArgs, args.ToMultiByteArray());
-		}
+        public int ExecLuaAsInt(string body, params string[] args)
+        {
+            return base.EvalInt(body, 0, args.ToMultiByteArray());
+        }
 
-		public int GetEvalInt(string body, int numOfArgs, params string[] args)
-		{
-			return base.EvalInt(body, numOfArgs, args.ToMultiByteArray());
-		}
+        public int ExecLuaAsInt(string luaBody, string[] keys, string[] args)
+        {
+            return base.EvalInt(luaBody, keys.Length, MergeAndConvertToBytes(keys, args));
+        }
 
-		public List<string> GetEvalMultiData(string body, int numOfArgs, params string[] args)
-		{
-			return base.Eval(body, numOfArgs, args.ToMultiByteArray()).ToStringList();
-		}
+        public int ExecLuaShaAsInt(string sha1, params string[] args)
+        {
+            return base.EvalShaInt(sha1, args.Length, args.ToMultiByteArray());
+        }
+
+        public int ExecLuaShaAsInt(string sha1, string[] keys, string[] args)
+        {
+            return base.EvalShaInt(sha1, keys.Length, MergeAndConvertToBytes(keys, args));
+        }
+
+        public string ExecLuaAsString(string body, params string[] args)
+        {
+            return base.EvalStr(body, 0, args.ToMultiByteArray());
+        }
+
+        public string ExecLuaAsString(string sha1, string[] keys, string[] args)
+        {
+            return base.EvalStr(sha1, keys.Length, MergeAndConvertToBytes(keys, args));
+        }
+
+        public string ExecLuaShaAsString(string sha1, params string[] args)
+        {
+            return base.EvalShaStr(sha1, 0, args.ToMultiByteArray());
+        }
+
+        public string ExecLuaShaAsString(string sha1, string[] keys, string[] args)
+        {
+            return base.EvalShaStr(sha1, keys.Length, MergeAndConvertToBytes(keys, args));
+        }
+
+        public List<string> ExecLuaAsList(string body, params string[] args)
+        {
+            return base.Eval(body, 0, args.ToMultiByteArray()).ToStringList();
+        }
+
+        public List<string> ExecLuaAsList(string luaBody, string[] keys, string[] args)
+        {
+            return base.Eval(luaBody, keys.Length, MergeAndConvertToBytes(keys, args)).ToStringList();
+        }
+
+        public List<string> ExecLuaShaAsList(string sha1, params string[] args)
+        {
+            return base.EvalSha(sha1, 0, args.ToMultiByteArray()).ToStringList();
+        }
+
+        public List<string> ExecLuaShaAsList(string sha1, string[] keys, string[] args)
+        {
+            return base.EvalSha(sha1, keys.Length, MergeAndConvertToBytes(keys, args)).ToStringList();
+        }
+
+
+        public bool HasLuaScript(string sha1Ref)
+        {
+            return WhichLuaScriptsExists(sha1Ref)[sha1Ref];
+        }
+
+        public Dictionary<string, bool> WhichLuaScriptsExists(params string[] sha1Refs)
+        {
+            var intFlags = base.ScriptExists(sha1Refs.ToMultiByteArray());
+            var map = new Dictionary<string, bool>();
+            for (int i = 0; i < sha1Refs.Length; i++)
+            {
+                var sha1Ref = sha1Refs[i];
+                map[sha1Ref] = intFlags[i].FromUtf8Bytes() == "1";
+            }
+            return map;
+        }
+
+        public void RemoveAllLuaScripts()
+        {
+            base.ScriptFlush();
+        }
+
+        public void KillRunningLuaScript()
+        {
+            base.ScriptKill();
+        }
+
+        public string LoadLuaScript(string body)
+        {
+            return base.ScriptLoad(body).FromUtf8Bytes();
+        }
 
 		#endregion
 	}
