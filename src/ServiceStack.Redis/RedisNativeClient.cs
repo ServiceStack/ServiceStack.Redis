@@ -568,7 +568,7 @@ namespace ServiceStack.Redis
 			if (newKeyname == null)
 				throw new ArgumentNullException("newKeyname");
 
-			return SendExpectInt(Commands.Rename, oldKeyname.ToUtf8Bytes(), newKeyname.ToUtf8Bytes()) == Success;
+			return SendExpectInt(Commands.RenameNx, oldKeyname.ToUtf8Bytes(), newKeyname.ToUtf8Bytes()) == Success;
 		}
 
     	public bool Expire(string key, int seconds)
