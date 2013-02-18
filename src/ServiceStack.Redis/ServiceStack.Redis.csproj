@@ -143,10 +143,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Alchemy\Commands.cs" />
-    <Compile Include="Alchemy\RedisNativeClient_Alchemy.cs" />
-    <Compile Include="Alchemy\Keywords.cs" />
-    <Compile Include="Alchemy\IAlchemyNativeClient.cs" />
     <Compile Include="BasicRedisClientManager.cs" />
     <Compile Include="BasicRedisClientManager.ICacheClient.cs" />
     <Compile Include="BufferPool.cs" />
