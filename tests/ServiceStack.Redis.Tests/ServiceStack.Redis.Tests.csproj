@@ -168,8 +168,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdhocClientTests.cs" />
-    <Compile Include="AlchemyClientTestsBase.cs" />
-    <Compile Include="AlchemyNativeClientTests.cs" />
     <Compile Include="Benchmarks\RedisMqHostPoolBenchmarks.cs" />
     <Compile Include="DiagnosticTests.cs" />
     <Compile Include="Generic\RedisClientListTestExtra.cs" />
