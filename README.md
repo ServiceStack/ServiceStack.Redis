@@ -55,10 +55,10 @@ alphabet.ForEach(x => Redis.AddItemToSortedSet("zalphabet", x, i++));
 
 //Remove the letters with the lowest rank from the sorted set 'zalphabet'
 var letters = Redis.ExecLuaAsList(luaBody, keys: new[] { "zalphabet" }, args: new[] { "3" });
-letters.PrintDump(); // [A, B, C]
+letters.PrintDump(); //[A, B, C]
 ```
 
-And ZREVPOP to remove items with the highest rank from a sorted set:
+And how to implement ZREVPOP to remove items with the highest rank from a sorted set:
 
 ```csharp
 var luaBody = @"
@@ -73,7 +73,7 @@ alphabet.ForEach(x => Redis.AddItemToSortedSet("zalphabet", x, i++));
 //Remove the letters with the highest rank from the sorted set 'zalphabet'
 List<string> letters = Redis.ExecLuaAsList(luaBody, keys: new[] { "zalphabet" }, args: new[] { "3" });
 
-letters.PrintDump(); // [X, Y, Z]
+letters.PrintDump(); //[X, Y, Z]
 ```
 
 ### Other examples
@@ -88,17 +88,17 @@ int intVal = Redis.ExecLuaAsInt("return ARGV[1] + ARGV[2]", "10", "20"); //30
 Returning an string:
 
 ```csharp
-var strVal = Redis.ExecLuaAsString(@"return 'Hello, ' .. ARGV[1] .. '!'", "Redis Lua"); //Hello, Redis!
+var strVal = Redis.ExecLuaAsString(@"return 'Hello, ' .. ARGV[1] .. '!'", "Redis Lua"); //Hello, Redis Lua!
 ```
 
 Returning a List of strings:
 
 ```csharp
-Enum.GetNames(typeof (DayOfWeek)).ToList()
+Enum.GetNames(typeof(DayOfWeek)).ToList()
     .ForEach(x => Redis.AddItemToList("DaysOfWeek", x));
 
 var daysOfWeek = Redis.ExecLuaAsList("return redis.call('LRANGE', 'DaysOfWeek', 0, -1)");
-daysOfWeek.PrintDump(); // [Sunday, Monday, Tuesday, ...]
+daysOfWeek.PrintDump(); //[Sunday, Monday, Tuesday, ...]
 ```
 
 More examples can be found in the [Redis Eval Lua tests](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/RedisClientEvalTests.cs
