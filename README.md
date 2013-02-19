@@ -41,7 +41,7 @@ public interface IRedisClient
 
 ### Usage Examples
 
-Here's how you can implement a ZPOP in Lua to remove the items with the lowest score from a sorted set:
+Here's how you can implement a ZPOP in Lua to remove the items with the lowest rank from a sorted set:
 
 ```csharp
 var luaBody = @"
@@ -58,7 +58,7 @@ var letters = Redis.ExecLuaAsList(luaBody, keys: new[] { "zalphabet" }, args: ne
 letters.PrintDump(); // [A, B, C]
 ```
 
-And ZREVPOP to remove items with the highest value from a sorted set:
+And ZREVPOP to remove items with the highest rank from a sorted set:
 
 ```csharp
 var luaBody = @"
