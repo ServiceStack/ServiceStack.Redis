@@ -1,18 +1,23 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
+using ServiceStack.Common;
+using ServiceStack.Net30;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture, Category("Integration")]
-	public class RedisClientEvalTests : RedisClientTestsBase
-	{
-		public override void OnBeforeEachTest()
-		{
-			base.OnBeforeEachTest();
-            
+    [TestFixture, Category("Integration")]
+    public class RedisClientEvalTests : RedisClientTestsBase
+    {
+        public override void OnBeforeEachTest()
+        {
+            //base.OnBeforeEachTest();
+
             //Run on local build server
-            //Redis = new RedisClient("192.168.2.16");
-            //Redis.FlushAll();
+            Redis = new RedisClient("192.168.2.16");
+            Redis.FlushAll();
         }
 
         [Test]
@@ -46,19 +51,26 @@ namespace ServiceStack.Redis.Tests
             Assert.That(intVal, Is.EqualTo(50));
         }
 
-		[Test]
-		public void Can_Eval_int2()
-		{
-            var intVal = Redis.ExecLuaAsInt("return 3141592");
-			Assert.That(intVal, Is.EqualTo(3141592));
-		}
+        [Test]
+        public void Can_Eval_int2()
+        {
+            var intVal = Redis.ExecLuaAsInt("return ARGV[1] + ARGV[2]", "10", "20");
+            Assert.That(intVal, Is.EqualTo(30));
+        }
 
-		[Test]
-		public void Can_Eval_string()
-		{
+        [Test]
+        public void Can_Eval_string()
+        {
             var strVal = Redis.ExecLuaAsString(@"return 'abc'");
-			Assert.That(strVal, Is.EqualTo("abc"));
-		}
+            Assert.That(strVal, Is.EqualTo("abc"));
+        }
+
+        [Test]
+        public void Can_Eval_HelloWorld_string()
+        {
+            var strVal = Redis.ExecLuaAsString(@"return 'Hello, ' .. ARGV[1] .. '!'", "Redis Lua");
+            Assert.That(strVal, Is.EqualTo("Hello, Redis Lua!"));
+        }
 
         [Test]
         public void Can_Eval_string_with_args()
@@ -115,22 +127,66 @@ namespace ServiceStack.Redis.Tests
             catch (RedisResponseException ex)
             {
                 Assert.That(ex.Message, Is.StringContaining("NOSCRIPT"));
-            } 
+            }
         }
 
-	    [Test]
-	    public void Can_detect_which_scripts_exist()
-	    {
+        [Test]
+        public void Can_detect_which_scripts_exist()
+        {
             var sha1 = Redis.LoadLuaScript("return 'script1'");
-            var sha2 = Redis.CalculateSha1("return 'script2'"); 
+            var sha2 = Redis.CalculateSha1("return 'script2'");
             var sha3 = Redis.LoadLuaScript("return 'script3'");
-            
+
             Assert.That(Redis.HasLuaScript(sha1));
 
-	        var existsMap = Redis.WhichLuaScriptsExists(sha1, sha2, sha3);
+            var existsMap = Redis.WhichLuaScriptsExists(sha1, sha2, sha3);
             Assert.That(existsMap[sha1]);
             Assert.That(!existsMap[sha2]);
             Assert.That(existsMap[sha3]);
-	    }
-	}
+        }
+
+        [Test]
+        public void Can_create_ZPop_with_lua()
+        {
+            var luaBody = @"
+                local val = redis.call('zrange', KEYS[1], 0, ARGV[1]-1)
+                if val then redis.call('zremrangebyrank', KEYS[1], 0, ARGV[1]-1) end
+                return val";
+
+            var i = 0;
+            var alphabet = 26.Times(c => ((char)('A' + c)).ToString());
+            alphabet.ForEach(x => Redis.AddItemToSortedSet("zalphabet", x, i++));
+
+            var letters = Redis.ExecLuaAsList(luaBody, keys: new[] { "zalphabet" }, args: new[] { "3" });
+
+            letters.PrintDump();
+            Assert.That(letters, Is.EquivalentTo(new[] { "A", "B", "C" }));
+        }
+
+        [Test]
+        public void Can_create_ZRevPop_with_lua()
+        {
+            var luaBody = @"
+                local val = redis.call('zrange', KEYS[1], -ARGV[1], -1)
+                if val then redis.call('zremrangebyrank', KEYS[1], -ARGV[1], -1) end
+                return val";
+
+            var i = 0;
+            var alphabet = 26.Times(c => ((char)('A' + c)).ToString());
+            alphabet.ForEach(x => Redis.AddItemToSortedSet("zalphabet", x, i++));
+
+            var letters = Redis.ExecLuaAsList(luaBody, keys: new[] { "zalphabet" }, args: new[] { "3" });
+
+            letters.PrintDump();
+            Assert.That(letters, Is.EquivalentTo(new[] { "X", "Y", "Z" }));
+        }
+
+        [Test]
+        public void Can_return_DaysOfWeek_as_list()
+        {
+            Enum.GetNames(typeof (DayOfWeek)).ToList()
+                .ForEach(x => Redis.AddItemToList("DaysOfWeek", x));
+            Redis.ExecLuaAsList("return redis.call('LRANGE', 'DaysOfWeek', 0, -1)").PrintDump();
+        }
+    }
 }

@@ -1,8 +1,110 @@
-[Join the new google group](http://groups.google.com/group/servicestack) or
-follow [@demisbellot](http://twitter.com/demisbellot) and [@boxerab](http://twitter.com/boxerab)
-for twitter updates.
+[Join the new ServiceStack Google+ group](https://plus.google.com/u/0/communities/112445368900682590445) or
+follow [@servicestack](http://twitter.com/servicestack) for twitter updates.
 
 # An Open Source C# Client for Redis
+
+## New in v3.9.37
+
+### New IRedisClient LUA API's
+
+The `IRedisClient` API's for [redis server-side LUA support](http://redis.io/commands/eval) have been re-factored into the more user-friendly API's below:
+
+```csharp
+public interface IRedisClient 
+{
+    //Eval/Lua operations 
+
+    string ExecLuaAsString(string luaBody, params string[] args);
+    string ExecLuaAsString(string luaBody, string[] keys, string[] args);
+    string ExecLuaShaAsString(string sha1, params string[] args);
+    string ExecLuaShaAsString(string sha1, string[] keys, string[] args);
+    
+    int ExecLuaAsInt(string luaBody, params string[] args);
+    int ExecLuaAsInt(string luaBody, string[] keys, string[] args);
+    int ExecLuaShaAsInt(string sha1, params string[] args);
+    int ExecLuaShaAsInt(string sha1, string[] keys, string[] args);
+
+    List<string> ExecLuaAsList(string luaBody, params string[] args);
+    List<string> ExecLuaAsList(string luaBody, string[] keys, string[] args);
+    List<string> ExecLuaShaAsList(string sha1, params string[] args);
+    List<string> ExecLuaShaAsList(string sha1, string[] keys, string[] args);
+
+    string CalculateSha1(string luaBody);
+    
+    bool HasLuaScript(string sha1Ref);
+    Dictionary<string, bool> WhichLuaScriptsExists(params string[] sha1Refs);
+    void RemoveAllLuaScripts();
+    void KillRunningLuaScript();
+    string LoadLuaScript(string body);
+}
+```
+
+### Usage Examples
+
+Here's how you can implement a ZPOP in Lua to remove the items with the lowest score from a sorted set:
+
+```csharp
+var luaBody = @"
+    local val = redis.call('zrange', KEYS[1], 0, ARGV[1]-1)
+    if val then redis.call('zremrangebyrank', KEYS[1], 0, ARGV[1]-1) end
+    return val";
+
+var i = 0;
+var alphabet = 26.Times(c => ((char)('A' + c)).ToString());
+alphabet.ForEach(x => Redis.AddItemToSortedSet("zalphabet", x, i++));
+
+//Remove the letters with the lowest rank from the sorted set 'zalphabet'
+var letters = Redis.ExecLuaAsList(luaBody, keys: new[] { "zalphabet" }, args: new[] { "3" });
+letters.PrintDump(); // [A, B, C]
+```
+
+And ZREVPOP to remove items with the highest value from a sorted set:
+
+```csharp
+var luaBody = @"
+    local val = redis.call('zrange', KEYS[1], -ARGV[1], -1)
+    if val then redis.call('zremrangebyrank', KEYS[1], -ARGV[1], -1) end
+    return val";
+
+var i = 0;
+var alphabet = 26.Times(c => ((char)('A' + c)).ToString());
+alphabet.ForEach(x => Redis.AddItemToSortedSet("zalphabet", x, i++));
+
+//Remove the letters with the highest rank from the sorted set 'zalphabet'
+List<string> letters = Redis.ExecLuaAsList(luaBody, keys: new[] { "zalphabet" }, args: new[] { "3" });
+
+letters.PrintDump(); // [X, Y, Z]
+```
+
+### Other examples
+
+Returning an int:
+
+```csharp
+int intVal = Redis.ExecLuaAsInt("return 123"); //123
+int intVal = Redis.ExecLuaAsInt("return ARGV[1] + ARGV[2]", "10", "20"); //30
+```
+
+Returning an string:
+
+```csharp
+var strVal = Redis.ExecLuaAsString(@"return 'Hello, ' .. ARGV[1] .. '!'", "Redis Lua"); //Hello, Redis!
+```
+
+Returning a List of strings:
+
+```csharp
+Enum.GetNames(typeof (DayOfWeek)).ToList()
+    .ForEach(x => Redis.AddItemToList("DaysOfWeek", x));
+
+var daysOfWeek = Redis.ExecLuaAsList("return redis.call('LRANGE', 'DaysOfWeek', 0, -1)");
+daysOfWeek.PrintDump(); // [Sunday, Monday, Tuesday, ...]
+```
+
+More examples can be found in the [Redis Eval Lua tests](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/RedisClientEvalTests.cs
+)
+
+## Overview
 
 *The Redis client is an independent project and can be used with or without the ServiceStack webservices framework.*
 
