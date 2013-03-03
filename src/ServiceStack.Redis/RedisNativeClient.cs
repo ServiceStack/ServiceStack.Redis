@@ -224,7 +224,7 @@ namespace ServiceStack.Redis
 
     	public void ConfigSet(string item, byte[] value)
     	{
-			SendExpectSuccess(Commands.Config, Commands.Select, value);
+			SendExpectSuccess(Commands.Config, Commands.Set, item.ToUtf8Bytes(), value);
 		}
 
     	public void ConfigResetStat()
