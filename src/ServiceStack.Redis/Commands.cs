@@ -80,6 +80,9 @@ namespace ServiceStack.Redis
         public readonly static byte[] LRange = "LRANGE".ToUtf8Bytes();
         public readonly static byte[] LTrim = "LTRIM".ToUtf8Bytes();
         public readonly static byte[] LIndex = "LINDEX".ToUtf8Bytes();
+        public readonly static byte[] LInsert = "LINSERT".ToUtf8Bytes();
+        public readonly static byte[] Before = "BEFORE".ToUtf8Bytes();
+        public readonly static byte[] After = "AFTER".ToUtf8Bytes();
         public readonly static byte[] LSet = "LSET".ToUtf8Bytes();
         public readonly static byte[] LRem = "LREM".ToUtf8Bytes();
         public readonly static byte[] LPop = "LPOP".ToUtf8Bytes();

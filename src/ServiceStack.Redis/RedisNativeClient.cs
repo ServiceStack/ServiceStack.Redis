@@ -958,6 +958,16 @@ namespace ServiceStack.Redis
             return SendExpectData(Commands.LIndex, listId.ToUtf8Bytes(), listIndex.ToUtf8Bytes());
         }
 
+        public void LInsert(string listId, bool insertBefore, byte[] pivot, byte[] value)
+        {
+            if (listId == null)
+                throw new ArgumentNullException("listId");
+
+            var position = insertBefore ? Commands.Before : Commands.After;
+
+            SendExpectSuccess(Commands.LInsert, listId.ToUtf8Bytes(), position, pivot, value);
+        }
+
         public void LSet(string listId, int listIndex, byte[] value)
         {
             if (listId == null)

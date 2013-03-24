@@ -153,7 +153,17 @@ namespace ServiceStack.Redis.Generic
 			client.LSet(toList.Id, listIndex, SerializeValue(value));
 		}
 
-		public void EnqueueItemOnList(IRedisList<T> fromList, T item)
+	    public void InsertBeforeItemInList(IRedisList<T> toList, T pivot, T value)
+	    {
+            client.LInsert(toList.Id, insertBefore: true, pivot: SerializeValue(pivot), value: SerializeValue(value));
+	    }
+
+	    public void InsertAfterItemInList(IRedisList<T> toList, T pivot, T value)
+	    {
+            client.LInsert(toList.Id, insertBefore: false, pivot: SerializeValue(pivot), value: SerializeValue(value));
+        }
+
+	    public void EnqueueItemOnList(IRedisList<T> fromList, T item)
 		{
 			client.LPush(fromList.Id, SerializeValue(item));
 		}

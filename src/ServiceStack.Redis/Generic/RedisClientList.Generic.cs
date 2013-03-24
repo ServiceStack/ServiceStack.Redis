@@ -123,9 +123,7 @@ namespace ServiceStack.Redis.Generic
 
 		public void Insert(int index, T item)
 		{
-			//TODO: replace with implementation involving creating on new temp list then replacing
-			//otherwise wait for native implementation
-			throw new NotImplementedException();
+            client.InsertAfterItemInList(this, this[index], item);
 		}
 
 		public void RemoveAt(int index)
