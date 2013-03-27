@@ -343,3 +343,13 @@ _(Running inside a VS.NET/R# unit test on a 3 year old iMac)_
 
 Note: The total time taken includes an extra Redis operation for each record to store the id in a Redis set for each
 type as well as serializing and de-serializing each record using Service Stack's TypeSerializer.
+
+
+# Community Resources
+
+  - [Redis and VB.Net](http://blogs.lessthandot.com/index.php/DataMgmt/DBProgramming/redis-and-vb-net) by [@chrissie1](https://twitter.com/chrissie1)
+  - [Using ServiceStack.Redis Part 2: Sets and Hashes](http://michaelsarchet.com/using-the-servicestack-redis-client/) by [@msarchet](http://twitter.com/msarchet)
+  - [Using the ServiceStack.Redis Client](http://michaelsarchet.com/using-the-servicestack-redis-client/) by [@msarchet](http://twitter.com/msarchet)
+  - [Implementing ServiceStack.Redis.RedisClient (.NET Client for Redis)](http://www.narizwallace.com/2012/10/implementing-servicestack-redis-redisclient-net-client-for-redis/) by [@NarizWallace](https://twitter.com/NarizWallace)
+  - [Getting started with Redis in ASP.NET under Windows](http://maxivak.com/getting-started-with-redis-and-asp-net-mvc-under-windows/) by [@maxivak](https://twitter.com/maxivak)
+  - [Using Redis on Windows with ServiceStack](http://www.clippersoft.net/using-redis-on-windows-with-servicestack/)
