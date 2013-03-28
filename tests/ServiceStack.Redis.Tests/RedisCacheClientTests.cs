@@ -51,6 +51,13 @@ namespace ServiceStack.Redis.Tests
 			ModelWithIdAndName.AssertIsEqual(existingModel, model);
 		}
 
+
+		[Test]
+		public void Can_store_null_model()
+		{
+			cacheClient.Set<ModelWithIdAndName>("test-key", null);
+		}
+	    
 		[Test]
 		public void Can_Set_and_Get_key_with_all_byte_values()
 		{
