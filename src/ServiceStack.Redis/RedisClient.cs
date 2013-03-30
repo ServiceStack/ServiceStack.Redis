@@ -119,7 +119,7 @@ namespace ServiceStack.Redis
                 ? value.ToUtf8Bytes()
                 : null;
 
-            Set(key, bytesValue);
+            base.Set(key, bytesValue);
         }
 
         public void SetAll(IEnumerable<string> keys, IEnumerable<string> values)
