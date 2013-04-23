@@ -116,7 +116,7 @@ namespace ServiceStack.Redis
         public RedisNativeClient(string host, int port)
             : this(host, port, null) {}
 
-        public RedisNativeClient(string host, int port, string password)
+        public RedisNativeClient(string host, int port, string password = null, int db = DefaultDb)
         {
             if (host == null)
                 throw new ArgumentNullException("host");
@@ -126,6 +126,7 @@ namespace ServiceStack.Redis
             SendTimeout = -1;
 			ReceiveTimeout = -1;
             Password = password;
+            Db = db;
         }
 
         public RedisNativeClient()
