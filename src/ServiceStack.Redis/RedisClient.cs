@@ -60,8 +60,8 @@ namespace ServiceStack.Redis
             Init();
         }
 
-        public RedisClient(string host, int port, string password)
-            : base(host, port, password)
+        public RedisClient(string host, int port, string password = "", int db = DefaultDb)
+            : base(host, port, password, db)
         {
             Init();
         }
