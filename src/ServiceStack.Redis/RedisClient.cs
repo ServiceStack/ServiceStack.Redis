@@ -74,6 +74,12 @@ namespace ServiceStack.Redis
             Init();
         }
 
+        public RedisClient(ConnectionString connectionString)
+            : base(connectionString.Host, connectionString.Port, connectionString.Password, connectionString.Db)
+        {
+            
+        }
+
         public void Init()
         {
             this.Lists = new RedisClientLists(this);
@@ -797,5 +803,4 @@ namespace ServiceStack.Redis
 
         #endregion
     }
-
 }

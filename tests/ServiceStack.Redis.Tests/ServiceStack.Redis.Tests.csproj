@@ -169,6 +169,7 @@
   <ItemGroup>
     <Compile Include="AdhocClientTests.cs" />
     <Compile Include="Benchmarks\RedisMqHostPoolBenchmarks.cs" />
+    <Compile Include="ConnectionStringTests.cs" />
     <Compile Include="DiagnosticTests.cs" />
     <Compile Include="Generic\RedisClientListTestExtra.cs" />
     <Compile Include="ManagedListGenericTests.cs" />
