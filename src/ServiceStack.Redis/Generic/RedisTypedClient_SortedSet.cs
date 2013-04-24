@@ -252,7 +252,7 @@ namespace ServiceStack.Redis.Generic
 
 		public int RemoveRangeFromSortedSet(IRedisSortedSet<T> set, int minRank, int maxRank)
 		{
-			return client.RemoveRangeFromSortedSet(set.Id, maxRank, maxRank);
+			return client.RemoveRangeFromSortedSet(set.Id, minRank, maxRank);
 		}
 
 		public int RemoveRangeFromSortedSetByScore(IRedisSortedSet<T> set, double fromScore, double toScore)
