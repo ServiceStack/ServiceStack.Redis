@@ -53,6 +53,20 @@ namespace ServiceStack.Redis
 			return base.HSet(hashId, key.ToUtf8Bytes(), value.ToUtf8Bytes()) == Success;
 		}
 
+        public bool SetEntryInHash<T>(string hashId, string key, T value)
+        {
+            var bytesValue = value as byte[];
+            if (bytesValue != null)
+            {
+                base.HSet(hashId, key.ToUtf8Bytes(), bytesValue);
+                return true;
+            }
+
+            var valueString = JsonSerializer.SerializeToString(value);
+            SetEntryInHash(hashId, key, valueString);
+            return true;
+        }
+
 		public bool SetEntryInHashIfNotExists(string hashId, string key, string value)
 		{
 			return base.HSetNX(hashId, key.ToUtf8Bytes(), value.ToUtf8Bytes()) == Success;
@@ -90,6 +104,13 @@ namespace ServiceStack.Redis
 		{
 			return base.HGet(hashId, key.ToUtf8Bytes()).FromUtf8Bytes();
 		}
+
+        public T GetValueFromHash<T>(string hashId, string key)
+        {
+            return typeof(T) == typeof(byte[])
+                ? (T)(object)base.HGet(hashId, key.ToUtf8Bytes())
+                : JsonSerializer.DeserializeFromString<T>(GetValueFromHash(hashId, key));
+        }
 
 		public bool HashContainsEntry(string hashId, string key)
 		{
