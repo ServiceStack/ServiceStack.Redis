@@ -16,7 +16,7 @@ namespace ServiceStack.Redis.Tests
             //base.OnBeforeEachTest();
 
             //Run on local build server
-            Redis = new RedisClient("192.168.2.16");
+            Redis = new RedisClient(TestConfig.SingleHost);
             Redis.FlushAll();
         }
 
