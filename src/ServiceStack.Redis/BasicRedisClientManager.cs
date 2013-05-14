@@ -100,7 +100,7 @@ namespace ServiceStack.Redis
 			//Set database to userSpecified if different
 			if (Db != RedisNativeClient.DefaultDb)
 			{
-				client.Db = Db;
+				client.ChangeDb(Db);
 			}
 
             if (nextHost.RequiresAuth)
@@ -130,7 +130,7 @@ namespace ServiceStack.Redis
 			//Set database to userSpecified if different
 			if (Db != RedisNativeClient.DefaultDb)
 			{
-				client.Db = Db;
+				client.ChangeDb(Db);
 			}
 
             if (nextHost.RequiresAuth)

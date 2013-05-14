@@ -42,13 +42,14 @@ namespace ServiceStack.Redis.Tests
 		}
 
 		public PooledRedisClientManager CreateManager(
-			IRedisClientFactory usingFactory, string[] readWriteHosts, string[] readOnlyHosts)
+			IRedisClientFactory usingFactory, string[] readWriteHosts, string[] readOnlyHosts, int ? defaultDb = null)
 		{
 			return new PooledRedisClientManager(readWriteHosts, readOnlyHosts,
 				new RedisClientManagerConfig {
 					MaxWritePoolSize = readWriteHosts.Length,
 					MaxReadPoolSize = readOnlyHosts.Length,
 					AutoStart = false,
+                    DefaultDb = defaultDb
 				}) 
 				{
 					RedisClientFactory = usingFactory,
@@ -96,6 +97,29 @@ namespace ServiceStack.Redis.Tests
 				Assert.Fail("Should throw");
 			}
 		}
+
+        [Test]
+        public void Can_change_db_for_client()
+        {
+            using (var db1 = new PooledRedisClientManager(1, new string[] { TestConfig.SingleHost }))
+            using (var db2 = new PooledRedisClientManager(2, new string[] { TestConfig.SingleHost }))
+            {
+                var val = Environment.TickCount;
+                var key = "test" + val;
+                var db1c = db1.GetClient();
+                var db2c = db2.GetClient();
+                try
+                {
+                    db1c.Set(key, val);
+                    Assert.That(db2c.Get<int>(key), Is.EqualTo(0));
+                    Assert.That(db1c.Get<int>(key), Is.EqualTo(val));
+                }
+                finally
+                {
+                    db1c.Remove(key);
+                }
+            }
+        }
 
 		[Test]
 		public void Can_get_client_after_calling_Start()

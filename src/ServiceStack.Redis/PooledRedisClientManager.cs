@@ -193,7 +193,7 @@ namespace ServiceStack.Redis
 				//Reset database to default if changed
 				if (inActiveClient.Db != Db)
 				{
-					inActiveClient.Db = Db;
+					inActiveClient.ChangeDb(Db);
 				}
 
 				return inActiveClient;
@@ -230,7 +230,7 @@ namespace ServiceStack.Redis
                         client.ClientManager = this;
                         client.NamespacePrefix = NamespacePrefix;
                         client.ConnectionFilter = ConnectionFilter;
-
+                        
                         writeClients[i] = client;
 
                         return client;
@@ -278,7 +278,7 @@ namespace ServiceStack.Redis
 				//Reset database to default if changed
 				if (inActiveClient.Db != Db)
 				{
-					inActiveClient.Db = Db;
+                    inActiveClient.ChangeDb(Db);
 				}
 
 				return inActiveClient;

@@ -145,7 +145,6 @@ namespace ServiceStack.Redis
             set
             {
                 db = value;
-                SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
             }
         }
 

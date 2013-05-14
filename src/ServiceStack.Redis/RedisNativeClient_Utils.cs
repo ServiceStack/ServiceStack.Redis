@@ -52,7 +52,9 @@ namespace ServiceStack.Redis
                 if (Password != null)
                     SendExpectSuccess(Commands.Auth, Password.ToUtf8Bytes());
 
-                db = 0;
+                if (db != 0)
+                    SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
+
                 var ipEndpoint = socket.LocalEndPoint as IPEndPoint;
                 clientPort = ipEndpoint != null ? ipEndpoint.Port : -1;
                 lastCommand = null;
@@ -109,9 +111,7 @@ namespace ServiceStack.Redis
 
             if (socket == null)
             {
-                var previousDb = db;
                 Connect();
-                if (previousDb != DefaultDb) this.Db = previousDb;
             }
 
             var isConnected = socket != null;

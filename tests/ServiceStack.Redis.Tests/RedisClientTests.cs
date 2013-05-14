@@ -523,6 +523,27 @@ namespace ServiceStack.Redis.Tests
         }
 
 
+        [Test]
+        public void Can_change_db_at_runtime()
+        {
+            var redis = new RedisClient(TestConfig.SingleHost, TestConfig.RedisPort, db : 1);
+            var val = Environment.TickCount;
+            var key = "test" + val;
+            try
+            {
+                redis.Set(key, val);
+                redis.ChangeDb(2);
+                Assert.That(redis.Get<int>(key), Is.EqualTo(0));
+                redis.ChangeDb(1);
+                Assert.That(redis.Get<int>(key), Is.EqualTo(val));
+                redis.Dispose();
+            }
+            finally
+            {
+                redis.ChangeDb(1);
+                redis.Del(key);
+            }
+        }
 	}
 
 }

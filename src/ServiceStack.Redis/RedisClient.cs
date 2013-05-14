@@ -122,6 +122,12 @@ namespace ServiceStack.Redis
             base.Set(key, bytesValue);
         }
 
+        public void ChangeDb(int db)
+        {
+            Db = db;
+            SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
+        }
+
         public void SetAll(IEnumerable<string> keys, IEnumerable<string> values)
         {
             if (keys == null || values == null) return;
