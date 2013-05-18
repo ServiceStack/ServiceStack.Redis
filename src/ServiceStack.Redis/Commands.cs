@@ -48,6 +48,9 @@ namespace ServiceStack.Redis
         public readonly static byte[] Monitor = "MONITOR".ToUtf8Bytes();		//missing
         public readonly static byte[] Debug = "DEBUG".ToUtf8Bytes();			//missing
         public readonly static byte[] Config = "CONFIG".ToUtf8Bytes();			//missing
+        public readonly static byte[] Client = "CLIENT".ToUtf8Bytes();
+        public readonly static byte[] SetName = "SETNAME".ToUtf8Bytes();
+        public readonly static byte[] GetName = "GETNAME".ToUtf8Bytes();
         //public readonly static byte[] Get = "GET".ToUtf8Bytes();
         //public readonly static byte[] Set = "SET".ToUtf8Bytes();
 
