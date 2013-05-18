@@ -659,6 +659,22 @@ namespace ServiceStack.Redis
             SendExpectSuccess(Commands.FlushAll);
         }
 
+        public string GetClientName()
+        {
+            return SendExpectString(Commands.Client, Commands.GetName);
+        }
+
+        public void SetClientName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("Name cannot be null or empty");
+
+            if (name.Contains(" "))
+                throw new ArgumentException("Name cannot contain spaces");
+
+            SendExpectSuccess(Commands.Client, Commands.SetName, name.ToUtf8Bytes());
+        }
+
         public byte[][] Keys(string pattern)
         {
             if (pattern == null)
