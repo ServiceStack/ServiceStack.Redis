@@ -86,7 +86,7 @@ namespace ServiceStack.Redis.Generic
 
 		public int Count
 		{
-			get { return client.GetHashCount(this); }
+			get { return (int)client.GetHashCount(this); }
 		}
 
 		public bool IsReadOnly

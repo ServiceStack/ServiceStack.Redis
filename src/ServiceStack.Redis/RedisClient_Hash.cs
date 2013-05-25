@@ -76,12 +76,12 @@ namespace ServiceStack.Redis
 			base.HMSet(hashId, keys, values);
 		}
 
-        public int IncrementValueInHash(string hashId, string key, int incrementBy)
+		public long IncrementValueInHash(string hashId, string key, int incrementBy)
         {
             return base.HIncrby(hashId, key.ToUtf8Bytes(), incrementBy);
         }
 
-        public int IncrementValueInHash(string hashId, string key, long incrementBy)
+		public long IncrementValueInHash(string hashId, string key, long incrementBy)
         {
             return base.HIncrby(hashId, key.ToUtf8Bytes(), incrementBy);
         }
@@ -101,7 +101,7 @@ namespace ServiceStack.Redis
 			return base.HDel(hashId, key.ToUtf8Bytes()) == Success;
 		}
 
-		public int GetHashCount(string hashId)
+		public long GetHashCount(string hashId)
 		{
 			return base.HLen(hashId);
 		}

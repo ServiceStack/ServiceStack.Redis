@@ -193,6 +193,16 @@ namespace ServiceStack.Redis.Tests
 		}
 
 		[Test]
+		public void Can_increment_Hash_field_beyond_32_bits()
+		{
+			Redis.SetEntryInHash(HashId, "int", Int32.MaxValue.ToString());
+			Redis.IncrementValueInHash(HashId, "int", 1);
+			long actual = Int64.Parse(Redis.GetValueFromHash(HashId, "int"));
+			long expected = Int32.MaxValue + 1L;
+			Assert.That(actual, Is.EqualTo(expected));
+		}
+
+		[Test]
 		public void Can_SetItemInHashIfNotExists()
 		{
 			stringMap.ForEach(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));

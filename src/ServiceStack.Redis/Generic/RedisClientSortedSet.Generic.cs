@@ -100,7 +100,7 @@ namespace ServiceStack.Redis.Generic
 		{
 			get
 			{
-				var setCount = client.GetSortedSetCount(this);
+				var setCount = (int)client.GetSortedSetCount(this);
 				return setCount;
 			}
 		}
@@ -124,10 +124,10 @@ namespace ServiceStack.Redis.Generic
 
 		public int IndexOf(T item)
 		{
-			return client.GetItemIndexInSortedSet(this, item);
+			return (int)client.GetItemIndexInSortedSet(this, item);
 		}
 
-		public int IndexOfDescending(T item)
+		public long IndexOfDescending(T item)
 		{
 			return client.GetItemIndexInSortedSetDesc(this, item);
 		}
@@ -167,12 +167,12 @@ namespace ServiceStack.Redis.Generic
 			return client.GetRangeFromSortedSetByHighestScore(this, fromScore, toScore, skip, take);
 		}
 
-		public int RemoveRange(int minRank, int maxRank)
+		public long RemoveRange(int minRank, int maxRank)
 		{
 			return client.RemoveRangeFromSortedSet(this, minRank, maxRank);
 		}
 
-		public int RemoveRangeByScore(double fromScore, double toScore)
+		public long RemoveRangeByScore(double fromScore, double toScore)
 		{
 			return client.RemoveRangeFromSortedSetByScore(this, fromScore, toScore);
 		}
@@ -182,12 +182,12 @@ namespace ServiceStack.Redis.Generic
 			return client.GetItemScoreInSortedSet(this, item);
 		}
 
-		public int PopulateWithIntersectOf(params IRedisSortedSet<T>[] setIds)
+		public long PopulateWithIntersectOf(params IRedisSortedSet<T>[] setIds)
 		{
 			return client.StoreIntersectFromSortedSets(this, setIds);
 		}
 
-		public int PopulateWithUnionOf(params IRedisSortedSet<T>[] setIds)
+		public long PopulateWithUnionOf(params IRedisSortedSet<T>[] setIds)
 		{
 			return client.StoreUnionFromSortedSets(this, setIds);
 		}

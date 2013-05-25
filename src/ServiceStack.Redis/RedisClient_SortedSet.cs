@@ -159,12 +159,12 @@ namespace ServiceStack.Redis
 			return base.ZIncrBy(setId, incrementBy, value.ToUtf8Bytes());
 		}
 
-		public int GetItemIndexInSortedSet(string setId, string value)
+		public long GetItemIndexInSortedSet(string setId, string value)
 		{
 			return base.ZRank(setId, value.ToUtf8Bytes());
 		}
 
-		public int GetItemIndexInSortedSetDesc(string setId, string value)
+		public long GetItemIndexInSortedSetDesc(string setId, string value)
 		{
 			return base.ZRevRank(setId, value.ToUtf8Bytes());
 		}
@@ -366,39 +366,39 @@ namespace ServiceStack.Redis
 
 
 
-		public int RemoveRangeFromSortedSet(string setId, int minRank, int maxRank)
+		public long RemoveRangeFromSortedSet(string setId, int minRank, int maxRank)
 		{
 			return base.ZRemRangeByRank(setId, minRank, maxRank);
 		}
 
-		public int RemoveRangeFromSortedSetByScore(string setId, double fromScore, double toScore)
+		public long RemoveRangeFromSortedSetByScore(string setId, double fromScore, double toScore)
 		{
 			return base.ZRemRangeByScore(setId, fromScore, toScore);
 		}
 
-		public int RemoveRangeFromSortedSetByScore(string setId, long fromScore, long toScore)
+		public long RemoveRangeFromSortedSetByScore(string setId, long fromScore, long toScore)
 		{
 			return base.ZRemRangeByScore(setId, fromScore, toScore);
 		}
 
-		public int GetSortedSetCount(string setId)
+		public long GetSortedSetCount(string setId)
 		{
 			return base.ZCard(setId);
 		}
 
-		public int GetSortedSetCount(string setId, string fromStringScore, string toStringScore)
+		public long GetSortedSetCount(string setId, string fromStringScore, string toStringScore)
 		{
 			var fromScore = GetLexicalScore(fromStringScore);
 			var toScore = GetLexicalScore(toStringScore);
 			return GetSortedSetCount(setId, fromScore, toScore);
 		}
 
-		public int GetSortedSetCount(string setId, double fromScore, double toScore)
+		public long GetSortedSetCount(string setId, double fromScore, double toScore)
 		{
 			return base.ZCount(setId, fromScore, toScore);
 		}
 
-		public int GetSortedSetCount(string setId, long fromScore, long toScore)
+		public long GetSortedSetCount(string setId, long fromScore, long toScore)
 		{
 			return base.ZCount(setId, fromScore, toScore);
 		}
@@ -408,12 +408,12 @@ namespace ServiceStack.Redis
 			return base.ZScore(setId, value.ToUtf8Bytes());
 		}
 
-		public int StoreIntersectFromSortedSets(string intoSetId, params string[] setIds)
+		public long StoreIntersectFromSortedSets(string intoSetId, params string[] setIds)
 		{
 			return base.ZInterStore(intoSetId, setIds);
 		}
 
-		public int StoreUnionFromSortedSets(string intoSetId, params string[] setIds)
+		public long StoreUnionFromSortedSets(string intoSetId, params string[] setIds)
 		{
 			return base.ZUnionStore(intoSetId, setIds);
 		}

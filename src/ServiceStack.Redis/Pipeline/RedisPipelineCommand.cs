@@ -19,9 +19,9 @@ namespace ServiceStack.Redis.Pipeline
 			cmdCount++;
 		}
 
-		public List<int> ReadAllAsInts()
+		public List<long> ReadAllAsInts()
 		{
-			var results = new List<int>();
+			var results = new List<long>();
 			while (cmdCount-- > 0)
 			{
 				results.Add(client.ReadInt());

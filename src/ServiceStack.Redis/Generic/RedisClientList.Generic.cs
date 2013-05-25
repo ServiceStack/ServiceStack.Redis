@@ -103,7 +103,7 @@ namespace ServiceStack.Redis.Generic
 		{
 			get
 			{
-				return client.GetListCount(this);
+				return (int)client.GetListCount(this);
 			}
 		}
 
@@ -167,12 +167,12 @@ namespace ServiceStack.Redis.Generic
 			client.TrimList(this, keepStartingFrom, keepEndingAt);
 		}
 
-		public int RemoveValue(T value)
+		public long RemoveValue(T value)
 		{
 			return client.RemoveItemFromList(this, value);
 		}
 
-		public int RemoveValue(T value, int noOfMatches)
+		public long RemoveValue(T value, int noOfMatches)
 		{
 			return client.RemoveItemFromList(this, value, noOfMatches);
 		}

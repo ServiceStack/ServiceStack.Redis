@@ -33,7 +33,7 @@ namespace ServiceStack.Redis.Support.Locking
 			var newLockExpire = CalculateLockExpire(ts, lockTimeout);
 
             var localClient = (RedisClient)client;
-            int wasSet = localClient.SetNX(key, BitConverter.GetBytes(newLockExpire));
+            long wasSet = localClient.SetNX(key, BitConverter.GetBytes(newLockExpire));
 			int totalTime = 0;
             while (wasSet == LOCK_NOT_ACQUIRED && totalTime < acquisitionTimeout)
 			{

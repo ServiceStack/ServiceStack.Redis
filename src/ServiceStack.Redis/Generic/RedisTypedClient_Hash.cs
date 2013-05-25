@@ -58,7 +58,7 @@ namespace ServiceStack.Redis.Generic
 			return client.RemoveEntryFromHash(hash.Id, key.SerializeToString());
 		}
 
-		public int GetHashCount<TKey>(IRedisHash<TKey, T> hash)
+		public long GetHashCount<TKey>(IRedisHash<TKey, T> hash)
 		{
 			return client.GetHashCount(hash.Id);
 		}

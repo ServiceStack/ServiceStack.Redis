@@ -21,7 +21,7 @@ namespace ServiceStack.Redis.Generic
 	{
 		public IHasNamed<IRedisSet<T>> Sets { get; set; }
 
-		public int Db
+		public long Db
 		{
 			get { return client.Db; }
 			set { client.Db = value; }
@@ -95,7 +95,7 @@ namespace ServiceStack.Redis.Generic
 			client.SMove(fromSet.Id, toSet.Id, SerializeValue(item));
 		}
 
-		public int GetSetCount(IRedisSet<T> set)
+		public long GetSetCount(IRedisSet<T> set)
 		{
 			return client.SCard(set.Id);
 		}

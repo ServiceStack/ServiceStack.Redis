@@ -102,12 +102,12 @@ namespace ServiceStack.Redis.Generic
 			return client.IncrementItemInSortedSet(set.Id, value.SerializeToString(), incrementBy);
 		}
 
-		public int GetItemIndexInSortedSet(IRedisSortedSet<T> set, T value)
+		public long GetItemIndexInSortedSet(IRedisSortedSet<T> set, T value)
 		{
 			return client.GetItemIndexInSortedSet(set.Id, value.SerializeToString());
 		}
 
-		public int GetItemIndexInSortedSetDesc(IRedisSortedSet<T> set, T value)
+		public long GetItemIndexInSortedSetDesc(IRedisSortedSet<T> set, T value)
 		{
 			return client.GetItemIndexInSortedSetDesc(set.Id, value.SerializeToString());
 		}
@@ -250,17 +250,17 @@ namespace ServiceStack.Redis.Generic
 			return CreateGenericMap(map);
 		}
 
-		public int RemoveRangeFromSortedSet(IRedisSortedSet<T> set, int minRank, int maxRank)
+		public long RemoveRangeFromSortedSet(IRedisSortedSet<T> set, int minRank, int maxRank)
 		{
 			return client.RemoveRangeFromSortedSet(set.Id, minRank, maxRank);
 		}
 
-		public int RemoveRangeFromSortedSetByScore(IRedisSortedSet<T> set, double fromScore, double toScore)
+		public long RemoveRangeFromSortedSetByScore(IRedisSortedSet<T> set, double fromScore, double toScore)
 		{
 			return client.RemoveRangeFromSortedSetByScore(set.Id, fromScore, toScore);
 		}
-        
-		public int GetSortedSetCount(IRedisSortedSet<T> set)
+
+		public long GetSortedSetCount(IRedisSortedSet<T> set)
 		{
 			return client.GetSortedSetCount(set.Id);
 		}
@@ -270,12 +270,12 @@ namespace ServiceStack.Redis.Generic
 			return client.GetItemScoreInSortedSet(set.Id, value.SerializeToString());
 		}
 
-		public int StoreIntersectFromSortedSets(IRedisSortedSet<T> intoSetId, params IRedisSortedSet<T>[] setIds)
+		public long StoreIntersectFromSortedSets(IRedisSortedSet<T> intoSetId, params IRedisSortedSet<T>[] setIds)
 		{
 			return client.StoreIntersectFromSortedSets(intoSetId.Id, setIds.ConvertAll(x => x.Id).ToArray());
 		}
 
-		public int StoreUnionFromSortedSets(IRedisSortedSet<T> intoSetId, params IRedisSortedSet<T>[] setIds)
+		public long StoreUnionFromSortedSets(IRedisSortedSet<T> intoSetId, params IRedisSortedSet<T>[] setIds)
 		{
 			return client.StoreUnionFromSortedSets(intoSetId.Id, setIds.ConvertAll(x => x.Id).ToArray());
 		}
