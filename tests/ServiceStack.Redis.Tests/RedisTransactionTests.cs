@@ -126,7 +126,7 @@ namespace ServiceStack.Redis.Tests
 		public void Supports_different_operation_types_in_same_transaction()
 		{
 			var incrementResults = new List<long>();
-			var collectionCounts = new List<int>();
+			var collectionCounts = new List<long>();
 			var containsItem = false;
 
 			Assert.That(Redis.GetValue(Key), Is.Null);

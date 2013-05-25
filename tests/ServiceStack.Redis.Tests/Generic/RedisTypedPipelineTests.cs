@@ -122,7 +122,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		public void Supports_different_operation_types_in_same_pipeline()
 		{
 			var incrementResults = new List<long>();
-			var collectionCounts = new List<int>();
+			var collectionCounts = new List<long>();
 			var containsItem = false;
 
 			var typedList = typedClient.Lists[ListKey];
