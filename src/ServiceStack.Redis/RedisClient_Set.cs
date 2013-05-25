@@ -134,7 +134,7 @@ namespace ServiceStack.Redis
 			SMove(fromSetId, toSetId, item.ToUtf8Bytes());
 		}
 
-		public int GetSetCount(string setId)
+		public long GetSetCount(string setId)
 		{
 			return SCard(setId);
 		}

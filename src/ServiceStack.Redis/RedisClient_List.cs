@@ -151,17 +151,17 @@ namespace ServiceStack.Redis
 			LTrim(listId, keepStartingFrom, keepEndingAt);
 		}
 
-		public int RemoveItemFromList(string listId, string value)
+		public long RemoveItemFromList(string listId, string value)
 		{
 			return LRem(listId, 0, value.ToUtf8Bytes());
 		}
 
-		public int RemoveItemFromList(string listId, string value, int noOfMatches)
+		public long RemoveItemFromList(string listId, string value, int noOfMatches)
 		{
 			return LRem(listId, noOfMatches, value.ToUtf8Bytes());
 		}
 
-		public int GetListCount(string listId)
+		public long GetListCount(string listId)
 		{
 			return LLen(listId);
 		}

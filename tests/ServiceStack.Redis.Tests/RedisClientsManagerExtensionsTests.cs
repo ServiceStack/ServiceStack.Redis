@@ -50,7 +50,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_Exec_Func_int()
 		{
-			int value = redisManager.Exec(r =>
+			long value = redisManager.Exec(r =>
 			{
 				r.AddItemToList("list", "value");
 				return r.GetListCount("list");

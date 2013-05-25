@@ -91,7 +91,7 @@ namespace ServiceStack.Redis
 		{
 			get
 			{
-				return client.GetSortedSetCount(setId);
+				return (int)client.GetSortedSetCount(setId);
 			}
 		}
 
@@ -152,7 +152,7 @@ namespace ServiceStack.Redis
 			client.StoreUnionFromSets(setId, ofSets.GetIds());
 		}
 
-		public int GetItemIndex(string value)
+		public long GetItemIndex(string value)
 		{
 			return client.GetItemIndexInSortedSet(setId, value);
 		}

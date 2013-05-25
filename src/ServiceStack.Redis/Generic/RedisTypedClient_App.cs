@@ -57,7 +57,7 @@ namespace ServiceStack.Redis.Generic
 			}
 		}
 
-		public int GetRelatedEntitiesCount<TChild>(object parentId)
+		public long GetRelatedEntitiesCount<TChild>(object parentId)
 		{
 			var childRefKey = GetChildReferenceSetKey<TChild>(parentId);
 			return client.GetSetCount(childRefKey);

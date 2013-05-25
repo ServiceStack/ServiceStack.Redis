@@ -316,19 +316,6 @@ namespace ServiceStack.Redis
             ExpectSuccess();
         }
 
-        protected int SendExpectInt(params byte[][] cmdWithBinaryArgs)
-        {
-            if (!SendCommand(cmdWithBinaryArgs))
-                throw CreateConnectionError();
-
-            if (Pipeline != null)
-            {
-                Pipeline.CompleteIntQueuedCommand(ReadInt);
-                return default(int);
-            }
-            return ReadInt();
-        }
-
         protected long SendExpectLong(params byte[][] cmdWithBinaryArgs)
         {
             if (!SendCommand(cmdWithBinaryArgs))
@@ -336,12 +323,12 @@ namespace ServiceStack.Redis
 
             if (Pipeline != null)
             {
-                Pipeline.CompleteLongQueuedCommand(ReadLong);
+                Pipeline.CompleteLongQueuedCommand(ReadInt);
                 return default(long);
             }
             return ReadLong();
         }
-
+		        
         protected byte[] SendExpectData(params byte[][] cmdWithBinaryArgs)
         {
             if (!SendCommand(cmdWithBinaryArgs))
@@ -514,7 +501,7 @@ namespace ServiceStack.Redis
             ExpectWord("QUEUED");
         }
 
-        public int ReadInt()
+		public long ReadInt()
         {
             int c = SafeReadByte();
             if (c == -1)
@@ -825,22 +812,22 @@ namespace ServiceStack.Redis
             return ConvertToBytes(merged);
         }
 
-        public int EvalInt(string luaBody, int numberKeysInArgs, params byte[][] keys)
+        public long EvalInt(string luaBody, int numberKeysInArgs, params byte[][] keys)
         {
             if (luaBody == null)
                 throw new ArgumentNullException("luaBody");
 
             var cmdArgs = MergeCommandWithArgs(Commands.Eval, luaBody.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
-            return SendExpectInt(cmdArgs);
+            return SendExpectLong(cmdArgs);
         }
 
-        public int EvalShaInt(string sha1, int numberKeysInArgs, params byte[][] keys)
+		public long EvalShaInt(string sha1, int numberKeysInArgs, params byte[][] keys)
         {
             if (sha1 == null)
                 throw new ArgumentNullException("sha1");
 
             var cmdArgs = MergeCommandWithArgs(Commands.EvalSha, sha1.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
-            return SendExpectInt(cmdArgs);
+            return SendExpectLong(cmdArgs);
         }
 
         public string EvalStr(string luaBody, int numberKeysInArgs, params byte[][] keys)
