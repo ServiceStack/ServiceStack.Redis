@@ -65,7 +65,7 @@ namespace ServiceStack.Redis
 		public BasicRedisClientManager(
 			IEnumerable<string> readWriteHosts,
 			IEnumerable<string> readOnlyHosts,
-			int initalDb)
+			long initalDb)
 		{
 			this.Db = initalDb;
 

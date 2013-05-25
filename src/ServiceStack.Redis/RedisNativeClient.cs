@@ -34,7 +34,7 @@ namespace ServiceStack.Redis
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(RedisNativeClient));
 
-        public const int DefaultDb = 0;
+        public const long DefaultDb = 0;
         public const int DefaultPort = 6379;
         public const string DefaultHost = "localhost";
 
@@ -116,7 +116,7 @@ namespace ServiceStack.Redis
         public RedisNativeClient(string host, int port)
             : this(host, port, null) {}
 
-        public RedisNativeClient(string host, int port, string password = null, int db = DefaultDb)
+        public RedisNativeClient(string host, int port, string password = null, long db = DefaultDb)
         {
             if (host == null)
                 throw new ArgumentNullException("host");

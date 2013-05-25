@@ -60,7 +60,7 @@ namespace ServiceStack.Redis
             Init();
         }
 
-        public RedisClient(string host, int port, string password = null, int db = DefaultDb)
+        public RedisClient(string host, int port, string password = null, long db = DefaultDb)
             : base(host, port, password, db)
         {
             Init();
@@ -122,7 +122,7 @@ namespace ServiceStack.Redis
             base.Set(key, bytesValue);
         }
 
-        public void ChangeDb(int db)
+        public void ChangeDb(long db)
         {
             Db = db;
             SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
