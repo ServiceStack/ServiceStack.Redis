@@ -36,7 +36,7 @@ namespace ServiceStack.Redis
 
 		public IRedisClientFactory RedisClientFactory { get; set; }
 
-		public int Db { get; private set; }
+		public long Db { get; private set; }
 
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
 
@@ -65,7 +65,7 @@ namespace ServiceStack.Redis
 		public BasicRedisClientManager(
 			IEnumerable<string> readWriteHosts,
 			IEnumerable<string> readOnlyHosts,
-			int initalDb)
+			long initalDb)
 		{
 			this.Db = initalDb;
 

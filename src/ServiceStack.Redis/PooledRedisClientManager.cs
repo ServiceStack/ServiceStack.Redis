@@ -59,7 +59,7 @@ namespace ServiceStack.Redis
 
 		public IRedisClientFactory RedisClientFactory { get; set; }
 
-		public int Db { get; private set; }
+		public long Db { get; private set; }
 
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
 
@@ -70,7 +70,7 @@ namespace ServiceStack.Redis
 		{
 		}
 
-        public PooledRedisClientManager(int initialDb, params string[] readWriteHosts)
+        public PooledRedisClientManager(long initialDb, params string[] readWriteHosts)
             : this(readWriteHosts, readWriteHosts, initialDb) {}
 
         public PooledRedisClientManager(params string[] readWriteHosts)
@@ -102,7 +102,7 @@ namespace ServiceStack.Redis
 		public PooledRedisClientManager(
 			IEnumerable<string> readWriteHosts,
 			IEnumerable<string> readOnlyHosts,
-			int initalDb)
+			long initalDb)
 			: this(readWriteHosts, readOnlyHosts, null, initalDb, null, null)
 		{
 		}
@@ -111,7 +111,7 @@ namespace ServiceStack.Redis
 			IEnumerable<string> readWriteHosts,
 			IEnumerable<string> readOnlyHosts,
 			RedisClientManagerConfig config,
-			int initalDb,
+			long initalDb,
 			int? poolSizeMultiplier,
 			int? poolTimeOutSeconds)
 		{

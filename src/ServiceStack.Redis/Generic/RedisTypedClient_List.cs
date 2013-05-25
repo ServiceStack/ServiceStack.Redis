@@ -127,18 +127,18 @@ namespace ServiceStack.Redis.Generic
 			client.LTrim(fromList.Id, keepStartingFrom, keepEndingAt);
 		}
 
-		public int RemoveItemFromList(IRedisList<T> fromList, T value)
+		public long RemoveItemFromList(IRedisList<T> fromList, T value)
 		{
 			const int removeAll = 0;
 			return client.LRem(fromList.Id, removeAll, SerializeValue(value));
 		}
 
-		public int RemoveItemFromList(IRedisList<T> fromList, T value, int noOfMatches)
+		public long RemoveItemFromList(IRedisList<T> fromList, T value, int noOfMatches)
 		{
 			return client.LRem(fromList.Id, noOfMatches, SerializeValue(value));
 		}
 
-		public int GetListCount(IRedisList<T> fromList)
+		public long GetListCount(IRedisList<T> fromList)
 		{
 			return client.LLen(fromList.Id);
 		}
