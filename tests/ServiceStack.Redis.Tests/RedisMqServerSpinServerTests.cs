@@ -4,6 +4,7 @@ using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Redis.Messaging;
 using ServiceStack.Text;
+using ServiceStack.Redis.Tests.Support;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -39,10 +40,10 @@ namespace ServiceStack.Redis.Tests
 
         RedisMqServer CreateServer()
         {
-            using (var redis = new RedisClient())
+            using (var redis = new RedisClient(TestConfig.SingleHost))
                 redis.FlushAll();
 
-            var mqServer = new RedisMqServer(new BasicRedisClientManager());
+            var mqServer = new RedisMqServer(RedisTestClientManagerFactory.GetBasicRedisClientManagerInstance());
             mqServer.RegisterHandler<Spin0>(m => new Spin0 { Id = counter.Spin0++ });
 
             mqServer.RegisterHandler<Spin10>(m => {

@@ -23,7 +23,7 @@ namespace ServiceStack.Redis.Tests.Examples
 		public void Crud_TODO_App()
 		{
 			//Thread-safe client factory
-			var redisManager = new PooledRedisClientManager("localhost:6379");
+			var redisManager = new PooledRedisClientManager(TestConfig.SingleHostConnectionString);
 
 			redisManager.ExecAs<Todo>(redisTodos => {
 				var todo = new Todo {

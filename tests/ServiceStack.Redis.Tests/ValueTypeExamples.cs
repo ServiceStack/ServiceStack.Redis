@@ -98,7 +98,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Working_with_Generic_types()
 		{
-			using (var redisClient = new RedisClient())
+			using (var redisClient = new RedisClient(TestConfig.SingleHost))
 			{
 				//Create a typed Redis client that treats all values as IntAndString:
 				var typedRedis = redisClient.GetTypedClient<IntAndString>();

@@ -4,6 +4,7 @@ using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Redis.Messaging;
 using ServiceStack.Text;
+using ServiceStack.Redis.Tests.Support;
 
 namespace ServiceStack.Redis.Tests.Benchmarks
 {
@@ -22,7 +23,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
 
         private static RedisMqHostPool CreateMqHostPool(int threadCount = 1)
         {
-            var redisFactory = new BasicRedisClientManager();
+            var redisFactory = RedisTestClientManagerFactory.GetBasicRedisClientManagerInstance();
             try
             {
                 redisFactory.Exec(redis => redis.FlushAll());

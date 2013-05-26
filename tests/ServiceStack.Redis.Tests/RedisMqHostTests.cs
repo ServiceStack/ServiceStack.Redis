@@ -9,6 +9,7 @@ using ServiceStack.Logging.Support.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.Redis.Messaging;
 using ServiceStack.Text;
+using ServiceStack.Redis.Tests.Support;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -40,7 +41,7 @@ namespace ServiceStack.Redis.Tests
 
 		private static RedisMqHost CreateMqHost(int noOfRetries)
 		{
-			var redisFactory = new BasicRedisClientManager();
+			var redisFactory = RedisTestClientManagerFactory.GetBasicRedisClientManagerInstance();
 			try
 			{
 				redisFactory.Exec(redis => redis.FlushAll());
@@ -72,7 +73,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Utils_publish_Reverse_messages()
         {
-            mqHost = new RedisMqHost(new BasicRedisClientManager(), 2, null);
+            mqHost = new RedisMqHost(RedisTestClientManagerFactory.GetBasicRedisClientManagerInstance(), 2, null);
             var mqClient = mqHost.CreateMessageQueueClient();
             Publish_4_messages(mqClient);
             Thread.Sleep(500);
@@ -82,7 +83,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Utils_publish_Rot13_messages()
         {
-            mqHost = new RedisMqHost(new BasicRedisClientManager(), 2, null);
+            mqHost = new RedisMqHost(RedisTestClientManagerFactory.GetBasicRedisClientManagerInstance(), 2, null);
             var mqClient = mqHost.CreateMessageQueueClient();
             Publish_4_Rot13_messages(mqClient);
             Thread.Sleep(500);
