@@ -242,7 +242,6 @@
     <Compile Include="SerializationTests.cs" />
     <Compile Include="Support\CustomType.cs" />
     <Compile Include="Support\CustomTypeFactory.cs" />
-    <Compile Include="Support\RedisTestClientManagerFactory.cs" />
     <Compile Include="Support\TcpClientWithTimeout.cs" />
     <Compile Include="TestConfig.cs" />
     <Compile Include="RedisPersistenceProviderTests.cs" />

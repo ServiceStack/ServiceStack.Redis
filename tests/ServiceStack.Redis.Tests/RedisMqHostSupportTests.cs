@@ -2,7 +2,6 @@ using NUnit.Framework;
 using ServiceStack.Messaging;
 using ServiceStack.Messaging.Tests.Services;
 using ServiceStack.Redis.Messaging;
-using ServiceStack.Redis.Tests.Support;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -14,7 +13,7 @@ namespace ServiceStack.Redis.Tests
         {
             var message = new Message<Greet>(new Greet {Name = "Test"}) {};
 
-            var mqClient = new RedisMessageQueueClient(RedisTestClientManagerFactory.GetBasicRedisClientManagerInstance());
+            var mqClient = new RedisMessageQueueClient(TestConfig.BasicClientManger);
 
             mqClient.Publish(message);
         }

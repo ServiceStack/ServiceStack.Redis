@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ServiceStack.Redis.Generic;
-using ServiceStack.Redis.Tests.Support;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -16,7 +15,7 @@ namespace ServiceStack.Redis.Tests
         public void TestSetUp()
         {
             if (redisManager != null) redisManager.Dispose();
-            redisManager = RedisTestClientManagerFactory.GetBasicRedisClientManagerInstance();
+            redisManager = TestConfig.BasicClientManger;
             redisManager.Exec(r => r.FlushAll());
         }
 

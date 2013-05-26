@@ -43,7 +43,7 @@ namespace ServiceStack.Redis.Tests
             using (var redis = new RedisClient(TestConfig.SingleHost))
                 redis.FlushAll();
 
-            var mqServer = new RedisMqServer(RedisTestClientManagerFactory.GetBasicRedisClientManagerInstance());
+            var mqServer = new RedisMqServer(TestConfig.BasicClientManger);
             mqServer.RegisterHandler<Spin0>(m => new Spin0 { Id = counter.Spin0++ });
 
             mqServer.RegisterHandler<Spin10>(m => {

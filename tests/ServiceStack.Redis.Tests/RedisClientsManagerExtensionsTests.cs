@@ -3,7 +3,6 @@ using NUnit.Framework;
 using ServiceStack.Common.Extensions;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Redis.Generic;
-using ServiceStack.Redis.Tests.Support;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -16,7 +15,7 @@ namespace ServiceStack.Redis.Tests
 		public void OnBeforeEachTest()
 		{
 			if (redisManager != null) redisManager.Dispose();
-			redisManager = RedisTestClientManagerFactory.GetBasicRedisClientManagerInstance();
+			redisManager = TestConfig.BasicClientManger;
 			redisManager.Exec(r => r.FlushAll());
 		}
 

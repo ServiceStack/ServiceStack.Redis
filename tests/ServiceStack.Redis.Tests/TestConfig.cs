@@ -27,6 +27,17 @@ namespace ServiceStack.Redis.Tests
 			}
 		}
 
+		public static BasicRedisClientManager BasicClientManger
+		{
+			get
+			{
+				return new BasicRedisClientManager(new string[1]
+				{
+					TestConfig.SingleHostConnectionString
+				});
+			}
+		}
+
 		//public const string SingleHost = "chi-dev-mem1.ddnglobal.local";
 		//public static readonly string [] MasterHosts = new[] { "chi-dev-mem1.ddnglobal.local" };
 		//public static readonly string [] SlaveHosts = new[] { "chi-dev-mem1.ddnglobal.local", "chi-dev-mem2.ddnglobal.local" };
