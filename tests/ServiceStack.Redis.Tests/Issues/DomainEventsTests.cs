@@ -33,7 +33,7 @@ namespace ServiceStack.Redis.Tests.Issues
         public void Can_Retrieve_DomainEvents()
         {
             var userId = Guid.NewGuid();
-            var client = new RedisClient("localhost");
+            var client = new RedisClient(TestConfig.SingleHost);
             client.FlushAll();
 
             client.As<DomainEvent>().Lists["urn:domainevents-" + userId].Add(new UserPromotedEvent { UserId = userId });
@@ -51,7 +51,7 @@ namespace ServiceStack.Redis.Tests.Issues
         [Test]
         public void Can_from_Retrieve_DomainEvents_list()
         {
-            var client = new RedisClient("localhost");
+            var client = new RedisClient(TestConfig.SingleHost);
             var users = client.As<AggregateEvents>();
 
             var userId = Guid.NewGuid();
