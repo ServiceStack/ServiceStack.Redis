@@ -6,6 +6,7 @@ using ServiceStack.Common.Extensions;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Redis.Generic;
 using ServiceStack.Text;
+using ServiceStack.Redis.Tests.Support;
 
 namespace ServiceStack.Redis.Tests.Generic
 {

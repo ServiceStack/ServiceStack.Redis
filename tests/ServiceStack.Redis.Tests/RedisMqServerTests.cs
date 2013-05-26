@@ -28,13 +28,13 @@ namespace ServiceStack.Redis.Tests
         [TestFixtureSetUp]
         public void TestFixtureSetUp()
         {
-
+            RedisClient.NewFactoryFn = () => new RedisClient(TestConfig.SingleHost);
             LogManager.LogFactory = new ConsoleLogFactory();
         }
 
         private static RedisMqServer CreateMqServer(int noOfRetries = 2)
         {
-            var redisFactory = new BasicRedisClientManager();
+            var redisFactory = TestConfig.BasicClientManger;
             try
             {
                 redisFactory.Exec(redis => redis.FlushAll());
@@ -66,7 +66,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Utils_publish_Reverse_messages()
         {
-            var mqHost = new RedisMqHost(new BasicRedisClientManager(), 2);
+            var mqHost = new RedisMqHost(TestConfig.BasicClientManger, 2);
             var mqClient = mqHost.CreateMessageQueueClient();
             Publish_4_messages(mqClient);
             mqHost.Stop();
@@ -75,7 +75,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Utils_publish_Rot13_messages()
         {
-            var mqHost = new RedisMqHost(new BasicRedisClientManager(), 2);
+            var mqHost = new RedisMqHost(TestConfig.BasicClientManger, 2);
             var mqClient = mqHost.CreateMessageQueueClient();
             Publish_4_Rot13_messages(mqClient);
             mqHost.Stop();

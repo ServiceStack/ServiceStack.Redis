@@ -13,7 +13,7 @@ namespace ServiceStack.Redis.Tests
         {
             var message = new Message<Greet>(new Greet {Name = "Test"}) {};
 
-            var mqClient = new RedisMessageQueueClient(new BasicRedisClientManager());
+            var mqClient = new RedisMessageQueueClient(TestConfig.BasicClientManger);
 
             mqClient.Publish(message);
         }

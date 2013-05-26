@@ -26,7 +26,7 @@ namespace ServiceStack.Redis.Tests.Benchmarks
 
 		private static RedisMqHost CreateMqHost(int noOfRetries)
 		{
-			var redisFactory = new BasicRedisClientManager();
+			var redisFactory = TestConfig.BasicClientManger;
 			try
 			{
 				redisFactory.Exec(redis => redis.FlushAll());

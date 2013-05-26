@@ -29,7 +29,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void TestSequentialWorkQueueUpdate()
         {
-            using (var queue = new RedisSequentialWorkQueue<string>(10, 10, "127.0.0.1", 6379,1))
+            using (var queue = new RedisSequentialWorkQueue<string>(10, 10, TestConfig.SingleHost, TestConfig.RedisPort,1))
             {
 
                 for (int i = 0; i < numMessages; ++i)
@@ -56,7 +56,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void TestSequentialWorkQueue()
         {
-            using (var queue = new RedisSequentialWorkQueue<string>(10,10,"127.0.0.1",6379,1))
+            using (var queue = new RedisSequentialWorkQueue<string>(10, 10, TestConfig.SingleHost, TestConfig.RedisPort, 1))
             {
               
                 for (int i = 0; i < numMessages; ++i)
@@ -117,7 +117,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void TestChronologicalWorkQueue()
         {
-            using (var queue = new RedisChronologicalWorkQueue<string>(10, 10, "127.0.0.1", 6379))
+            using (var queue = new RedisChronologicalWorkQueue<string>(10, 10, TestConfig.SingleHost, TestConfig.RedisPort))
             {
                 const int numMessages = 6;
                 var messages = new List<string>();
@@ -156,7 +156,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void TestSimpleWorkQueue()
         {
-            using (var queue = new RedisSimpleWorkQueue<string>(10, 10, "127.0.0.1", 6379))
+            using (var queue = new RedisSimpleWorkQueue<string>(10, 10, TestConfig.SingleHost, TestConfig.RedisPort))
             {
                 int numMessages = 6;
                 var messages = new string[numMessages];

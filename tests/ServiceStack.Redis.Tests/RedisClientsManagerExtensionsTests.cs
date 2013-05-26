@@ -15,7 +15,7 @@ namespace ServiceStack.Redis.Tests
 		public void OnBeforeEachTest()
 		{
 			if (redisManager != null) redisManager.Dispose();
-			redisManager = new BasicRedisClientManager(TestConfig.SingleHost);
+			redisManager = TestConfig.BasicClientManger;
 			redisManager.Exec(r => r.FlushAll());
 		}
 
