@@ -222,7 +222,7 @@ namespace ServiceStack.Redis.Generic
 
 		public List<T> GetRangeFromSortedSetByHighestScore(IRedisSortedSet<T> set, double fromScore, double toScore, int? skip, int? take)
 		{
-			var list = client.GetRangeFromSortedSetByHighestScore(set.Id, fromScore, toScore, take, skip);
+			var list = client.GetRangeFromSortedSetByHighestScore(set.Id, fromScore, toScore, skip, take);
 			return list.ConvertEachTo<T>();
 		}
 
