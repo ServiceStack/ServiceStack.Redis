@@ -271,6 +271,25 @@ namespace ServiceStack.Redis
             return TimeSpan.FromSeconds(Ttl(key));
         }
 
+        public void SetConfig(string configItem, string value)
+        {
+            base.ConfigSet(configItem, value.ToUtf8Bytes());
+        }
+
+        public string GetConfig(string configItem)
+        {
+            var sb = new StringBuilder();
+            var byteArray = base.ConfigGet(configItem);
+            foreach (var bytes in byteArray)
+            {
+                if (sb.Length > 0)
+                    sb.Append(" ");
+
+                sb.Append(bytes.FromUtf8Bytes());
+            }
+            return sb.ToString();
+        }
+
         [Obsolete("Renamed to 'As'")]
         public IRedisTypedClient<T> GetTypedClient<T>()
         {
