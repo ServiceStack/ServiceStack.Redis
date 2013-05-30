@@ -95,6 +95,13 @@ namespace ServiceStack.Redis
             return sb.ToString();
         }
 
+        public bool IsSocketConnected()
+        {
+            var part1 = socket.Poll(1000, SelectMode.SelectRead);
+            var part2 = (socket.Available == 0);
+            return !(part1 & part2);
+        }
+
         private bool AssertConnectedSocket()
         {
             if (LastConnectedAtTimestamp > 0)

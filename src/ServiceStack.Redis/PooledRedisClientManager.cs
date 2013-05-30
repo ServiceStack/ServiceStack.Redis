@@ -398,6 +398,70 @@ namespace ServiceStack.Redis
 			ReadPoolIndex = 0;
 		}
 
+        public Dictionary<string, string> GetStats()
+        {
+            var writeClientsPoolSize = writeClients.Length;
+            var writeClientsCreated = 0;
+            var writeClientsWithExceptions = 0;
+            var writeClientsInUse = 0;
+            var writeClientsConnected = 0;
+
+            foreach (var client in writeClients)
+            {
+                if (client == null)
+                {
+                    writeClientsCreated++;
+                    continue;
+                }
+
+                if (client.HadExceptions)
+                    writeClientsWithExceptions++;
+                if (client.Active)
+                    writeClientsInUse++;
+                if (client.IsSocketConnected())
+                    writeClientsConnected++;
+            }
+
+            var readClientsPoolSize = readClients.Length;
+            var readClientsCreated = 0;
+            var readClientsWithExceptions = 0;
+            var readClientsInUse = 0;
+            var readClientsConnected = 0;
+
+            foreach (var client in readClients)
+            {
+                if (client == null)
+                {
+                    readClientsCreated++;
+                    continue;
+                }
+
+                if (client.HadExceptions)
+                    readClientsWithExceptions++;
+                if (client.Active)
+                    readClientsInUse++;
+                if (client.IsSocketConnected())
+                    readClientsConnected++;
+            }
+
+            var ret = new Dictionary<string, string>
+                {
+                    {"writeClientsPoolSize", "" + writeClientsPoolSize},
+                    {"writeClientsCreated", "" + writeClientsCreated},
+                    {"writeClientsWithExceptions", "" + writeClientsWithExceptions},
+                    {"writeClientsInUse", "" + writeClientsInUse},
+                    {"writeClientsConnected", "" + writeClientsConnected},
+
+                    {"readClientsPoolSize", "" + readClientsPoolSize},
+                    {"readClientsCreated", "" + readClientsCreated},
+                    {"readClientsWithExceptions", "" + readClientsWithExceptions},
+                    {"readClientsInUse", "" + readClientsInUse},
+                    {"readClientsConnected", "" + readClientsConnected},
+                };
+
+            return ret;
+        }
+
 		private void AssertValidReadWritePool()
 		{
 			if (writeClients.Length < 1)

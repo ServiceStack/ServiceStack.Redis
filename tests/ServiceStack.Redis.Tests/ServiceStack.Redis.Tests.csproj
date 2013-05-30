@@ -173,6 +173,7 @@
     <Compile Include="Generic\RedisClientListTestExtra.cs" />
     <Compile Include="ManagedListGenericTests.cs" />
     <Compile Include="RedisExtensionTests.cs" />
+    <Compile Include="RedisFailoverTests.cs" />
     <Compile Include="RedisMqServerSpinServerTests.cs" />
     <Compile Include="RedisMqServerSleepServerTests.cs" />
     <Compile Include="RedisMqServerTests.cs" />
