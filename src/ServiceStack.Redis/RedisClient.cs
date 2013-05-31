@@ -128,6 +128,28 @@ namespace ServiceStack.Redis
             SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
         }
 
+        public List<Dictionary<string, string>> GetClientList()
+        {
+            var clientList = base.ClientList().FromUtf8Bytes();
+            var results = new List<Dictionary<string, string>>();
+            
+            var lines = clientList.Split('\n');
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrEmpty(line)) continue;
+
+                var map = new Dictionary<string, string>();
+                var parts = line.Split(' ');
+                foreach (var part in parts)
+                {
+                    var keyValue = part.SplitOnFirst('=');
+                    map[keyValue[0]] = keyValue[1];
+                }
+                results.Add(map);
+            }
+            return results;
+        }
+
         public void SetAll(IEnumerable<string> keys, IEnumerable<string> values)
         {
             if (keys == null || values == null) return;

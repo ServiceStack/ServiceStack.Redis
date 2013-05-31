@@ -49,6 +49,8 @@ namespace ServiceStack.Redis
         public readonly static byte[] Debug = "DEBUG".ToUtf8Bytes();			//missing
         public readonly static byte[] Config = "CONFIG".ToUtf8Bytes();			//missing
         public readonly static byte[] Client = "CLIENT".ToUtf8Bytes();
+        public readonly static byte[] List = "LIST".ToUtf8Bytes();
+        public readonly static byte[] Kill = "KILL".ToUtf8Bytes();
         public readonly static byte[] SetName = "SETNAME".ToUtf8Bytes();
         public readonly static byte[] GetName = "GETNAME".ToUtf8Bytes();
         //public readonly static byte[] Get = "GET".ToUtf8Bytes();
@@ -170,7 +172,6 @@ namespace ServiceStack.Redis
         public readonly static byte[] Load = "LOAD".ToUtf8Bytes();
         //public readonly static byte[] Exists = "EXISTS".ToUtf8Bytes();
         public readonly static byte[] Flush = "FLUSH".ToUtf8Bytes();
-        public readonly static byte[] Kill = "KILL".ToUtf8Bytes();
         public readonly static byte[] Slowlog = "SLOWLOG".ToUtf8Bytes();
     }
 }
