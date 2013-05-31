@@ -38,6 +38,7 @@ namespace ServiceStack.Redis
         public int? ConnectTimeout { get; set; }
 		public int? SocketSendTimeout { get; set; }
 		public int? SocketReceiveTimeout { get; set; }
+        public bool CheckConnected { get; set; }
 
         /// <summary>
         /// Gets or sets object key prefix.
@@ -214,8 +215,9 @@ namespace ServiceStack.Redis
                 var nextHostIndex = (desiredIndex + x) % ReadWriteHosts.Count;
                 var nextHost = ReadWriteHosts[nextHostIndex];
                 for (var i = nextHostIndex; i < writeClients.Length; i += ReadWriteHosts.Count)
-                {                    
-                    if (writeClients[i] != null && !writeClients[i].Active && !writeClients[i].HadExceptions)
+                {
+                    if (writeClients[i] != null && !writeClients[i].Active && !writeClients[i].HadExceptions
+                        && (!CheckConnected || writeClients[i].IsSocketConnected()))
                         return writeClients[i];
                     else if (writeClients[i] == null || writeClients[i].HadExceptions)
                     {
@@ -300,7 +302,8 @@ namespace ServiceStack.Redis
                 var nextHost = ReadOnlyHosts[nextHostIndex];
                 for (var i = nextHostIndex; i < readClients.Length; i += ReadOnlyHosts.Count)
                 {
-                    if (readClients[i] != null && !readClients[i].Active && !readClients[i].HadExceptions)
+                    if (readClients[i] != null && !readClients[i].Active && !readClients[i].HadExceptions
+                        && (!CheckConnected || readClients[i].IsSocketConnected()))
                         return readClients[i];
                     else if (readClients[i] == null || readClients[i].HadExceptions)
                     {
