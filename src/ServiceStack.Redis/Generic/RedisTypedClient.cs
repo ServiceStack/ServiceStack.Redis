@@ -450,9 +450,11 @@ namespace ServiceStack.Redis.Generic
 
 		public void DeleteAll()
 		{
-			var urnKeys = client.GetAllItemsFromSet(this.TypeIdsSetKey);
+			var ids = client.GetAllItemsFromSet(this.TypeIdsSetKey);
+            var urnKeys = ids.ConvertAll(t => client.UrnKey<T>(t));
             if (urnKeys.Count > 0)
             {
+                
                 this.RemoveEntry(urnKeys.ToArray());
                 this.RemoveEntry(this.TypeIdsSetKey);
             }
