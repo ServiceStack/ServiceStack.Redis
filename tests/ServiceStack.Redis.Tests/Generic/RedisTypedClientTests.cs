@@ -98,6 +98,27 @@ namespace ServiceStack.Redis.Tests.Generic
 			Thread.Sleep(2000);
 			Assert.That(RedisTyped.GetById("key"), Is.Null);
 		}
+
+        [Test]
+        public void Can_Delete_All_Items()
+        {
+            var cachedRecord = new CacheRecord
+            {
+                Id = "key",
+                Children = {
+					new CacheRecordChild { Id = "childKey", Data = "data" }
+				}
+            };
+
+            RedisTyped.Store(cachedRecord);
+
+            Assert.That(RedisTyped.GetById("key"), Is.Not.Null);
+
+            RedisTyped.DeleteAll();
+
+            Assert.That(RedisTyped.GetById("key"), Is.Null);
+
+        }
 	}
 
 }
