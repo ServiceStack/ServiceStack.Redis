@@ -546,6 +546,14 @@ namespace ServiceStack.Redis
             return SendExpectLong(Commands.SetBit, key.ToUtf8Bytes(), offset.ToUtf8Bytes(), value.ToUtf8Bytes());
         }
 
+        public long BitCount(string key)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
+
+            return SendExpectLong(Commands.BitCount, key.ToUtf8Bytes());
+        }
+
         public string RandomKey()
         {
             return SendExpectData(Commands.RandomKey).FromUtf8Bytes();
