@@ -100,7 +100,7 @@ namespace ServiceStack.Redis
                     queuedCommand.ProcessResult();
                 }
             }
-            catch (RedisTransactionFailedException e)
+            catch (RedisTransactionFailedException)
             {
                 rc = false;
             }
