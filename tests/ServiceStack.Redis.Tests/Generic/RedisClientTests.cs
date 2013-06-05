@@ -116,12 +116,13 @@ namespace ServiceStack.Redis.Tests.Generic
 		}
         
         [Test]
-        public void Can_SetBit_And_GetBit()
+        public void Can_SetBit_And_GetBit_And_BitCount()
         {
             const string key = "BitKey";
             const int offset = 100;
             Redis.SetBit(key, offset, 1);
             Assert.AreEqual(1, Redis.GetBit(key,offset));
+            Assert.AreEqual(1, Redis.BitCount(key));
         }
 
 		[Test, Explicit]
