@@ -29,7 +29,10 @@ namespace ServiceStack.Redis.Tests
             int remaining = loop;
             var stopwatch = Stopwatch.StartNew();
 
-            var clientManager = new PooledRedisClientManager(new[] { "localhost" }) { CheckConnected = true };
+            var clientManager = new PooledRedisClientManager(new[] { "localhost" })
+                {
+                    
+                };
             loop.Times(i =>
                 {
                     ThreadPool.QueueUserWorkItem(x =>
@@ -77,7 +80,10 @@ namespace ServiceStack.Redis.Tests
         {
             LogManager.LogFactory = new ConsoleLogFactory();
 
-            var clientManager = new PooledRedisClientManager(new[] { "localhost" }) { CheckConnected = true };
+            var clientManager = new PooledRedisClientManager(new[] { "localhost" })
+                {
+                    
+                };
             var mqHost = new RedisMqServer(clientManager, retryCount: 2);
 
             var sum = 0;
@@ -111,7 +117,14 @@ namespace ServiceStack.Redis.Tests
                         client.SetConfig("timeout", "1");
                         var clientAddrs = client.GetClientList().ConvertAll(x => x["addr"]);
                         "Killing clients: {0}...".Print(clientAddrs.Dump());
-                        clientAddrs.ForEach(client.ClientKill);
+                        try
+                        {
+                            clientAddrs.ForEach(client.ClientKill);
+                        }
+                        catch (Exception ex)
+                        {
+                            "Client exception: {0}".Print(ex.Message);
+                        }
                     }
                 });
 

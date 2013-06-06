@@ -34,11 +34,11 @@ namespace ServiceStack.Redis
 				   "Redis Timeout expired. The timeout period elapsed prior to obtaining a connection from the pool. This may have occurred because all pooled connections were in use.";
 
 		protected readonly int PoolSizeMultiplier = 10;
-		public int? PoolTimeOut { get; set; }
+	    public int RecheckPoolAfterMs = 100;
+        public int? PoolTimeout { get; set; }
         public int? ConnectTimeout { get; set; }
 		public int? SocketSendTimeout { get; set; }
 		public int? SocketReceiveTimeout { get; set; }
-        public bool CheckConnected { get; set; }
 
         /// <summary>
         /// Gets or sets object key prefix.
@@ -133,7 +133,7 @@ namespace ServiceStack.Redis
 			};
 
 			// if timeout provided, convert into milliseconds
-			this.PoolTimeOut = poolTimeOutSeconds != null
+			this.PoolTimeout = poolTimeOutSeconds != null
 				? poolTimeOutSeconds * 1000
 				: null;
 
@@ -162,14 +162,14 @@ namespace ServiceStack.Redis
 				RedisClient inActiveClient;
 				while ((inActiveClient = GetInActiveWriteClient()) == null)
 				{
-					if (PoolTimeOut.HasValue)
+					if (PoolTimeout.HasValue)
 					{
 						// wait for a connection, cry out if made to wait too long
-						if (!Monitor.Wait(writeClients, PoolTimeOut.Value))
+						if (!Monitor.Wait(writeClients, PoolTimeout.Value))
 							throw new TimeoutException(PoolTimeoutError);
 					}
 					else
-						Monitor.Wait(writeClients);
+                        Monitor.Wait(writeClients, RecheckPoolAfterMs);
 				}
 
 				WritePoolIndex++;
@@ -216,8 +216,7 @@ namespace ServiceStack.Redis
                 var nextHost = ReadWriteHosts[nextHostIndex];
                 for (var i = nextHostIndex; i < writeClients.Length; i += ReadWriteHosts.Count)
                 {
-                    if (writeClients[i] != null && !writeClients[i].Active && !writeClients[i].HadExceptions
-                        && (!CheckConnected || writeClients[i].IsSocketConnected()))
+                    if (writeClients[i] != null && !writeClients[i].Active && !writeClients[i].HadExceptions)
                         return writeClients[i];
                     else if (writeClients[i] == null || writeClients[i].HadExceptions)
                     {
@@ -255,8 +254,15 @@ namespace ServiceStack.Redis
 				RedisClient inActiveClient;
 				while ((inActiveClient = GetInActiveReadClient()) == null)
 				{
-					Monitor.Wait(readClients);
-				}
+                    if (PoolTimeout.HasValue)
+                    {
+                        // wait for a connection, cry out if made to wait too long
+                        if (!Monitor.Wait(readClients, PoolTimeout.Value))
+                            throw new TimeoutException(PoolTimeoutError);
+                    }
+                    else
+                        Monitor.Wait(readClients, RecheckPoolAfterMs);
+                }
 
 				ReadPoolIndex++;
 				inActiveClient.Active = true;
@@ -302,8 +308,7 @@ namespace ServiceStack.Redis
                 var nextHost = ReadOnlyHosts[nextHostIndex];
                 for (var i = nextHostIndex; i < readClients.Length; i += ReadOnlyHosts.Count)
                 {
-                    if (readClients[i] != null && !readClients[i].Active && !readClients[i].HadExceptions
-                        && (!CheckConnected || readClients[i].IsSocketConnected()))
+                    if (readClients[i] != null && !readClients[i].Active && !readClients[i].HadExceptions)
                         return readClients[i];
                     else if (readClients[i] == null || readClients[i].HadExceptions)
                     {
@@ -476,6 +481,36 @@ namespace ServiceStack.Redis
 			if (readClients.Length < 1)
 				throw new InvalidOperationException("Need a minimum read pool size of 1, then call Start()");
 		}
+
+        public int[] GetClientPoolActiveStates()
+        {
+            var activeStates = new int[writeClients.Length];
+            lock (writeClients)
+            {
+                for (int i = 0; i < writeClients.Length; i++)
+                {
+                    activeStates[i] = writeClients[i] == null
+                        ? -1
+                        : writeClients[i].Active ? 1 : 0;
+                }
+            }
+            return activeStates;
+        }
+
+        public int[] GetReadOnlyClientPoolActiveStates()
+        {
+            var activeStates = new int[readClients.Length];
+            lock (readClients)
+            {
+                for (int i = 0; i < readClients.Length; i++)
+                {
+                    activeStates[i] = readClients[i] == null
+                        ? -1
+                        : readClients[i].Active ? 1 : 0;
+                }
+            }
+            return activeStates;
+        }
 
 		~PooledRedisClientManager()
 		{

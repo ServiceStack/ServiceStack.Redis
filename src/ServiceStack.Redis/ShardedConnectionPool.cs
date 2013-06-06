@@ -26,7 +26,7 @@ namespace ServiceStack.Redis
 		public ShardedConnectionPool(string name, int weight, params string[] readWriteHosts)
 			: base(readWriteHosts)
 		{
-			this.PoolTimeOut = 1000;
+			this.PoolTimeout = 1000;
 			this.name = name;
 			this.weight = weight;
 		}
