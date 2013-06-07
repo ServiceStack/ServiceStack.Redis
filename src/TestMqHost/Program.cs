@@ -19,7 +19,8 @@ namespace TestMqHost
         static void Main(string[] args)
         {
 
-            //LogManager.LogFactory = new ConsoleLogFactory();
+            LogManager.LogFactory = new ConsoleLogFactory();
+            var log = LogManager.GetLogger(typeof(Program));
 
             var clientManager = new PooledRedisClientManager(new[] { "localhost" })
             {
@@ -33,7 +34,7 @@ namespace TestMqHost
             {
                 var dto = c.GetBody();
                 sum += dto.Value;
-                "Received {0}, sum: {1}".Print(dto.Value, sum);
+                log.InfoFormat("Received {0}, sum: {1}", dto.Value, sum);
                 return null;
             });
 
@@ -47,14 +48,12 @@ namespace TestMqHost
                     {
                         try
                         {
-                            lock (clientManager)
-                                "Publish: {0}...".Print(i);
+                            log.InfoFormat("Publish: {0}...", i);
                             client.Publish(new Incr { Value = i });
                         }
                         catch (Exception ex)
                         {
-                            lock (clientManager)
-                                "Start Publish exception: {0}".Print(ex.Message);
+                            log.InfoFormat("Start Publish exception: {0}", ex.Message);
                             clientManager.GetClientPoolActiveStates().PrintDump();
                             clientManager.GetReadOnlyClientPoolActiveStates().PrintDump();
                         }
@@ -69,16 +68,15 @@ namespace TestMqHost
                 {
                     client.SetConfig("timeout", "1");
                     var clientAddrs = client.GetClientList().ConvertAll(x => x["addr"]);
-                    lock (clientManager)
-                        "Killing clients: {0}...".Print(clientAddrs.Dump());
+                    log.InfoFormat("Killing clients: {0}...", clientAddrs.Dump());
+
                     try
                     {
                         clientAddrs.ForEach(client.ClientKill);
                     }
                     catch (Exception ex)
                     {
-                        lock (clientManager)
-                            "Client exception: {0}".Print(ex.Message);
+                        log.InfoFormat("Client exception: {0}", ex.Message);
                     }
                 }
             });
@@ -89,14 +87,12 @@ namespace TestMqHost
                 {
                     try
                     {
-                        lock (clientManager)
-                            "Publish: {0}...".Print(i);
+                        log.InfoFormat("Publish: {0}...", i);
                         client.Publish(new Incr { Value = i });
                     }
                     catch (Exception ex)
                     {
-                        lock (clientManager)
-                            "Publish exception: {0}".Print(ex.Message);
+                        log.InfoFormat("Publish exception: {0}", ex.Message);
                         clientManager.GetClientPoolActiveStates().PrintDump();
                         clientManager.GetReadOnlyClientPoolActiveStates().PrintDump();
                     }
