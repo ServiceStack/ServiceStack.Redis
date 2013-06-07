@@ -35,6 +35,8 @@ namespace ServiceStack.Redis.Messaging
 
         public int RetryCount { get; protected set; }
 
+        public int? KeepAliveRetryAfterMs { get; set; }
+
         public IMessageFactory MessageFactory { get; private set; }
 
         public Func<string, IOneWayClient> ReplyClientFactory { get; set; }
@@ -111,6 +113,7 @@ namespace ServiceStack.Redis.Messaging
             //this.RequestTimeOut = requestTimeOut;
             this.MessageFactory = new RedisMessageFactory(clientsManager);
             this.ErrorHandler = ex => Log.Error("Exception in Redis MQ Server: " + ex.Message, ex);
+            this.KeepAliveRetryAfterMs = 2000;
         }
 
         public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn)
@@ -314,6 +317,13 @@ namespace ServiceStack.Redis.Messaging
 
                 if (this.ErrorHandler != null) 
                     this.ErrorHandler(ex);
+
+
+                if (KeepAliveRetryAfterMs != null)
+                {
+                    Thread.Sleep(KeepAliveRetryAfterMs.Value);
+                    Start();
+                }
             }
         }
 
