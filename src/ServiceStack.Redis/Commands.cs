@@ -174,5 +174,10 @@ namespace ServiceStack.Redis
         //public readonly static byte[] Exists = "EXISTS".ToUtf8Bytes();
         public readonly static byte[] Flush = "FLUSH".ToUtf8Bytes();
         public readonly static byte[] Slowlog = "SLOWLOG".ToUtf8Bytes();
+
+        public readonly static byte[] ExpireInSeconds = "EX".ToUtf8Bytes();
+        public readonly static byte[] ExpireInMilliseconds = "PX".ToUtf8Bytes();
+        public readonly static byte[] SetIfKeyDoesNotExist = "NX".ToUtf8Bytes();
+        public readonly static byte[] SetIfKeyExists = "XX".ToUtf8Bytes();
     }
 }
