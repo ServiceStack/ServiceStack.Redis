@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using ServiceStack.Common;
+using ServiceStack.Common.Support;
 using ServiceStack.Logging;
 using ServiceStack.Logging.Support.Logging;
 using ServiceStack.Redis;
@@ -18,8 +19,8 @@ namespace TestMqHost
     {
         static void Main(string[] args)
         {
-
-            //LogManager.LogFactory = new ConsoleLogFactory();
+            var sbLogFactory = new StringBuilderLogFactory();
+            LogManager.LogFactory = sbLogFactory;
             var log = LogManager.GetLogger(typeof(Program));
 
             var clientManager = new PooledRedisClientManager(new[] { "localhost" })
@@ -105,6 +106,8 @@ namespace TestMqHost
 
             Thread.Sleep(2000);
             "Messages processed: {0}".Print(msgsProcessed);
+            "Logs: ".Print();
+            sbLogFactory.GetLogs().Print();
             Console.ReadKey();
         }
     }
