@@ -315,7 +315,7 @@ namespace ServiceStack.Redis
 			return SendExpectLong(Commands.StrLen, key.ToUtf8Bytes());
 		}
 
-    	public void Set(string key, byte[] value)
+    	public void Set(string key, byte[] value, int? expirySeconds = null, long? expiryMs = null, bool? exists = null)
         {
             if (key == null)
                 throw new ArgumentNullException("key");
@@ -324,103 +324,28 @@ namespace ServiceStack.Redis
             if (value.Length > OneGb)
                 throw new ArgumentException("value exceeds 1G", "value");
 
-            SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value);
-        }
-
-        public void SetOnlyIfKeyExists(string key, byte[] value)
-        {
-            if (key == null)
-                throw new ArgumentNullException("key");
-            value = value ?? new byte[0];
-
-            if (value.Length > OneGb)
-                throw new ArgumentException("value exceeds 1G", "value");
-
-            SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.SetIfKeyExists);
-        }
-
-        public void SetOnlyIfKeyDoesNotExist(string key, byte[] value)
-        {
-            if (key == null)
-                throw new ArgumentNullException("key");
-            value = value ?? new byte[0];
-
-            if (value.Length > OneGb)
-                throw new ArgumentException("value exceeds 1G", "value");
-
-            SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.SetIfKeyDoesNotExist);
-        }
-
-        public void SetOnlyIfKeyExistsExpireInMilliseconds(string key, byte[] value, long expireInMs)
-        {
-            if (key == null)
-                throw new ArgumentNullException("key");
-            value = value ?? new byte[0];
-
-            if (value.Length > OneGb)
-                throw new ArgumentException("value exceeds 1G", "value");
-
-            SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.SetIfKeyExists, Commands.ExpireInMilliseconds, expireInMs.ToUtf8Bytes());
-        }
-
-        public void SetOnlyIfKeyDoesNotExistExprireInMillseconds(string key, byte[] value, long expireInMs)
-        {
-            if (key == null)
-                throw new ArgumentNullException("key");
-            value = value ?? new byte[0];
-
-            if (value.Length > OneGb)
-                throw new ArgumentException("value exceeds 1G", "value");
-
-            SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.SetIfKeyDoesNotExist, Commands.ExpireInMilliseconds, expireInMs.ToUtf8Bytes());
-        }
-
-        public void SetOnlyIfKeyExistsExpire(string key, byte[] value, int expireInSeconds)
-        {
-            if (key == null)
-                throw new ArgumentNullException("key");
-            value = value ?? new byte[0];
-
-            if (value.Length > OneGb)
-                throw new ArgumentException("value exceeds 1G", "value");
-
-            SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.SetIfKeyExists, Commands.ExpireInSeconds, expireInSeconds.ToUtf8Bytes());
-        }
-
-        public void SetOnlyIfKeyDoesNotExistExpire(string key, byte[] value, int expireInSeconds)
-        {
-            if (key == null)
-                throw new ArgumentNullException("key");
-            value = value ?? new byte[0];
-
-            if (value.Length > OneGb)
-                throw new ArgumentException("value exceeds 1G", "value");
-
-            SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.SetIfKeyDoesNotExist, Commands.ExpireInSeconds, expireInSeconds.ToUtf8Bytes());
-        }
-
-        public void SetExpireInMilliseconds(string key, byte value, long expireInMs)
-        {
-            if (key == null)
-                throw new ArgumentNullException("key");
-            value = value ?? new byte[0];
-
-            if (value.Length > OneGb)
-                throw new ArgumentException("value exceeds 1G", "value");
-
-            SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.ExpireInMilliseconds, expireInMs.ToUtf8Bytes());
-        }
-
-        public void SetExpireInSeconds(string key, byte value, int expireInSeconds)
-        {
-            if (key == null)
-                throw new ArgumentNullException("key");
-            value = value ?? new byte[0];
-
-            if (value.Length > OneGb)
-                throw new ArgumentException("value exceeds 1G", "value");
-
-            SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.ExpireInSeconds, expireInSeconds.ToUtf8Bytes());
+            if (!expirySeconds.HasValue && !exists.HasValue)
+            {
+                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value);
+            }
+            else if (!exists.HasValue && expiryMs.HasValue)
+            {
+                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.ExpireInMilliseconds, expiryMs.Value.ToUtf8Bytes());
+            }
+            else if (!exists.HasValue && expirySeconds.HasValue)
+            {
+                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.ExpireInSeconds, expirySeconds.Value.ToUtf8Bytes());
+            }
+            else if (exists.HasValue && !expirySeconds.HasValue && !expiryMs.HasValue)
+            {
+                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, exists.Value ? Commands.SetIfKeyExists : Commands.SetIfKeyDoesNotExist);
+            }
+            else if (exists.HasValue && expirySeconds.HasValue) {
+                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, exists.Value ? Commands.SetIfKeyExists : Commands.SetIfKeyDoesNotExist, Commands.ExpireInSeconds, expirySeconds.Value.ToUtf8Bytes());
+            }
+            else if (exists.HasValue && expiryMs.HasValue) {
+                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, exists.Value ? Commands.SetIfKeyExists : Commands.SetIfKeyDoesNotExist, Commands.ExpireInMilliseconds, expiryMs.Value.ToUtf8Bytes());
+            }
         }
 
         public void SetEx(string key, int expireInSeconds, byte[] value)
