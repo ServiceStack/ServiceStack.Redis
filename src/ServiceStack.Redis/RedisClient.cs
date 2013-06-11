@@ -122,6 +122,47 @@ namespace ServiceStack.Redis
             base.Set(key, bytesValue);
         }
 
+        public void SetEntry(string key, string value, TimeSpan expireIn)
+        {
+            var bytesValue = value != null ? value.ToUtf8Bytes() : null;
+
+            if (expireIn.Milliseconds == 0)
+            {
+                base.Set(key, bytesValue, (int)expireIn.TotalSeconds);
+            }
+            else { 
+                base.Set(key, bytesValue, null, (long)expireIn.TotalMilliseconds);
+            }
+        }
+
+        public void SetEntryIfExists(string key, string value, TimeSpan expireIn)
+        {
+            var bytesValue = value != null ? value.ToUtf8Bytes() : null;
+
+            if (expireIn.Milliseconds == 0)
+            {
+                base.Set(key, bytesValue, (int)expireIn.TotalSeconds, null, true);
+            }
+            else
+            {
+                base.Set(key, bytesValue, null, (long)expireIn.TotalMilliseconds, true);
+            }
+        }
+
+        public void SetEntryIfNotExists(string key, string value, TimeSpan expireIn)
+        {
+            var bytesValue = value != null ? value.ToUtf8Bytes() : null;
+
+            if (expireIn.Milliseconds == 0)
+            {
+                base.Set(key, bytesValue, (int)expireIn.TotalSeconds, null, false);
+            }
+            else
+            {
+                base.Set(key, bytesValue, null, (long)expireIn.TotalMilliseconds, false);
+            }
+        }
+
         public void ChangeDb(long db)
         {
             Db = db;
