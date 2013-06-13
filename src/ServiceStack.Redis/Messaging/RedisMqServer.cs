@@ -237,19 +237,30 @@ namespace ServiceStack.Redis.Messaging
 
                     SleepBackOffMultiplier(Interlocked.CompareExchange(ref noOfContinuousErrors, 0, 0));
 
-                    KillBgThreadIfExists();
-
-                    bgThread = new Thread(RunLoop) {
-                        IsBackground = true,
-                        Name = "Redis MQ Server " + Interlocked.Increment(ref bgThreadCount)
-                    };
-                    bgThread.Start();
-                    Log.Debug("Started Background Thread: " + bgThread.Name);
-
                     StartWorkerThreads();
+
+                    //Don't kill us if we're the thread that's retrying to Start() after a failure.
+                    if (bgThread != Thread.CurrentThread)
+                    {
+                        KillBgThreadIfExists();
+
+                        bgThread = new Thread(RunLoop)
+                        {
+                            IsBackground = true,
+                            Name = "Redis MQ Server " + Interlocked.Increment(ref bgThreadCount)
+                        };
+                        bgThread.Start();
+                        Log.Debug("Started Background Thread: " + bgThread.Name);
+                    }
+                    else
+                    {
+                        Log.Debug("Retrying RunLoop() on Thread: " + bgThread.Name);
+                        RunLoop();
+                    }
                 }
                 catch (Exception ex)
                 {
+                    ex.Message.Print();
                     if (this.ErrorHandler != null) this.ErrorHandler(ex);
                 }
             }
