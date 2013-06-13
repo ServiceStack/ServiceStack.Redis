@@ -385,8 +385,10 @@ namespace ServiceStack.Redis
             }
 
             //Client not found in any pool, pulse both pools.
-            Monitor.PulseAll(readClients);
-            Monitor.PulseAll(writeClients);
+            lock (readClients)
+                Monitor.PulseAll(readClients);
+            lock (writeClients)
+                Monitor.PulseAll(writeClients);
         }
 
         /// <summary>
