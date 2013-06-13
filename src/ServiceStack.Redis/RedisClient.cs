@@ -130,7 +130,8 @@ namespace ServiceStack.Redis
             {
                 base.Set(key, bytesValue, (int)expireIn.TotalSeconds);
             }
-            else { 
+            else 
+            { 
                 base.Set(key, bytesValue, null, (long)expireIn.TotalMilliseconds);
             }
         }
@@ -147,6 +148,14 @@ namespace ServiceStack.Redis
             {
                 base.Set(key, bytesValue, null, (long)expireIn.TotalMilliseconds, true);
             }
+        }
+
+        public bool SetEntryIfNotExists(string key, string value)
+        {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            return SetNX(key, value.ToUtf8Bytes()) == Success;
         }
 
         public void SetEntryIfNotExists(string key, string value, TimeSpan expireIn)
@@ -230,23 +239,6 @@ namespace ServiceStack.Redis
             }
 
             base.MSet(keyBytes, valBytes);
-        }
-
-        public void SetEntry(string key, string value, TimeSpan expireIn)
-        {
-            var bytesValue = value != null
-                ? value.ToUtf8Bytes()
-                : null;
-
-            SetEx(key, (int)expireIn.TotalSeconds, bytesValue);
-        }
-
-        public bool SetEntryIfNotExists(string key, string value)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
-            return SetNX(key, value.ToUtf8Bytes()) == Success;
         }
 
         public string GetValue(string key)
