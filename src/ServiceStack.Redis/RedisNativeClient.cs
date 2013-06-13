@@ -315,6 +315,18 @@ namespace ServiceStack.Redis
 			return SendExpectLong(Commands.StrLen, key.ToUtf8Bytes());
 		}
 
+        public void Set(string key, byte[] value)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
+            value = value ?? new byte[0];
+
+            if (value.Length > OneGb)
+                throw new ArgumentException("value exceeds 1G", "value");
+
+            SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value);
+        }
+
     	public void Set(string key, byte[] value, int? expirySeconds = null, long? expiryMs = null, bool? exists = null)
         {
             if (key == null)
@@ -340,10 +352,12 @@ namespace ServiceStack.Redis
             {
                 SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, exists.Value ? Commands.SetIfKeyExists : Commands.SetIfKeyDoesNotExist);
             }
-            else if (exists.HasValue && expirySeconds.HasValue) {
+            else if (exists.HasValue && expirySeconds.HasValue) 
+            {
                 SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, exists.Value ? Commands.SetIfKeyExists : Commands.SetIfKeyDoesNotExist, Commands.ExpireInSeconds, expirySeconds.Value.ToUtf8Bytes());
             }
-            else if (exists.HasValue && expiryMs.HasValue) {
+            else if (exists.HasValue && expiryMs.HasValue) 
+            {
                 SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, exists.Value ? Commands.SetIfKeyExists : Commands.SetIfKeyDoesNotExist, Commands.ExpireInMilliseconds, expiryMs.Value.ToUtf8Bytes());
             }
         }
