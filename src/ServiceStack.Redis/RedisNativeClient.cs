@@ -111,7 +111,7 @@ namespace ServiceStack.Redis
         }
 
         public RedisNativeClient(string host)
-            : this(host, DefaultPort) {}
+            : this(host.SplitOnLast(':')[0], host.Contains(':') ? int.Parse(host.SplitOnLast(':')[1]) : DefaultPort) { }
 
         public RedisNativeClient(string host, int port)
             : this(host, port, null) {}

@@ -140,5 +140,78 @@ namespace ServiceStack.Redis.Tests
             });
 
         }
+
+        [Test]
+        public void Can_failover_at_runtime()
+        {
+            var failoverHost = "ny-devredis01:6380";
+            var localClient = new RedisClient("localhost");
+            string key = "test:failover";
+
+            localClient.Remove(key);
+            var failoverClient = new RedisClient(failoverHost);
+            failoverClient.Remove(key);
+
+            var clientManager = new PooledRedisClientManager(new[] { "localhost" });
+
+            RunInLoop(clientManager, callback:() =>
+                {
+                    lock (clientManager)
+                        Monitor.Pulse(clientManager);
+                });
+
+            Thread.Sleep(100);
+
+            clientManager.FailoverTo(failoverHost);
+
+            lock (clientManager)
+                Monitor.Wait(clientManager);
+
+            var localIncr = localClient.Get<int>(key);
+            var failoverIncr = failoverClient.Get<int>(key);
+            Assert.That(localIncr, Is.GreaterThan(0));
+            Assert.That(failoverIncr, Is.GreaterThan(0));
+            Assert.That(localIncr + failoverIncr, Is.EqualTo(100));
+        }
+
+
+        public static bool RunInLoop(PooledRedisClientManager clientManager, int iterations = 100, int sleepMs = 10, Action callback=null)
+        {
+            int count = 0;
+            int errors = 0;
+            
+            10.Times(i =>
+            {
+                ThreadPool.QueueUserWorkItem(_ =>
+                {
+                    while (iterations-- > 0)
+                    {
+                        using (var client = clientManager.GetClient())
+                        {
+                            try
+                            {
+                                var result = client.Increment("test:failover", 1);
+                                if (++count % (iterations / 10) == 0)
+                                    lock (clientManager)
+                                        Console.WriteLine("count: {0}, errors: {1}", count, errors);
+                            }
+                            catch (Exception ex)
+                            {
+                                errors++;
+                            }
+                            Thread.Sleep(sleepMs);
+                        }
+                    }
+
+                    if (callback != null)
+                    {
+                        callback();
+                        callback = null;
+                    }
+                });
+            });
+
+            return true;
+        }
     }
 }

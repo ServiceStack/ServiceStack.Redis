@@ -13,13 +13,17 @@ namespace TestMqHost
 {
     class Program2
     {
+
         static void Main(string[] args)
         {
             var clientManager = new PooledRedisClientManager(new[] { "localhost" })
             {
                 PoolTimeout = 1000,
             };
-            clientManager.GetClient().FlushAll();
+            using (var client = clientManager.GetClient())
+            {
+                client.FlushAll();
+            }
 
             var mqHost = new RedisMqServer(clientManager);
 
