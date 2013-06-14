@@ -91,9 +91,9 @@ namespace ServiceStack.Redis.Tests
                 subscription.OnMessage = (channel, msg) =>
                 {
                     Log("Received '{0}' from channel '{1}'", msg, channel);
-                    Assert.That(channel, Is.EqualTo(channelWildcard));
+                    Assert.That(channel, Is.EqualTo(channelName));
                     Assert.That(msg, Is.EqualTo(message), "we should get the message, not the channel");
-                    subscription.UnSubscribeFromAllChannels();
+                    subscription.UnSubscribeFromChannelsMatching();
                 };
 
                 ThreadPool.QueueUserWorkItem(x =>
