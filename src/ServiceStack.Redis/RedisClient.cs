@@ -126,28 +126,14 @@ namespace ServiceStack.Redis
         {
             var bytesValue = value != null ? value.ToUtf8Bytes() : null;
 
-            if (expireIn.Milliseconds == 0)
-            {
-                base.Set(key, bytesValue, (int)expireIn.TotalSeconds);
-            }
-            else 
-            { 
-                base.Set(key, bytesValue, null, (long)expireIn.TotalMilliseconds);
-            }
+            base.Set(key, bytesValue, (int)expireIn.TotalSeconds, expireIn.Milliseconds);
         }
 
         public void SetEntryIfExists(string key, string value, TimeSpan expireIn)
         {
             var bytesValue = value != null ? value.ToUtf8Bytes() : null;
 
-            if (expireIn.Milliseconds == 0)
-            {
-                base.Set(key, bytesValue, (int)expireIn.TotalSeconds, null, true);
-            }
-            else
-            {
-                base.Set(key, bytesValue, null, (long)expireIn.TotalMilliseconds, true);
-            }
+            base.Set(key, bytesValue, (int)expireIn.TotalSeconds, expireIn.Milliseconds, exists:true);
         }
 
         public bool SetEntryIfNotExists(string key, string value)
@@ -162,14 +148,7 @@ namespace ServiceStack.Redis
         {
             var bytesValue = value != null ? value.ToUtf8Bytes() : null;
 
-            if (expireIn.Milliseconds == 0)
-            {
-                base.Set(key, bytesValue, (int)expireIn.TotalSeconds, null, false);
-            }
-            else
-            {
-                base.Set(key, bytesValue, null, (long)expireIn.TotalMilliseconds, false);
-            }
+            base.Set(key, bytesValue, (int)expireIn.TotalSeconds, expireIn.Milliseconds, exists: false);
         }
 
         public void ChangeDb(long db)

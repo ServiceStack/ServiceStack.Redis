@@ -327,7 +327,7 @@ namespace ServiceStack.Redis
             SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value);
         }
 
-    	public void Set(string key, byte[] value, int? expirySeconds = null, long? expiryMs = null, bool? exists = null)
+    	public void Set(string key, byte[] value, int expirySeconds, long expiryMs = 0, bool? exists = null)
         {
             if (key == null)
                 throw new ArgumentNullException("key");
@@ -336,29 +336,20 @@ namespace ServiceStack.Redis
             if (value.Length > OneGb)
                 throw new ArgumentException("value exceeds 1G", "value");
 
-            if (!expirySeconds.HasValue && !exists.HasValue)
+            if (exists == null)
             {
-                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value);
+                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value,
+                    Commands.Ex, expirySeconds.ToUtf8Bytes(),
+                    Commands.Px, expiryMs.ToUtf8Bytes());
             }
-            else if (!exists.HasValue && expiryMs.HasValue)
+            else
             {
-                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.ExpireInMilliseconds, expiryMs.Value.ToUtf8Bytes());
-            }
-            else if (!exists.HasValue && expirySeconds.HasValue)
-            {
-                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.ExpireInSeconds, expirySeconds.Value.ToUtf8Bytes());
-            }
-            else if (exists.HasValue && !expirySeconds.HasValue && !expiryMs.HasValue)
-            {
-                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, exists.Value ? Commands.SetIfKeyExists : Commands.SetIfKeyDoesNotExist);
-            }
-            else if (exists.HasValue && expirySeconds.HasValue) 
-            {
-                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, exists.Value ? Commands.SetIfKeyExists : Commands.SetIfKeyDoesNotExist, Commands.ExpireInSeconds, expirySeconds.Value.ToUtf8Bytes());
-            }
-            else if (exists.HasValue && expiryMs.HasValue) 
-            {
-                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, exists.Value ? Commands.SetIfKeyExists : Commands.SetIfKeyDoesNotExist, Commands.ExpireInMilliseconds, expiryMs.Value.ToUtf8Bytes());
+                var entryExists = exists.Value ? Commands.Xx : Commands.Nx;
+
+                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value,
+                    Commands.Ex, expirySeconds.ToUtf8Bytes(),
+                    Commands.Px, expiryMs.ToUtf8Bytes(), 
+                    entryExists);                
             }
         }
 
