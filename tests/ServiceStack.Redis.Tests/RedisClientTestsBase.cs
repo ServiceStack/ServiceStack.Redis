@@ -20,6 +20,10 @@ namespace ServiceStack.Redis.Tests
 		public void TestFixtureSetUp()
 		{
 			RedisClient.NewFactoryFn = () => new RedisClient(TestConfig.SingleHost);
+            using (var redis = RedisClient.New())
+            {
+                redis.FlushAll();
+            }
 		}
 
 		[SetUp]

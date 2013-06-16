@@ -12,9 +12,7 @@ namespace ServiceStack.Redis.Tests.Issues
 		[Test]
 		public void Add_range_to_set_fails_if_first_command()
 		{
-			var redis = new RedisClient(TestConfig.SingleHost);
-
-			redis.AddRangeToSet("testset", storeMembers);
+			Redis.AddRangeToSet("testset", storeMembers);
 
 			var members = Redis.GetAllItemsFromSet("testset");
 			Assert.That(members, Is.EquivalentTo(storeMembers));
@@ -23,27 +21,24 @@ namespace ServiceStack.Redis.Tests.Issues
 		[Test]
 		public void Transaction_fails_if_first_command()
 		{
-			var redis = new RedisClient(TestConfig.SingleHost);
-			using (var trans = redis.CreateTransaction())
+            using (var trans = Redis.CreateTransaction())
 			{
 				trans.QueueCommand(r => r.IncrementValue("A"));
 
 				trans.Commit();
 			}
-			Assert.That(redis.GetValue("A"), Is.EqualTo("1"));
+			Assert.That(Redis.GetValue("A"), Is.EqualTo("1"));
 		}
 
         [Test]
         public void Success_callback_fails_for_pipeline_using_GetItemScoreInSortedSet()
         {
-            var redis = new RedisClient(TestConfig.SingleHost);
             double score = 0;
+            Redis.AddItemToSortedSet("testzset", "value", 1);
 
-            redis.AddItemToSortedSet("testset", "value", 1);
-
-            using (var pipeline = redis.CreatePipeline())
+            using (var pipeline = Redis.CreatePipeline())
             {
-                pipeline.QueueCommand(u => u.GetItemScoreInSortedSet("testset", "value"), x =>
+                pipeline.QueueCommand(u => u.GetItemScoreInSortedSet("testzset", "value"), x =>
                 {
                     //score should be assigned to 1 here
                     score = x;
