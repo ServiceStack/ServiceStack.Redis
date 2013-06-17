@@ -21,6 +21,7 @@ namespace ServiceStack.Redis.Messaging
     /// The Start/Stop methods are idempotent i.e. It's safe to call them repeatedly on multiple threads 
     /// and the Redis MQ Host will only have Started/Stopped once.
     /// </summary>
+    [Obsolete("RedisMqServer is maintained and preferred over RedisMqHost")]
     public class RedisMqHost : IMessageService
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RedisMqHost));

@@ -21,7 +21,7 @@ namespace ServiceStack.Redis
 	/// Allows the configuration of different ReadWrite and ReadOnly hosts
 	/// </summary>
 	public partial class BasicRedisClientManager
-		: IRedisClientsManager
+        : IRedisClientsManager, IRedisFailover
 	{
 		private List<RedisEndPoint> ReadWriteHosts { get; set; }
 		private List<RedisEndPoint> ReadOnlyHosts { get; set; }
@@ -39,6 +39,8 @@ namespace ServiceStack.Redis
 		public long Db { get; private set; }
 
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
+
+        public List<Action<IRedisClientsManager>> OnFailover { get; private set; }
 
 		public BasicRedisClientManager() : this(RedisNativeClient.DefaultHost) { }
 
@@ -155,6 +157,19 @@ namespace ServiceStack.Redis
 			readWriteHostsIndex = 0;
 			readOnlyHostsIndex = 0;
 		}
+
+        public void FailoverTo(params string[] readWriteHosts)
+        {
+            FailoverTo(readWriteHosts, readWriteHosts);
+        }
+
+        public void FailoverTo(IEnumerable<string> readWriteHosts, IEnumerable<string> readOnlyHosts)
+        {
+            ReadWriteHosts = readWriteHosts.ToRedisEndPoints();
+            ReadOnlyHosts = readOnlyHosts.ToRedisEndPoints();
+
+            Start();
+        }
 
 		public void Dispose()
 		{

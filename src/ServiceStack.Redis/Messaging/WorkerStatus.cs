@@ -10,6 +10,7 @@ namespace ServiceStack.Redis.Messaging
 
         //Control Commands
         public const string StopCommand = "STOP";
+        public const string ResetCommand = "RESET";
 
         public static string ToString(int workerStatus)
         {

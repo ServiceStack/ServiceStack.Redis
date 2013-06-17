@@ -114,6 +114,12 @@ namespace ServiceStack.Redis.Messaging
             this.MessageFactory = new RedisMessageFactory(clientsManager);
             this.ErrorHandler = ex => Log.Error("Exception in Redis MQ Server: " + ex.Message, ex);
             this.KeepAliveRetryAfterMs = 2000;
+
+            var failoverHost = clientsManager as IRedisFailover;
+            if (failoverHost != null)
+            {
+                failoverHost.OnFailover.Add(OnFailover);
+            }
         }
 
         public void RegisterHandler<T>(Func<IMessage<T>, object> processMessageFn)
@@ -230,11 +236,6 @@ namespace ServiceStack.Redis.Messaging
                         return;
                     }
 
-                    foreach (var worker in workers)
-                    {
-                        worker.Start();
-                    }
-
                     SleepBackOffMultiplier(Interlocked.CompareExchange(ref noOfContinuousErrors, 0, 0));
 
                     StartWorkerThreads();
@@ -266,6 +267,7 @@ namespace ServiceStack.Redis.Messaging
             }
         }
 
+        private IRedisClient masterClient;
         private void RunLoop()
         {
             if (Interlocked.CompareExchange(ref status, WorkerStatus.Started, WorkerStatus.Starting) != WorkerStatus.Starting) return;
@@ -273,47 +275,59 @@ namespace ServiceStack.Redis.Messaging
 
             try
             {
-                using (var redisClient = clientsManager.GetReadOnlyClient())
+                //RESET
+                while (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Started)
                 {
-                    //Record that we had a good run...
-                    Interlocked.CompareExchange(ref noOfContinuousErrors, 0, noOfContinuousErrors);
-
-                    using (var subscription = redisClient.CreateSubscription())
+                    using (var redisClient = clientsManager.GetReadOnlyClient())
                     {
-                        subscription.OnUnSubscribe = channel => Log.Debug("OnUnSubscribe: " + channel);
+                        masterClient = redisClient;
 
-                        subscription.OnMessage = (channel, msg) => {
+                        //Record that we had a good run...
+                        Interlocked.CompareExchange(ref noOfContinuousErrors, 0, noOfContinuousErrors);
 
-                            if (msg == WorkerStatus.StopCommand)
+                        using (var subscription = redisClient.CreateSubscription())
+                        {
+                            subscription.OnUnSubscribe = channel => Log.Debug("OnUnSubscribe: " + channel);
+
+                            subscription.OnMessage = (channel, msg) =>
                             {
-                                Log.Debug("Stop Command Issued");
-
-                                if (Interlocked.CompareExchange(ref status, WorkerStatus.Stopped, WorkerStatus.Started) != WorkerStatus.Started)
-                                    Interlocked.CompareExchange(ref status, WorkerStatus.Stopped, WorkerStatus.Stopping);
-
-                                Log.Debug("UnSubscribe From All Channels...");
-                                subscription.UnSubscribeFromAllChannels(); //Un block thread.
-                                return;
-                            }
-
-                            if (!string.IsNullOrEmpty(msg))
-                            {
-                                int[] workerIndexes;
-                                if (queueWorkerIndexMap.TryGetValue(msg, out workerIndexes))
+                                if (msg == WorkerStatus.StopCommand)
                                 {
-                                    foreach (var workerIndex in workerIndexes)
+                                    Log.Debug("Stop Command Issued");
+
+                                    if (Interlocked.CompareExchange(ref status, WorkerStatus.Stopped, WorkerStatus.Started) != WorkerStatus.Started)
+                                        Interlocked.CompareExchange(ref status, WorkerStatus.Stopped, WorkerStatus.Stopping);
+
+                                    Log.Debug("UnSubscribe From All Channels...");
+                                    subscription.UnSubscribeFromAllChannels(); //Un block thread.
+                                    return;
+                                }
+                                if (msg == WorkerStatus.ResetCommand)
+                                {
+                                    subscription.UnSubscribeFromAllChannels(); //Un block thread.
+                                    return;
+                                }
+
+                                if (!string.IsNullOrEmpty(msg))
+                                {
+                                    int[] workerIndexes;
+                                    if (queueWorkerIndexMap.TryGetValue(msg, out workerIndexes))
                                     {
-                                        workers[workerIndex].NotifyNewMessage();
+                                        foreach (var workerIndex in workerIndexes)
+                                        {
+                                            workers[workerIndex].NotifyNewMessage();
+                                        }
                                     }
                                 }
-                            }
-                        };
+                            };
 
-                        subscription.SubscribeToChannels(QueueNames.TopicIn); //blocks thread
+                            subscription.SubscribeToChannels(QueueNames.TopicIn); //blocks thread
+                            masterClient = null;
+                        }
                     }
-
-                    StopWorkerThreads();
                 }
+
+                StopWorkerThreads();
             }
             catch (Exception ex)
             {
@@ -361,6 +375,37 @@ namespace ServiceStack.Redis.Messaging
                     Log.Warn("Could not send STOP message to bg thread: " + ex.Message);
                 }
             }
+        }
+
+        private void OnFailover(IRedisClientsManager clientsManager)
+        {
+            try
+            {
+                if (masterClient != null)
+                {
+                    //New thread-safe client with same connection info as connected master
+                    using (var currentlySubscribedClient = ((RedisClient)masterClient).CloneClient())
+                    {
+                        currentlySubscribedClient.PublishMessage(QueueNames.TopicIn, WorkerStatus.ResetCommand);
+                    }
+                }
+                else
+                {
+                    Restart();
+                }
+            }
+            catch (Exception ex)
+            {
+                if (this.ErrorHandler != null) this.ErrorHandler(ex);
+                Log.Warn("Error trying to UnSubscribeFromChannels in OnFailover. Restarting...", ex);
+                Restart();
+            }
+        }
+
+        public void Restart()
+        {
+            Stop();
+            Start();
         }
 
         public void NotifyAll()

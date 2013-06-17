@@ -170,7 +170,7 @@ namespace ServiceStack.Redis
         {
             var clientList = base.ClientList().FromUtf8Bytes();
             var results = new List<Dictionary<string, string>>();
-            
+
             var lines = clientList.Split('\n');
             foreach (var line in lines)
             {
@@ -279,7 +279,7 @@ namespace ServiceStack.Redis
             return DecrBy(key, count);
         }
 
-		public long AppendToValue(string key, string value)
+        public long AppendToValue(string key, string value)
         {
             return base.Append(key, value.ToUtf8Bytes());
         }
@@ -471,7 +471,7 @@ namespace ServiceStack.Redis
             return new RedisSubscription(this);
         }
 
-		public long PublishMessage(string toChannel, string message)
+        public long PublishMessage(string toChannel, string message)
         {
             return base.Publish(toChannel, message.ToUtf8Bytes());
         }
@@ -734,6 +734,15 @@ namespace ServiceStack.Redis
             }
         }
 
+        public RedisClient CloneClient()
+        {
+            return new RedisClient(Host, Port, Password, Db)
+            {
+                SendTimeout = SendTimeout,
+                ReceiveTimeout = ReceiveTimeout
+            };
+        }
+
         /// <summary>
         /// Returns key with automatic object id detection in provided value with <typeparam name="T">generic type</typeparam>.
         /// </summary>
@@ -770,22 +779,22 @@ namespace ServiceStack.Redis
 
         #region LUA EVAL
 
-		public long ExecLuaAsInt(string body, params string[] args)
+        public long ExecLuaAsInt(string body, params string[] args)
         {
             return base.EvalInt(body, 0, args.ToMultiByteArray());
         }
 
-		public long ExecLuaAsInt(string luaBody, string[] keys, string[] args)
+        public long ExecLuaAsInt(string luaBody, string[] keys, string[] args)
         {
             return base.EvalInt(luaBody, keys.Length, MergeAndConvertToBytes(keys, args));
         }
 
-		public long ExecLuaShaAsInt(string sha1, params string[] args)
+        public long ExecLuaShaAsInt(string sha1, params string[] args)
         {
             return base.EvalShaInt(sha1, args.Length, args.ToMultiByteArray());
         }
 
-		public long ExecLuaShaAsInt(string sha1, string[] keys, string[] args)
+        public long ExecLuaShaAsInt(string sha1, string[] keys, string[] args)
         {
             return base.EvalShaInt(sha1, keys.Length, MergeAndConvertToBytes(keys, args));
         }

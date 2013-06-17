@@ -26,7 +26,7 @@ namespace ServiceStack.Redis
     /// 1 master and multiple replicated read slaves.
     /// </summary>
     public partial class PooledRedisClientManager
-        : IRedisClientsManager
+        : IRedisClientsManager, IRedisFailover
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PooledRedisClientManager));
 
@@ -47,6 +47,7 @@ namespace ServiceStack.Redis
 
         private List<RedisEndPoint> ReadWriteHosts { get; set; }
         private List<RedisEndPoint> ReadOnlyHosts { get; set; }
+        public List<Action<IRedisClientsManager>> OnFailover { get; private set; }
 
         private RedisClient[] writeClients = new RedisClient[0];
         protected int WritePoolIndex;
@@ -133,6 +134,8 @@ namespace ServiceStack.Redis
                 MaxReadPoolSize = ReadOnlyHosts.Count * PoolSizeMultiplier,
             };
 
+            this.OnFailover = new List<Action<IRedisClientsManager>>();
+
             // if timeout provided, convert into milliseconds
             this.PoolTimeout = poolTimeOutSeconds != null
                 ? poolTimeOutSeconds * 1000
@@ -168,6 +171,21 @@ namespace ServiceStack.Redis
                     writeClients[i] = null;
                 }
                 ReadWriteHosts = readWriteHosts.ToRedisEndPoints();
+            }
+
+            if (this.OnFailover != null)
+            {
+                foreach (var callback in OnFailover)
+                {
+                    try
+                    {
+                        callback(this);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error("Error firing OnFailover callback(): ", ex);
+                    }
+                }
             }
         }
 

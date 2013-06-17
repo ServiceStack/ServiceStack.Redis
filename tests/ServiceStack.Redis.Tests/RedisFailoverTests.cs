@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Common;
 using ServiceStack.Logging;
 using ServiceStack.Logging.Support.Logging;
+using ServiceStack.Messaging;
 using ServiceStack.Redis.Messaging;
 using ServiceStack.Text;
 
@@ -39,7 +41,7 @@ namespace ServiceStack.Redis.Tests
                     {
                         try
                         {
-                            using (RedisClient client = (RedisClient)clientManager.GetClient())
+                            using (var client = (RedisClient)clientManager.GetClient())
                             {
                                 client.IncrementValue("key");
                                 var val = client.Get<long>("key");
@@ -73,7 +75,6 @@ namespace ServiceStack.Redis.Tests
         {
             public int Value { get; set; }
         }
-
 
         [Test]
         public void Can_MqServer_recover_from_server_terminated_client_connections()
@@ -144,10 +145,10 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_failover_at_runtime()
         {
-            var failoverHost = "ny-devredis01:6380";
-            var localClient = new RedisClient("localhost");
+            var failoverHost = "redis-failover:6379";
             string key = "test:failover";
 
+            var localClient = new RedisClient("localhost");
             localClient.Remove(key);
             var failoverClient = new RedisClient(failoverHost);
             failoverClient.Remove(key);
@@ -174,7 +175,6 @@ namespace ServiceStack.Redis.Tests
             Assert.That(localIncr + failoverIncr, Is.EqualTo(100));
         }
 
-
         public static bool RunInLoop(PooledRedisClientManager clientManager, int iterations = 100, int sleepMs = 10, Action callback=null)
         {
             int count = 0;
@@ -184,20 +184,21 @@ namespace ServiceStack.Redis.Tests
             {
                 ThreadPool.QueueUserWorkItem(_ =>
                 {
-                    while (iterations-- > 0)
+                    while (Interlocked.Decrement(ref iterations) >= 0)
                     {
                         using (var client = clientManager.GetClient())
                         {
                             try
                             {
                                 var result = client.Increment("test:failover", 1);
-                                if (++count % (iterations / 10) == 0)
+                                Interlocked.Increment(ref count);
+                                if (count % (iterations / 10) == 0)
                                     lock (clientManager)
                                         Console.WriteLine("count: {0}, errors: {1}", count, errors);
                             }
                             catch (Exception ex)
                             {
-                                errors++;
+                                Interlocked.Increment(ref errors);
                             }
                             Thread.Sleep(sleepMs);
                         }
@@ -207,6 +208,125 @@ namespace ServiceStack.Redis.Tests
                     {
                         callback();
                         callback = null;
+                    }
+                });
+            });
+
+            return true;
+        }
+
+
+        public class Msg
+        {
+            public string Host { get; set; }
+        }
+
+        [Test]
+        public void Can_failover_MqServer_at_runtime()
+        {
+            const int iterations = 100;
+            var failoverHost = "redis-failover:6379";
+            var localClient = new RedisClient("localhost:6379");
+
+            localClient.FlushDb();
+            var failoverClient = new RedisClient(failoverHost);
+            failoverClient.FlushDb();
+
+            var clientManager = new PooledRedisClientManager(new[] { "localhost" });
+            var mqHost = new RedisMqServer(clientManager);
+
+            var map = new Dictionary<string, int>();
+            var received = 0;
+            mqHost.RegisterHandler<Msg>(c =>
+            {
+                var dto = c.GetBody();
+                received++;
+                int count;
+                map.TryGetValue(dto.Host, out count);
+                map[dto.Host] = count + 1;
+
+                lock (clientManager)
+                {
+                    "Received #{0} from {1}".Print(received, dto.Host);
+                    if (received == iterations)
+                        Monitor.Pulse(clientManager);
+                }
+
+                return null;
+            });
+
+            mqHost.Start();
+
+            RunMqInLoop(mqHost, iterations: iterations, callback: () =>
+            {
+                lock (clientManager)
+                    "{0} msgs were published.".Print(iterations);
+            });
+
+            Thread.Sleep(500);
+
+            clientManager.FailoverTo(failoverHost);
+
+            lock (clientManager)
+                Monitor.Wait(clientManager);
+
+            map.PrintDump();
+            "localclient inq: {0}, outq: {1}".Print(
+                localClient.GetListCount("mq:Msg.inq"),
+                localClient.GetListCount("mq:Msg.outq"));
+            "failoverClient inq: {0}, outq: {1}".Print(
+                failoverClient.GetListCount("mq:Msg.inq"),
+                failoverClient.GetListCount("mq:Msg.outq"));
+
+            Assert.That(received, Is.EqualTo(100));
+            Assert.That(map.Count, Is.EqualTo(2));
+            var msgsFromAllHosts = 0;
+            foreach (var count in map.Values)
+            {
+                Assert.That(count, Is.GreaterThan(0));
+                msgsFromAllHosts += count;
+            }
+            Assert.That(msgsFromAllHosts, Is.EqualTo(iterations));
+        }
+
+        public static bool RunMqInLoop(RedisMqServer mqServer, int iterations = 100, int sleepMs = 10, Action callback = null)
+        {
+            int count = 0;
+            int errors = 0;
+
+            10.Times(i =>
+            {
+                ThreadPool.QueueUserWorkItem(_ =>
+                {
+                    while (Interlocked.Decrement(ref iterations) >= 0)
+                    {
+                        using (var client = mqServer.CreateMessageQueueClient())
+                        {
+                            try
+                            {
+                                var redis = (RedisNativeClient)((RedisMessageQueueClient)client).ReadWriteClient;
+
+                                client.Publish(new Msg { Host = redis.Host + ":" + redis.Port });
+                                Interlocked.Increment(ref count);
+                                if (count % (iterations / 10) == 0)
+                                    lock (mqServer)
+                                        "count: {0}, errors: {1}".Print(count, errors);
+                            }
+                            catch (Exception ex)
+                            {
+                                Interlocked.Increment(ref errors);
+                            }
+                            Thread.Sleep(sleepMs);
+                        }
+                    }
+
+                    lock (mqServer)
+                    {
+                        if (callback != null)
+                        {
+                            callback();
+                            callback = null;
+                        }
                     }
                 });
             });
