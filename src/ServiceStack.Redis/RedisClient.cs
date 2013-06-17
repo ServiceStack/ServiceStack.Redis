@@ -1,5 +1,5 @@
 //
-// http://code.google.com/p/servicestack/wiki/ServiceStackRedis
+// https://github.com/ServiceStack/ServiceStack.Redis/
 // ServiceStack.Redis: ECMA CLI Binding to the Redis key-value storage system
 //
 // Authors:
