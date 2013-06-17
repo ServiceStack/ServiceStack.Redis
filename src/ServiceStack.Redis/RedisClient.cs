@@ -124,12 +124,17 @@ namespace ServiceStack.Redis
 
         public void SetEntry(string key, string value, TimeSpan expireIn)
         {
-            var bytesValue = value != null ? value.ToUtf8Bytes() : null;
+            var bytesValue = value != null
+                ? value.ToUtf8Bytes()
+                : null;
 
-            if (expireIn.Milliseconds > 0)
-                base.Set(key, bytesValue, 0, (long)expireIn.TotalMilliseconds);
-            else
-                base.Set(key, bytesValue, (int)expireIn.TotalSeconds, 0);
+            SetEx(key, (int)expireIn.TotalSeconds, bytesValue); 
+            
+            //New in 2.6.x - TODO change when 2.6 is most popular
+            //if (expireIn.Milliseconds > 0)
+            //    base.Set(key, bytesValue, 0, (long)expireIn.TotalMilliseconds);
+            //else
+            //    base.Set(key, bytesValue, (int)expireIn.TotalSeconds, 0);
         }
 
         public void SetEntryIfExists(string key, string value, TimeSpan expireIn)
