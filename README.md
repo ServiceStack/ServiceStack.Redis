@@ -188,7 +188,7 @@ _Full source code of this example is [viewable online](https://github.com/Servic
     using (var redisClient = new RedisClient())
     {
         //Create a 'strongly-typed' API that makes all Redis Value operations to apply against Shippers
-        IRedisTypedClient<Shipper> redis = redisClient.GetTypedClient<Shipper>();
+        IRedisTypedClient<Shipper> redis = redisClient.As<Shipper>();
 
         //Redis lists implement IList<T> while Redis sets implement ICollection<T>
         var currentShippers = redis.Lists["urn:shippers:current"];
