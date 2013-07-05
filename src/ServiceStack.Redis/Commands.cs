@@ -82,6 +82,8 @@ namespace ServiceStack.Redis
 
         public readonly static byte[] RPush = "RPUSH".ToUtf8Bytes();
         public readonly static byte[] LPush = "LPUSH".ToUtf8Bytes();
+        public readonly static byte[] RPushX = "RPUSHX".ToUtf8Bytes();
+        public readonly static byte[] LPushX = "LPUSHX".ToUtf8Bytes();
         public readonly static byte[] LLen = "LLEN".ToUtf8Bytes();
         public readonly static byte[] LRange = "LRANGE".ToUtf8Bytes();
         public readonly static byte[] LTrim = "LTRIM".ToUtf8Bytes();
