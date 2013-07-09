@@ -347,6 +347,7 @@ type as well as serializing and de-serializing each record using Service Stack's
 
 # Community Resources
 
+  - [Fan Messaging with ServiceStack.Redis](http://cornishdev.wordpress.com/2013/04/04/fan-messaging-with-servicestack-redis/) by [miket](http://stackoverflow.com/users/1804544/miket)
   - [Redis and VB.Net](http://blogs.lessthandot.com/index.php/DataMgmt/DBProgramming/redis-and-vb-net) by [@chrissie1](https://twitter.com/chrissie1)
   - [Using ServiceStack.Redis Part 2: Sets and Hashes](http://michaelsarchet.com/using-servicestack-redis-part-2-sets-and-hashes/) by [@msarchet](http://twitter.com/msarchet)
   - [Using the ServiceStack.Redis Client](http://michaelsarchet.com/using-the-servicestack-redis-client/) by [@msarchet](http://twitter.com/msarchet)
