@@ -17,5 +17,7 @@ namespace ServiceStack.Redis
 	public interface IRedisClientFactory
 	{
 	    RedisClient CreateRedisClient(string host, int port);
+
+        RedisClient CreateRedisClient(string host, int port, string password);
 	}
 }
