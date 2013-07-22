@@ -26,5 +26,10 @@ namespace ServiceStack.Redis
 		{
 			return new RedisClient(host, port);
 		}
+
+        public RedisClient CreateRedisClient(string host, int port, string password)
+        {
+            return new RedisClient(host, port, password);
+        }
 	}
 }

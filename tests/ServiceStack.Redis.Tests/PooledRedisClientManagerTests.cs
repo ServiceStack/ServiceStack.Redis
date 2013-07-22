@@ -365,6 +365,26 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(hostCount, Is.EqualTo(noOfConcurrentClients), "Invalid no of clients used");
 		}
 
+        [Test]
+        [TestCase("localhost:6379", Result = false)]
+        [TestCase("vakibritha@localhost:6379", Result = true)]
+        public bool Can_connect_to_password_protected_redis_using_PooledRedisClientManager(string host)
+        {
+
+            try
+            {
+                var rPool = new PooledRedisClientManager(new List<string> { host }, new List<string> { host });
+
+                rPool.GetClient();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+        }
+
 		private static void UseClient(IRedisClientsManager manager, int clientNo, Dictionary<string, int> hostCountMap)
 		{
 			using (var client = manager.GetClient())

@@ -11,5 +11,10 @@
         {
             return new SerializingRedisClient(host, port);
         }
+
+        public RedisClient CreateRedisClient(string host, int port, string password)
+        {
+            return new SerializingRedisClient(host, port);
+        }
     }
 }

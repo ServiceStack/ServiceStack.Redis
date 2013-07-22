@@ -267,10 +267,10 @@ namespace ServiceStack.Redis
                     {
                         if (writeClients[i] != null)
                             writeClients[i].DisposeConnection();
-                        var client = RedisClientFactory.CreateRedisClient(nextHost.Host, nextHost.Port);
 
-                        if (nextHost.RequiresAuth)
-                            client.Password = nextHost.Password;
+                        var client = nextHost.RequiresAuth ?
+                            RedisClientFactory.CreateRedisClient(nextHost.Host, nextHost.Port, nextHost.Password)
+                            : RedisClientFactory.CreateRedisClient(nextHost.Host, nextHost.Port);
 
                         client.Id = RedisClientCounter++;
                         client.ClientManager = this;
