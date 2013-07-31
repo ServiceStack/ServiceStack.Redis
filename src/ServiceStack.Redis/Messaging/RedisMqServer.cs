@@ -81,6 +81,17 @@ namespace ServiceStack.Redis.Messaging
             return new RedisMessageQueueClient(this.clientsManager, null);
         }
 
+        /// <summary>
+        /// Opt-in to only publish responses on this white list. 
+        /// Publishes all responses by default.
+        /// </summary>
+        public string[] PublishResponsesWhitelist { get; set; }
+
+        public bool DisablePublishingResponses
+        {
+            set { PublishResponsesWhitelist = value ? new string[0] : null; }
+        }
+
         //Stats
         private long timesStarted = 0;
         private long noOfErrors = 0;
@@ -153,6 +164,7 @@ namespace ServiceStack.Redis.Messaging
             return new MessageHandlerFactory<T>(this, processMessageFn, processExceptionEx) {
                 RequestFilter = this.RequestFilter,
                 ResponseFilter = this.ResponseFilter,
+                PublishResponsesWhitelist = PublishResponsesWhitelist,
                 RetryCount = RetryCount,
             };
         }
