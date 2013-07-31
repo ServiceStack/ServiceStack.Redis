@@ -3,7 +3,7 @@ follow [@servicestack](http://twitter.com/servicestack) for twitter updates.
 
 # An Open Source C# Client for Redis
 
-## New in v3.9.37
+_Note: the source code is provided as-is - there is no commercial support available for ServiceStack_
 
 ### New IRedisClient LUA API's
 
@@ -128,13 +128,11 @@ The class hierachy for the C# Redis clients effectively look like:
 
     RedisTypedClient (POCO) > RedisClient (string) > RedisNativeClient (raw byte[])
 
-Each client is optimized for maximum efficiency and provides layered functionality for maximum developer productivity:
+Each client provides a different layer of abstraction:
   
   * The RedisNativeClient exposes raw **byte[]** apis and does no marshalling and passes all values directly to redis.
   * The RedisClient assumes **string** values and simply converts strings to UTF8 bytes before sending to Redis
   * The RedisTypedClient provides a generic interface allowing you to add POCO values. The POCO types are serialized using [.NETs fastest JSON Serializer](http://www.servicestack.net/mythz_blog/?p=344) which is then converted to UTF8 bytes and sent to Redis.
-
-At all times you can pick the most optimal Redis Client for your needs so you can achieve maximum efficiency in your applications.
 
 ### Redis Client API Overview
 [![Redis Client API](http://servicestack.net/img/Redis-annotated-preview.png)](http://servicestack.net/img/Redis-annotated.png)
@@ -145,16 +143,6 @@ For multi-threaded applications you can choose from our different client connect
   * BasicRedisClientManager - a load-balance (master-write and read-slaves) client manager that returns a new [IRedisClient](https://github.com/ServiceStack/ServiceStack.Redis/wiki/IRedisClient) connection with the defaults specified (faster when accessing a redis-server instance on the same host).
   * PooledRedisClientManager - a load-balanced (master-write and read-slaves) client manager that utilizes a pool of redis client connections (faster when accessing a redis-server instance over the network).
 
-# Download
-
-You can download the Redis Client in any one of the following ways:
-
-* Packaged by default in [ServiceStack.dll](https://github.com/ServiceStack/ServiceStack/downloads)
-* Available to download separately as a stand-alone [ServiceStack.Redis.dll](https://github.com/ServiceStack/ServiceStack.Redis/downloads) 
-* As Source Code via Git: `git clone git://github.com/ServiceStack/ServiceStack.Redis.git`
-* For those interested in having a GUI admin tool to visualize your Redis data should check out the [Redis Admin UI](http://www.servicestack.net/mythz_blog/?p=381)
-
-[View the release notes](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Redis-Client-Release-Notes).
 
 ### Redis Server builds for Windows
   
