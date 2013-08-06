@@ -91,6 +91,11 @@ namespace ServiceStack.Redis.Messaging
         private readonly Dictionary<Type, IMessageHandlerFactory> handlerMap
             = new Dictionary<Type, IMessageHandlerFactory>();
 
+        public List<Type> RegisteredTypes
+        {
+            get { return handlerMap.Keys.ToList(); }
+        }
+
         private IMessageHandler[] messageHandlers;
         private string[] inQueueNames;
 

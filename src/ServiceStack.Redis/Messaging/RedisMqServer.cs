@@ -115,6 +115,10 @@ namespace ServiceStack.Redis.Messaging
         private MessageHandlerWorker[] workers;
         private Dictionary<string, int[]> queueWorkerIndexMap;
 
+        public List<Type> RegisteredTypes
+        {
+            get { return handlerMap.Keys.ToList(); }
+        }
 
         public RedisMqServer(IRedisClientsManager clientsManager,
             int retryCount = DefaultRetryCount, TimeSpan? requestTimeOut = null)

@@ -161,6 +161,8 @@ namespace ServiceStack.Redis.Messaging
         }
 
         public IMessageFactory MessageFactory { get; set; }
+        
+        public List<Type> RegisteredTypes { get; private set; }
 
         public virtual void Dispose()
         {
