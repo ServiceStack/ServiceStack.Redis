@@ -78,12 +78,14 @@ namespace ServiceStack.Redis.Tests
             RunFor(TimeSpan.FromSeconds(5));
         }
 
+        [Explicit]
         [Test]
         public void Run_for_10_seconds()
         {
             RunFor(TimeSpan.FromSeconds(10));
         }
 
+        [Explicit]
         [Test]
         public void Run_for_30_seconds()
         {
