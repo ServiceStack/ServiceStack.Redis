@@ -66,7 +66,7 @@ namespace ServiceStack.Redis.Messaging
         /// <summary>
         /// Don't listen on any Priority Queues
         /// </summary>
-        public bool DisableAllPriorityQueues
+        public bool DisablePriorityQueues
         {
             set
             {
