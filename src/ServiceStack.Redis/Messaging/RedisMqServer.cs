@@ -61,7 +61,7 @@ namespace ServiceStack.Redis.Messaging
         /// <summary>
         /// If you only want to enable priority queue handlers (and threads) for specific msg types
         /// </summary>
-        public Type[] OnlyEnablePriortyQueuesForTypes { get; set; }
+        public string[] PriortyQueuesWhitelist { get; set; }
 
         /// <summary>
         /// Don't listen on any Priority Queues
@@ -70,7 +70,7 @@ namespace ServiceStack.Redis.Messaging
         {
             set
             {
-                OnlyEnablePriortyQueuesForTypes = new Type[0];
+                PriortyQueuesWhitelist = new string[0];
             }
         }
 
@@ -187,8 +187,8 @@ namespace ServiceStack.Redis.Messaging
                     var queueNames = new QueueNames(msgType);
                     var noOfThreads = handlerThreadCountMap[msgType];
 
-                    if (OnlyEnablePriortyQueuesForTypes == null
-                        || OnlyEnablePriortyQueuesForTypes.Any(x => x == msgType))
+                    if (PriortyQueuesWhitelist == null
+                        || PriortyQueuesWhitelist.Any(x => x == msgType.Name))
                     {
                         noOfThreads.Times(i =>
                             workerBuilder.Add(new MessageHandlerWorker(
