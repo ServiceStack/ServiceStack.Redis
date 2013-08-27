@@ -3178,6 +3178,7 @@
             Reserves the specified URL for non-administrator users and accounts. 
             http://msdn.microsoft.com/en-us/library/windows/desktop/cc307223(v=vs.85).aspx
             </summary>
+            <returns>Reserved Url if the process completes successfully</returns>
         </member>
         <member name="P:ServiceStack.WebHost.Endpoints.Support.HttpListenerBase.Plugins">
             TODO: plugin added with .Add method after host initialization won't be configured. Each plugin should have state so we can invoke Register method if host was already started.  
