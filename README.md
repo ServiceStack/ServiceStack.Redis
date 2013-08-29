@@ -165,7 +165,7 @@ Contains all the examples, tutorials and resources you need to get you up to spe
 
 ### Specific Examples
   * [Using Transactions in Redis (i.e. MULTI/EXEC/DISCARD)](https://github.com/ServiceStack/ServiceStack.Redis/wiki/RedisTransactions)
-  * [Using Redis's built-in Publsih/Subscribe pattern for high performance network notifications](https://github.com/ServiceStack/ServiceStack.Redis/wiki/RedisPubSub)
+  * [Using Redis's built-in Publish/Subscribe pattern for high performance network notifications](https://github.com/ServiceStack/ServiceStack.Redis/wiki/RedisPubSub)
   * [Using Redis to create high performance *distributed locks* spannable across multiple app servers](https://github.com/ServiceStack/ServiceStack.Redis/wiki/RedisLocks)
 
 # Simple example using Redis Lists
