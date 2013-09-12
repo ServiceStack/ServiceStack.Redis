@@ -2940,6 +2940,16 @@
             <param name="withPathInfoParts"></param>
             <returns></returns>
         </member>
+        <member name="M:ServiceStack.ServiceHost.RestPath.IsMatch(System.String,System.String[],System.Int32@)">
+            <summary>
+            For performance withPathInfoParts should already be a lower case string
+            to minimize redundant matching operations.
+            </summary>
+            <param name="httpMethod"></param>
+            <param name="withPathInfoParts"></param>
+            <param name="wildcardMatchCount"></param>
+            <returns></returns>
+        </member>
         <member name="P:ServiceStack.ServiceHost.RestPath.PathComponentsCount">
             <summary>
             The number of segments separated by '/' determinable by path.Split('/').Length
