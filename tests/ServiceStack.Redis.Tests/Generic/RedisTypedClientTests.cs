@@ -9,7 +9,8 @@ namespace ServiceStack.Redis.Tests.Generic
 {
 	[TestFixture, Category("Integration")]
 	public class RedisTypedClientTests
-	{
+        : RedisClientTestsBase
+    {
 		public class CacheRecord
 		{
 			public CacheRecord()
@@ -38,11 +39,12 @@ namespace ServiceStack.Redis.Tests.Generic
 		[SetUp]
 		public virtual void OnBeforeEachTest()
 		{
+            base.OnBeforeEachTest();
+
 			if (Redis != null) Redis.Dispose();
 			Redis = new RedisClient(TestConfig.SingleHost);
 		    Redis.NamespacePrefix = "RedisTypedClientTests:";
 			RedisTyped = Redis.As<CacheRecord>();
-            Redis.FlushAll();
 		}
 
         [TearDown]

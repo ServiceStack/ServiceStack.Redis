@@ -181,7 +181,7 @@ namespace ServiceStack.Redis.Tests
 			Redis.ExpireAt("key", in2Secs);
 
 			Assert.That(Redis.ContainsKey("key"), Is.True);
-			Thread.Sleep(2000);
+			Thread.Sleep(3000);
 			Assert.That(Redis.ContainsKey("key"), Is.False);
 		}
 
