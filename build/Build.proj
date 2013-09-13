@@ -3,11 +3,11 @@
     xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="4.0">
   <Import Project="$(MSBuildProjectDirectory)/Build.tasks" />
 
-    <PropertyGroup>
-        <MajorVersion>3</MajorVersion>
-        <MinorVersion>9</MinorVersion>
-        <PatchVersion>$(BUILD_NUMBER)</PatchVersion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <MajorVersion Condition="$(MajorVersion) == ''">3</MajorVersion>
+    <MinorVersion Condition="$(MinorVersion) == ''">9</MinorVersion>
+    <PatchVersion Condition="$(PatchVersion) == ''">$(BUILD_NUMBER)</PatchVersion>
+  </PropertyGroup>
 
   <PropertyGroup>
     <BuildSolutionDir>$(MSBuildProjectDirectory)/..</BuildSolutionDir>
@@ -58,7 +58,7 @@
 
   <Target Name="NuGetPack">
 
-    <!-- Update Versino -->
+    <!-- Update Version -->
     <ItemGroup>
         <RegexTransform Include="$(SourcesDir)/**/AssemblyInfo.cs">
             <Find>\d+\.\d+\.\d+\.\d+</Find>
@@ -74,7 +74,7 @@
              Targets="Build"
              Properties="BuildPackage=true;Version=$(PackageVersion);OutputPath=$(NuGetPackageDir)/lib/net35;Configuration=$(Configuration)" />
  
-    <Exec Command="&quot;$(NuGetPath)&quot; pack &quot;$(NuGetPackageDescription)&quot; -OutputDirectory &quot;$(NuGetPackageDir)&quot; -Version $(PackageVersion)"
+    <Exec Command="&quot;$(NuGetPath)&quot; pack &quot;$(NuGetPackageDescription)&quot; -OutputDirectory &quot;$(NuGetPackageDir)&quot; -Version $(PackageVersion) -Symbols"
             LogStandardErrorAsError="true" />
 
   </Target>
