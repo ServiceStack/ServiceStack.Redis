@@ -176,12 +176,12 @@ namespace ServiceStack.Redis.Tests
 			Redis.SetEntry("key", "val");
 
 			var unixNow = DateTime.Now.ToUnixTime();
-			var in1Sec = unixNow + 1;
+			var in2Secs = unixNow + 2;
 
-			Redis.ExpireAt("key", in1Sec);
+            Redis.ExpireAt("key", in2Secs);
 
 			Assert.That(Redis.ContainsKey("key"), Is.True);
-			Thread.Sleep(2000);
+			Thread.Sleep(3000);
 			Assert.That(Redis.ContainsKey("key"), Is.False);
 		}
 
@@ -601,7 +601,7 @@ namespace ServiceStack.Redis.Tests
 
             Redis.Remove("key");
             Redis.SetEntryIfNotExists("key", "val", expireIn: TimeSpan.FromMilliseconds(1000));
-            Assert.That(Redis.ContainsKey("key"), Is.False);
+            Assert.That(Redis.ContainsKey("key"), Is.True);
         }
     }
 
