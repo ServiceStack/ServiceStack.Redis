@@ -17,7 +17,7 @@
     <NuGetPackageDir>$(BuildSolutionDir)/NuGet/</NuGetPackageDir>
     <NuGetBasePath>$(MSBuildProjectDirectory)</NuGetBasePath>
     <NuGetPackageLibDir>$(BuildSolutionDir)/NuGet/lib</NuGetPackageLibDir>
-    <NuGetPackageDescription>$(BuildSolutionDir)/NuGet/stackexpress.redis.nuspec</NuGetPackageDescription>
+    <NuGetPackageDescription>$(BuildSolutionDir)/NuGet/servicestack.redis.nuspec</NuGetPackageDescription>
     <Version>$(MajorVersion).$(MinorVersion).$(PatchVersion).0</Version>
     <UnstableTag Condition="$(RELEASE) == ''">-unstable</UnstableTag>
     <PackageVersion>$(MajorVersion).$(MinorVersion).$(PatchVersion)$(UnstableTag)</PackageVersion>
