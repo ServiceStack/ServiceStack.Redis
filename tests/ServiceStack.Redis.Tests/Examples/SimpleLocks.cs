@@ -12,7 +12,7 @@ namespace ServiceStack.Redis.Tests.Examples
     [TestFixture, Explicit, Category("Integration")]
 	public class SimpleLocks
 	{
-		[TestFixtureSetUp]
+		[SetUp]
 		public void OnTestFixtureSetUp()
 		{
 			using (var redisClient = new RedisClient(TestConfig.SingleHost))

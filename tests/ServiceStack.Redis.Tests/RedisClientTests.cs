@@ -601,7 +601,7 @@ namespace ServiceStack.Redis.Tests
 
             Redis.Remove("key");
             Redis.SetEntryIfNotExists("key", "val", expireIn: TimeSpan.FromMilliseconds(1000));
-            Assert.That(Redis.ContainsKey("key"), Is.False);
+            Assert.That(Redis.ContainsKey("key"), Is.True);
         }
     }
 
