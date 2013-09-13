@@ -91,9 +91,9 @@ namespace ServiceStack.Redis.Tests.Generic
 
 			RedisTyped.Store(cachedRecord);
 
-			var in1Sec = DateTime.Now.AddSeconds(2);
+			var in2Secs = DateTime.Now.AddSeconds(2);
 
-			RedisTyped.ExpireAt("key", in1Sec);
+			RedisTyped.ExpireAt("key", in2Secs);
 
 			Assert.That(RedisTyped.GetById("key"), Is.Not.Null);
 			Thread.Sleep(3000);
