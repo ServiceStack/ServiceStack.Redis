@@ -3,7 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{38F69F8F-9303-4BAF-B081-D28339163E07}"
 	ProjectSection(SolutionItems) = preProject
+		..\build\build-local.bat = ..\build\build-local.bat
 		..\build\build.bat = ..\build\build.bat
+		..\build\build.proj = ..\build\build.proj
+		..\build\build.tasks = ..\build\build.tasks
 		..\build\NuGetPack.cmd = ..\build\NuGetPack.cmd
 		..\NuGet\servicestack.redis.nuspec = ..\NuGet\servicestack.redis.nuspec
 	EndProjectSection
