@@ -15,9 +15,6 @@
     <Configuration Condition="$(Configuration) == ''">Release</Configuration>
     <NuGetPath>$(BuildSolutionDir)/src/.nuget/nuget.exe</NuGetPath>
     <NuGetPackageDir>$(BuildSolutionDir)/NuGet/</NuGetPackageDir>
-    <NuGetBasePath>$(MSBuildProjectDirectory)</NuGetBasePath>
-    <NuGetPackageLibDir>$(BuildSolutionDir)/NuGet/lib</NuGetPackageLibDir>
-    <NuGetPackageDescription>$(BuildSolutionDir)/NuGet/servicestack.redis.nuspec</NuGetPackageDescription>
     <Version>$(MajorVersion).$(MinorVersion).$(PatchVersion).0</Version>
     <UnstableTag Condition="$(RELEASE) == ''">-unstable</UnstableTag>
     <PackageVersion>$(MajorVersion).$(MinorVersion).$(PatchVersion)$(UnstableTag)</PackageVersion>
@@ -72,9 +69,9 @@
 
     <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis/ServiceStack.Redis.csproj"
              Targets="Build"
-             Properties="BuildPackage=true;Version=$(PackageVersion);OutputPath=$(NuGetPackageDir)/lib/net35;Configuration=$(Configuration)" />
+             Properties="Version=$(PackageVersion);OutputPath=$(NuGetPackageDir)/lib/net35;Configuration=$(Configuration)" />
  
-    <Exec Command="&quot;$(NuGetPath)&quot; pack &quot;$(NuGetPackageDescription)&quot; -OutputDirectory &quot;$(NuGetPackageDir)&quot; -Version $(PackageVersion) -Symbols"
+    <Exec Command="&quot;$(NuGetPath)&quot; pack &quot;$(NuGetPackageDir)/servicestack.redis.nuspec&quot; -OutputDirectory &quot;$(NuGetPackageDir)&quot; -Version $(PackageVersion) -Symbols"
             LogStandardErrorAsError="true" />
 
   </Target>
