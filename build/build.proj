@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Default"
     xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="4.0">
-  <Import Project="$(MSBuildProjectDirectory)/Build.tasks" />
+  <Import Project="$(MSBuildProjectDirectory)/build.tasks" />
 
-    <PropertyGroup>
-        <MajorVersion>3</MajorVersion>
-        <MinorVersion>9</MinorVersion>
-        <PatchVersion>$(BUILD_NUMBER)</PatchVersion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <MajorVersion Condition="$(MajorVersion) == ''">3</MajorVersion>
+    <MinorVersion Condition="$(MinorVersion) == ''">9</MinorVersion>
+    <PatchVersion Condition="$(PatchVersion) == ''">$(BUILD_NUMBER)</PatchVersion>
+  </PropertyGroup>
 
   <PropertyGroup>
     <BuildSolutionDir>$(MSBuildProjectDirectory)/..</BuildSolutionDir>
-    <SourcesDir>$(BuildSolutionDir)/src</SourcesDir>
+    <SrcDir>$(BuildSolutionDir)/src</SrcDir>
     <Configuration Condition="$(Configuration) == ''">Release</Configuration>
     <NuGetPath>$(BuildSolutionDir)/src/.nuget/nuget.exe</NuGetPath>
     <NuGetPackageDir>$(BuildSolutionDir)/NuGet/</NuGetPackageDir>
-    <NuGetBasePath>$(MSBuildProjectDirectory)</NuGetBasePath>
-    <NuGetPackageLibDir>$(BuildSolutionDir)/NuGet/lib</NuGetPackageLibDir>
-    <NuGetPackageDescription>$(BuildSolutionDir)/NuGet/stackexpress.redis.nuspec</NuGetPackageDescription>
     <Version>$(MajorVersion).$(MinorVersion).$(PatchVersion).0</Version>
     <UnstableTag Condition="$(RELEASE) == ''">-unstable</UnstableTag>
     <PackageVersion>$(MajorVersion).$(MinorVersion).$(PatchVersion)$(UnstableTag)</PackageVersion>
@@ -37,6 +34,11 @@
   </PropertyGroup>
 
   <Target Name="Default" DependsOnTargets="$(DoBuildSolutionsDependsOn)" />
+
+  <Target Name="TeamCityBuild">
+    <!--<Copy SourceFiles="$(BuildSolutionDir)/tests/ServiceStack.Common.Tests/ci.app.config" DestinationFiles="$(BuildSolutionDir)/tests/ServiceStack.Common.Tests/app.config" />-->
+    <CallTarget Targets="Default" />
+  </Target>
 
   <Target Name="UnitTestsWithoutIntegration" DependsOnTargets="$(DoBuildSolutionsDependsOn)">
       <Exec Command="$(BuildSolutionDir)/lib/tests/nunit-console-x86.exe /exclude:Integration $(BuildSolutionDir)/tests/ServiceStack.Redis.Tests/bin/Debug/ServiceStack.Redis.Tests.dll"/>
@@ -58,9 +60,9 @@
 
   <Target Name="NuGetPack">
 
-    <!-- Update Versino -->
+    <!-- Update Version -->
     <ItemGroup>
-        <RegexTransform Include="$(SourcesDir)/**/AssemblyInfo.cs">
+        <RegexTransform Include="$(SrcDir)/**/AssemblyInfo.cs">
             <Find>\d+\.\d+\.\d+\.\d+</Find>
             <ReplaceWith>$(Version)</ReplaceWith>
         </RegexTransform>
@@ -70,11 +72,18 @@
 
     <Delete Files="@(NugetPackageFilesToDelete)" />
 
+    <ItemGroup>
+      <RedisFiles Include="$(SrcDir)/ServiceStack.Redis/bin/$(Configuration)/ServiceStack.Redis.*"></RedisFiles>
+    </ItemGroup>
+
     <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis/ServiceStack.Redis.csproj"
              Targets="Build"
-             Properties="BuildPackage=true;Version=$(PackageVersion);OutputPath=$(NuGetPackageDir)/lib/net35;Configuration=$(Configuration)" />
+             Properties="Version=$(PackageVersion);Configuration=$(Configuration)" />
  
-    <Exec Command="&quot;$(NuGetPath)&quot; pack &quot;$(NuGetPackageDescription)&quot; -OutputDirectory &quot;$(NuGetPackageDir)&quot; -Version $(PackageVersion)"
+    <MakeDir Directories="$(NuGetPackageDir)/ServiceStack.Redis/lib/net35" Condition="!Exists('$(NuGetPackageDir)/ServiceStack.Redis/lib/net35')" />
+    <Copy SourceFiles="%(RedisFiles.Identity)" DestinationFolder="$(NuGetPackageDir)/ServiceStack.Redis/lib/net35" />
+
+    <Exec Command="&quot;$(NuGetPath)&quot; pack &quot;$(NuGetPackageDir)/ServiceStack.Redis/servicestack.redis.nuspec&quot; -OutputDirectory &quot;$(NuGetPackageDir)&quot; -Version $(PackageVersion) -Symbols"
             LogStandardErrorAsError="true" />
 
   </Target>
