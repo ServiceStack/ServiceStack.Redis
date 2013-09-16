@@ -12,7 +12,7 @@ namespace ServiceStack.Redis.Tests.Examples
     [TestFixture, Explicit, Category("Integration")]
 	public class SimpleLocks
 	{
-		[TestFixtureSetUp]
+		[SetUp]
 		public void OnTestFixtureSetUp()
 		{
 			using (var redisClient = new RedisClient(TestConfig.SingleHost))
@@ -104,7 +104,7 @@ namespace ServiceStack.Redis.Tests.Examples
             var waitFor = TimeSpan.FromMilliseconds(20);
 
             var loc = redisClient.AcquireLock("testlock",waitFor);
-            Thread.Sleep(40); //should have lock expire
+            Thread.Sleep(100); //should have lock expire
             using(var newloc = redisClient.AcquireLock("testlock", waitFor))
             {
                 
