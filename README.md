@@ -143,6 +143,20 @@ For multi-threaded applications you can choose from our different client connect
   * BasicRedisClientManager - a load-balance (master-write and read-slaves) client manager that returns a new [IRedisClient](https://github.com/ServiceStack/ServiceStack.Redis/wiki/IRedisClient) connection with the defaults specified (faster when accessing a redis-server instance on the same host).
   * PooledRedisClientManager - a load-balanced (master-write and read-slaves) client manager that utilizes a pool of redis client connections (faster when accessing a redis-server instance over the network).
 
+## Install ServiceStack.Redis
+
+    PM> Install-Pacakage ServiceStack.Redis
+
+_Commercial support will be available for ServiceStack, contact team@servicestack.net for details_
+
+## Copying
+
+Since September 2013, ServiceStack source code is available under GNU Affero General Public License/FOSS License Exception, see license.txt in the source. Alternative commercial licensing is also available, contact team@servicestack.net for details.
+
+## Contributing
+
+Commits should be made to the **v3-fixes** branch so they can be merged into both **v3** and **master** (v4) release branches. 
+Contributors need to approve the [Contributor License Agreement](https://docs.google.com/forms/d/16Op0fmKaqYtxGL4sg7w_g-cXXyCoWjzppgkuqzOeKyk/viewform) before any code will be reviewed, see the [Contributing wiki](https://github.com/ServiceStack/ServiceStack/wiki/Contributing) for more details. 
 
 ### Redis Server builds for Windows
   
