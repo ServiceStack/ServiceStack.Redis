@@ -39,6 +39,7 @@ namespace ServiceStack.Redis
         public int? ConnectTimeout { get; set; }
         public int? SocketSendTimeout { get; set; }
         public int? SocketReceiveTimeout { get; set; }
+        public int? IdleTimeOutSecs { get; set; }
 
         /// <summary>
         /// Gets or sets object key prefix.
@@ -233,6 +234,10 @@ namespace ServiceStack.Redis
                 {
                     inActiveClient.ReceiveTimeout = this.SocketReceiveTimeout.Value;
                 }
+                if (this.IdleTimeOutSecs.HasValue)
+                {
+                    inActiveClient.IdleTimeOutSecs = this.IdleTimeOutSecs.Value;
+                }
 
                 inActiveClient.NamespacePrefix = NamespacePrefix;
 
@@ -324,6 +329,10 @@ namespace ServiceStack.Redis
                 if (this.SocketReceiveTimeout.HasValue)
                 {
                     inActiveClient.ReceiveTimeout = this.SocketReceiveTimeout.Value;
+                }
+                if (this.IdleTimeOutSecs.HasValue)
+                {
+                    inActiveClient.IdleTimeOutSecs = this.IdleTimeOutSecs.Value;
                 }
 
                 inActiveClient.NamespacePrefix = NamespacePrefix;

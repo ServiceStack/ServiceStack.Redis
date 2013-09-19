@@ -37,6 +37,7 @@ namespace ServiceStack.Redis
         public const long DefaultDb = 0;
         public const int DefaultPort = 6379;
         public const string DefaultHost = "localhost";
+        public const int DefaultIdleTimeOutSecs = 240; //default on redis is 300
 
         internal const int Success = 1;
         internal const int OneGb = 1073741824;
@@ -60,14 +61,13 @@ namespace ServiceStack.Redis
         internal bool Active { get; set; }
         internal PooledRedisClientManager ClientManager { get; set; }
 
-        internal int IdleTimeOutSecs = 240; //default on redis is 300
         internal long LastConnectedAtTimestamp;
 
         public long Id { get; set; }
 
         public string Host { get; private set; }
         public int Port { get; private set; }
-
+        
         /// <summary>
         /// Gets or sets object key prefix.
         /// </summary>
@@ -78,6 +78,7 @@ namespace ServiceStack.Redis
         public int SendTimeout { get; set; }
 		public int ReceiveTimeout { get; set; }
         public string Password { get; set; }
+        public int IdleTimeOutSecs { get; set; }
 
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
 
@@ -127,6 +128,7 @@ namespace ServiceStack.Redis
 			ReceiveTimeout = -1;
             Password = password;
             Db = db;
+            IdleTimeOutSecs = DefaultIdleTimeOutSecs;
         }
 
         public RedisNativeClient()
