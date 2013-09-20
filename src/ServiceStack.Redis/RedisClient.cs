@@ -15,7 +15,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Common.Utils;
 using ServiceStack.Redis.Generic;
 using ServiceStack.Redis.Pipeline;
@@ -521,7 +521,7 @@ namespace ServiceStack.Redis
         internal void RegisterTypeIds<T>(IEnumerable<T> values)
         {
             var typeIdsSetKey = GetTypeIdsSetKey<T>();
-            var ids = values.ConvertAll(x => x.GetId().ToString());
+            var ids = values.SafeConvertAll(x => x.GetId().ToString());
 
             if (this.Pipeline != null)
             {
@@ -540,11 +540,11 @@ namespace ServiceStack.Redis
             if (this.Pipeline != null)
             {
                 var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
-                ids.ForEach(x => registeredTypeIdsWithinPipeline.Remove(x));
+                ids.SafeForEach(x => registeredTypeIdsWithinPipeline.Remove(x));
             }
             else
             {
-                ids.ForEach(x => this.RemoveItemFromSet(typeIdsSetKey, x));
+                ids.SafeForEach(x => this.RemoveItemFromSet(typeIdsSetKey, x));
             }
         }
 
@@ -554,11 +554,11 @@ namespace ServiceStack.Redis
             if (this.Pipeline != null)
             {
                 var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
-                values.ForEach(x => registeredTypeIdsWithinPipeline.Remove(x.GetId().ToString()));
+                values.SafeForEach(x => registeredTypeIdsWithinPipeline.Remove(x.GetId().ToString()));
             }
             else
             {
-                values.ForEach(x => this.RemoveItemFromSet(typeIdsSetKey, x.GetId().ToString()));
+                values.SafeForEach(x => this.RemoveItemFromSet(typeIdsSetKey, x.GetId().ToString()));
             }
         }
 
@@ -570,7 +570,7 @@ namespace ServiceStack.Redis
                 foreach (var id in entry.Value)
                 {
                     var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
-                    registeredTypeIdsWithinPipeline.ForEach(x => this.AddItemToSet(typeIdsSetKey, id));
+                    registeredTypeIdsWithinPipeline.SafeForEach(x => this.AddItemToSet(typeIdsSetKey, id));
                 }
             }
             registeredTypeIdsWithinPipelineMap = new Dictionary<string, HashSet<string>>();
@@ -596,7 +596,7 @@ namespace ServiceStack.Redis
             if (ids == null || ids.Count == 0)
                 return new List<T>();
 
-            var urnKeys = ids.ConvertAll(x => UrnKey<T>(x));
+            var urnKeys = ids.Cast<object>().SafeConvertAll(UrnKey<T>);
             return GetValues<T>(urnKeys);
         }
 
@@ -605,7 +605,7 @@ namespace ServiceStack.Redis
         {
             var typeIdsSetKy = this.GetTypeIdsSetKey<T>();
             var allTypeIds = this.GetAllItemsFromSet(typeIdsSetKy);
-            var urnKeys = allTypeIds.ConvertAll(x => UrnKey<T>(x));
+            var urnKeys = allTypeIds.Cast<object>().SafeConvertAll(UrnKey<T>);
             return GetValues<T>(urnKeys);
         }
 
@@ -722,9 +722,10 @@ namespace ServiceStack.Redis
         {
             if (ids == null || ids.Count == 0) return;
 
-            var urnKeys = ids.ConvertAll(UrnKey<T>);
+            var idsList = ids.Cast<object>();
+            var urnKeys = idsList.SafeConvertAll(UrnKey<T>);
             this.RemoveEntry(urnKeys.ToArray());
-            this.RemoveTypeIds<T>(ids.ConvertAll(x => x.ToString()).ToArray());
+            this.RemoveTypeIds<T>(idsList.SafeConvertAll(x => x.ToString()).ToArray());
         }
 
         public void DeleteAll<T>() where T : class, new()
@@ -733,7 +734,7 @@ namespace ServiceStack.Redis
             var ids = this.GetAllItemsFromSet(typeIdsSetKey);
             if (ids.Count > 0)
             {
-                var urnKeys = ids.ConvertAll(UrnKey<T>);
+                var urnKeys = ids.ToList().ConvertAll(UrnKey<T>);
                 this.RemoveEntry(urnKeys.ToArray());
                 this.Remove(typeIdsSetKey);
             }
