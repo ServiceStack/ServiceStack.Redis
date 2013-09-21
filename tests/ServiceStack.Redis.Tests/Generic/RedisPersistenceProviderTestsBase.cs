@@ -1,6 +1,6 @@
 using System.Linq;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Common.Utils;
 using ServiceStack.Redis.Generic;
@@ -50,7 +50,7 @@ namespace ServiceStack.Redis.Tests.Generic
 			redis.StoreAll(tos);
 
 			var froms = redis.GetByIds(ids);
-			var fromIds = froms.ConvertAll(x => x.GetId().ToString());
+			var fromIds = froms.Map(x => x.GetId().ToString());
 
 			Assert.That(fromIds, Is.EquivalentTo(ids));
 		}
@@ -68,7 +68,7 @@ namespace ServiceStack.Redis.Tests.Generic
 			redis.DeleteByIds(deleteIds);
 
 			var froms = redis.GetByIds(ids);
-			var fromIds = froms.ConvertAll(x => x.GetId().ToString());
+            var fromIds = froms.Map(x => x.GetId().ToString());
 
 			var expectedIds = ids.Where(x => !deleteIds.Contains(x))
 				.ToList().ConvertAll(x => x.ToString());

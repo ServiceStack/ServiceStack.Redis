@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Common.Tests.Models;
 
 namespace ServiceStack.Redis.Tests
@@ -30,12 +30,12 @@ namespace ServiceStack.Redis.Tests
 			using (var redis = new RedisClient(TestConfig.SingleHost))
 			{
 				var ids = new[] { 1, 2, 3, 4, 5 };
-				var tos = ids.ConvertAll(x => ModelWithIdAndName.Create(x));
+                var tos = ids.Map(ModelWithIdAndName.Create);
 
 				redis.StoreAll(tos);
 
 				var froms = redis.GetByIds<ModelWithIdAndName>(ids);
-				var fromIds = froms.ConvertAll(x => x.Id);
+                var fromIds = froms.Map(x => x.Id);
 
 				Assert.That(fromIds, Is.EquivalentTo(ids));
 			}
@@ -47,7 +47,7 @@ namespace ServiceStack.Redis.Tests
 			using (var redis = new RedisClient(TestConfig.SingleHost))
 			{
 				var ids = new List<int> { 1, 2, 3, 4, 5 };
-				var tos = ids.ConvertAll(x => ModelWithIdAndName.Create(x));
+				var tos = ids.ConvertAll(ModelWithIdAndName.Create);
 
 				redis.StoreAll(tos);
 
@@ -56,7 +56,7 @@ namespace ServiceStack.Redis.Tests
 				redis.DeleteByIds<ModelWithIdAndName>(deleteIds);
 
 				var froms = redis.GetByIds<ModelWithIdAndName>(ids);
-				var fromIds = froms.ConvertAll(x => x.Id);
+                var fromIds = froms.Map(x => x.Id);
 
 				var expectedIds = ids.Where(x => !deleteIds.Contains(x)).ToList();
 

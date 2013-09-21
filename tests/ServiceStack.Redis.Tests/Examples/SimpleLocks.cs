@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 
 namespace ServiceStack.Redis.Tests.Examples
 {

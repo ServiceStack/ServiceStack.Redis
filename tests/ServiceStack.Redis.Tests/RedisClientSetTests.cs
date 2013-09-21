@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -287,7 +288,7 @@ namespace ServiceStack.Redis.Tests
 			var list = Redis.Sets[SetId];
 			storeMembers.ForEach(list.Add);
 
-			var members = list.ToList<string>();
+			var members = list.ToList();
 			Assert.That(members, Is.EquivalentTo(storeMembers));
 		}
 
@@ -323,7 +324,7 @@ namespace ServiceStack.Redis.Tests
 			storeMembers.Remove("two");
 			list.Remove("two");
 
-			var members = list.ToList<string>();
+			var members = list.ToList();
 
 			Assert.That(members, Is.EquivalentTo(storeMembers));
 		}

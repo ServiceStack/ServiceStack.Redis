@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Examples
@@ -155,10 +155,10 @@ namespace ServiceStack.Redis.Tests.Examples
 				};
 
 				ayende.BlogIds.Add(ayendeBlog.Id);
-				ayendeBlog.BlogPostIds.AddRange(blogPosts.Where(x => x.BlogId == ayendeBlog.Id).ConvertAll(x => x.Id));
+                ayendeBlog.BlogPostIds.AddRange(blogPosts.Where(x => x.BlogId == ayendeBlog.Id).Map(x => x.Id));
 
 				mythz.BlogIds.Add(mythzBlog.Id);
-				mythzBlog.BlogPostIds.AddRange(blogPosts.Where(x => x.BlogId == mythzBlog.Id).ConvertAll(x => x.Id));
+                mythzBlog.BlogPostIds.AddRange(blogPosts.Where(x => x.BlogId == mythzBlog.Id).Map(x => x.Id));
 
 				redisUsers.Store(ayende);
 				redisUsers.Store(mythz);

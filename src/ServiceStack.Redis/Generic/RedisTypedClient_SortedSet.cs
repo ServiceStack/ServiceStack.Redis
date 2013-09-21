@@ -17,7 +17,7 @@ using ServiceStack.Common.Utils;
 using ServiceStack.DesignPatterns.Model;
 using ServiceStack.Redis.Support;
 using ServiceStack.Text;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 
 namespace ServiceStack.Redis.Generic
 {
@@ -272,12 +272,12 @@ namespace ServiceStack.Redis.Generic
 
 		public long StoreIntersectFromSortedSets(IRedisSortedSet<T> intoSetId, params IRedisSortedSet<T>[] setIds)
 		{
-			return client.StoreIntersectFromSortedSets(intoSetId.Id, setIds.ConvertAll(x => x.Id).ToArray());
+            return client.StoreIntersectFromSortedSets(intoSetId.Id, setIds.Map(x => x.Id).ToArray());
 		}
 
 		public long StoreUnionFromSortedSets(IRedisSortedSet<T> intoSetId, params IRedisSortedSet<T>[] setIds)
 		{
-			return client.StoreUnionFromSortedSets(intoSetId.Id, setIds.ConvertAll(x => x.Id).ToArray());
+            return client.StoreUnionFromSortedSets(intoSetId.Id, setIds.Map(x => x.Id).ToArray());
 		}
 	}
 }

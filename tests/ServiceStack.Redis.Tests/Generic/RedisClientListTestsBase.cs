@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Redis.Generic;
 using ServiceStack.Text;

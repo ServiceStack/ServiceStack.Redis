@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Text;
 
 //Shows how to easily migrated data from an old version of the schema to a new one
@@ -191,7 +191,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 				IList<BlogPost> oldBlogPosts = redisBlogPosts.GetAll();
 
 				//Write a custom translation layer to migrate to the new schema
-				var migratedBlogPosts = oldBlogPosts.ConvertAll(old => new New.BlogPost
+                var migratedBlogPosts = oldBlogPosts.Map(old => new New.BlogPost
 				{
 					Id = old.Id,
 					BlogId = old.BlogId,

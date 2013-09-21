@@ -13,6 +13,7 @@
 using System;
 using ServiceStack.Messaging;
 using ServiceStack.Text;
+using ServiceStack.Common;
 
 namespace ServiceStack.Redis.Messaging
 {

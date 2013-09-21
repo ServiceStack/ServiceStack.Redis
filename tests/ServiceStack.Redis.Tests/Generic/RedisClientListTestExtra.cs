@@ -1,5 +1,6 @@
-﻿using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+﻿using System.Linq;
+using NUnit.Framework;
+using ServiceStack.Common;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Redis.Generic;
 using ServiceStack.Redis.Tests.Support;
@@ -50,7 +51,7 @@ namespace ServiceStack.Redis.Tests.Generic
             storeMembers.Remove(equalItem);
             List.Remove(equalItem);
 
-            var members = List.ToList<CustomType>();
+            var members = List.ToList();
 
             Factory.AssertListsAreEqual(members, storeMembers);
         }

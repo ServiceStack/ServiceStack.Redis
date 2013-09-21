@@ -11,7 +11,7 @@
 //
 
 using System;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Messaging;
 
 namespace ServiceStack.Redis.Messaging

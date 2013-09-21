@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.DesignPatterns.Model;
 
 namespace ServiceStack.Redis.Tests
@@ -135,9 +135,9 @@ namespace ServiceStack.Redis.Tests
 
 			//Test internal TestModelIdsSetKey state
 			var idsRemaining = Redis.GetAllItemsFromSet(Redis.NamespacePrefix + TestModelIdsSetKey)
-				.OrderBy(x => x).ConvertAll(x => new Guid(x));
+				.OrderBy(x => x).Map(x => new Guid(x));
 
-			var testModelIds = testModels.OrderBy(x => x.Id).ConvertAll(x => x.Id);
+            var testModelIds = testModels.OrderBy(x => x.Id).Map(x => x.Id);
 
 			Assert.That(idsRemaining, Is.EquivalentTo(testModelIds));
 		}
@@ -178,9 +178,9 @@ namespace ServiceStack.Redis.Tests
 
 			//Test internal TestModelIdsSetKey state
 			var idsRemaining = Redis.GetAllItemsFromSet(Redis.NamespacePrefix + TestModelIdsSetKey)
-				.OrderBy(x => x).ConvertAll(x => new Guid(x));
+                .OrderBy(x => x).Map(x => new Guid(x));
 
-			var testModelIds = testModels.OrderBy(x => x.Id).ConvertAll(x => x.Id);
+            var testModelIds = testModels.OrderBy(x => x.Id).Map(x => x.Id);
 
 			Assert.That(idsRemaining, Is.EquivalentTo(testModelIds));
 		}

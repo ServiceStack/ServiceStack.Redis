@@ -11,6 +11,7 @@
 //
 
 using System;
+using ServiceStack.Common;
 using ServiceStack.Messaging;
 using ServiceStack.Text;
 

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -34,7 +34,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_SetItemInHash_and_GetAllFromHash()
 		{
-			stringMap.ForEach(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
+			stringMap.Each(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
 
 			var members = Redis.GetAllEntriesFromHash(HashId);
 			Assert.That(members, Is.EquivalentTo(stringMap));
@@ -45,7 +45,7 @@ namespace ServiceStack.Redis.Tests
 		{
 			const string removeMember = "two";
 
-			stringMap.ForEach(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
+            stringMap.Each(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
 
 			Redis.RemoveEntryFromHash(HashId, removeMember);
 
@@ -58,7 +58,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_GetItemFromHash()
 		{
-			stringMap.ForEach(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
+            stringMap.Each(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
 
 			var hashValue = Redis.GetValueFromHash(HashId, "two");
 
@@ -68,7 +68,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_GetHashCount()
 		{
-			stringMap.ForEach(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
+            stringMap.Each(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
 
 			var hashCount = Redis.GetHashCount(HashId);
 
@@ -81,7 +81,7 @@ namespace ServiceStack.Redis.Tests
 			const string existingMember = "two";
 			const string nonExistingMember = "five";
 
-			stringMap.ForEach(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
+            stringMap.Each(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
 
 			Assert.That(Redis.HashContainsEntry(HashId, existingMember), Is.True);
 			Assert.That(Redis.HashContainsEntry(HashId, nonExistingMember), Is.False);
@@ -90,8 +90,8 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_GetHashKeys()
 		{
-			stringMap.ForEach(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
-			var expectedKeys = stringMap.ConvertAll(x => x.Key);
+            stringMap.Each(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
+			var expectedKeys = stringMap.Map(x => x.Key);
 
 			var hashKeys = Redis.GetHashKeys(HashId);
 
@@ -101,8 +101,8 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_GetHashValues()
 		{
-			stringMap.ForEach(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
-			var expectedValues = stringMap.ConvertAll(x => x.Value);
+            stringMap.Each(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
+            var expectedValues = stringMap.Map(x => x.Value);
 
 			var hashValues = Redis.GetHashValues(HashId);
 
@@ -112,7 +112,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_enumerate_small_IDictionary_Hash()
 		{
-			stringMap.ForEach(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
+            stringMap.Each(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
 
 			var members = new List<string>();
 			foreach (var item in Redis.Hashes[HashId])
@@ -127,7 +127,7 @@ namespace ServiceStack.Redis.Tests
 		public void Can_Add_to_IDictionary_Hash()
 		{
 			var hash = Redis.Hashes[HashId];
-			stringMap.ForEach(x => hash.Add(x));
+			stringMap.Each(hash.Add);
 
 			var members = Redis.GetAllEntriesFromHash(HashId);
 			Assert.That(members, Is.EquivalentTo(stringMap));
@@ -137,7 +137,7 @@ namespace ServiceStack.Redis.Tests
 		public void Can_Clear_IDictionary_Hash()
 		{
 			var hash = Redis.Hashes[HashId];
-			stringMap.ForEach(x => hash.Add(x));
+			stringMap.Each(hash.Add);
 
 			Assert.That(hash.Count, Is.EqualTo(stringMap.Count));
 
@@ -150,7 +150,7 @@ namespace ServiceStack.Redis.Tests
 		public void Can_Test_Contains_in_IDictionary_Hash()
 		{
 			var hash = Redis.Hashes[HashId];
-			stringMap.ForEach(x => hash.Add(x));
+            stringMap.Each(hash.Add);
 
 			Assert.That(hash.ContainsKey("two"), Is.True);
 			Assert.That(hash.ContainsKey("five"), Is.False);
@@ -160,7 +160,7 @@ namespace ServiceStack.Redis.Tests
 		public void Can_Remove_value_from_IDictionary_Hash()
 		{
 			var hash = Redis.Hashes[HashId];
-			stringMap.ForEach(x => hash.Add(x));
+			stringMap.Each(hash.Add);
 
 			stringMap.Remove("two");
 			hash.Remove("two");
@@ -183,7 +183,7 @@ namespace ServiceStack.Redis.Tests
 		public void Can_increment_Hash_field()
 		{
 			var hash = Redis.Hashes[HashId];
-			stringIntMap.ForEach(x => hash.Add(x.Key, x.Value.ToString()));
+            stringIntMap.Each(x => hash.Add(x.Key, x.Value.ToString()));
 
 			stringIntMap["two"] += 10;
 			Redis.IncrementValueInHash(HashId, "two", 10);
@@ -205,7 +205,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_SetItemInHashIfNotExists()
 		{
-			stringMap.ForEach(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
+            stringMap.Each(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
 
 			Redis.SetEntryInHashIfNotExists(HashId, "two", "did not change existing item");
 			Redis.SetEntryInHashIfNotExists(HashId, "five", "changed non existing item");
@@ -221,11 +221,11 @@ namespace ServiceStack.Redis.Tests
 			var newStringMap = new Dictionary<string, string> {
      			{"five","e"}, {"six","f"}, {"seven","g"}
      		};
-			stringMap.ForEach(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
+            stringMap.Each(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
 
 			Redis.SetRangeInHash(HashId, newStringMap);
 
-			newStringMap.ForEach(x => stringMap.Add(x.Key, x.Value));
+            newStringMap.Each(x => stringMap.Add(x.Key, x.Value));
 
 			var members = Redis.GetAllEntriesFromHash(HashId);
 			Assert.That(members, Is.EquivalentTo(stringMap));
@@ -234,7 +234,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_GetItemsFromHash()
 		{
-			stringMap.ForEach(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
+            stringMap.Each(x => Redis.SetEntryInHash(HashId, x.Key, x.Value));
 
 			var expectedValues = new List<string> { stringMap["one"], stringMap["two"], null };
 			var hashValues = Redis.GetValuesFromHash(HashId, "one", "two", "not-exists");

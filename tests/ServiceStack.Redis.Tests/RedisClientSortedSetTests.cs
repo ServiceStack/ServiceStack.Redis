@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
@@ -229,7 +229,7 @@ namespace ServiceStack.Redis.Tests
 		[Test]
 		public void Can_IncrementItemInSortedSet()
 		{
-			stringDoubleMap.ForEach(x => Redis.AddItemToSortedSet(SetId, x.Key, x.Value));
+			stringDoubleMap.Each(x => Redis.AddItemToSortedSet(SetId, x.Key, x.Value));
 
 			var currentScore = Redis.IncrementItemInSortedSet(SetId, "one", 2);
 			stringDoubleMap["one"] = stringDoubleMap["one"] + 2;

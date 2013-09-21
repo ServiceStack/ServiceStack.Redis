@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using ServiceStack.Common;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Examples.BestPractice
@@ -125,7 +125,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 			{
 				Inject(users);
 				users.Where(x => x.Id == default(int))
-					.ForEach(x => x.Id = userClient.GetNextSequence());
+					.Each(x => x.Id = userClient.GetNextSequence());
 
 				userClient.StoreAll(users);
 			}
@@ -169,7 +169,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 			using (var redisBlogs = redisClient.GetTypedClient<Blog>())
 			{
 				return Inject(
-					redisBlogs.GetByIds(blogIds.ConvertAll(x => x.ToString())));
+                    redisBlogs.GetByIds(blogIds.Map(x => x.ToString())));
 			}
 		}
 
@@ -185,7 +185,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 		{
 			using (var redisBlogPosts = redisClient.GetTypedClient<BlogPost>())
 			{
-				return redisBlogPosts.GetByIds(blogPostIds.ConvertAll(x => x.ToString())).ToList();
+                return redisBlogPosts.GetByIds(blogPostIds.Map(x => x.ToString())).ToList();
 			}
 		}
 

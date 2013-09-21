@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Redis.Generic;
 using System.Linq;
@@ -119,7 +119,7 @@ namespace ServiceStack.Redis.Tests.Generic
 			var mapValues = CreateMap();
 			mapValues.ForEach((k,v) => redis.SetEntryInHash(Hash, k, v));
 
-			var expectedKeys = mapValues.ConvertAll(x => x.Key);
+            var expectedKeys = mapValues.Map(x => x.Key);
 
 			var hashKeys = redis.GetHashKeys(Hash);
 
@@ -132,7 +132,7 @@ namespace ServiceStack.Redis.Tests.Generic
 			var mapValues = CreateMap();
 			mapValues.ForEach((k,v) => redis.SetEntryInHash(Hash, k, v));
 
-			var expectedValues = mapValues.ConvertAll(x => x.Value);
+            var expectedValues = mapValues.Map(x => x.Value);
 
 			var hashValues = redis.GetHashValues(Hash);
 
@@ -248,7 +248,7 @@ namespace ServiceStack.Redis.Tests.Generic
 
 			redis.SetRangeInHash(Hash, newMapValues);
 
-			newMapValues.ForEach(x => mapValues[x.Key] = x.Value);
+			newMapValues.Each(x => mapValues[x.Key] = x.Value);
 
 			var members = redis.GetAllEntriesFromHash(Hash);
 			Assert.That(members, Is.EquivalentTo(mapValues));

@@ -4,14 +4,14 @@
         <name>ServiceStack</name>
     </assembly>
     <members>
-        <member name="M:ServiceStack.CacheAccess.Providers.CacheClientExtensions.RemoveByPattern(ServiceStack.CacheAccess.ICacheClient,System.String)">
+        <member name="M:ServiceStack.CacheClientExtensions.RemoveByPattern(ServiceStack.CacheAccess.ICacheClient,System.String)">
             <summary>
             Removes items from cache that have keys matching the specified wildcard pattern
             </summary>
             <param name="cacheClient">Cache client</param>
             <param name="pattern">The wildcard, where "*" means any sequence of characters and "?" means any single character.</param>
         </member>
-        <member name="M:ServiceStack.CacheAccess.Providers.CacheClientExtensions.RemoveByRegex(ServiceStack.CacheAccess.ICacheClient,System.String)">
+        <member name="M:ServiceStack.CacheClientExtensions.RemoveByRegex(ServiceStack.CacheAccess.ICacheClient,System.String)">
             <summary>
             Removes items from the cache based on the specified regular expression pattern
             </summary>
@@ -930,7 +930,7 @@
 			Default reuse scope for new registrations. <see cref="F:Funq.ReuseScope.Hierarchy"/> by default.
 		</summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.ContainerTypeExtensions.RegisterAutoWiredType(Funq.Container,System.Type,System.Type,Funq.ReuseScope)">
+        <member name="M:ServiceStack.ContainerTypeExtensions.RegisterAutoWiredType(Funq.Container,System.Type,System.Type,Funq.ReuseScope)">
             <summary>
             Registers the type in the IoC container and
             adds auto-wiring to the specified type.
@@ -938,7 +938,7 @@
             <param name="serviceType"></param>
             <param name="inFunqAsType"></param>
         </member>
-        <member name="M:ServiceStack.ServiceHost.ContainerTypeExtensions.RegisterAutoWiredType(Funq.Container,System.Type,Funq.ReuseScope)">
+        <member name="M:ServiceStack.ContainerTypeExtensions.RegisterAutoWiredType(Funq.Container,System.Type,Funq.ReuseScope)">
             <summary>
             Registers the type in the IoC container and
             adds auto-wiring to the specified type.
@@ -946,7 +946,7 @@
             </summary>
             <param name="serviceTypes"></param>
         </member>
-        <member name="M:ServiceStack.ServiceHost.ContainerTypeExtensions.RegisterAutoWiredTypes(Funq.Container,System.Collections.Generic.IEnumerable{System.Type},Funq.ReuseScope)">
+        <member name="M:ServiceStack.ContainerTypeExtensions.RegisterAutoWiredTypes(Funq.Container,System.Collections.Generic.IEnumerable{System.Type},Funq.ReuseScope)">
             <summary>
             Registers the types in the IoC container and
             adds auto-wiring to the specified types.
@@ -2730,7 +2730,7 @@
             Context to capture IService action
             </summary>
         </member>
-        <member name="M:ServiceStack.WebHost.Endpoints.AppHostExtensions.GetContainer(ServiceStack.WebHost.Endpoints.IAppHost)">
+        <member name="M:ServiceStack.AppHostExtensions.GetContainer(ServiceStack.WebHost.Endpoints.IAppHost)">
             <summary>
             Get an IAppHost container. 
             Note: Registering dependencies should only be done during setup/configuration 
@@ -2857,7 +2857,7 @@
               Looks up a localized string similar to Unknown scope..
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.HttpRequestExtensions.GetItemOrCookie(ServiceStack.ServiceHost.IHttpRequest,System.String)">
+        <member name="M:ServiceStack.HttpRequestExtensions.GetItemOrCookie(ServiceStack.ServiceHost.IHttpRequest,System.String)">
             <summary>
             Gets string value from Items[name] then Cookies[name] if exists.
             Useful when *first* setting the users response cookie in the request filter.
@@ -2865,7 +2865,7 @@
             </summary>
             <returns>string value or null if it doesn't exist</returns>
         </member>
-        <member name="M:ServiceStack.ServiceHost.HttpRequestExtensions.GetParam(ServiceStack.ServiceHost.IHttpRequest,System.String)">
+        <member name="M:ServiceStack.HttpRequestExtensions.GetParam(ServiceStack.ServiceHost.IHttpRequest,System.String)">
             <summary>
             Gets request paramater string value by looking in the following order:
             - QueryString[name]
@@ -2875,32 +2875,67 @@
             </summary>
             <returns>string value or null if it doesn't exist</returns>
         </member>
-        <member name="M:ServiceStack.ServiceHost.HttpResponseExtensions.SetPermanentCookie(ServiceStack.ServiceHost.IHttpResponse,System.String,System.String)">
+        <member name="F:ServiceStack.HttpRequestExtensions.Log">
+                     * 
+                         Input: http://localhost:96/Cambia3/Temp/Test.aspx/path/info?q=item#fragment
+            
+                        Some HttpRequest path and URL properties:
+                        Request.ApplicationPath:	/Cambia3
+                        Request.CurrentExecutionFilePath:	/Cambia3/Temp/Test.aspx
+                        Request.FilePath:			/Cambia3/Temp/Test.aspx
+                        Request.Path:				/Cambia3/Temp/Test.aspx/path/info
+                        Request.PathInfo:			/path/info
+                        Request.PhysicalApplicationPath:	D:\Inetpub\wwwroot\CambiaWeb\Cambia3\
+                        Request.QueryString:		/Cambia3/Temp/Test.aspx/path/info?query=arg
+                        Request.Url.AbsolutePath:	/Cambia3/Temp/Test.aspx/path/info
+                        Request.Url.AbsoluteUri:	http://localhost:96/Cambia3/Temp/Test.aspx/path/info?query=arg
+                        Request.Url.Fragment:	
+                        Request.Url.Host:			localhost
+                        Request.Url.LocalPath:		/Cambia3/Temp/Test.aspx/path/info
+                        Request.Url.PathAndQuery:	/Cambia3/Temp/Test.aspx/path/info?query=arg
+                        Request.Url.Port:			96
+                        Request.Url.Query:			?query=arg
+                        Request.Url.Scheme:			http
+                        Request.Url.Segments:		/
+                                                    Cambia3/
+                                                    Temp/
+                                                    Test.aspx/
+                                                    path/
+                                                    info
+                     * 
+        </member>
+        <member name="M:ServiceStack.HttpRequestExtensions.ResolveItem(ServiceStack.ServiceHost.IHttpRequest,System.String,System.Func{ServiceStack.ServiceHost.IHttpRequest,System.Object})">
+            <summary>
+            Use this to treat Request.Items[] as a cache by returning pre-computed items to save 
+            calculating them multiple times.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpResponseExtensions.SetPermanentCookie(ServiceStack.ServiceHost.IHttpResponse,System.String,System.String)">
             <summary>
             Sets a persistent cookie which never expires
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.HttpResponseExtensions.SetSessionCookie(ServiceStack.ServiceHost.IHttpResponse,System.String,System.String)">
+        <member name="M:ServiceStack.HttpResponseExtensions.SetSessionCookie(ServiceStack.ServiceHost.IHttpResponse,System.String,System.String)">
             <summary>
             Sets a session cookie which expires after the browser session closes
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.HttpResponseExtensions.SetCookie(ServiceStack.ServiceHost.IHttpResponse,System.String,System.String,System.TimeSpan)">
+        <member name="M:ServiceStack.HttpResponseExtensions.SetCookie(ServiceStack.ServiceHost.IHttpResponse,System.String,System.String,System.TimeSpan)">
             <summary>
             Sets a persistent cookie which expires after the given time
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.HttpResponseExtensions.SetCookie(ServiceStack.ServiceHost.IHttpResponse,System.String,System.String,System.DateTime,System.String)">
+        <member name="M:ServiceStack.HttpResponseExtensions.SetCookie(ServiceStack.ServiceHost.IHttpResponse,System.String,System.String,System.DateTime,System.String)">
             <summary>
             Sets a persistent cookie with an expiresAt date
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.HttpResponseExtensions.DeleteCookie(ServiceStack.ServiceHost.IHttpResponse,System.String)">
+        <member name="M:ServiceStack.HttpResponseExtensions.DeleteCookie(ServiceStack.ServiceHost.IHttpResponse,System.String)">
             <summary>
             Deletes a specified cookie by setting its value to empty and expiration to -1 days
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.RequestContextExtensions.ToOptimizedResult``1(ServiceStack.ServiceHost.IRequestContext,``0)">
+        <member name="M:ServiceStack.RequestContextExtensions.ToOptimizedResult``1(ServiceStack.ServiceHost.IRequestContext,``0)">
             <summary>
             Returns the optimized result for the IRequestContext. 
             Does not use or store results in any cache.
@@ -2909,20 +2944,20 @@
             <param name="dto"></param>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.ServiceHost.RequestContextExtensions.ToOptimizedResultUsingCache``1(ServiceStack.ServiceHost.IRequestContext,ServiceStack.CacheAccess.ICacheClient,System.String,System.Func{``0})">
+        <member name="M:ServiceStack.RequestContextExtensions.ToOptimizedResultUsingCache``1(ServiceStack.ServiceHost.IRequestContext,ServiceStack.CacheAccess.ICacheClient,System.String,System.Func{``0})">
             <summary>
             Overload for the <see cref="!:ContentCacheManager.Resolve"/> method returning the most
             optimized result based on the MimeType and CompressionType from the IRequestContext.
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.RequestContextExtensions.ToOptimizedResultUsingCache``1(ServiceStack.ServiceHost.IRequestContext,ServiceStack.CacheAccess.ICacheClient,System.String,System.Nullable{System.TimeSpan},System.Func{``0})">
+        <member name="M:ServiceStack.RequestContextExtensions.ToOptimizedResultUsingCache``1(ServiceStack.ServiceHost.IRequestContext,ServiceStack.CacheAccess.ICacheClient,System.String,System.Nullable{System.TimeSpan},System.Func{``0})">
             <summary>
             Overload for the <see cref="!:ContentCacheManager.Resolve"/> method returning the most
             optimized result based on the MimeType and CompressionType from the IRequestContext.
             <param name="expireCacheIn">How long to cache for, null is no expiration</param>
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.RequestContextExtensions.RemoveFromCache(ServiceStack.ServiceHost.IRequestContext,ServiceStack.CacheAccess.ICacheClient,System.String[])">
+        <member name="M:ServiceStack.RequestContextExtensions.RemoveFromCache(ServiceStack.ServiceHost.IRequestContext,ServiceStack.CacheAccess.ICacheClient,System.String[])">
             <summary>
             Clears all the serialized and compressed caches set 
             by the 'Resolve' method for the cacheKey provided
@@ -3575,7 +3610,7 @@
             </summary>
             <param name="context"></param>
         </member>
-        <member name="M:ServiceStack.WebHost.Endpoints.Extensions.HttpResponseExtensions.WriteToResponse(ServiceStack.ServiceHost.IHttpResponse,System.Object,ServiceStack.ServiceHost.ResponseSerializerDelegate,ServiceStack.ServiceHost.IRequestContext,System.Byte[],System.Byte[])">
+        <member name="M:ServiceStack.HttpResponseExtensionsInternal.WriteToResponse(ServiceStack.ServiceHost.IHttpResponse,System.Object,ServiceStack.ServiceHost.ResponseSerializerDelegate,ServiceStack.ServiceHost.IRequestContext,System.Byte[],System.Byte[])">
             <summary>
             Writes to response.
             Response headers are customizable by implementing IHasOptions an returning Dictionary of Http headers.
@@ -3587,41 +3622,6 @@
             <param name="bodyPrefix">Add prefix to response body if any</param>
             <param name="bodySuffix">Add suffix to response body if any</param>
             <returns></returns>
-        </member>
-        <member name="T:ServiceStack.WebHost.Endpoints.Extensions.HttpRequestExtensions">
-            	 * 
-            		 Input: http://localhost:96/Cambia3/Temp/Test.aspx/path/info?q=item#fragment
-            
-            		Some HttpRequest path and URL properties:
-            		Request.ApplicationPath:	/Cambia3
-            		Request.CurrentExecutionFilePath:	/Cambia3/Temp/Test.aspx
-            		Request.FilePath:			/Cambia3/Temp/Test.aspx
-            		Request.Path:				/Cambia3/Temp/Test.aspx/path/info
-            		Request.PathInfo:			/path/info
-            		Request.PhysicalApplicationPath:	D:\Inetpub\wwwroot\CambiaWeb\Cambia3\
-            		Request.QueryString:		/Cambia3/Temp/Test.aspx/path/info?query=arg
-            		Request.Url.AbsolutePath:	/Cambia3/Temp/Test.aspx/path/info
-            		Request.Url.AbsoluteUri:	http://localhost:96/Cambia3/Temp/Test.aspx/path/info?query=arg
-            		Request.Url.Fragment:	
-            		Request.Url.Host:			localhost
-            		Request.Url.LocalPath:		/Cambia3/Temp/Test.aspx/path/info
-            		Request.Url.PathAndQuery:	/Cambia3/Temp/Test.aspx/path/info?query=arg
-            		Request.Url.Port:			96
-            		Request.Url.Query:			?query=arg
-            		Request.Url.Scheme:			http
-            		Request.Url.Segments:		/
-            									Cambia3/
-            									Temp/
-            									Test.aspx/
-            									path/
-            									info
-            	 * 
-        </member>
-        <member name="M:ServiceStack.WebHost.Endpoints.Extensions.HttpRequestExtensions.ResolveItem(ServiceStack.ServiceHost.IHttpRequest,System.String,System.Func{ServiceStack.ServiceHost.IHttpRequest,System.Object})">
-            <summary>
-            Use this to treat Request.Items[] as a cache by returning pre-computed items to save 
-            calculating them multiple times.
-            </summary>
         </member>
         <member name="M:ServiceStack.WebHost.Endpoints.ServiceStackHttpHandlerFactory.ReturnRequestInfo(System.Web.HttpRequest)">
             <summary>

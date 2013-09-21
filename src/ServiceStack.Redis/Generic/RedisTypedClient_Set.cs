@@ -12,7 +12,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.DesignPatterns.Model;
 
 namespace ServiceStack.Redis.Generic
@@ -107,35 +107,35 @@ namespace ServiceStack.Redis.Generic
 
 		public HashSet<T> GetIntersectFromSets(params IRedisSet<T>[] sets)
 		{
-			var multiDataList = client.SInter(sets.ConvertAll(x => x.Id).ToArray());
+			var multiDataList = client.SInter(sets.Map(x => x.Id).ToArray());
 			return CreateHashSet(multiDataList);
 		}
 
 		public void StoreIntersectFromSets(IRedisSet<T> intoSet, params IRedisSet<T>[] sets)
 		{
-			client.SInterStore(intoSet.Id, sets.ConvertAll(x => x.Id).ToArray());
+            client.SInterStore(intoSet.Id, sets.Map(x => x.Id).ToArray());
 		}
 
 		public HashSet<T> GetUnionFromSets(params IRedisSet<T>[] sets)
 		{
-			var multiDataList = client.SUnion(sets.ConvertAll(x => x.Id).ToArray());
+            var multiDataList = client.SUnion(sets.Map(x => x.Id).ToArray());
 			return CreateHashSet(multiDataList);
 		}
 
 		public void StoreUnionFromSets(IRedisSet<T> intoSet, params IRedisSet<T>[] sets)
 		{
-			client.SUnionStore(intoSet.Id, sets.ConvertAll(x => x.Id).ToArray());
+            client.SUnionStore(intoSet.Id, sets.Map(x => x.Id).ToArray());
 		}
 
 		public HashSet<T> GetDifferencesFromSet(IRedisSet<T> fromSet, params IRedisSet<T>[] withSets)
 		{
-			var multiDataList = client.SDiff(fromSet.Id, withSets.ConvertAll(x => x.Id).ToArray());
+            var multiDataList = client.SDiff(fromSet.Id, withSets.Map(x => x.Id).ToArray());
 			return CreateHashSet(multiDataList);
 		}
 
 		public void StoreDifferencesFromSet(IRedisSet<T> intoSet, IRedisSet<T> fromSet, params IRedisSet<T>[] withSets)
 		{
-			client.SDiffStore(intoSet.Id, fromSet.Id, withSets.ConvertAll(x => x.Id).ToArray());
+            client.SDiffStore(intoSet.Id, fromSet.Id, withSets.Map(x => x.Id).ToArray());
 		}
 
 		public T GetRandomItemFromSet(IRedisSet<T> fromSet)

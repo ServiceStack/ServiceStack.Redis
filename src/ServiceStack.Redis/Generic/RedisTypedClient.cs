@@ -15,7 +15,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Common.Utils;
 using ServiceStack.DesignPatterns.Model;
 using ServiceStack.Redis.Pipeline;
@@ -225,7 +225,7 @@ namespace ServiceStack.Redis.Generic
 
 		public bool RemoveEntry(params IHasStringId[] entities)
 		{
-			var ids = entities.ConvertAll(x => x.Id);
+            var ids = entities.Map(x => x.Id);
 			var success = client.Del(ids.ToArray()) == RedisNativeClient.Success;
 			if (success) client.RemoveTypeIds(ids.ToArray());
 			return success;
@@ -379,7 +379,7 @@ namespace ServiceStack.Redis.Generic
 		{
 			if (ids != null)
 			{
-                var urnKeys = ids.ConvertAll(x => client.UrnKey<T>(x));
+                var urnKeys = ids.Map(x => client.UrnKey<T>(x));
 				if (urnKeys.Count != 0)
 					return GetValues(urnKeys);
 			}
@@ -440,18 +440,18 @@ namespace ServiceStack.Redis.Generic
 		{
 			if (ids == null) return;
 
-			var urnKeys = ids.ConvertAll(t => client.UrnKey<T>(t));
+            var urnKeys = ids.Map(t => client.UrnKey<T>(t));
             if (urnKeys.Count > 0)
             {
                 this.RemoveEntry(urnKeys.ToArray());
-                client.RemoveTypeIds<T>(ids.ConvertAll(x => x.ToString()).ToArray());
+                client.RemoveTypeIds<T>(ids.Map(x => x.ToString()).ToArray());
             }
 		}
 
 		public void DeleteAll()
 		{
 			var ids = client.GetAllItemsFromSet(this.TypeIdsSetKey);
-            var urnKeys = ids.ConvertAll(t => client.UrnKey<T>(t));
+            var urnKeys = ids.Map(t => client.UrnKey<T>(t));
             if (urnKeys.Count > 0)
             {
                 

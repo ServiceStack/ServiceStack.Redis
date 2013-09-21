@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using Northwind.Common.DataModel;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Common.Utils;
 using ServiceStack.Text;
 

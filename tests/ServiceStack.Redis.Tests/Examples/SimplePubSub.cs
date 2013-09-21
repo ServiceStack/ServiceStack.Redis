@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 
 namespace ServiceStack.Redis.Tests.Examples
 {

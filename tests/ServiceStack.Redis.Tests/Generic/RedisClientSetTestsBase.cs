@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Common.Utils;
 using ServiceStack.Redis.Generic;

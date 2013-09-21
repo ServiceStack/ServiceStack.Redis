@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
-using ServiceStack.Common.Extensions;
+using ServiceStack.Common;
 using ServiceStack.Redis.Support.Locking;
 using ServiceStack.Text;
 
@@ -130,7 +131,7 @@ namespace ServiceStack.Redis.Tests
 
 			10.Times(i => Assert.That(Redis.ContainsKey("key" + i), Is.True));
 
-			Redis.Del(keysMap.Keys.ToList<string>().ToArray());
+			Redis.Del(keysMap.Keys.ToArray());
 
 			10.Times(i => Assert.That(Redis.ContainsKey("key" + i), Is.False));
 		}
