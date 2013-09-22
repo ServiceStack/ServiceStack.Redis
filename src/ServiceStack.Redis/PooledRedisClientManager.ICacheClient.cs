@@ -10,7 +10,7 @@
 // Licensed under the same terms of Redis and ServiceStack: new BSD license.
 //
 
-using ServiceStack.CacheAccess;
+using ServiceStack.Caching;
 
 namespace ServiceStack.Redis
 {

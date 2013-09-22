@@ -582,7 +582,7 @@ namespace ServiceStack.Redis
         }
 
 
-        public T GetById<T>(object id) where T : class, new()
+        public T GetById<T>(object id)
         {
             var key = UrnKey<T>(id);
             var valueString = this.GetValue(key);
@@ -591,7 +591,6 @@ namespace ServiceStack.Redis
         }
 
         public IList<T> GetByIds<T>(ICollection ids)
-            where T : class, new()
         {
             if (ids == null || ids.Count == 0)
                 return new List<T>();
@@ -601,7 +600,6 @@ namespace ServiceStack.Redis
         }
 
         public IList<T> GetAll<T>()
-            where T : class, new()
         {
             var typeIdsSetKy = this.GetTypeIdsSetKey<T>();
             var allTypeIds = this.GetAllItemsFromSet(typeIdsSetKy);
@@ -610,7 +608,6 @@ namespace ServiceStack.Redis
         }
 
         public T Store<T>(T entity)
-            where T : class, new()
         {
             var urnKey = UrnKey(entity);
             var valueString = JsonSerializer.SerializeToString(entity);
@@ -638,7 +635,6 @@ namespace ServiceStack.Redis
         }
 
         public void StoreAll<TEntity>(IEnumerable<TEntity> entities)
-            where TEntity : class, new()
         {
             _StoreAll(entities);
         }
@@ -704,21 +700,20 @@ namespace ServiceStack.Redis
         }
 
         public void Delete<T>(T entity)
-            where T : class, new()
         {
             var urnKey = UrnKey(entity);
             this.Remove(urnKey);
             this.RemoveTypeIds(entity);
         }
 
-        public void DeleteById<T>(object id) where T : class, new()
+        public void DeleteById<T>(object id)
         {
             var urnKey = UrnKey<T>(id);
             this.Remove(urnKey);
             this.RemoveTypeIds<T>(id.ToString());
         }
 
-        public void DeleteByIds<T>(ICollection ids) where T : class, new()
+        public void DeleteByIds<T>(ICollection ids)
         {
             if (ids == null || ids.Count == 0) return;
 
@@ -728,7 +723,7 @@ namespace ServiceStack.Redis
             this.RemoveTypeIds<T>(idsList.SafeConvertAll(x => x.ToString()).ToArray());
         }
 
-        public void DeleteAll<T>() where T : class, new()
+        public void DeleteAll<T>()
         {
             var typeIdsSetKey = this.GetTypeIdsSetKey<T>();
             var ids = this.GetAllItemsFromSet(typeIdsSetKey);

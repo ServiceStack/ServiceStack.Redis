@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ServiceStack.CacheAccess;
+using ServiceStack.Caching;
 
 namespace ServiceStack.Redis
 {

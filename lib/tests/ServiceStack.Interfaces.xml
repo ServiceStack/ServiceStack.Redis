@@ -4,12 +4,12 @@
         <name>ServiceStack.Interfaces</name>
     </assembly>
     <members>
-        <member name="T:ServiceStack.CacheAccess.ICacheClient">
+        <member name="T:ServiceStack.Caching.ICacheClient">
             <summary>
             A common interface implementation that is implemented by most cache providers
             </summary>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ICacheClient.Remove(System.String)">
+        <member name="M:ServiceStack.Caching.ICacheClient.Remove(System.String)">
             <summary>
             Removes the specified item from the cache.
             </summary>
@@ -18,13 +18,13 @@
             true if the item was successfully removed from the cache; false otherwise.
             </returns>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ICacheClient.RemoveAll(System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:ServiceStack.Caching.ICacheClient.RemoveAll(System.Collections.Generic.IEnumerable{System.String})">
             <summary>
             Removes the cache for all the keys provided.
             </summary>
             <param name="keys">The keys.</param>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ICacheClient.Get``1(System.String)">
+        <member name="M:ServiceStack.Caching.ICacheClient.Get``1(System.String)">
             <summary>
             Retrieves the specified item from the cache.
             </summary>
@@ -34,7 +34,7 @@
             The retrieved item, or <value>null</value> if the key was not found.
             </returns>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ICacheClient.Increment(System.String,System.UInt32)">
+        <member name="M:ServiceStack.Caching.ICacheClient.Increment(System.String,System.UInt32)">
             <summary>
             Increments the value of the specified key by the given amount. 
             The operation is atomic and happens on the server.
@@ -47,7 +47,7 @@
             </returns>
             <remarks>The item must be inserted into the cache before it can be changed. The item must be inserted as a <see cref="T:System.String"/>. The operation only works with <see cref="T:System.UInt32"/> values, so -1 always indicates that the item was not found.</remarks>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ICacheClient.Decrement(System.String,System.UInt32)">
+        <member name="M:ServiceStack.Caching.ICacheClient.Decrement(System.String,System.UInt32)">
             <summary>
             Increments the value of the specified key by the given amount. 
             The operation is atomic and happens on the server.
@@ -60,7 +60,7 @@
             </returns>
             <remarks>The item must be inserted into the cache before it can be changed. The item must be inserted as a <see cref="T:System.String"/>. The operation only works with <see cref="T:System.UInt32"/> values, so -1 always indicates that the item was not found.</remarks>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ICacheClient.Add``1(System.String,``0)">
+        <member name="M:ServiceStack.Caching.ICacheClient.Add``1(System.String,``0)">
             <summary>
             Adds a new item into the cache at the specified cache key only if the cache is empty.
             </summary>
@@ -71,22 +71,22 @@
             </returns>
             <remarks>The item does not expire unless it is removed due memory pressure.</remarks>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ICacheClient.Set``1(System.String,``0)">
+        <member name="M:ServiceStack.Caching.ICacheClient.Set``1(System.String,``0)">
             <summary>
             Sets an item into the cache at the cache key specified regardless if it already exists or not.
             </summary>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ICacheClient.Replace``1(System.String,``0)">
+        <member name="M:ServiceStack.Caching.ICacheClient.Replace``1(System.String,``0)">
             <summary>
             Replaces the item at the cachekey specified only if an items exists at the location already. 
             </summary>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ICacheClient.FlushAll">
+        <member name="M:ServiceStack.Caching.ICacheClient.FlushAll">
             <summary>
             Invalidates all data on the cache.
             </summary>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ICacheClient.GetAll``1(System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:ServiceStack.Caching.ICacheClient.GetAll``1(System.Collections.Generic.IEnumerable{System.String})">
             <summary>
             Retrieves multiple items from the cache. 
             The default value of T is set for all keys that do not exist.
@@ -96,26 +96,26 @@
             a Dictionary holding all items indexed by their key.
             </returns>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ICacheClient.SetAll``1(System.Collections.Generic.IDictionary{System.String,``0})">
+        <member name="M:ServiceStack.Caching.ICacheClient.SetAll``1(System.Collections.Generic.IDictionary{System.String,``0})">
             <summary>
             Sets multiple items to the cache. 
             </summary>
             <typeparam name="T"></typeparam>
             <param name="values">The values.</param>
         </member>
-        <member name="M:ServiceStack.CacheAccess.IRemoveByPattern.RemoveByPattern(System.String)">
+        <member name="M:ServiceStack.Caching.IRemoveByPattern.RemoveByPattern(System.String)">
             <summary>
             Removes items from cache that have keys matching the specified wildcard pattern
             </summary>
             <param name="pattern">The wildcard, where "*" means any sequence of characters and "?" means any single character.</param>
         </member>
-        <member name="M:ServiceStack.CacheAccess.IRemoveByPattern.RemoveByRegex(System.String)">
+        <member name="M:ServiceStack.Caching.IRemoveByPattern.RemoveByRegex(System.String)">
             <summary>
             Removes items from the cache based on the specified regular expression pattern
             </summary>
             <param name="regex">Regular expression pattern to search cache keys</param>
         </member>
-        <member name="T:ServiceStack.CacheAccess.IMemcachedClient">
+        <member name="T:ServiceStack.Caching.IMemcachedClient">
             <summary>
             A light interface over a cache client.
             This interface was inspired by Enyim.Caching.MemcachedClient
@@ -125,7 +125,7 @@
             implemented in DdnMemcachedClient
             </summary>
         </member>
-        <member name="M:ServiceStack.CacheAccess.IMemcachedClient.Remove(System.String)">
+        <member name="M:ServiceStack.Caching.IMemcachedClient.Remove(System.String)">
             <summary>
             Removes the specified item from the cache.
             </summary>
@@ -134,13 +134,13 @@
             true if the item was successfully removed from the cache; false otherwise.
             </returns>
         </member>
-        <member name="M:ServiceStack.CacheAccess.IMemcachedClient.RemoveAll(System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:ServiceStack.Caching.IMemcachedClient.RemoveAll(System.Collections.Generic.IEnumerable{System.String})">
             <summary>
             Removes the cache for all the keys provided.
             </summary>
             <param name="keys">The keys.</param>
         </member>
-        <member name="M:ServiceStack.CacheAccess.IMemcachedClient.Get(System.String)">
+        <member name="M:ServiceStack.Caching.IMemcachedClient.Get(System.String)">
             <summary>
             Retrieves the specified item from the cache.
             </summary>
@@ -149,7 +149,7 @@
             The retrieved item, or <value>null</value> if the key was not found.
             </returns>
         </member>
-        <member name="M:ServiceStack.CacheAccess.IMemcachedClient.Increment(System.String,System.UInt32)">
+        <member name="M:ServiceStack.Caching.IMemcachedClient.Increment(System.String,System.UInt32)">
             <summary>
             Increments the value of the specified key by the given amount. The operation is atomic and happens on the server.
             </summary>
@@ -160,7 +160,7 @@
             </returns>
             <remarks>The item must be inserted into the cache before it can be changed. The item must be inserted as a <see cref="T:System.String"/>. The operation only works with <see cref="T:System.UInt32"/> values, so -1 always indicates that the item was not found.</remarks>
         </member>
-        <member name="M:ServiceStack.CacheAccess.IMemcachedClient.Decrement(System.String,System.UInt32)">
+        <member name="M:ServiceStack.Caching.IMemcachedClient.Decrement(System.String,System.UInt32)">
             <summary>
             Increments the value of the specified key by the given amount. The operation is atomic and happens on the server.
             </summary>
@@ -171,7 +171,7 @@
             </returns>
             <remarks>The item must be inserted into the cache before it can be changed. The item must be inserted as a <see cref="T:System.String"/>. The operation only works with <see cref="T:System.UInt32"/> values, so -1 always indicates that the item was not found.</remarks>
         </member>
-        <member name="M:ServiceStack.CacheAccess.IMemcachedClient.Add(System.String,System.Object)">
+        <member name="M:ServiceStack.Caching.IMemcachedClient.Add(System.String,System.Object)">
             <summary>
             Inserts an item into the cache with a cache key to reference its location.
             </summary>
@@ -182,7 +182,7 @@
             </returns>
             <remarks>The item does not expire unless it is removed due memory pressure.</remarks>
         </member>
-        <member name="M:ServiceStack.CacheAccess.IMemcachedClient.Add(System.String,System.Object,System.DateTime)">
+        <member name="M:ServiceStack.Caching.IMemcachedClient.Add(System.String,System.Object,System.DateTime)">
             <summary>
             Inserts an item into the cache with a cache key to reference its location.
             </summary>
@@ -191,12 +191,12 @@
             <param name="expiresAt">The time when the item is invalidated in the cache.</param>
             <returns>true if the item was successfully stored in the cache; false otherwise.</returns>
         </member>
-        <member name="M:ServiceStack.CacheAccess.IMemcachedClient.FlushAll">
+        <member name="M:ServiceStack.Caching.IMemcachedClient.FlushAll">
             <summary>
             Removes all data from the cache.
             </summary>
         </member>
-        <member name="M:ServiceStack.CacheAccess.IMemcachedClient.GetAll(System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:ServiceStack.Caching.IMemcachedClient.GetAll(System.Collections.Generic.IEnumerable{System.String})">
             <summary>
             Retrieves multiple items from the cache.
             </summary>
@@ -205,12 +205,12 @@
             a Dictionary holding all items indexed by their key.
             </returns>
         </member>
-        <member name="T:ServiceStack.CacheAccess.ISession">
+        <member name="T:ServiceStack.Caching.ISession">
             <summary>
             A Users Session
             </summary>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ISession.Set``1(System.String,``0)">
+        <member name="M:ServiceStack.Caching.ISession.Set``1(System.String,``0)">
             <summary>
             Set a typed value at key
             </summary>
@@ -218,7 +218,7 @@
             <param name="key"></param>
             <param name="value"></param>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ISession.Get``1(System.String)">
+        <member name="M:ServiceStack.Caching.ISession.Get``1(System.String)">
             <summary>
             Get a typed value at key
             </summary>
@@ -226,19 +226,19 @@
             <param name="key"></param>
             <returns></returns>
         </member>
-        <member name="P:ServiceStack.CacheAccess.ISession.Item(System.String)">
+        <member name="P:ServiceStack.Caching.ISession.Item(System.String)">
             <summary>
             Store any object at key
             </summary>
             <param name="key"></param>
             <returns></returns>
         </member>
-        <member name="T:ServiceStack.CacheAccess.ISessionFactory">
+        <member name="T:ServiceStack.Caching.ISessionFactory">
             <summary>
             Retrieves a User Session
             </summary>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ISessionFactory.GetOrCreateSession(ServiceStack.ServiceHost.IHttpRequest,ServiceStack.ServiceHost.IHttpResponse)">
+        <member name="M:ServiceStack.Caching.ISessionFactory.GetOrCreateSession(ServiceStack.ServiceHost.IHttpRequest,ServiceStack.ServiceHost.IHttpResponse)">
             <summary>
             Gets the session for this request, creates one if it doesn't exist.
             </summary>
@@ -246,7 +246,7 @@
             <param name="httpRes"></param>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.CacheAccess.ISessionFactory.GetOrCreateSession">
+        <member name="M:ServiceStack.Caching.ISessionFactory.GetOrCreateSession">
             <summary>
             Gets the session for this request, creates one if it doesn't exist.
             Only for ASP.NET apps. Uses the HttpContext.Current singleton.
@@ -271,16 +271,11 @@
             <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
-        <member name="T:ServiceStack.DataAccess.IBasicPersistenceProvider`1">
+        <member name="T:ServiceStack.Data.IEntityStore`1">
             <summary>
             For providers that want a cleaner API with a little more perf
             </summary>
             <typeparam name="T"></typeparam>
-        </member>
-        <member name="T:ServiceStack.DataAccess.IPersistenceProviderManager">
-            <summary>
-            Manages a connection to a persistance provider
-            </summary>
         </member>
         <member name="T:ServiceStack.DataAnnotations.MetaAttribute">
             <summary>

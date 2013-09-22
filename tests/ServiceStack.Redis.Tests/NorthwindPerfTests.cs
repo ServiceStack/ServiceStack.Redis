@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using Northwind.Common.DataModel;
 using NUnit.Framework;
-using ServiceStack.DataAccess;
+using ServiceStack.Data;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -26,7 +26,7 @@ namespace ServiceStack.Redis.Tests
 			Debug.WriteLine("stopWatch.ElapsedMilliseconds: " + stopWatch.ElapsedMilliseconds);
 		}
 
-		private static void LoadNorthwindData(IBasicPersistenceProvider persistenceProvider)
+		private static void LoadNorthwindData(IEntityStore persistenceProvider)
 		{
 			persistenceProvider.StoreAll(NorthwindData.Categories);
 			persistenceProvider.StoreAll(NorthwindData.Customers);
