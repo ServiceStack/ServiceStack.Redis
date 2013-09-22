@@ -16,7 +16,7 @@ using System.Globalization;
 using System.Net.Sockets;
 using System.Text;
 using ServiceStack.Common.Web;
-using ServiceStack.DesignPatterns.Model;
+using ServiceStack.Model;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis

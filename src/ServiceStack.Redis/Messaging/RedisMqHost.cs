@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using ServiceStack.Clients;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
-using ServiceStack.Service;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Messaging

@@ -5,7 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using ServiceStack.Caching;
 using ServiceStack.Common;
-using ServiceStack.DesignPatterns.Model;
+using ServiceStack.Model;
 using ServiceStack.Logging;
 using ServiceStack.Logging.Support.Logging;
 

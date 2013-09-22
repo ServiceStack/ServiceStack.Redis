@@ -17,7 +17,7 @@ using System.Linq;
 using System.Text;
 using ServiceStack.Common;
 using ServiceStack.Common.Utils;
-using ServiceStack.DesignPatterns.Model;
+using ServiceStack.Model;
 using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
 
