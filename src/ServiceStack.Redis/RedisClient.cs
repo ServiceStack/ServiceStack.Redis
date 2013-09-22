@@ -15,11 +15,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ServiceStack.Common;
-using ServiceStack.Common.Utils;
 using ServiceStack.Redis.Generic;
 using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
+using ServiceStack.Utils;
 
 namespace ServiceStack.Redis
 {

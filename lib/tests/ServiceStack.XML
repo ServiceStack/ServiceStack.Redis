@@ -145,81 +145,56 @@
             <summary>
             Gets the nullable app setting.
             </summary>
-            <param name="key">The key.</param>
-            <returns></returns>
         </member>
         <member name="M:ServiceStack.Configuration.ConfigUtils.GetAppSetting(System.String)">
             <summary>
             Gets the app setting.
             </summary>
-            <param name="key">The key.</param>
-            <returns></returns>
         </member>
         <member name="M:ServiceStack.Configuration.ConfigUtils.ConfigSectionExists(System.String)">
             <summary>
             Determines wheter the Config section identified by the sectionName exists.
             </summary>
-            <param name="sectionName">Name of the section.</param>
-            <returns></returns>
         </member>
         <member name="M:ServiceStack.Configuration.ConfigUtils.GetAppSetting(System.String,System.String)">
             <summary>
             Returns AppSetting[key] if exists otherwise defaultValue
             </summary>
-            <param name="key">The key.</param>
-            <param name="defaultValue">The default value.</param>
-            <returns></returns>
         </member>
         <member name="M:ServiceStack.Configuration.ConfigUtils.GetAppSetting``1(System.String,``0)">
             <summary>
             Returns AppSetting[key] if exists otherwise defaultValue, for non-string values
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="key">The key.</param>
-            <param name="defaultValue">The default value.</param>
-            <returns></returns>
         </member>
         <member name="M:ServiceStack.Configuration.ConfigUtils.GetConnectionStringSetting(System.String)">
             <summary>
             Gets the connection string setting.
             </summary>
-            <param name="key">The key.</param>
-            <returns></returns>
         </member>
         <member name="M:ServiceStack.Configuration.ConfigUtils.GetConnectionString(System.String)">
             <summary>
             Gets the connection string.
             </summary>
-            <param name="key">The key.</param>
-            <returns></returns>
         </member>
         <member name="M:ServiceStack.Configuration.ConfigUtils.GetListFromAppSetting(System.String)">
             <summary>
             Gets the list from app setting.
             </summary>
-            <param name="key">The key.</param>
-            <returns></returns>
         </member>
         <member name="M:ServiceStack.Configuration.ConfigUtils.GetDictionaryFromAppSetting(System.String)">
             <summary>
             Gets the dictionary from app setting.
             </summary>
-            <param name="key">The key.</param>
-            <returns></returns>
         </member>
         <member name="M:ServiceStack.Configuration.ConfigUtils.GetParseMethod(System.Type)">
             <summary>
             Get the static Parse(string) method on the type supplied
             </summary>
-            <param name="type"></param>
-            <returns>A delegate to the type's Parse(string) if it has one</returns>
         </member>
         <member name="M:ServiceStack.Configuration.ConfigUtils.GetConstructorInfo(System.Type)">
             <summary>
             Gets the constructor info for T(string) if exists.
             </summary>
-            <param name="type">The type.</param>
-            <returns></returns>
         </member>
         <member name="M:ServiceStack.Configuration.ConfigUtils.ParseTextValue``1(System.String)">
             <summary>
@@ -227,9 +202,6 @@
             e.g. if T was a TimeSpan it will return TimeSpan.Parse(textValue).
             If there is no Parse Method it will attempt to create a new instance of the destined type
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="textValue">The default value.</param>
-            <returns>T.Parse(string) or new T(string) value</returns>
         </member>
         <member name="T:ServiceStack.Html.AntiXsrf.AntiForgery">
             <summary>
@@ -400,7 +372,7 @@
             End a ServiceStack Request
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpExtensions.EndRequest(ServiceStack.ServiceHost.IHttpResponse,System.Boolean)">
+        <member name="M:ServiceStack.HttpExtensions.EndRequest(ServiceStack.Server.IHttpResponse,System.Boolean)">
             <summary>
             End a ServiceStack Request
             </summary>
@@ -410,12 +382,12 @@
             End a HttpHandler Request
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpExtensions.EndHttpHandlerRequest(ServiceStack.ServiceHost.IHttpResponse,System.Boolean,System.Boolean,System.Action{ServiceStack.ServiceHost.IHttpResponse})">
+        <member name="M:ServiceStack.HttpExtensions.EndHttpHandlerRequest(ServiceStack.Server.IHttpResponse,System.Boolean,System.Boolean,System.Action{ServiceStack.Server.IHttpResponse})">
             <summary>
             End a HttpHandler Request
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpExtensions.EndRequestWithNoContent(ServiceStack.ServiceHost.IHttpResponse)">
+        <member name="M:ServiceStack.HttpExtensions.EndRequestWithNoContent(ServiceStack.Server.IHttpResponse)">
             <summary>
             End a ServiceStack Request with no content
             </summary>
@@ -2490,12 +2462,12 @@
             Returns either includes' css/javascript or results' html.
             </summary>
         </member>
-        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.Includes(ServiceStack.ServiceHost.IHttpRequest,ServiceStack.ServiceHost.IHttpResponse,System.String)">
+        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.Includes(ServiceStack.Server.IHttpRequest,ServiceStack.Server.IHttpResponse,System.String)">
             <summary>
             Handles rendering static content files.
             </summary>
         </member>
-        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.Results(ServiceStack.ServiceHost.IHttpRequest,ServiceStack.ServiceHost.IHttpResponse)">
+        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.Results(ServiceStack.Server.IHttpRequest,ServiceStack.Server.IHttpResponse)">
             <summary>
             Handles rendering a previous MiniProfiler session, identified by its "?id=GUID" on the query.
             </summary>
@@ -2505,7 +2477,7 @@
             Embedded resource contents keyed by filename.
             </summary>
         </member>
-        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.NotFound(ServiceStack.ServiceHost.IHttpResponse,System.String,System.String)">
+        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.NotFound(ServiceStack.Server.IHttpResponse,System.String,System.String)">
             <summary>
             Helper method that sets a proper 404 response code.
             </summary>
@@ -2620,7 +2592,7 @@
             Combined service error logs are maintained in 'urn:ServiceErrors:All'
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.DtoUtils.CreateResponseDto(System.Object,ServiceStack.ServiceInterface.ServiceModel.ResponseStatus)">
+        <member name="M:ServiceStack.ServiceHost.DtoUtils.CreateResponseDto(System.Object,ServiceStack.ResponseStatus)">
             <summary>
             Create an instance of the service response dto type and inject it with the supplied responseStatus
             </summary>
@@ -2628,7 +2600,7 @@
             <param name="responseStatus"></param>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.ServiceHost.DtoUtils.HandleException(ServiceStack.ServiceHost.IResolver,System.Object,System.Exception)">
+        <member name="M:ServiceStack.ServiceHost.DtoUtils.HandleException(ServiceStack.Configuration.IResolver,System.Object,System.Exception)">
             <summary>
             
             </summary>
@@ -2780,7 +2752,7 @@
               Looks up a localized string similar to Unknown scope..
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpRequestExtensions.GetItemOrCookie(ServiceStack.ServiceHost.IHttpRequest,System.String)">
+        <member name="M:ServiceStack.HttpRequestExtensions.GetItemOrCookie(ServiceStack.Server.IHttpRequest,System.String)">
             <summary>
             Gets string value from Items[name] then Cookies[name] if exists.
             Useful when *first* setting the users response cookie in the request filter.
@@ -2788,7 +2760,7 @@
             </summary>
             <returns>string value or null if it doesn't exist</returns>
         </member>
-        <member name="M:ServiceStack.HttpRequestExtensions.GetParam(ServiceStack.ServiceHost.IHttpRequest,System.String)">
+        <member name="M:ServiceStack.HttpRequestExtensions.GetParam(ServiceStack.Server.IHttpRequest,System.String)">
             <summary>
             Gets request paramater string value by looking in the following order:
             - QueryString[name]
@@ -2827,38 +2799,38 @@
                                                     info
                      * 
         </member>
-        <member name="M:ServiceStack.HttpRequestExtensions.ResolveItem(ServiceStack.ServiceHost.IHttpRequest,System.String,System.Func{ServiceStack.ServiceHost.IHttpRequest,System.Object})">
+        <member name="M:ServiceStack.HttpRequestExtensions.ResolveItem(ServiceStack.Server.IHttpRequest,System.String,System.Func{ServiceStack.Server.IHttpRequest,System.Object})">
             <summary>
             Use this to treat Request.Items[] as a cache by returning pre-computed items to save 
             calculating them multiple times.
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResponseExtensions.SetPermanentCookie(ServiceStack.ServiceHost.IHttpResponse,System.String,System.String)">
+        <member name="M:ServiceStack.HttpResponseExtensions.SetPermanentCookie(ServiceStack.Server.IHttpResponse,System.String,System.String)">
             <summary>
             Sets a persistent cookie which never expires
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResponseExtensions.SetSessionCookie(ServiceStack.ServiceHost.IHttpResponse,System.String,System.String)">
+        <member name="M:ServiceStack.HttpResponseExtensions.SetSessionCookie(ServiceStack.Server.IHttpResponse,System.String,System.String)">
             <summary>
             Sets a session cookie which expires after the browser session closes
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResponseExtensions.SetCookie(ServiceStack.ServiceHost.IHttpResponse,System.String,System.String,System.TimeSpan)">
+        <member name="M:ServiceStack.HttpResponseExtensions.SetCookie(ServiceStack.Server.IHttpResponse,System.String,System.String,System.TimeSpan)">
             <summary>
             Sets a persistent cookie which expires after the given time
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResponseExtensions.SetCookie(ServiceStack.ServiceHost.IHttpResponse,System.String,System.String,System.DateTime,System.String)">
+        <member name="M:ServiceStack.HttpResponseExtensions.SetCookie(ServiceStack.Server.IHttpResponse,System.String,System.String,System.DateTime,System.String)">
             <summary>
             Sets a persistent cookie with an expiresAt date
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResponseExtensions.DeleteCookie(ServiceStack.ServiceHost.IHttpResponse,System.String)">
+        <member name="M:ServiceStack.HttpResponseExtensions.DeleteCookie(ServiceStack.Server.IHttpResponse,System.String)">
             <summary>
             Deletes a specified cookie by setting its value to empty and expiration to -1 days
             </summary>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.ToOptimizedResult``1(ServiceStack.ServiceHost.IRequestContext,``0)">
+        <member name="M:ServiceStack.RequestContextExtensions.ToOptimizedResult``1(ServiceStack.Server.IRequestContext,``0)">
             <summary>
             Returns the optimized result for the IRequestContext. 
             Does not use or store results in any cache.
@@ -2867,20 +2839,20 @@
             <param name="dto"></param>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.ToOptimizedResultUsingCache``1(ServiceStack.ServiceHost.IRequestContext,ServiceStack.Caching.ICacheClient,System.String,System.Func{``0})">
+        <member name="M:ServiceStack.RequestContextExtensions.ToOptimizedResultUsingCache``1(ServiceStack.Server.IRequestContext,ServiceStack.Caching.ICacheClient,System.String,System.Func{``0})">
             <summary>
             Overload for the <see cref="!:ContentCacheManager.Resolve"/> method returning the most
             optimized result based on the MimeType and CompressionType from the IRequestContext.
             </summary>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.ToOptimizedResultUsingCache``1(ServiceStack.ServiceHost.IRequestContext,ServiceStack.Caching.ICacheClient,System.String,System.Nullable{System.TimeSpan},System.Func{``0})">
+        <member name="M:ServiceStack.RequestContextExtensions.ToOptimizedResultUsingCache``1(ServiceStack.Server.IRequestContext,ServiceStack.Caching.ICacheClient,System.String,System.Nullable{System.TimeSpan},System.Func{``0})">
             <summary>
             Overload for the <see cref="!:ContentCacheManager.Resolve"/> method returning the most
             optimized result based on the MimeType and CompressionType from the IRequestContext.
             <param name="expireCacheIn">How long to cache for, null is no expiration</param>
             </summary>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.RemoveFromCache(ServiceStack.ServiceHost.IRequestContext,ServiceStack.Caching.ICacheClient,System.String[])">
+        <member name="M:ServiceStack.RequestContextExtensions.RemoveFromCache(ServiceStack.Server.IRequestContext,ServiceStack.Caching.ICacheClient,System.String[])">
             <summary>
             Clears all the serialized and compressed caches set 
             by the 'Resolve' method for the cacheKey provided
@@ -3005,7 +2977,7 @@
             Create a service runner for IService actions
             </summary>
         </member>
-        <member name="M:ServiceStack.WebHost.Endpoints.IAppHost.ResolveAbsoluteUrl(System.String,ServiceStack.ServiceHost.IHttpRequest)">
+        <member name="M:ServiceStack.WebHost.Endpoints.IAppHost.ResolveAbsoluteUrl(System.String,ServiceStack.Server.IHttpRequest)">
             <summary>
             Resolve the absolute url for this request
             </summary>
@@ -3015,7 +2987,7 @@
             Register user-defined custom routes.
             </summary>
         </member>
-        <member name="P:ServiceStack.WebHost.Endpoints.IAppHost.ContentTypeFilters">
+        <member name="P:ServiceStack.WebHost.Endpoints.IAppHost.ContentTypeses">
             <summary>
             Register custom ContentType serializers
             </summary>
@@ -3503,12 +3475,12 @@
             see http://code.google.com/p/markdownsharp/ for the latest code or to contribute
             </summary>
         </member>
-        <member name="M:ServiceStack.WebHost.Endpoints.Formats.MarkdownFormat.SerializeToStream(ServiceStack.ServiceHost.IRequestContext,System.Object,System.IO.Stream)">
+        <member name="M:ServiceStack.WebHost.Endpoints.Formats.MarkdownFormat.SerializeToStream(ServiceStack.Server.IRequestContext,System.Object,System.IO.Stream)">
             <summary>
             Render Markdown for text/markdown and text/plain ContentTypes
             </summary>
         </member>
-        <member name="M:ServiceStack.WebHost.Endpoints.RestHandler.CreateRequest(ServiceStack.ServiceHost.IHttpRequest,System.String)">
+        <member name="M:ServiceStack.WebHost.Endpoints.RestHandler.CreateRequest(ServiceStack.Server.IHttpRequest,System.String)">
             <summary>
             Used in Unit tests
             </summary>
@@ -3519,7 +3491,7 @@
             Summary description for $codebehindclassname$
             </summary>
         </member>
-        <member name="M:ServiceStack.WebHost.Endpoints.Support.RedirectHttpHandler.ProcessRequest(ServiceStack.ServiceHost.IHttpRequest,ServiceStack.ServiceHost.IHttpResponse,System.String)">
+        <member name="M:ServiceStack.WebHost.Endpoints.Support.RedirectHttpHandler.ProcessRequest(ServiceStack.Server.IHttpRequest,ServiceStack.Server.IHttpResponse,System.String)">
             <summary>
             Non ASP.NET requests
             </summary>
@@ -3533,7 +3505,7 @@
             </summary>
             <param name="context"></param>
         </member>
-        <member name="M:ServiceStack.HttpResponseExtensionsInternal.WriteToResponse(ServiceStack.ServiceHost.IHttpResponse,System.Object,ServiceStack.ServiceHost.ResponseSerializerDelegate,ServiceStack.ServiceHost.IRequestContext,System.Byte[],System.Byte[])">
+        <member name="M:ServiceStack.HttpResponseExtensionsInternal.WriteToResponse(ServiceStack.Server.IHttpResponse,System.Object,ServiceStack.Server.ResponseSerializerDelegate,ServiceStack.Server.IRequestContext,System.Byte[],System.Byte[])">
             <summary>
             Writes to response.
             Response headers are customizable by implementing IHasOptions an returning Dictionary of Http headers.
@@ -3571,7 +3543,7 @@
             <param name="serviceStackHandlerPrefix"></param>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.WebHost.Endpoints.Support.IndexPageHttpHandler.ProcessRequest(ServiceStack.ServiceHost.IHttpRequest,ServiceStack.ServiceHost.IHttpResponse,System.String)">
+        <member name="M:ServiceStack.WebHost.Endpoints.Support.IndexPageHttpHandler.ProcessRequest(ServiceStack.Server.IHttpRequest,ServiceStack.Server.IHttpResponse,System.String)">
             <summary>
             Non ASP.NET requests
             </summary>
@@ -3591,21 +3563,21 @@
             </summary>
             <param name="defaultFilePath"></param>
         </member>
-        <member name="M:ServiceStack.WebHost.Endpoints.EndpointHost.ApplyPreRequestFilters(ServiceStack.ServiceHost.IHttpRequest,ServiceStack.ServiceHost.IHttpResponse)">
+        <member name="M:ServiceStack.WebHost.Endpoints.EndpointHost.ApplyPreRequestFilters(ServiceStack.Server.IHttpRequest,ServiceStack.Server.IHttpResponse)">
             <summary>
             Applies the raw request filters. Returns whether or not the request has been handled 
             and no more processing should be done.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.WebHost.Endpoints.EndpointHost.ApplyRequestFilters(ServiceStack.ServiceHost.IHttpRequest,ServiceStack.ServiceHost.IHttpResponse,System.Object)">
+        <member name="M:ServiceStack.WebHost.Endpoints.EndpointHost.ApplyRequestFilters(ServiceStack.Server.IHttpRequest,ServiceStack.Server.IHttpResponse,System.Object)">
             <summary>
             Applies the request filters. Returns whether or not the request has been handled 
             and no more processing should be done.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.WebHost.Endpoints.EndpointHost.ApplyResponseFilters(ServiceStack.ServiceHost.IHttpRequest,ServiceStack.ServiceHost.IHttpResponse,System.Object)">
+        <member name="M:ServiceStack.WebHost.Endpoints.EndpointHost.ApplyResponseFilters(ServiceStack.Server.IHttpRequest,ServiceStack.Server.IHttpResponse,System.Object)">
             <summary>
             Applies the response filters. Returns whether or not the request has been handled 
             and no more processing should be done.

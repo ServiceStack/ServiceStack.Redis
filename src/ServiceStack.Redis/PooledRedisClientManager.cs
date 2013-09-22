@@ -12,10 +12,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using ServiceStack.Caching;
-using ServiceStack.Common.Web;
 using ServiceStack.Logging;
 
 namespace ServiceStack.Redis

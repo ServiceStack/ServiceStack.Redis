@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using NUnit.Framework;
-using ServiceStack.Common.Utils;
+using ServiceStack.Utils;
 using System.Text;
 using ServiceStack.Text;
 

@@ -1,4 +1,4 @@
-﻿using ServiceStack.Common.Web;
+﻿using ServiceStack.Web;
 
 namespace ServiceStack.Redis
 {

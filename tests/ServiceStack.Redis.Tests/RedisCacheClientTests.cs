@@ -1,8 +1,7 @@
-using System.Collections.Generic;
 using NUnit.Framework;
 using ServiceStack.Caching;
 using ServiceStack.Common.Tests.Models;
-using ServiceStack.Common.Utils;
+using ServiceStack.Utils;
 
 namespace ServiceStack.Redis.Tests
 {

@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using Northwind.Common.DataModel;
 using NUnit.Framework;
-using ServiceStack.Common;
-using ServiceStack.Common.Utils;
 using ServiceStack.Text;
+using ServiceStack.Utils;
 
 namespace ServiceStack.Redis.Tests.Generic
 {

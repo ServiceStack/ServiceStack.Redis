@@ -1,5 +1,5 @@
-using ServiceStack.Common.Support;
 using ServiceStack.Logging;
+using ServiceStack.Support;
 
 namespace ServiceStack.Redis.Tests
 {
