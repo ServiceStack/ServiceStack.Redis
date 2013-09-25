@@ -75,7 +75,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		{
 			base.OnBeforeEachTest();
 
-			redisQuestions = base.Redis.GetTypedClient<Question>();
+			redisQuestions = base.Redis.As<Question>();
 		    redisQuestions.Db = 10;
 		    redisQuestions.FlushDb();
 
@@ -146,7 +146,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		[Test]
 		public void Can_AddToRecentsList()
 		{
-			var redisAnswers = Redis.GetTypedClient<Answer>();
+			var redisAnswers = Redis.As<Answer>();
 
 			redisAnswers.StoreAll(q1Answers);
 			q1Answers.ForEach(redisAnswers.AddToRecentsList);
@@ -160,7 +160,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		[Test]
 		public void Can_GetLatestFromRecentsList()
 		{
-			var redisAnswers = Redis.GetTypedClient<Answer>();
+			var redisAnswers = Redis.As<Answer>();
 
 			redisAnswers.StoreAll(q1Answers);
 			q1Answers.ForEach(redisAnswers.AddToRecentsList);
@@ -179,7 +179,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		[Test]
 		public void Can_GetEarliestFromRecentsList()
 		{
-			var redisAnswers = Redis.GetTypedClient<Answer>();
+			var redisAnswers = Redis.As<Answer>();
 
 			redisAnswers.StoreAll(q1Answers);
 			q1Answers.ForEach(redisAnswers.AddToRecentsList);

@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using ServiceStack.Logging;
-using ServiceStack.Redis;
 using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
 
@@ -534,14 +533,6 @@ namespace ServiceStack.Redis
                 throw new ArgumentNullException("key");
 
             return SendExpectLong(Commands.Append, key.ToUtf8Bytes(), value);
-        }
-        
-        public byte[] Substr(string key, int fromIndex, int toIndex)
-        {
-            if (key == null)
-                throw new ArgumentNullException("key");
-
-            return SendExpectData(Commands.Substr, key.ToUtf8Bytes(), fromIndex.ToUtf8Bytes(), toIndex.ToUtf8Bytes());
         }
 
     	public byte[] GetRange(string key, int fromIndex, int toIndex)

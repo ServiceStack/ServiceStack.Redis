@@ -380,7 +380,7 @@ namespace ServiceStack.Redis.Tests
 		}
 
 		[Test]
-		public void Can_Substring()
+        public void Can_GetRange()
 		{
 			const string helloWorld = "Hello, World!";
 			Redis.SetEntry("key", helloWorld);
@@ -389,7 +389,7 @@ namespace ServiceStack.Redis.Tests
 			var toIndex = "Hello, World".Length - 1;
 
 			var expectedString = helloWorld.Substring(fromIndex, toIndex - fromIndex + 1);
-			var world = Redis.GetSubstring("key", fromIndex, toIndex);
+			var world = Redis.GetRange("key", fromIndex, toIndex);
 
 			Assert.That(world.Length, Is.EqualTo(expectedString.Length));
 		}

@@ -72,107 +72,105 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 			BlogPostBestPractice.InsertTestData(repository);
 
 			//Create a typed-client based on the new schema
-			using (var redisBlogPosts = redisClient.GetTypedClient<New.BlogPost>())
-			{
-				//Automatically retrieve blog posts
-				IList<New.BlogPost> allBlogPosts = redisBlogPosts.GetAll();
+		    var redisBlogPosts = redisClient.As<New.BlogPost>();
+            //Automatically retrieve blog posts
+            IList<New.BlogPost> allBlogPosts = redisBlogPosts.GetAll();
 
-				//Print out the data in the list of 'New.BlogPost' populated from old 'BlogPost' type
-				//Note: renamed fields are lost 
-				Debug.WriteLine(allBlogPosts.Dump());
-				/*Output:
-				[
-					{
-						Id: 3,
-						BlogId: 2,
-						PostType: None,
-						Title: Redis,
-						Labels: [],
-						Tags: 
-						[
-							Redis,
-							NoSQL,
-							Scalability,
-							Performance
-						],
-						Comments: 
-						[
-							{
-								Content: First Comment!,
-								CreatedDate: 2010-04-28T21:42:03.9484725Z
-							}
-						]
-					},
-					{
-						Id: 4,
-						BlogId: 2,
-						PostType: None,
-						Title: Couch Db,
-						Labels: [],
-						Tags: 
-						[
-							CouchDb,
-							NoSQL,
-							JSON
-						],
-						Comments: 
-						[
-							{
-								Content: First Comment!,
-								CreatedDate: 2010-04-28T21:42:03.9484725Z
-							}
-						]
-					},
-					{
-						Id: 1,
-						BlogId: 1,
-						PostType: None,
-						Title: RavenDB,
-						Labels: [],
-						Tags: 
-						[
-							Raven,
-							NoSQL,
-							JSON,
-							.NET
-						],
-						Comments: 
-						[
-							{
-								Content: First Comment!,
-								CreatedDate: 2010-04-28T21:42:03.9004697Z
-							},
-							{
-								Content: Second Comment!,
-								CreatedDate: 2010-04-28T21:42:03.9004697Z
-							}
-						]
-					},
-					{
-						Id: 2,
-						BlogId: 1,
-						PostType: None,
-						Title: Cassandra,
-						Labels: [],
-						Tags: 
-						[
-							Cassandra,
-							NoSQL,
-							Scalability,
-							Hashing
-						],
-						Comments: 
-						[
-							{
-								Content: First Comment!,
-								CreatedDate: 2010-04-28T21:42:03.9004697Z
-							}
-						]
-					}
-				]
+            //Print out the data in the list of 'New.BlogPost' populated from old 'BlogPost' type
+            //Note: renamed fields are lost 
+		    allBlogPosts.PrintDump();
+		    /*Output:
+            [
+                {
+                    Id: 3,
+                    BlogId: 2,
+                    PostType: None,
+                    Title: Redis,
+                    Labels: [],
+                    Tags: 
+                    [
+                        Redis,
+                        NoSQL,
+                        Scalability,
+                        Performance
+                    ],
+                    Comments: 
+                    [
+                        {
+                            Content: First Comment!,
+                            CreatedDate: 2010-04-28T21:42:03.9484725Z
+                        }
+                    ]
+                },
+                {
+                    Id: 4,
+                    BlogId: 2,
+                    PostType: None,
+                    Title: Couch Db,
+                    Labels: [],
+                    Tags: 
+                    [
+                        CouchDb,
+                        NoSQL,
+                        JSON
+                    ],
+                    Comments: 
+                    [
+                        {
+                            Content: First Comment!,
+                            CreatedDate: 2010-04-28T21:42:03.9484725Z
+                        }
+                    ]
+                },
+                {
+                    Id: 1,
+                    BlogId: 1,
+                    PostType: None,
+                    Title: RavenDB,
+                    Labels: [],
+                    Tags: 
+                    [
+                        Raven,
+                        NoSQL,
+                        JSON,
+                        .NET
+                    ],
+                    Comments: 
+                    [
+                        {
+                            Content: First Comment!,
+                            CreatedDate: 2010-04-28T21:42:03.9004697Z
+                        },
+                        {
+                            Content: Second Comment!,
+                            CreatedDate: 2010-04-28T21:42:03.9004697Z
+                        }
+                    ]
+                },
+                {
+                    Id: 2,
+                    BlogId: 1,
+                    PostType: None,
+                    Title: Cassandra,
+                    Labels: [],
+                    Tags: 
+                    [
+                        Cassandra,
+                        NoSQL,
+                        Scalability,
+                        Hashing
+                    ],
+                    Comments: 
+                    [
+                        {
+                            Content: First Comment!,
+                            CreatedDate: 2010-04-28T21:42:03.9004697Z
+                        }
+                    ]
+                }
+            ]
 
-				 */
-			}
+             */
 		}
 
 		[Test]
@@ -184,148 +182,144 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
 			BlogPostBestPractice.InsertTestData(repository);
 
 			//Create a typed-client based on the new schema
-			using (var redisBlogPosts = redisClient.GetTypedClient<BlogPost>())
-			using (var redisNewBlogPosts = redisClient.GetTypedClient<New.BlogPost>())
-			{
-				//Automatically retrieve blog posts
-				IList<BlogPost> oldBlogPosts = redisBlogPosts.GetAll();
+		    var redisBlogPosts = redisClient.As<BlogPost>();
+		    var redisNewBlogPosts = redisClient.As<New.BlogPost>();
+            //Automatically retrieve blog posts
+            IList<BlogPost> oldBlogPosts = redisBlogPosts.GetAll();
 
-				//Write a custom translation layer to migrate to the new schema
-                var migratedBlogPosts = oldBlogPosts.Map(old => new New.BlogPost
-				{
-					Id = old.Id,
-					BlogId = old.BlogId,
-					Title = old.Title,
-					Content = old.Content,
-					Labels = old.Categories, //populate with data from renamed field
-					PostType = New.BlogPostType.Article, //select non-default enum value
-					Tags = new HashSet<string>(old.Tags),
-					Comments = old.Comments.ConvertAll(x => new Dictionary<string, string> 
-						{ { "Content", x.Content }, { "CreatedDate", x.CreatedDate.ToString() }, }),
-					NoOfComments = old.Comments.Count, //populate using logic from old data
-				});
+            //Write a custom translation layer to migrate to the new schema
+            var migratedBlogPosts = oldBlogPosts.Map(old => new New.BlogPost
+            {
+                Id = old.Id,
+                BlogId = old.BlogId,
+                Title = old.Title,
+                Content = old.Content,
+                Labels = old.Categories, //populate with data from renamed field
+                PostType = New.BlogPostType.Article, //select non-default enum value
+                Tags = new HashSet<string>(old.Tags),
+                Comments = old.Comments.ConvertAll(x => new Dictionary<string, string> { { "Content", x.Content }, { "CreatedDate", x.CreatedDate.ToString() }, }),
+                NoOfComments = old.Comments.Count, //populate using logic from old data
+            });
 
-				//Persist the new migrated blogposts 
-				redisNewBlogPosts.StoreAll(migratedBlogPosts);
+            //Persist the new migrated blogposts 
+            redisNewBlogPosts.StoreAll(migratedBlogPosts);
 
-				//Read out the newly stored blogposts
-				var refreshedNewBlogPosts = redisNewBlogPosts.GetAll();
-				//Note: data renamed fields are successfully migrated to the new schema
-				Debug.WriteLine(refreshedNewBlogPosts.Dump());
-				/*
-				[
-					{
-						Id: 3,
-						BlogId: 2,
-						PostType: Article,
-						Title: Redis,
-						Labels: 
-						[
-							NoSQL,
-							Cache
-						],
-						Tags: 
-						[
-							Redis,
-							NoSQL,
-							Scalability,
-							Performance
-						],
-						Comments: 
-						[
-							{
-								Content: First Comment!,
-								CreatedDate: 28/04/2010 22:58:35
-							}
-						],
-						NoOfComments: 1
-					},
-					{
-						Id: 4,
-						BlogId: 2,
-						PostType: Article,
-						Title: Couch Db,
-						Labels: 
-						[
-							NoSQL,
-							DocumentDB
-						],
-						Tags: 
-						[
-							CouchDb,
-							NoSQL,
-							JSON
-						],
-						Comments: 
-						[
-							{
-								Content: First Comment!,
-								CreatedDate: 28/04/2010 22:58:35
-							}
-						],
-						NoOfComments: 1
-					},
-					{
-						Id: 1,
-						BlogId: 1,
-						PostType: Article,
-						Title: RavenDB,
-						Labels: 
-						[
-							NoSQL,
-							DocumentDB
-						],
-						Tags: 
-						[
-							Raven,
-							NoSQL,
-							JSON,
-							.NET
-						],
-						Comments: 
-						[
-							{
-								Content: First Comment!,
-								CreatedDate: 28/04/2010 22:58:35
-							},
-							{
-								Content: Second Comment!,
-								CreatedDate: 28/04/2010 22:58:35
-							}
-						],
-						NoOfComments: 2
-					},
-					{
-						Id: 2,
-						BlogId: 1,
-						PostType: Article,
-						Title: Cassandra,
-						Labels: 
-						[
-							NoSQL,
-							Cluster
-						],
-						Tags: 
-						[
-							Cassandra,
-							NoSQL,
-							Scalability,
-							Hashing
-						],
-						Comments: 
-						[
-							{
-								Content: First Comment!,
-								CreatedDate: 28/04/2010 22:58:35
-							}
-						],
-						NoOfComments: 1
-					}
-				]
-
-				 */
-			}
-		}
+            //Read out the newly stored blogposts
+            var refreshedNewBlogPosts = redisNewBlogPosts.GetAll();
+            //Note: data renamed fields are successfully migrated to the new schema
+            refreshedNewBlogPosts.PrintDump();
+            /*
+            [
+                {
+                    Id: 3,
+                    BlogId: 2,
+                    PostType: Article,
+                    Title: Redis,
+                    Labels: 
+                    [
+                        NoSQL,
+                        Cache
+                    ],
+                    Tags: 
+                    [
+                        Redis,
+                        NoSQL,
+                        Scalability,
+                        Performance
+                    ],
+                    Comments: 
+                    [
+                        {
+                            Content: First Comment!,
+                            CreatedDate: 28/04/2010 22:58:35
+                        }
+                    ],
+                    NoOfComments: 1
+                },
+                {
+                    Id: 4,
+                    BlogId: 2,
+                    PostType: Article,
+                    Title: Couch Db,
+                    Labels: 
+                    [
+                        NoSQL,
+                        DocumentDB
+                    ],
+                    Tags: 
+                    [
+                        CouchDb,
+                        NoSQL,
+                        JSON
+                    ],
+                    Comments: 
+                    [
+                        {
+                            Content: First Comment!,
+                            CreatedDate: 28/04/2010 22:58:35
+                        }
+                    ],
+                    NoOfComments: 1
+                },
+                {
+                    Id: 1,
+                    BlogId: 1,
+                    PostType: Article,
+                    Title: RavenDB,
+                    Labels: 
+                    [
+                        NoSQL,
+                        DocumentDB
+                    ],
+                    Tags: 
+                    [
+                        Raven,
+                        NoSQL,
+                        JSON,
+                        .NET
+                    ],
+                    Comments: 
+                    [
+                        {
+                            Content: First Comment!,
+                            CreatedDate: 28/04/2010 22:58:35
+                        },
+                        {
+                            Content: Second Comment!,
+                            CreatedDate: 28/04/2010 22:58:35
+                        }
+                    ],
+                    NoOfComments: 2
+                },
+                {
+                    Id: 2,
+                    BlogId: 1,
+                    PostType: Article,
+                    Title: Cassandra,
+                    Labels: 
+                    [
+                        NoSQL,
+                        Cluster
+                    ],
+                    Tags: 
+                    [
+                        Cassandra,
+                        NoSQL,
+                        Scalability,
+                        Hashing
+                    ],
+                    Comments: 
+                    [
+                        {
+                            Content: First Comment!,
+                            CreatedDate: 28/04/2010 22:58:35
+                        }
+                    ],
+                    NoOfComments: 1
+                }
+            ]
+            */
+        }
 
 	}
 

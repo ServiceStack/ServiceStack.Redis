@@ -34,7 +34,7 @@ namespace ServiceStack.Redis.Tests.Generic
 			client = new RedisClient(TestConfig.SingleHost);
 			client.FlushAll();
 
-			redis = client.GetTypedClient<T>();
+			redis = client.As<T>();
 
 			List = redis.Lists[ListId];
 			List2 = redis.Lists[ListId2];

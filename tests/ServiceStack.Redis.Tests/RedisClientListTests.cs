@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using ServiceStack.Common;
 using System.Linq;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {

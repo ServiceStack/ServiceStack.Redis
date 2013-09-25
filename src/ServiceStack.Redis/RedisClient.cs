@@ -293,11 +293,6 @@ namespace ServiceStack.Redis
             base.Rename(fromName, toName);
         }
 
-        public string GetSubstring(string key, int fromIndex, int toIndex)
-        {
-            return base.Substr(key, fromIndex, toIndex).FromUtf8Bytes();
-        }
-
         public string GetRandomKey()
         {
             return RandomKey();
@@ -335,12 +330,6 @@ namespace ServiceStack.Redis
                 sb.Append(bytes.FromUtf8Bytes());
             }
             return sb.ToString();
-        }
-
-        [Obsolete("Renamed to 'As'")]
-        public IRedisTypedClient<T> GetTypedClient<T>()
-        {
-            return new RedisTypedClient<T>(this);
         }
 
         public IRedisTypedClient<T> As<T>()

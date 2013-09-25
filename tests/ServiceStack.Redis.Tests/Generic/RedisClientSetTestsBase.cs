@@ -3,6 +3,7 @@ using NUnit.Framework;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Redis.Generic;
 using System.Linq;
+using ServiceStack.Text;
 using ServiceStack.Utils;
 
 namespace ServiceStack.Redis.Tests.Generic
@@ -31,7 +32,7 @@ namespace ServiceStack.Redis.Tests.Generic
 			client = new RedisClient(TestConfig.SingleHost);
 			client.FlushAll();
 
-			redis = client.GetTypedClient<T>();
+			redis = client.As<T>();
 
 			Set = redis.Sets[SetId];
 			Set2 = redis.Sets[SetId2];

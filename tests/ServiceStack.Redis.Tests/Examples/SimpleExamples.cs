@@ -11,26 +11,24 @@ namespace ServiceStack.Redis.Tests.Examples
     [TestFixture, Explicit, Category("Integration")]
 	public class SimpleExamples
 	{
-		readonly RedisClient redisClient = new RedisClient(TestConfig.SingleHost);
+		readonly RedisClient redis = new RedisClient(TestConfig.SingleHost);
 
 		[SetUp]
 		public void OnBeforeEachTest()
 		{
-			redisClient.FlushAll();
+			redis.FlushAll();
 		}
 
 		[Test]
 		public void Store_and_retrieve_users()
 		{
-			using (var redisUsers = redisClient.GetTypedClient<User>())
-			{
-				redisUsers.Store(new User { Id = redisUsers.GetNextSequence(), Name = "ayende" });
-				redisUsers.Store(new User { Id = redisUsers.GetNextSequence(), Name = "mythz" });
+		    var redisUsers = redis.As<User>();
+			redisUsers.Store(new User { Id = redisUsers.GetNextSequence(), Name = "ayende" });
+			redisUsers.Store(new User { Id = redisUsers.GetNextSequence(), Name = "mythz" });
 
-				var allUsers = redisUsers.GetAll();
-				Debug.WriteLine(allUsers.Dump());
-			}
-			/*Output
+			var allUsers = redisUsers.GetAll();
+		    allUsers.PrintDump();
+		    /*Output
 			[
 				{
 					Id: 1,
@@ -50,14 +48,13 @@ namespace ServiceStack.Redis.Tests.Examples
 		public void Store_and_retrieve_some_blogs()
 		{
 			//Retrieve strongly-typed Redis clients that let's you natively persist POCO's
-			using (var redisUsers = redisClient.GetTypedClient<User>())
-			using (var redisBlogs = redisClient.GetTypedClient<Blog>())
-			{
-				//Create the user, getting a unique User Id from the User sequence.
-				var mythz = new User { Id = redisUsers.GetNextSequence(), Name = "Demis Bellot" };
+		    var redisUsers = redis.As<User>();
+		    var redisBlogs = redis.As<Blog>();
+            //Create the user, getting a unique User Id from the User sequence.
+            var mythz = new User { Id = redisUsers.GetNextSequence(), Name = "Demis Bellot" };
 
-				//create some blogs using unique Ids from the Blog sequence. Also adding references
-				var mythzBlogs = new List<Blog>
+            //create some blogs using unique Ids from the Blog sequence. Also adding references
+            var mythzBlogs = new List<Blog>
 				{
 					new Blog
 					{
@@ -74,47 +71,47 @@ namespace ServiceStack.Redis.Tests.Examples
 						Tags = new List<string> { "Music", "Twitter", "Life" },
 					},
 				};
-				//Add the blog references
-				mythzBlogs.ForEach(x => mythz.BlogIds.Add(x.Id));
+            //Add the blog references
+            mythzBlogs.ForEach(x => mythz.BlogIds.Add(x.Id));
 
-				//Store the user and their blogs
-				redisUsers.Store(mythz);
-				redisBlogs.StoreAll(mythzBlogs);
+            //Store the user and their blogs
+            redisUsers.Store(mythz);
+            redisBlogs.StoreAll(mythzBlogs);
 
-				//retrieve all blogs
-				var blogs = redisBlogs.GetAll();
+            //retrieve all blogs
+            var blogs = redisBlogs.GetAll();
 
-				//Recursively print the values of the POCO (For T.Dump() Extension method see: http://www.servicestack.net/mythz_blog/?p=202)
-				Debug.WriteLine(blogs.Dump());
-			}
-			/*Output
-			[
-				{
-					Id: 1,
-					UserId: 1,
-					UserName: Demis Bellot,
-					Tags: 
-					[
-						Architecture,
-						.NET,
-						Redis
-					],
-					BlogPostIds: []
-				},
-				{
-					Id: 2,
-					UserId: 1,
-					UserName: Demis Bellot,
-					Tags: 
-					[
-						Music,
-						Twitter,
-						Life
-					],
-					BlogPostIds: []
-				}
-			]
-			 */
+            //Recursively print the values of the POCO (For T.Dump() Extension method see: http://www.servicestack.net/mythz_blog/?p=202)
+            blogs.PrintDump();
+            
+            /*Output
+            [
+                {
+                    Id: 1,
+                    UserId: 1,
+                    UserName: Demis Bellot,
+                    Tags: 
+                    [
+                        Architecture,
+                        .NET,
+                        Redis
+                    ],
+                    BlogPostIds: []
+                },
+                {
+                    Id: 2,
+                    UserId: 1,
+                    UserName: Demis Bellot,
+                    Tags: 
+                    [
+                        Music,
+                        Twitter,
+                        Life
+                    ],
+                    BlogPostIds: []
+                }
+            ]
+             */
 		}
 
 	}

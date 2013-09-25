@@ -1577,11 +1577,11 @@
         </member>
         <member name="P:ServiceStack.MiniProfiler.Profiler.User">
             <summary>
-            A string identifying the user/client that is profiling this request.  Set <see cref="P:ServiceStack.MiniProfiler.Profiler.Settings.UserProvider"/>
+            A string identifying the user/client that is profiling this request.  Set <see cref="!:Profiler.Settings.UserProvider"/>
             with an <see cref="T:ServiceStack.MiniProfiler.IUserProvider"/>-implementing class to provide a custom value.
             </summary>
             <remarks>
-            If this is not set manually at some point, the <see cref="P:ServiceStack.MiniProfiler.Profiler.Settings.UserProvider"/> implementation will be used;
+            If this is not set manually at some point, the <see cref="!:Profiler.Settings.UserProvider"/> implementation will be used;
             by default, this will be the current request's ip address.
             </remarks>
         </member>
@@ -1792,11 +1792,6 @@
         <member name="P:ServiceStack.MiniProfiler.Profiler.Settings.SqlFormatter">
             <summary>
             The formatter applied to the SQL being rendered (used only for UI)
-            </summary>
-        </member>
-        <member name="P:ServiceStack.MiniProfiler.Profiler.Settings.UserProvider">
-            <summary>
-            Provides user identification for a given profiling request.
             </summary>
         </member>
         <member name="P:ServiceStack.MiniProfiler.Profiler.Settings.Version">
@@ -2184,7 +2179,7 @@
             <summary>
             Returns a list of <see cref="P:ServiceStack.MiniProfiler.Profiler.Id"/>s that haven't been seen by <paramref name="user"/>.
             </summary>
-            <param name="user">User identified by the current <see cref="P:ServiceStack.MiniProfiler.Profiler.Settings.UserProvider"/>.</param>
+            <param name="user">User identified by the current <see cref="!:Profiler.Settings.UserProvider"/>.</param>
         </member>
         <member name="M:ServiceStack.MiniProfiler.Storage.DatabaseStorageBase.#ctor(System.String)">
             <summary>
@@ -2205,7 +2200,7 @@
             <summary>
             Returns a list of <see cref="P:ServiceStack.MiniProfiler.Profiler.Id"/>s that haven't been seen by <paramref name="user"/>.
             </summary>
-            <param name="user">User identified by the current <see cref="P:ServiceStack.MiniProfiler.Profiler.Settings.UserProvider"/>.</param>
+            <param name="user">User identified by the current <see cref="!:Profiler.Settings.UserProvider"/>.</param>
         </member>
         <member name="M:ServiceStack.MiniProfiler.Storage.DatabaseStorageBase.GetConnection">
             <summary>
@@ -2260,7 +2255,7 @@
             <summary>
             Returns a list of <see cref="P:ServiceStack.MiniProfiler.Profiler.Id"/>s that haven't been seen by <paramref name="user"/>.
             </summary>
-            <param name="user">User identified by the current <see cref="P:ServiceStack.MiniProfiler.Profiler.Settings.UserProvider"/>.</param>
+            <param name="user">User identified by the current <see cref="!:Profiler.Settings.UserProvider"/>.</param>
         </member>
         <member name="F:ServiceStack.MiniProfiler.Storage.HttpRuntimeCacheStorage.AddPerUserUnviewedIdsLock">
             <summary>
@@ -2897,11 +2892,6 @@
             Provide for quick lookups based on hashes that can be determined from a request url
             </summary>
         </member>
-        <member name="T:ServiceStack.ServiceHost.ServiceControllerReflection">
-            <summary>
-            Keeping around just to compare how slow it is
-            </summary>
-        </member>
         <member name="T:ServiceStack.ServiceHost.ServiceExecOperations">
             <summary>
             Static type constants for referring to service exec methods
@@ -2997,12 +2987,12 @@
             Add Request Filters, to be applied before the dto is deserialized
             </summary>
         </member>
-        <member name="P:ServiceStack.WebHost.Endpoints.IAppHost.RequestFilters">
+        <member name="P:ServiceStack.WebHost.Endpoints.IAppHost.GlobalRequestFilters">
             <summary>
             Add Request Filters
             </summary>
         </member>
-        <member name="P:ServiceStack.WebHost.Endpoints.IAppHost.ResponseFilters">
+        <member name="P:ServiceStack.WebHost.Endpoints.IAppHost.GlobalResponseFilters">
             <summary>
             Add Response Filters
             </summary>

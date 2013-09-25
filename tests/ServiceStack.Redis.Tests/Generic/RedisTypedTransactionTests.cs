@@ -28,7 +28,7 @@ namespace ServiceStack.Redis.Tests.Generic
 		{
 			base.OnBeforeEachTest();
 
-			typedClient = Redis.GetTypedClient<Shipper>();			
+			typedClient = Redis.As<Shipper>();			
 			model = modelFactory.CreateInstance(1);
 		}
 

@@ -27,12 +27,10 @@ namespace ServiceStack.Redis.Tests.Generic
 		[Test]
 		public void Can_GetTypeIdsSet()
 		{
-			using (var typedClient = Redis.GetTypedClient<OrderDetail>())
-			{
-				typedClient.StoreAll(NorthwindData.OrderDetails);
+		    var typedClient = Redis.As<OrderDetail>();
+			typedClient.StoreAll(NorthwindData.OrderDetails);
 
-				Assert.That(typedClient.TypeIdsSet.Count, Is.EqualTo(NorthwindData.OrderDetails.Count));
-			}
+			Assert.That(typedClient.TypeIdsSet.Count, Is.EqualTo(NorthwindData.OrderDetails.Count));
 		}
 
 		[Test]
@@ -56,7 +54,7 @@ namespace ServiceStack.Redis.Tests.Generic
 				value[i] = (byte) i;
 			}
 
-			var redis = Redis.GetTypedClient<byte[]>();
+			var redis = Redis.As<byte[]>();
 
 			redis.SetEntry(key, value);
 			var resultValue = redis.GetValue(key);
@@ -92,25 +90,23 @@ namespace ServiceStack.Redis.Tests.Generic
             var orderDetails = Redis.GetAll<OrderDetail>();
 			AssertUnorderedListsAreEqual(orderDetails, NorthwindData.OrderDetails);
 
-			Debug.WriteLine(String.Format("\nWrote {0:#,#} in {1:#,#}ms: {2:#,#.##}: items/ms",
+			"\nWrote {0:#,#} in {1:#,#}ms: {2:#,#.##}: items/ms".Print(
 				NorthwindData.OrderDetails.Count, sp.ElapsedMilliseconds,
-				NorthwindData.OrderDetails.Count / (double)sp.ElapsedMilliseconds));
+				NorthwindData.OrderDetails.Count / (double)sp.ElapsedMilliseconds);
 		}
 
 		[Test]
 		public void Can_StoreAll_RedisTypedClient()
 		{
 			var sp = Stopwatch.StartNew();
-            using (var typedClient = Redis.GetTypedClient<OrderDetail>())
-			{
-				typedClient.StoreAll(NorthwindData.OrderDetails);
+		    var redisOrderDetails = Redis.As<OrderDetail>();
+            redisOrderDetails.StoreAll(NorthwindData.OrderDetails);
 
-				var orderDetails = typedClient.GetAll();
-				AssertUnorderedListsAreEqual(orderDetails, NorthwindData.OrderDetails);
-			}
-			Debug.WriteLine(String.Format("\nWrote {0:#,#} in {1:#,#}ms: {2:#,#.##}: items/ms",
+            var orderDetails = redisOrderDetails.GetAll();
+            AssertUnorderedListsAreEqual(orderDetails, NorthwindData.OrderDetails);
+            "\nWrote {0:#,#} in {1:#,#}ms: {2:#,#.##}: items/ms".Print(
 				NorthwindData.OrderDetails.Count, sp.ElapsedMilliseconds,
-				NorthwindData.OrderDetails.Count / (double)sp.ElapsedMilliseconds));
+				NorthwindData.OrderDetails.Count / (double)sp.ElapsedMilliseconds);
 		}
         
         [Test]

@@ -808,13 +808,6 @@
             Interface to operations that allow queued commands to be completed
             </summary>
         </member>
-        <member name="M:ServiceStack.Redis.IRedisClient.GetTypedClient``1">
-            <summary>
-            Returns a high-level typed client API
-            Shorter Alias is As&lt;T&gt;();
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
         <member name="M:ServiceStack.Redis.IRedisClient.As``1">
             <summary>
             Returns a high-level typed client API
@@ -983,14 +976,6 @@
             <summary>
             The description of a response status code
             </summary>
-        </member>
-        <member name="T:ServiceStack.Server.IRestOptionsService`1">
-            <summary>
-            If the Service also implements this interface,
-            IRestPutService.Options() will be used instead of IService.Execute() for 
-            EndpointAttributes.HttpPut requests
-            </summary>
-            <typeparam name="T"></typeparam>
         </member>
         <member name="T:ServiceStack.IService">
             <summary>
@@ -1290,59 +1275,6 @@
             Implement on services that need access to the RequestContext
             </summary>
         </member>
-        <member name="T:ServiceStack.Server.IRestDeleteService`1">
-            <summary>
-            If the Service also implements this interface,
-            IRestDeleteService.Delete() will be used instead of IService.Execute() for 
-            EndpointAttributes.HttpDelete requests
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="T:ServiceStack.Server.IRestGetService`1">
-            <summary>
-            If the Service also implements this interface,
-            IRestGetService.Get() will be used instead of IService.Execute() for 
-            EndpointAttributes.HttpGet requests
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="T:ServiceStack.Server.IRestPatchService`1">
-            <summary>
-            If the Service also implements this interface,
-            IRestPutService.Patch() will be used instead of IService.Execute() for 
-            EndpointAttributes.HttpPatch requests
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="T:ServiceStack.Server.IRestPostService`1">
-            <summary>
-            If the Service also implements this interface,
-            IRestPostService.Post() will be used instead of IService.Execute() for 
-            EndpointAttributes.HttpPost requests
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="T:ServiceStack.Server.IRestPutService`1">
-            <summary>
-            If the Service also implements this interface,
-            IRestPutService.Put() will be used instead of IService.Execute() for 
-            EndpointAttributes.HttpPut requests
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="T:ServiceStack.Server.IRestService`1">
-            <summary>
-            Utility interface that implements all Rest operations
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="T:ServiceStack.Server.IService`1">
-            <summary>
-            Base interface all webservices need to implement.
-            For simplicity this is the only interface you need to implement
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
         <member name="T:ServiceStack.Server.IServiceController">
             <summary>
             Responsible for executing the operation within the specified context.
@@ -1392,7 +1324,7 @@
             <typeparam name="TRequest">The type of request DTO to map 
             	the path to.</typeparam>
             <param name="restPath">The path to map the request DTO to.
-            	See <see cref="!:RestServiceAttribute.Path">RestServiceAttribute.Path</see>
+            	See <see cref="P:ServiceStack.RouteAttribute.Path">RouteAttribute.Path</see>
             	for details on the correct format.</param>
             <returns>The same <see cref="T:ServiceStack.Server.IServiceRoutes"/> instance;
             	never <see langword="null"/>.</returns>
@@ -1405,7 +1337,7 @@
             <typeparam name="TRequest">The type of request DTO to map 
             	the path to.</typeparam>
             <param name="restPath">The path to map the request DTO to.
-            	See <see cref="!:RestServiceAttribute.Path">RestServiceAttribute.Path</see>
+            	See <see cref="P:ServiceStack.RouteAttribute.Path">RouteAttribute.Path</see>
             	for details on the correct format.</param>
             <param name="verbs">
             	The comma-delimited list of HTTP verbs supported by the path, 
@@ -1425,7 +1357,7 @@
             	The type of request DTO to map the path to.
             </param>
             <param name="restPath">The path to map the request DTO to.
-            	See <see cref="!:RestServiceAttribute.Path">RestServiceAttribute.Path</see>
+            	See <see cref="P:ServiceStack.RouteAttribute.Path">RouteAttribute.Path</see>
             	for details on the correct format.</param>
             <param name="verbs">
             	The comma-delimited list of HTTP verbs supported by the path, 
@@ -1444,7 +1376,7 @@
             	The type of request DTO to map the path to.
             </param>
             <param name="restPath">The path to map the request DTO to.
-            	See <see cref="!:RestServiceAttribute.Path">RestServiceAttribute.Path</see>
+            	See <see cref="P:ServiceStack.RouteAttribute.Path">RouteAttribute.Path</see>
             	for details on the correct format.</param>
             <param name="verbs">
             	The comma-delimited list of HTTP verbs supported by the path, 
@@ -1582,35 +1514,6 @@
             <summary>
             A log entry added by the IRequestLogger
             </summary>
-        </member>
-        <member name="T:ServiceStack.Server.RestServiceAttribute">
-            <summary>
-            	Used to decorate Request DTO's to associate a RESTful request 
-            	path mapping with a service.  Multiple attributes can be applied to 
-            	each request DTO, to map multiple paths to the service.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Server.RestServiceAttribute.#ctor(System.String)">
-            <summary>
-            	<para>Initializes an instance of the <see cref="T:ServiceStack.Server.RestServiceAttribute"/> class.</para>
-            </summary>
-            <param name="path">
-            	<para>The path template to map to the request.  See 
-            	<see cref="T:System.IO.Path">RestServiceAttribute.Path</see>
-            	for details on the correct format.</para>
-            </param>
-        </member>
-        <member name="M:ServiceStack.Server.RestServiceAttribute.#ctor(System.String,System.String)">
-            <summary>
-            	<para>Initializes an instance of the <see cref="T:ServiceStack.Server.RestServiceAttribute"/> class.</para>
-            </summary>
-            <param name="path">
-            	<para>The path template to map to the request.  See 
-            	<see cref="T:System.IO.Path">RestServiceAttribute.Path</see>
-            	for details on the correct format.</para>
-            </param>
-            <param name="verbs">A comma-delimited list of HTTP verbs supported by the 
-            	service.  If unspecified, all verbs are assumed to be supported.</param>
         </member>
         <member name="T:ServiceStack.RestrictAttribute">
             <summary>
