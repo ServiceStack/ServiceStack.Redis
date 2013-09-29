@@ -21,14 +21,14 @@ namespace ServiceStack.Redis
 {
     internal static class RedisExtensions
     {
-        public static List<RedisEndPoint> ToRedisEndPoints(this IEnumerable<string> hosts)
+        public static List<RedisEndpoint> ToRedisEndPoints(this IEnumerable<string> hosts)
         {
-            if (hosts == null) return new List<RedisEndPoint>();
+            if (hosts == null) return new List<RedisEndpoint>();
 
-            var redisEndpoints = new List<RedisEndPoint>();
+            var redisEndpoints = new List<RedisEndpoint>();
             foreach (var host in hosts)
             {
-                RedisEndPoint endpoint;
+                RedisEndpoint endpoint;
                 string[] hostParts;
                 if (host.Contains("@"))
                 {
@@ -48,7 +48,7 @@ namespace ServiceStack.Redis
             return redisEndpoints;
         }
 
-        private static RedisEndPoint GetRedisEndPoint(string[] hostParts)
+        private static RedisEndpoint GetRedisEndPoint(string[] hostParts)
         {
             const int hostOrIpAddressIndex = 0;
             const int portIndex = 1;
@@ -60,7 +60,7 @@ namespace ServiceStack.Redis
                            ? RedisNativeClient.DefaultPort
                            : Int32.Parse(hostParts[portIndex]);
 
-            return new RedisEndPoint(hostParts[hostOrIpAddressIndex], port);
+            return new RedisEndpoint(hostParts[hostOrIpAddressIndex], port);
         }
 
         public static bool IsConnected(this Socket socket)

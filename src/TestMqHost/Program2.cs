@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
-using ServiceStack.Common;
-using ServiceStack.Common.Support;
-using ServiceStack.Logging;
-using ServiceStack.Logging.Support.Logging;
 using ServiceStack.Redis;
 using ServiceStack.Redis.Messaging;
 using ServiceStack.Text;

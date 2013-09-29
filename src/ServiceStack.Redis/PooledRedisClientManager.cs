@@ -43,8 +43,8 @@ namespace ServiceStack.Redis
         /// </summary>
         public string NamespacePrefix { get; set; }
 
-        private List<RedisEndPoint> ReadWriteHosts { get; set; }
-        private List<RedisEndPoint> ReadOnlyHosts { get; set; }
+        private List<RedisEndpoint> ReadWriteHosts { get; set; }
+        private List<RedisEndpoint> ReadOnlyHosts { get; set; }
         public List<Action<IRedisClientsManager>> OnFailover { get; private set; }
 
         private RedisClient[] writeClients = new RedisClient[0];

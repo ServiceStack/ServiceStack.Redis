@@ -22,8 +22,8 @@ namespace ServiceStack.Redis
     public partial class BasicRedisClientManager
         : IRedisClientsManager, IRedisFailover
     {
-        private List<RedisEndPoint> ReadWriteHosts { get; set; }
-        private List<RedisEndPoint> ReadOnlyHosts { get; set; }
+        private List<RedisEndpoint> ReadWriteHosts { get; set; }
+        private List<RedisEndpoint> ReadOnlyHosts { get; set; }
         public int? ConnectTimeout { get; set; }
 
         /// <summary>

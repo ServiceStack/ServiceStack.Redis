@@ -62,13 +62,13 @@
             <param name="enum"></param>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.HostContext.TrackDisposable(System.IDisposable)">
+        <member name="M:ServiceStack.RequestContext.TrackDisposable(System.IDisposable)">
             <summary>
             Track any IDisposable's to dispose of at the end of the request in IAppHost.OnEndRequest()
             </summary>
             <param name="instance"></param>
         </member>
-        <member name="P:ServiceStack.HostContext.Items">
+        <member name="P:ServiceStack.RequestContext.Items">
             <summary>
             Gets a list of items for this request. 
             </summary>
@@ -928,7 +928,7 @@
             rangeHeader should be of the format "bytes=0-" or "bytes=0-12345" or "bytes=123-456"
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResultExtensions.AddHttpRangeResponseHeaders(ServiceStack.Server.IHttpResponse,System.Int64,System.Int64,System.Int64)">
+        <member name="M:ServiceStack.HttpResultExtensions.AddHttpRangeResponseHeaders(ServiceStack.Web.IHttpResponse,System.Int64,System.Int64,System.Int64)">
             <summary>
             Adds 206 PartialContent Status, Content-Range and Content-Length headers
             </summary>
@@ -938,22 +938,22 @@
             Writes partial range as specified by start-end, from fromStream to toStream.
             </summary>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.SetItem(ServiceStack.Server.IRequestContext,System.String,System.Object)">
+        <member name="M:ServiceStack.RequestContextExtensions.SetItem(ServiceStack.Web.IRequestContext,System.String,System.Object)">
             <summary>
             Store an entry in the IHttpRequest.Items Dictionary
             </summary>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.SetItem(ServiceStack.Server.IHttpRequest,System.String,System.Object)">
+        <member name="M:ServiceStack.RequestContextExtensions.SetItem(ServiceStack.Web.IHttpRequest,System.String,System.Object)">
             <summary>
             Store an entry in the IHttpRequest.Items Dictionary
             </summary>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.GetItem(ServiceStack.Server.IRequestContext,System.String)">
+        <member name="M:ServiceStack.RequestContextExtensions.GetItem(ServiceStack.Web.IRequestContext,System.String)">
             <summary>
             Get an entry from the IHttpRequest.Items Dictionary
             </summary>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.GetItem(ServiceStack.Server.IHttpRequest,System.String)">
+        <member name="M:ServiceStack.RequestContextExtensions.GetItem(ServiceStack.Web.IHttpRequest,System.String)">
             <summary>
             Get an entry from the IHttpRequest.Items Dictionary
             </summary>

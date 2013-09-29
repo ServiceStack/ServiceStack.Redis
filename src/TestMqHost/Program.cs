@@ -2,7 +2,6 @@
 using System.Threading;
 using ServiceStack;
 using ServiceStack.Logging;
-using ServiceStack.Logging.Support.Logging;
 using ServiceStack.Redis;
 using ServiceStack.Redis.Messaging;
 using ServiceStack.Text;

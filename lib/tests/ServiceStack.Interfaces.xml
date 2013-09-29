@@ -238,7 +238,7 @@
             Retrieves a User Session
             </summary>
         </member>
-        <member name="M:ServiceStack.Caching.ISessionFactory.GetOrCreateSession(ServiceStack.Server.IHttpRequest,ServiceStack.Server.IHttpResponse)">
+        <member name="M:ServiceStack.Caching.ISessionFactory.GetOrCreateSession(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse)">
             <summary>
             Gets the session for this request, creates one if it doesn't exist.
             </summary>
@@ -280,6 +280,35 @@
         <member name="T:ServiceStack.DataAnnotations.MetaAttribute">
             <summary>
             Decorate any type or property with adhoc info
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Logging.ConsoleLogFactory">
+            <summary>
+            Creates a Console Logger, that logs all messages to: System.Console
+            
+            Made public so its testable
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Logging.ILogFactory">
+            <summary>
+            Factory to create ILog instances
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.ILogFactory.GetLogger(System.Type)">
+            <summary>
+            Gets the logger.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.ILogFactory.GetLogger(System.String)">
+            <summary>
+            Gets the logger.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Logging.ConsoleLogger">
+            <summary>
+            Default logger is to Console.WriteLine
+            
+            Made public so its testable
             </summary>
         </member>
         <member name="T:ServiceStack.Logging.ILog">
@@ -395,24 +424,174 @@
             	<c>true</c> if this instance is debug enabled; otherwise, <c>false</c>.
             </value>
         </member>
-        <member name="T:ServiceStack.Logging.ILogFactory">
+        <member name="M:ServiceStack.Logging.ConsoleLogger.#ctor(System.String)">
             <summary>
-            Factory to create ILog instances
+            Initializes a new instance of the <see cref="T:ServiceStack.Logging.DebugLogger"/> class.
             </summary>
         </member>
-        <member name="M:ServiceStack.Logging.ILogFactory.GetLogger(System.Type)">
+        <member name="M:ServiceStack.Logging.ConsoleLogger.#ctor(System.Type)">
             <summary>
-            Gets the logger.
+            Initializes a new instance of the <see cref="T:ServiceStack.Logging.DebugLogger"/> class.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.ConsoleLogger.Log(System.Object,System.Exception)">
+            <summary>
+            Logs the specified message.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.ConsoleLogger.LogFormat(System.Object,System.Object[])">
+            <summary>
+            Logs the format.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.ConsoleLogger.Log(System.Object)">
+            <summary>
+            Logs the specified message.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Logging.DebugLogFactory">
+            <summary>
+            Creates a Debug Logger, that logs all messages to: System.Diagnostics.Debug
+            
+            Made public so its testable
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Logging.DebugLogger">
+            <summary>
+            Default logger is to System.Diagnostics.Debug.WriteLine
+            
+            Made public so its testable
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.DebugLogger.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ServiceStack.Logging.DebugLogger"/> class.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.DebugLogger.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ServiceStack.Logging.DebugLogger"/> class.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.DebugLogger.Log(System.Object,System.Exception)">
+            <summary>
+            Logs the specified message.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.DebugLogger.LogFormat(System.Object,System.Object[])">
+            <summary>
+            Logs the format.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.DebugLogger.Log(System.Object)">
+            <summary>
+            Logs the specified message.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Logging.NullDebugLogger">
+            <summary>
+            Default logger is to System.Diagnostics.Debug.Print
+            
+            Made public so its testable
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.NullDebugLogger.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ServiceStack.Logging.DebugLogger"/> class.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.NullDebugLogger.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ServiceStack.Logging.DebugLogger"/> class.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.NullDebugLogger.Log(System.Object,System.Exception)">
+            <summary>
+            Logs the specified message.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.NullDebugLogger.LogFormat(System.Object,System.Object[])">
+            <summary>
+            Logs the format.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.NullDebugLogger.Log(System.Object)">
+            <summary>
+            Logs the specified message.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Logging.NullLogFactory">
+            <summary>
+            Creates a Debug Logger, that logs all messages to: System.Diagnostics.Debug
+            
+            Made public so its testable
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Logging.StringBuilderLogFactory">
+            <summary>
+            StringBuilderLog writes to shared StringBuffer.
+            Made public so its testable
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.StringBuilderLog.Log(System.Object,System.Exception)">
+            <summary>
+            Logs the specified message.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.StringBuilderLog.LogFormat(System.Object,System.Object[])">
+            <summary>
+            Logs the format.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.StringBuilderLog.Log(System.Object)">
+            <summary>
+            Logs the specified message.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="T:ServiceStack.Logging.TestLogFactory">
+            <summary>
+            Creates a test Logger, that stores all log messages in a member list
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Logging.TestLogger">
+            <summary>
+            Tests logger which  stores all log messages in a member list which can be examined later
+            
+            Made public so its testable
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Logging.TestLogger.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ServiceStack.Logging.TestLogger"/> class.
             </summary>
             <param name="type">The type.</param>
-            <returns></returns>
         </member>
-        <member name="M:ServiceStack.Logging.ILogFactory.GetLogger(System.String)">
+        <member name="M:ServiceStack.Logging.TestLogger.#ctor(System.Type)">
             <summary>
-            Gets the logger.
+            Initializes a new instance of the <see cref="T:ServiceStack.Logging.TestLogger"/> class.
             </summary>
-            <param name="typeName">Name of the type.</param>
-            <returns></returns>
+            <param name="type">The type.</param>
+        </member>
+        <member name="M:ServiceStack.Logging.TestLogger.Log(ServiceStack.Logging.TestLogger.Levels,System.Object,System.Exception)">
+            <summary>
+            Logs the specified message.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="exception">The exception.</param>
+        </member>
+        <member name="M:ServiceStack.Logging.TestLogger.LogFormat(ServiceStack.Logging.TestLogger.Levels,System.Object,System.Object[])">
+            <summary>
+            Logs the format.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="args">The args.</param>
+        </member>
+        <member name="M:ServiceStack.Logging.TestLogger.Log(ServiceStack.Logging.TestLogger.Levels,System.Object)">
+            <summary>
+            Logs the specified message.
+            </summary>
+            <param name="message">The message.</param>
         </member>
         <member name="T:ServiceStack.Logging.LogManager">
             <summary>
@@ -424,230 +603,17 @@
             <summary>
             Gets the logger.
             </summary>
-            <param name="type">The type.</param>
-            <returns></returns>
         </member>
         <member name="M:ServiceStack.Logging.LogManager.GetLogger(System.String)">
             <summary>
             Gets the logger.
             </summary>
-            <param name="typeName">Name of the type.</param>
-            <returns></returns>
         </member>
         <member name="P:ServiceStack.Logging.LogManager.LogFactory">
             <summary>
             Gets or sets the log factory.
             Use this to override the factory that is used to create loggers
             </summary>
-            <value>The log factory.</value>
-        </member>
-        <member name="T:ServiceStack.Logging.Support.Logging.ConsoleLogFactory">
-            <summary>
-            Creates a Console Logger, that logs all messages to: System.Console
-            
-            Made public so its testable
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Logging.Support.Logging.ConsoleLogger">
-            <summary>
-            Default logger is to Console.WriteLine
-            
-            Made public so its testable
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.ConsoleLogger.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:ServiceStack.Logging.Support.Logging.DebugLogger"/> class.
-            </summary>
-            <param name="type">The type.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.ConsoleLogger.#ctor(System.Type)">
-            <summary>
-            Initializes a new instance of the <see cref="T:ServiceStack.Logging.Support.Logging.DebugLogger"/> class.
-            </summary>
-            <param name="type">The type.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.ConsoleLogger.Log(System.Object,System.Exception)">
-            <summary>
-            Logs the specified message.
-            </summary>
-            <param name="message">The message.</param>
-            <param name="exception">The exception.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.ConsoleLogger.LogFormat(System.Object,System.Object[])">
-            <summary>
-            Logs the format.
-            </summary>
-            <param name="message">The message.</param>
-            <param name="args">The args.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.ConsoleLogger.Log(System.Object)">
-            <summary>
-            Logs the specified message.
-            </summary>
-            <param name="message">The message.</param>
-        </member>
-        <member name="T:ServiceStack.Logging.Support.Logging.StringBuilderLogFactory">
-            <summary>
-            StringBuilderLog writes to shared StringBuffer.
-            Made public so its testable
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.StringBuilderLog.Log(System.Object,System.Exception)">
-            <summary>
-            Logs the specified message.
-            </summary>
-            <param name="message">The message.</param>
-            <param name="exception">The exception.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.StringBuilderLog.LogFormat(System.Object,System.Object[])">
-            <summary>
-            Logs the format.
-            </summary>
-            <param name="message">The message.</param>
-            <param name="args">The args.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.StringBuilderLog.Log(System.Object)">
-            <summary>
-            Logs the specified message.
-            </summary>
-            <param name="message">The message.</param>
-        </member>
-        <member name="T:ServiceStack.Logging.Support.Logging.DebugLogFactory">
-            <summary>
-            Creates a Debug Logger, that logs all messages to: System.Diagnostics.Debug
-            
-            Made public so its testable
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Logging.Support.Logging.DebugLogger">
-            <summary>
-            Default logger is to System.Diagnostics.Debug.WriteLine
-            
-            Made public so its testable
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.DebugLogger.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:ServiceStack.Logging.Support.Logging.DebugLogger"/> class.
-            </summary>
-            <param name="type">The type.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.DebugLogger.#ctor(System.Type)">
-            <summary>
-            Initializes a new instance of the <see cref="T:ServiceStack.Logging.Support.Logging.DebugLogger"/> class.
-            </summary>
-            <param name="type">The type.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.DebugLogger.Log(System.Object,System.Exception)">
-            <summary>
-            Logs the specified message.
-            </summary>
-            <param name="message">The message.</param>
-            <param name="exception">The exception.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.DebugLogger.LogFormat(System.Object,System.Object[])">
-            <summary>
-            Logs the format.
-            </summary>
-            <param name="message">The message.</param>
-            <param name="args">The args.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.DebugLogger.Log(System.Object)">
-            <summary>
-            Logs the specified message.
-            </summary>
-            <param name="message">The message.</param>
-        </member>
-        <member name="T:ServiceStack.Logging.Support.Logging.NullDebugLogger">
-            <summary>
-            Default logger is to System.Diagnostics.Debug.Print
-            
-            Made public so its testable
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.NullDebugLogger.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:ServiceStack.Logging.Support.Logging.DebugLogger"/> class.
-            </summary>
-            <param name="type">The type.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.NullDebugLogger.#ctor(System.Type)">
-            <summary>
-            Initializes a new instance of the <see cref="T:ServiceStack.Logging.Support.Logging.DebugLogger"/> class.
-            </summary>
-            <param name="type">The type.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.NullDebugLogger.Log(System.Object,System.Exception)">
-            <summary>
-            Logs the specified message.
-            </summary>
-            <param name="message">The message.</param>
-            <param name="exception">The exception.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.NullDebugLogger.LogFormat(System.Object,System.Object[])">
-            <summary>
-            Logs the format.
-            </summary>
-            <param name="message">The message.</param>
-            <param name="args">The args.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.NullDebugLogger.Log(System.Object)">
-            <summary>
-            Logs the specified message.
-            </summary>
-            <param name="message">The message.</param>
-        </member>
-        <member name="T:ServiceStack.Logging.Support.Logging.NullLogFactory">
-            <summary>
-            Creates a Debug Logger, that logs all messages to: System.Diagnostics.Debug
-            
-            Made public so its testable
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Logging.Support.Logging.TestLogFactory">
-            <summary>
-            Creates a test Logger, that stores all log messages in a member list
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Logging.Support.Logging.TestLogger">
-            <summary>
-            Tests logger which  stores all log messages in a member list which can be examined later
-            
-            Made public so its testable
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.TestLogger.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:ServiceStack.Logging.Support.Logging.TestLogger"/> class.
-            </summary>
-            <param name="type">The type.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.TestLogger.#ctor(System.Type)">
-            <summary>
-            Initializes a new instance of the <see cref="T:ServiceStack.Logging.Support.Logging.TestLogger"/> class.
-            </summary>
-            <param name="type">The type.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.TestLogger.Log(ServiceStack.Logging.Support.Logging.TestLogger.Levels,System.Object,System.Exception)">
-            <summary>
-            Logs the specified message.
-            </summary>
-            <param name="message">The message.</param>
-            <param name="exception">The exception.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.TestLogger.LogFormat(ServiceStack.Logging.Support.Logging.TestLogger.Levels,System.Object,System.Object[])">
-            <summary>
-            Logs the format.
-            </summary>
-            <param name="message">The message.</param>
-            <param name="args">The args.</param>
-        </member>
-        <member name="M:ServiceStack.Logging.Support.Logging.TestLogger.Log(ServiceStack.Logging.Support.Logging.TestLogger.Levels,System.Object)">
-            <summary>
-            Logs the specified message.
-            </summary>
-            <param name="message">The message.</param>
         </member>
         <member name="M:ServiceStack.Messaging.IMessageQueueClient.Publish(System.String,System.Byte[])">
             <summary>
@@ -982,28 +948,15 @@
             Marker interfaces
             </summary>
         </member>
-        <member name="T:ServiceStack.Server.IExpress">
-            <summary>
-            Marker interface to mark an Express controller with different routes for each method
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Server.IRequiresRequestStream">
+        <member name="T:ServiceStack.Web.IRequiresRequestStream">
             <summary>
             Implement on Request DTOs that need access to the raw Request Stream
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IRequiresRequestStream.RequestStream">
+        <member name="P:ServiceStack.Web.IRequiresRequestStream.RequestStream">
             <summary>
             The raw Http Request Input Stream
             </summary>
-        </member>
-        <member name="T:ServiceStack.Server.IAsyncService`1">
-            <summary>
-            If the Service also implements this interface,
-            IAsyncService.ExecuteAsync() will be used instead of IService.Execute() for 
-            EndpointAttributes.AsyncOneWay requests
-            </summary>
-            <typeparam name="T"></typeparam>
         </member>
         <member name="M:ServiceStack.Configuration.IResolver.TryResolve``1">
             <summary>
@@ -1012,13 +965,13 @@
             <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
-        <member name="T:ServiceStack.Server.IHasRequestFilter">
+        <member name="T:ServiceStack.Web.IHasRequestFilter">
             <summary>
             This interface can be implemented by an attribute
             which adds an request filter for the specific request DTO the attribute marked.
             </summary>
         </member>
-        <member name="M:ServiceStack.Server.IHasRequestFilter.RequestFilter(ServiceStack.Server.IHttpRequest,ServiceStack.Server.IHttpResponse,System.Object)">
+        <member name="M:ServiceStack.Web.IHasRequestFilter.RequestFilter(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse,System.Object)">
             <summary>
             The request filter is executed before the service.
             </summary>
@@ -1026,199 +979,199 @@
             <param name="res">The http response wrapper</param>
             <param name="requestDto">The request DTO</param>
         </member>
-        <member name="M:ServiceStack.Server.IHasRequestFilter.Copy">
+        <member name="M:ServiceStack.Web.IHasRequestFilter.Copy">
             <summary>
             A new shallow copy of this filter is used on every request.
             </summary>
             <returns></returns>
         </member>
-        <member name="P:ServiceStack.Server.IHasRequestFilter.Priority">
+        <member name="P:ServiceStack.Web.IHasRequestFilter.Priority">
             <summary>
             Order in which Request Filters are executed. 
             &lt;0 Executed before global request filters
             &gt;0 Executed after global request filters
             </summary>
         </member>
-        <member name="T:ServiceStack.Server.IHasResponseFilter">
+        <member name="T:ServiceStack.Web.IHasResponseFilter">
             <summary>
             This interface can be implemented by an attribute
             which adds an response filter for the specific response DTO the attribute marked.
             </summary>
         </member>
-        <member name="M:ServiceStack.Server.IHasResponseFilter.ResponseFilter(ServiceStack.Server.IHttpRequest,ServiceStack.Server.IHttpResponse,System.Object)">
+        <member name="M:ServiceStack.Web.IHasResponseFilter.ResponseFilter(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse,System.Object)">
             <summary>
             The response filter is executed after the service
             </summary>
             <param name="req">The http request wrapper</param>
             <param name="res">The http response wrapper</param>
         </member>
-        <member name="M:ServiceStack.Server.IHasResponseFilter.Copy">
+        <member name="M:ServiceStack.Web.IHasResponseFilter.Copy">
             <summary>
             A new shallow copy of this filter is used on every request.
             </summary>
             <returns></returns>
         </member>
-        <member name="P:ServiceStack.Server.IHasResponseFilter.Priority">
+        <member name="P:ServiceStack.Web.IHasResponseFilter.Priority">
             <summary>
             Order in which Response Filters are executed. 
             &lt;0 Executed before global response filters
             &gt;0 Executed after global response filters
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpResult.Status">
+        <member name="P:ServiceStack.Web.IHttpResult.Status">
             <summary>
             The HTTP Response Status
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpResult.StatusCode">
+        <member name="P:ServiceStack.Web.IHttpResult.StatusCode">
             <summary>
             The HTTP Response Status Code
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpResult.StatusDescription">
+        <member name="P:ServiceStack.Web.IHttpResult.StatusDescription">
             <summary>
             The HTTP Status Description
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpResult.ContentType">
+        <member name="P:ServiceStack.Web.IHttpResult.ContentType">
             <summary>
             The HTTP Response ContentType
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpResult.Headers">
+        <member name="P:ServiceStack.Web.IHttpResult.Headers">
             <summary>
             Additional HTTP Headers
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpResult.Response">
+        <member name="P:ServiceStack.Web.IHttpResult.Response">
             <summary>
             Response DTO
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpResult.ResponseFilter">
+        <member name="P:ServiceStack.Web.IHttpResult.ResponseFilter">
             <summary>
             if not provided, get's injected by ServiceStack
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpResult.RequestContext">
+        <member name="P:ServiceStack.Web.IHttpResult.RequestContext">
             <summary>
             Holds the request call context
             </summary>
         </member>
-        <member name="T:ServiceStack.Server.IHttpRequest">
+        <member name="T:ServiceStack.Web.IHttpRequest">
             <summary>
             A thin wrapper around ASP.NET or HttpListener's HttpRequest
             </summary>
         </member>
-        <member name="M:ServiceStack.Server.IHttpRequest.GetRawBody">
+        <member name="M:ServiceStack.Web.IHttpRequest.GetRawBody">
             <summary>
             The entire string contents of Request.InputStream
             </summary>
             <returns></returns>
         </member>
-        <member name="P:ServiceStack.Server.IHttpRequest.OriginalRequest">
+        <member name="P:ServiceStack.Web.IHttpRequest.OriginalRequest">
             <summary>
             The underlying ASP.NET or HttpListener HttpRequest
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpRequest.OperationName">
+        <member name="P:ServiceStack.Web.IHttpRequest.OperationName">
             <summary>
             The name of the service being called (e.g. Request DTO Name)
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpRequest.ContentType">
+        <member name="P:ServiceStack.Web.IHttpRequest.ContentType">
             <summary>
             The request ContentType
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpRequest.ResponseContentType">
+        <member name="P:ServiceStack.Web.IHttpRequest.ResponseContentType">
             <summary>
             The expected Response ContentType for this request
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpRequest.Items">
+        <member name="P:ServiceStack.Web.IHttpRequest.Items">
             <summary>
             Attach any data to this request that all filters and services can access.
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpRequest.UseBufferedStream">
+        <member name="P:ServiceStack.Web.IHttpRequest.UseBufferedStream">
             <summary>
             Buffer the Request InputStream so it can be re-read
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpRequest.UserHostAddress">
+        <member name="P:ServiceStack.Web.IHttpRequest.UserHostAddress">
             <summary>
             The Remote Ip as reported by Request.UserHostAddress
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpRequest.RemoteIp">
+        <member name="P:ServiceStack.Web.IHttpRequest.RemoteIp">
             <summary>
             The Remote Ip as reported by X-Forwarded-For, X-Real-IP or Request.UserHostAddress
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpRequest.XForwardedFor">
+        <member name="P:ServiceStack.Web.IHttpRequest.XForwardedFor">
             <summary>
             The value of the X-Forwarded-For header, null if null or empty
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpRequest.XRealIp">
+        <member name="P:ServiceStack.Web.IHttpRequest.XRealIp">
             <summary>
             The value of the X-Real-IP header, null if null or empty
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpRequest.IsSecureConnection">
+        <member name="P:ServiceStack.Web.IHttpRequest.IsSecureConnection">
             <summary>
             e.g. is https or not
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpRequest.Files">
+        <member name="P:ServiceStack.Web.IHttpRequest.Files">
             <summary>
             Access to the multi-part/formdata files posted on this request
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpRequest.UrlReferrer">
+        <member name="P:ServiceStack.Web.IHttpRequest.UrlReferrer">
             <summary>
             The value of the Referrer, null if not available
             </summary>
         </member>
-        <member name="T:ServiceStack.Server.IHttpResponse">
+        <member name="T:ServiceStack.Web.IHttpResponse">
             <summary>
             A thin wrapper around ASP.NET or HttpListener's HttpResponse
             </summary>
         </member>
-        <member name="M:ServiceStack.Server.IHttpResponse.Close">
+        <member name="M:ServiceStack.Web.IHttpResponse.Close">
             <summary>
             Signal that this response has been handled and no more processing should be done.
             When used in a request or response filter, no more filters or processing is done on this request.
             </summary>
         </member>
-        <member name="M:ServiceStack.Server.IHttpResponse.End">
+        <member name="M:ServiceStack.Web.IHttpResponse.End">
             <summary>
             Calls Response.End() on ASP.NET HttpResponse otherwise is an alias for Close().
             Useful when you want to prevent ASP.NET to provide it's own custom error page.
             </summary>
         </member>
-        <member name="M:ServiceStack.Server.IHttpResponse.Flush">
+        <member name="M:ServiceStack.Web.IHttpResponse.Flush">
             <summary>
             Response.Flush() and OutputStream.Flush() seem to have different behaviour in ASP.NET
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpResponse.OriginalResponse">
+        <member name="P:ServiceStack.Web.IHttpResponse.OriginalResponse">
             <summary>
             The underlying ASP.NET or HttpListener HttpResponse
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IHttpResponse.IsClosed">
+        <member name="P:ServiceStack.Web.IHttpResponse.IsClosed">
             <summary>
             Gets a value indicating whether this instance is closed.
             </summary>
         </member>
-        <member name="T:ServiceStack.Server.IRequestLogger">
+        <member name="T:ServiceStack.Web.IRequestLogger">
             <summary>
             Log every service request
             </summary>
         </member>
-        <member name="M:ServiceStack.Server.IRequestLogger.Log(ServiceStack.Server.IRequestContext,System.Object,System.Object,System.TimeSpan)">
+        <member name="M:ServiceStack.Web.IRequestLogger.Log(ServiceStack.Web.IRequestContext,System.Object,System.Object,System.TimeSpan)">
             <summary>
             Log a request
             </summary>
@@ -1227,97 +1180,96 @@
             <param name="response">Response DTO or Exception</param>
             <param name="elapsed">How long did the Request take</param>
         </member>
-        <member name="M:ServiceStack.Server.IRequestLogger.GetLatestLogs(System.Nullable{System.Int32})">
+        <member name="M:ServiceStack.Web.IRequestLogger.GetLatestLogs(System.Nullable{System.Int32})">
             <summary>
             View the most recent logs
             </summary>
             <param name="take"></param>
             <returns></returns>
         </member>
-        <member name="P:ServiceStack.Server.IRequestLogger.EnableSessionTracking">
+        <member name="P:ServiceStack.Web.IRequestLogger.EnableSessionTracking">
             <summary>
             Turn On/Off Session Tracking
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IRequestLogger.EnableRequestBodyTracking">
+        <member name="P:ServiceStack.Web.IRequestLogger.EnableRequestBodyTracking">
             <summary>
             Turn On/Off Raw Request Body Tracking
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IRequestLogger.EnableResponseTracking">
+        <member name="P:ServiceStack.Web.IRequestLogger.EnableResponseTracking">
             <summary>
             Turn On/Off Tracking of Responses
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IRequestLogger.EnableErrorTracking">
+        <member name="P:ServiceStack.Web.IRequestLogger.EnableErrorTracking">
             <summary>
             Turn On/Off Tracking of Exceptions
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IRequestLogger.RequiredRoles">
+        <member name="P:ServiceStack.Web.IRequestLogger.RequiredRoles">
             <summary>
             Limit access to /requestlogs service to role
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IRequestLogger.ExcludeRequestDtoTypes">
+        <member name="P:ServiceStack.Web.IRequestLogger.ExcludeRequestDtoTypes">
             <summary>
             Don't log requests of these types.
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IRequestLogger.HideRequestBodyForRequestDtoTypes">
+        <member name="P:ServiceStack.Web.IRequestLogger.HideRequestBodyForRequestDtoTypes">
             <summary>
             Don't log request bodys for services with sensitive information.
             By default Auth and Registration requests are hidden.
             </summary>
         </member>
-        <member name="T:ServiceStack.Server.IRequiresRequestContext">
+        <member name="T:ServiceStack.Web.IRequiresRequestContext">
             <summary>
             Implement on services that need access to the RequestContext
             </summary>
         </member>
-        <member name="T:ServiceStack.Server.IServiceController">
+        <member name="T:ServiceStack.Web.IServiceController">
             <summary>
             Responsible for executing the operation within the specified context.
             </summary>
             <value>The operation types.</value>
         </member>
-        <member name="M:ServiceStack.Server.IServiceController.GetRestPathForRequest(System.String,System.String)">
+        <member name="M:ServiceStack.Web.IServiceController.GetRestPathForRequest(System.String,System.String)">
             <summary>
             Returns the first matching RestPath
             </summary>
-            <param name="httpMethod"></param>
-            <param name="pathInfo"></param>
-            <returns></returns>
         </member>
-        <member name="M:ServiceStack.Server.IServiceController.ExecuteMessage``1(ServiceStack.Messaging.IMessage{``0})">
+        <member name="M:ServiceStack.Web.IServiceController.ExecuteMessage``1(ServiceStack.Messaging.IMessage{``0})">
             <summary>
             Executes the MQ DTO request.
             </summary>
         </member>
-        <member name="M:ServiceStack.Server.IServiceController.ExecuteMessage``1(ServiceStack.Messaging.IMessage{``0},ServiceStack.Server.IRequestContext)">
+        <member name="M:ServiceStack.Web.IServiceController.ExecuteMessage``1(ServiceStack.Messaging.IMessage{``0},ServiceStack.Web.IRequestContext)">
             <summary>
             Executes the MQ DTO request with the supplied requestContext
             </summary>
         </member>
-        <member name="M:ServiceStack.Server.IServiceController.Execute(System.Object,ServiceStack.Server.IRequestContext)">
+        <member name="M:ServiceStack.Web.IServiceController.Execute(System.Object,ServiceStack.Web.IRequestContext)">
             <summary>
             Executes the DTO request under the supplied requestContext.
             </summary>
-            <param name="request"></param>
-            <param name="requestContext"></param>
-            <returns></returns>
         </member>
-        <member name="P:ServiceStack.Server.IServiceController.Routes">
+        <member name="M:ServiceStack.Web.IServiceController.Execute(System.Object)">
+            <summary>
+            Executes the DTO request with an empty RequestContext.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Web.IServiceController.Routes">
             <summary>
             Allow the registration of custom routes
             </summary>
         </member>
-        <member name="T:ServiceStack.Server.IServiceRoutes">
+        <member name="T:ServiceStack.Web.IServiceRoutes">
             <summary>
             Allow the registration of user-defined routes for services
             </summary>
         </member>
-        <member name="M:ServiceStack.Server.IServiceRoutes.Add``1(System.String)">
+        <member name="M:ServiceStack.Web.IServiceRoutes.Add``1(System.String)">
             <summary>
             	Maps the specified REST path to the specified request DTO.
             </summary>
@@ -1326,10 +1278,10 @@
             <param name="restPath">The path to map the request DTO to.
             	See <see cref="P:ServiceStack.RouteAttribute.Path">RouteAttribute.Path</see>
             	for details on the correct format.</param>
-            <returns>The same <see cref="T:ServiceStack.Server.IServiceRoutes"/> instance;
+            <returns>The same <see cref="T:ServiceStack.Web.IServiceRoutes"/> instance;
             	never <see langword="null"/>.</returns>
         </member>
-        <member name="M:ServiceStack.Server.IServiceRoutes.Add``1(System.String,System.String)">
+        <member name="M:ServiceStack.Web.IServiceRoutes.Add``1(System.String,System.String)">
             <summary>
             	Maps the specified REST path to the specified request DTO, and
             	specifies the HTTP verbs supported by the path.
@@ -1344,10 +1296,10 @@
             	such as "GET,PUT,DELETE".  Specify empty or <see langword="null"/>
             	to indicate that all verbs are supported.
             </param>
-            <returns>The same <see cref="T:ServiceStack.Server.IServiceRoutes"/> instance;
+            <returns>The same <see cref="T:ServiceStack.Web.IServiceRoutes"/> instance;
             	never <see langword="null"/>.</returns>
         </member>
-        <member name="M:ServiceStack.Server.IServiceRoutes.Add(System.Type,System.String,System.String)">
+        <member name="M:ServiceStack.Web.IServiceRoutes.Add(System.Type,System.String,System.String)">
             <summary>
             	Maps the specified REST path to the specified request DTO, 
             	specifies the HTTP verbs supported by the path, and indicates
@@ -1363,10 +1315,10 @@
             	The comma-delimited list of HTTP verbs supported by the path, 
             	such as "GET,PUT,DELETE".
             </param>
-            <returns>The same <see cref="T:ServiceStack.Server.IServiceRoutes"/> instance;
+            <returns>The same <see cref="T:ServiceStack.Web.IServiceRoutes"/> instance;
             	never <see langword="null"/>.</returns>
         </member>
-        <member name="M:ServiceStack.Server.IServiceRoutes.Add(System.Type,System.String,System.String,System.String,System.String)">
+        <member name="M:ServiceStack.Web.IServiceRoutes.Add(System.Type,System.String,System.String,System.String,System.String)">
             <summary>
             	Maps the specified REST path to the specified request DTO, 
             	specifies the HTTP verbs supported by the path, and indicates
@@ -1388,7 +1340,7 @@
             <param name="notes">
                 The longer text to explain the behaviour of the REST. 
             </param>
-            <returns>The same <see cref="T:ServiceStack.Server.IServiceRoutes"/> instance;
+            <returns>The same <see cref="T:ServiceStack.Web.IServiceRoutes"/> instance;
             	never <see langword="null"/>.</returns>
         </member>
         <member name="T:ServiceStack.RouteAttribute">
@@ -1520,19 +1472,19 @@
             Decorate on Request DTO's to alter the accessibility of a service and its visibility on /metadata pages
             </summary>
         </member>
-        <member name="M:ServiceStack.RestrictAttribute.#ctor(ServiceStack.EndpointAttributes[])">
+        <member name="M:ServiceStack.RestrictAttribute.#ctor(ServiceStack.RequestAttributes[])">
             <summary>
             Restrict access and metadata visibility to any of the specified access scenarios
             </summary>
             <value>The restrict access to scenarios.</value>
         </member>
-        <member name="M:ServiceStack.RestrictAttribute.#ctor(ServiceStack.EndpointAttributes[],ServiceStack.EndpointAttributes[])">
+        <member name="M:ServiceStack.RestrictAttribute.#ctor(ServiceStack.RequestAttributes[],ServiceStack.RequestAttributes[])">
             <summary>
             Restrict access and metadata visibility to any of the specified access scenarios
             </summary>
             <value>The restrict access to scenarios.</value>
         </member>
-        <member name="M:ServiceStack.RestrictAttribute.ToAllowedFlagsSet(ServiceStack.EndpointAttributes[])">
+        <member name="M:ServiceStack.RestrictAttribute.ToAllowedFlagsSet(ServiceStack.RequestAttributes[])">
             <summary>
             Returns the allowed set of scenarios based on the user-specified restrictions
             </summary>
@@ -1583,7 +1535,7 @@
             </summary>
             <value>Visibility restrictions</value>
         </member>
-        <member name="M:ServiceStack.RestrictExtensions.ToAllowedFlagsSet(ServiceStack.EndpointAttributes)">
+        <member name="M:ServiceStack.RestrictExtensions.ToAllowedFlagsSet(ServiceStack.RequestAttributes)">
             <summary>
             Converts from a User intended restriction to a flag with all the allowed attribute flags set, e.g:
             
@@ -1654,12 +1606,12 @@
             Can hold a specific error message for each named field.
             </summary>
         </member>
-        <member name="M:ServiceStack.Server.IPartialWriter.WritePartialTo(ServiceStack.Server.IHttpResponse)">
+        <member name="M:ServiceStack.Web.IPartialWriter.WritePartialTo(ServiceStack.Web.IHttpResponse)">
             <summary>
             Write a partial content result
             </summary>
         </member>
-        <member name="P:ServiceStack.Server.IPartialWriter.IsPartialRequest">
+        <member name="P:ServiceStack.Web.IPartialWriter.IsPartialRequest">
             <summary>
             Whether this HttpResult allows Partial Response
             </summary>
