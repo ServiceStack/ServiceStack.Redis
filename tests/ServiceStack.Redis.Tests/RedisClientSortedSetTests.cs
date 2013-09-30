@@ -231,18 +231,17 @@ namespace ServiceStack.Redis.Tests
 		{
 			stringDoubleMap.Each(x => Redis.AddItemToSortedSet(SetId, x.Key, x.Value));
 
-			var currentScore = Redis.IncrementItemInSortedSet(SetId, "one", 2);
-			stringDoubleMap["one"] = stringDoubleMap["one"] + 2;
+			var currentScore = Redis.IncrementItemInSortedSet(SetId, "one", 3);
+			stringDoubleMap["one"] = stringDoubleMap["one"] + 3;
 			Assert.That(currentScore, Is.EqualTo(stringDoubleMap["one"]));
 
-			currentScore = Redis.IncrementItemInSortedSet(SetId, "four", -2);
-			stringDoubleMap["four"] = stringDoubleMap["four"] - 2;
+			currentScore = Redis.IncrementItemInSortedSet(SetId, "four", -3);
+			stringDoubleMap["four"] = stringDoubleMap["four"] - 3;
 			Assert.That(currentScore, Is.EqualTo(stringDoubleMap["four"]));
 
 			var map = Redis.GetAllWithScoresFromSortedSet(SetId);
 
-			Assert.That(stringDoubleMap.EquivalentTo(map));
-			Debug.WriteLine(map.Dump());
+            Assert.That(stringDoubleMap.UnorderedEquivalentTo(map));
 		}
 
         [Test]

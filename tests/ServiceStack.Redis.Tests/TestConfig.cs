@@ -17,7 +17,6 @@ namespace ServiceStack.Redis.Tests
         public static readonly string[] SlaveHosts = new[] { "localhost" };
 
 	    public const int RedisPort = 6379;
-        public const int AlchemyPort = 6380;
 
 		public static string SingleHostConnectionString
 		{
@@ -31,15 +30,10 @@ namespace ServiceStack.Redis.Tests
 		{
 			get
 			{
-				return new BasicRedisClientManager(new string[1]
-				{
-					TestConfig.SingleHostConnectionString
+				return new BasicRedisClientManager(new[] {
+					SingleHostConnectionString
 				});
 			}
 		}
-
-		//public const string SingleHost = "chi-dev-mem1.ddnglobal.local";
-		//public static readonly string [] MasterHosts = new[] { "chi-dev-mem1.ddnglobal.local" };
-		//public static readonly string [] SlaveHosts = new[] { "chi-dev-mem1.ddnglobal.local", "chi-dev-mem2.ddnglobal.local" };
 	}
 }

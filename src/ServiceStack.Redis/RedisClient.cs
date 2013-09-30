@@ -508,7 +508,7 @@ namespace ServiceStack.Redis
         internal void RegisterTypeIds<T>(IEnumerable<T> values)
         {
             var typeIdsSetKey = GetTypeIdsSetKey<T>();
-            var ids = values.SafeConvertAll(x => x.GetId().ToString());
+            var ids = values.Map(x => x.GetId().ToString());
 
             if (this.Pipeline != null)
             {
@@ -527,11 +527,11 @@ namespace ServiceStack.Redis
             if (this.Pipeline != null)
             {
                 var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
-                ids.SafeForEach(x => registeredTypeIdsWithinPipeline.Remove(x));
+                ids.Each(x => registeredTypeIdsWithinPipeline.Remove(x));
             }
             else
             {
-                ids.SafeForEach(x => this.RemoveItemFromSet(typeIdsSetKey, x));
+                ids.Each(x => this.RemoveItemFromSet(typeIdsSetKey, x));
             }
         }
 
@@ -541,11 +541,11 @@ namespace ServiceStack.Redis
             if (this.Pipeline != null)
             {
                 var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
-                values.SafeForEach(x => registeredTypeIdsWithinPipeline.Remove(x.GetId().ToString()));
+                values.Each(x => registeredTypeIdsWithinPipeline.Remove(x.GetId().ToString()));
             }
             else
             {
-                values.SafeForEach(x => this.RemoveItemFromSet(typeIdsSetKey, x.GetId().ToString()));
+                values.Each(x => this.RemoveItemFromSet(typeIdsSetKey, x.GetId().ToString()));
             }
         }
 
@@ -557,7 +557,7 @@ namespace ServiceStack.Redis
                 foreach (var id in entry.Value)
                 {
                     var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
-                    registeredTypeIdsWithinPipeline.SafeForEach(x => this.AddItemToSet(typeIdsSetKey, id));
+                    registeredTypeIdsWithinPipeline.Each(x => this.AddItemToSet(typeIdsSetKey, id));
                 }
             }
             registeredTypeIdsWithinPipelineMap = new Dictionary<string, HashSet<string>>();
@@ -582,7 +582,7 @@ namespace ServiceStack.Redis
             if (ids == null || ids.Count == 0)
                 return new List<T>();
 
-            var urnKeys = ids.Cast<object>().SafeConvertAll(UrnKey<T>);
+            var urnKeys = ids.Cast<object>().Map(UrnKey<T>);
             return GetValues<T>(urnKeys);
         }
 
@@ -590,7 +590,7 @@ namespace ServiceStack.Redis
         {
             var typeIdsSetKy = this.GetTypeIdsSetKey<T>();
             var allTypeIds = this.GetAllItemsFromSet(typeIdsSetKy);
-            var urnKeys = allTypeIds.Cast<object>().SafeConvertAll(UrnKey<T>);
+            var urnKeys = allTypeIds.Cast<object>().Map(UrnKey<T>);
             return GetValues<T>(urnKeys);
         }
 
@@ -705,9 +705,9 @@ namespace ServiceStack.Redis
             if (ids == null || ids.Count == 0) return;
 
             var idsList = ids.Cast<object>();
-            var urnKeys = idsList.SafeConvertAll(UrnKey<T>);
+            var urnKeys = idsList.Map(UrnKey<T>);
             this.RemoveEntry(urnKeys.ToArray());
-            this.RemoveTypeIds<T>(idsList.SafeConvertAll(x => x.ToString()).ToArray());
+            this.RemoveTypeIds<T>(idsList.Map(x => x.ToString()).ToArray());
         }
 
         public void DeleteAll<T>()
