@@ -5,7 +5,6 @@ using System.Linq;
 using Northwind.Common.DataModel;
 using NUnit.Framework;
 using ServiceStack.Text;
-using ServiceStack.Utils;
 
 namespace ServiceStack.Redis.Tests.Generic
 {

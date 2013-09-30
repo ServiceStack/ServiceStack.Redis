@@ -29,6 +29,57 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:ServiceStack.HttpResultExtensions.GetDto(System.Object)">
+            <summary>
+            Shortcut to get the ResponseDTO whether it's bare or inside a IHttpResult
+            </summary>
+            <param name="response"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.HttpResultExtensions.GetResponseDto(System.Object)">
+            <summary>
+            Alias of AsDto
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpResultExtensions.GetDto``1(System.Object)">
+            <summary>
+            Shortcut to get the ResponseDTO whether it's bare or inside a IHttpResult
+            </summary>
+            <param name="response"></param>
+            <returns>TResponse if found; otherwise null</returns>
+        </member>
+        <member name="M:ServiceStack.HttpResultExtensions.GetResponseDto``1(System.Object)">
+            <summary>
+            Alias of AsDto
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpResultExtensions.GetResponseStatus(System.Object)">
+            <summary>
+            Shortcut to get the ResponseStatus whether it's bare or inside a IHttpResult
+            </summary>
+            <param name="response"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.HttpResultExtensions.IsErrorResponse(System.Object)">
+            <summary>
+            Whether the response is an IHttpError or Exception
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpResultExtensions.ExtractHttpRanges(System.String,System.Int64,System.Int64@,System.Int64@)">
+            <summary>
+            rangeHeader should be of the format "bytes=0-" or "bytes=0-12345" or "bytes=123-456"
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpResultExtensions.AddHttpRangeResponseHeaders(ServiceStack.Web.IHttpResponse,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Adds 206 PartialContent Status, Content-Range and Content-Length headers
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpResultExtensions.WritePartialTo(System.IO.Stream,System.IO.Stream,System.Int64,System.Int64)">
+            <summary>
+            Writes partial range as specified by start-end, from fromStream to toStream.
+            </summary>
+        </member>
         <member name="F:ServiceStack.RedisErrorLoggerFeature.UrnServiceErrorType">
             <summary>
             Service error logs are kept in 'urn:ServiceErrors:{ServiceName}'
@@ -4688,22 +4739,22 @@
             Otherwise uses Resolve approach, which will throw an exception if resolution fails
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.Cookies.AddPermanentCookie(System.String,System.String,System.Nullable{System.Boolean})">
+        <member name="M:ServiceStack.Host.Cookies.AddPermanentCookie(System.String,System.String,System.Nullable{System.Boolean})">
             <summary>
             Sets a persistent cookie which never expires
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.Cookies.AddSessionCookie(System.String,System.String,System.Nullable{System.Boolean})">
+        <member name="M:ServiceStack.Host.Cookies.AddSessionCookie(System.String,System.String,System.Nullable{System.Boolean})">
             <summary>
             Sets a session cookie which expires after the browser session closes
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.Cookies.DeleteCookie(System.String)">
+        <member name="M:ServiceStack.Host.Cookies.DeleteCookie(System.String)">
             <summary>
             Deletes a specified cookie by setting its value to empty and expiration to -1 days
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceHost.Cookies.AddCookie(System.Net.Cookie)">
+        <member name="M:ServiceStack.Host.Cookies.AddCookie(System.Net.Cookie)">
             <summary>
             Sets a persistent cookie which expires after the given time
             </summary>
@@ -4879,12 +4930,12 @@
             The AppHost.Container. Note: it is not thread safe to register dependencies after AppStart.
             </summary>
         </member>
-        <member name="F:ServiceStack.Utils.DtoUtils.ResponseStatusPropertyName">
+        <member name="F:ServiceStack.DtoUtils.ResponseStatusPropertyName">
             <summary>
             Naming convention for the ResponseStatus property name on the response DTO
             </summary>
         </member>
-        <member name="M:ServiceStack.Utils.DtoUtils.CreateResponseDto(System.Object,ServiceStack.ResponseStatus)">
+        <member name="M:ServiceStack.DtoUtils.CreateResponseDto(System.Object,ServiceStack.ResponseStatus)">
             <summary>
             Create an instance of the service response dto type and inject it with the supplied responseStatus
             </summary>
@@ -4892,7 +4943,7 @@
             <param name="responseStatus"></param>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.Utils.DtoUtils.CreateErrorResponse(System.Object,System.Exception)">
+        <member name="M:ServiceStack.DtoUtils.CreateErrorResponse(System.Object,System.Exception)">
             <summary>
             
             </summary>
@@ -4901,7 +4952,7 @@
             <param name="ex"></param>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.Utils.DtoUtils.GetRequestErrorBody(System.Object)">
+        <member name="M:ServiceStack.DtoUtils.GetRequestErrorBody(System.Object)">
             <summary>
             Override to provide additional/less context about the Service Exception. 
             By default the request is serialized and appended to the ResponseStatus StackTrace.
@@ -5243,6 +5294,26 @@
             <param name="cacheClient"></param>
             <param name="cacheKeys"></param>
         </member>
+        <member name="M:ServiceStack.RequestContextExtensions.SetItem(ServiceStack.Web.IRequestContext,System.String,System.Object)">
+            <summary>
+            Store an entry in the IHttpRequest.Items Dictionary
+            </summary>
+        </member>
+        <member name="M:ServiceStack.RequestContextExtensions.SetItem(ServiceStack.Web.IHttpRequest,System.String,System.Object)">
+            <summary>
+            Store an entry in the IHttpRequest.Items Dictionary
+            </summary>
+        </member>
+        <member name="M:ServiceStack.RequestContextExtensions.GetItem(ServiceStack.Web.IRequestContext,System.String)">
+            <summary>
+            Get an entry from the IHttpRequest.Items Dictionary
+            </summary>
+        </member>
+        <member name="M:ServiceStack.RequestContextExtensions.GetItem(ServiceStack.Web.IHttpRequest,System.String)">
+            <summary>
+            Get an entry from the IHttpRequest.Items Dictionary
+            </summary>
+        </member>
         <member name="M:ServiceStack.Host.RestPath.IsMatch(System.String,System.String[])">
             <summary>
             For performance withPathInfoParts should already be a lower case string
@@ -5277,11 +5348,6 @@
         <member name="P:ServiceStack.Host.RestPath.FirstMatchHashKey">
             <summary>
             Provide for quick lookups based on hashes that can be determined from a request url
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Host.ServiceExecOperations">
-            <summary>
-            Static type constants for referring to service exec methods
             </summary>
         </member>
         <member name="M:ServiceStack.Host.ServiceManager.#ctor(Funq.Container,ServiceStack.Host.ServiceController)">

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using NUnit.Framework;
-using ServiceStack.Common;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests

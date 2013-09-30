@@ -1673,7 +1673,12 @@ namespace ServiceStack.Redis
             return ReadMultiData();
         }
 
-    	public byte[][] Subscribe(params string[] toChannels)
+        public IRedisSubscription CreateSubscription()
+        {
+            return new RedisSubscription(this);
+        }
+
+        public byte[][] Subscribe(params string[] toChannels)
         {
             if (toChannels.Length == 0)
                 throw new ArgumentNullException("toChannels");

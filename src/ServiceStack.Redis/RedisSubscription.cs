@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using ServiceStack.Common;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis

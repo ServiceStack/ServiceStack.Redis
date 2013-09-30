@@ -1616,7 +1616,7 @@
             Whether this HttpResult allows Partial Response
             </summary>
         </member>
-        <member name="M:ServiceStack.Clients.IReplyClient.Send``1(System.Object)">
+        <member name="M:ServiceStack.IReplyClient.Send``1(System.Object)">
             <summary>
             Sends the specified request.
             </summary>

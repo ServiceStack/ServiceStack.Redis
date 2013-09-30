@@ -2,7 +2,6 @@ using System.Linq;
 using NUnit.Framework;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Redis.Generic;
-using ServiceStack.Utils;
 
 namespace ServiceStack.Redis.Tests.Generic
 {

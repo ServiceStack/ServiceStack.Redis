@@ -18,7 +18,6 @@ using System.Text;
 using ServiceStack.Redis.Generic;
 using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
-using ServiceStack.Utils;
 
 namespace ServiceStack.Redis
 {
