@@ -101,9 +101,15 @@ namespace ServiceStack.Redis
             return results;
         }
 
+        private static readonly NumberFormatInfo DoubleFormatProvider = new NumberFormatInfo
+        {
+            PositiveInfinitySymbol = "+inf",
+            NegativeInfinitySymbol = "-inf"
+        };
+
         public static byte[] ToFastUtf8Bytes(this double value)
         {
-            return FastToUtf8Bytes(value.ToString("R", CultureInfo.InvariantCulture));
+            return FastToUtf8Bytes(value.ToString("R", DoubleFormatProvider));
         }
 
         private static byte[] FastToUtf8Bytes(string strVal)
