@@ -819,6 +819,7 @@ namespace ServiceStack.Redis
             var cmdWithArgs = MergeCommandWithArgs(Commands.SAdd, setId.ToUtf8Bytes(), values);
             return SendExpectLong(cmdWithArgs);
         }
+
         public long SRem(string setId, byte[] value)
         {
             AssertSetIdAndValue(setId, value);
