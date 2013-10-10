@@ -251,7 +251,7 @@
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.Auth.AuthProvider.SaveUserAuth(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession,ServiceStack.Auth.IUserAuthRepository,ServiceStack.Auth.IAuthTokens)">
+        <member name="M:ServiceStack.Auth.AuthProvider.SaveUserAuth(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession,ServiceStack.Auth.IAuthRepository,ServiceStack.Auth.IAuthTokens)">
             <summary>
             Saves the Auth Tokens for this request. Called in OnAuthenticated(). 
             Overrideable, the default behaviour is to call IUserAuthRepository.CreateOrMergeAuthSession().
@@ -461,14 +461,14 @@
             Thread-safe In memory UserAuth data store so it can be used without a dependency on Redis.
             </summary>
         </member>
-        <member name="M:ServiceStack.Auth.RegisterService.Post(ServiceStack.Register)">
+        <member name="M:ServiceStack.Auth.RegisterService`1.Post(ServiceStack.Register)">
             <summary>
-            Create new Registration
+                Create new Registration
             </summary>
         </member>
-        <member name="M:ServiceStack.Auth.RegisterService.UpdateUserAuth(ServiceStack.Register)">
+        <member name="M:ServiceStack.Auth.RegisterService`1.UpdateUserAuth(ServiceStack.Register)">
             <summary>
-            Logic to update UserAuth from Registration info, not enabled on OnPut because of security.
+                Logic to update UserAuth from Registration info, not enabled on OnPut because of security.
             </summary>
         </member>
         <member name="T:ServiceStack.Auth.SaltedHash">
