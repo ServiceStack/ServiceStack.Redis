@@ -32,6 +32,8 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\src\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -124,12 +126,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\tests\Moq.dll</HintPath>
     </Reference>
-    <Reference Include="Northwind.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\tests\Northwind.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\..\lib\tests\nunit.framework.dll</HintPath>
+      <HintPath>..\..\src\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack">
       <HintPath>..\..\lib\tests\ServiceStack.dll</HintPath>
@@ -137,14 +136,8 @@
     <Reference Include="ServiceStack.Common">
       <HintPath>..\..\lib\ServiceStack.Common.dll</HintPath>
     </Reference>
-    <Reference Include="ServiceStack.Common.Tests">
-      <HintPath>..\..\lib\tests\ServiceStack.Common.Tests.dll</HintPath>
-    </Reference>
     <Reference Include="ServiceStack.Interfaces">
       <HintPath>..\..\lib\ServiceStack.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Messaging.Tests">
-      <HintPath>..\..\lib\tests\ServiceStack.Messaging.Tests.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.Text">
       <HintPath>..\..\lib\ServiceStack.Text.dll</HintPath>
@@ -153,6 +146,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -209,12 +203,8 @@
     <Compile Include="Generic\RedisPersistenceProviderTestsBaseImpl.cs" />
     <Compile Include="Integration\IntegrationTestBase.cs" />
     <Compile Include="Integration\MultiThreadedRedisClientIntegrationTests.cs" />
-    <Compile Include="Integration\MultiThreadedCacheClientManagerIntegrationTests.cs" />
     <Compile Include="Integration\MultiThreadedPoolIntegrationTests.cs" />
     <Compile Include="Integration\RedisRegressionTestRun.cs" />
-    <Compile Include="NorthwindPerfTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="PooledRedisClientManagerTests.cs" />
     <Compile Include="RedisCacheClientTests.cs" />
     <Compile Include="RedisClientListTests.cs" />
@@ -227,6 +217,32 @@
     <Compile Include="RedisTransactionTests.cs" />
     <Compile Include="RedisUtilTests.cs" />
     <Compile Include="SerializationTests.cs" />
+    <Compile Include="Shared\BuiltInsFactory.cs" />
+    <Compile Include="Shared\IModelFactory.cs" />
+    <Compile Include="Shared\ModelFactoryBase.cs" />
+    <Compile Include="Shared\ModelWithComplexTypes.cs" />
+    <Compile Include="Shared\ModelWithComplexTypesFactory.cs" />
+    <Compile Include="Shared\ModelWithCompositeIndexFields.cs" />
+    <Compile Include="Shared\ModelWithFieldsOfDifferentAndNullableTypes.cs" />
+    <Compile Include="Shared\ModelWithFieldsOfDifferentAndNullableTypesFactory.cs" />
+    <Compile Include="Shared\ModelWithFieldsOfDifferentTypes.cs" />
+    <Compile Include="Shared\ModelWithFieldsOfDifferentTypesFactory.cs" />
+    <Compile Include="Shared\ModelWithFieldsOfNullableTypes.cs" />
+    <Compile Include="Shared\ModelWithFieldsOfNullableTypesFactory.cs" />
+    <Compile Include="Shared\ModelWithIdAndName.cs" />
+    <Compile Include="Shared\ModelWithIdOnly.cs" />
+    <Compile Include="Shared\ModelWithIndexFields.cs" />
+    <Compile Include="Shared\ModelWithLongIdAndStringFields.cs" />
+    <Compile Include="Shared\ModelWithMapAndList.cs" />
+    <Compile Include="Shared\ModelWithNamedCompositeIndex.cs" />
+    <Compile Include="Shared\ModelWithOnlyStringFields.cs" />
+    <Compile Include="Shared\Movie.cs" />
+    <Compile Include="Shared\PerfTestBase.cs" />
+    <Compile Include="Shared\Poco.cs" />
+    <Compile Include="Shared\SampleOrderLine.cs" />
+    <Compile Include="Shared\Shipper.cs" />
+    <Compile Include="Shared\ShipperFactory.cs" />
+    <Compile Include="Shared\TaskQueue.cs" />
     <Compile Include="Support\CustomType.cs" />
     <Compile Include="Support\CustomTypeFactory.cs" />
     <Compile Include="Support\TcpClientWithTimeout.cs" />
@@ -240,6 +256,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Examples\BlogPostExample.cd" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -265,6 +282,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
