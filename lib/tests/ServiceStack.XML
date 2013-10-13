@@ -5858,7 +5858,7 @@
             </summary>
             <param name="context"></param>
         </member>
-        <member name="M:ServiceStack.Host.Handlers.StaticFileHandler.SetDefaultFile(System.String)">
+        <member name="M:ServiceStack.Host.Handlers.StaticFileHandler.SetDefaultFile(System.String,System.Byte[],System.DateTime)">
             <summary>
             Keep default file contents in-memory
             </summary>
