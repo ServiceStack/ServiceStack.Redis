@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Northwind.Common.DataModel;
 using NUnit.Framework;
-using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Generic
 {
@@ -14,7 +10,6 @@ namespace ServiceStack.Redis.Tests.Generic
 		[TestFixtureSetUp]
 		public void TestFixture()
 		{
-			NorthwindData.LoadData(false);
 		}
 
         public override void OnBeforeEachTest()
@@ -22,16 +17,7 @@ namespace ServiceStack.Redis.Tests.Generic
             base.OnBeforeEachTest();
             Redis.NamespacePrefix = "GenericRedisClientTests";
         }
-
-		[Test]
-		public void Can_GetTypeIdsSet()
-		{
-		    var typedClient = Redis.As<OrderDetail>();
-			typedClient.StoreAll(NorthwindData.OrderDetails);
-
-			Assert.That(typedClient.TypeIdsSet.Count, Is.EqualTo(NorthwindData.OrderDetails.Count));
-		}
-
+        
 		[Test]
 		public void Can_Set_and_Get_string()
 		{
@@ -79,34 +65,6 @@ namespace ServiceStack.Redis.Tests.Generic
 
 			Assert.That(actualMap, Is.EquivalentTo(expectedMap));
 		}
-
-		[Test]
-		public void Can_StoreAll_RedisClient()
-		{
-			var sp = Stopwatch.StartNew();
-			Redis.StoreAll(NorthwindData.OrderDetails);
-
-            var orderDetails = Redis.GetAll<OrderDetail>();
-			AssertUnorderedListsAreEqual(orderDetails, NorthwindData.OrderDetails);
-
-			"\nWrote {0:#,#} in {1:#,#}ms: {2:#,#.##}: items/ms".Print(
-				NorthwindData.OrderDetails.Count, sp.ElapsedMilliseconds,
-				NorthwindData.OrderDetails.Count / (double)sp.ElapsedMilliseconds);
-		}
-
-		[Test]
-		public void Can_StoreAll_RedisTypedClient()
-		{
-			var sp = Stopwatch.StartNew();
-		    var redisOrderDetails = Redis.As<OrderDetail>();
-            redisOrderDetails.StoreAll(NorthwindData.OrderDetails);
-
-            var orderDetails = redisOrderDetails.GetAll();
-            AssertUnorderedListsAreEqual(orderDetails, NorthwindData.OrderDetails);
-            "\nWrote {0:#,#} in {1:#,#}ms: {2:#,#.##}: items/ms".Print(
-				NorthwindData.OrderDetails.Count, sp.ElapsedMilliseconds,
-				NorthwindData.OrderDetails.Count / (double)sp.ElapsedMilliseconds);
-		}
         
         [Test]
         public void Can_SetBit_And_GetBit_And_BitCount()
@@ -117,122 +75,7 @@ namespace ServiceStack.Redis.Tests.Generic
             Assert.AreEqual(1, Redis.GetBit(key,offset));
             Assert.AreEqual(1, Redis.BitCount(key));
         }
-
-		[Test, Explicit]
-		public void Can_StoreAll_and_GetAll_from_Northwind()
-		{
-			var totalRecords
-				= NorthwindData.Categories.Count
-				  + NorthwindData.Customers.Count
-				  + NorthwindData.Employees.Count
-				  + NorthwindData.Shippers.Count
-				  + NorthwindData.Orders.Count
-				  + NorthwindData.OrderDetails.Count
-				  + NorthwindData.CustomerCustomerDemos.Count
-				  + NorthwindData.Regions.Count
-				  + NorthwindData.Territories.Count
-				  + NorthwindData.EmployeeTerritories.Count;
-
-			var before = DateTime.Now;
-
-            Redis.StoreAll(NorthwindData.Categories);
-            Redis.StoreAll(NorthwindData.Customers);
-            Redis.StoreAll(NorthwindData.Employees);
-            Redis.StoreAll(NorthwindData.Shippers);
-            Redis.StoreAll(NorthwindData.Orders);
-            Redis.StoreAll(NorthwindData.Products);
-            Redis.StoreAll(NorthwindData.OrderDetails);
-            Redis.StoreAll(NorthwindData.CustomerCustomerDemos);
-            Redis.StoreAll(NorthwindData.Regions);
-            Redis.StoreAll(NorthwindData.Territories);
-            Redis.StoreAll(NorthwindData.EmployeeTerritories);
-
-			Debug.WriteLine(String.Format("Took {0}ms to store the entire Northwind database ({1} records)",
-				(DateTime.Now - before).TotalMilliseconds, totalRecords));
-
-
-			before = DateTime.Now;
-
-            var categories = Redis.GetAll<Category>();
-            var customers = Redis.GetAll<Customer>();
-            var employees = Redis.GetAll<Employee>();
-            var shippers = Redis.GetAll<Shipper>();
-            var orders = Redis.GetAll<Order>();
-            var products = Redis.GetAll<Product>();
-            var orderDetails = Redis.GetAll<OrderDetail>();
-            var customerCustomerDemos = Redis.GetAll<CustomerCustomerDemo>();
-            var regions = Redis.GetAll<Region>();
-            var territories = Redis.GetAll<Territory>();
-            var employeeTerritories = Redis.GetAll<EmployeeTerritory>();
-
-			Debug.WriteLine(String.Format("Took {0}ms to get the entire Northwind database ({1} records)",
-				(DateTime.Now - before).TotalMilliseconds, totalRecords));
-
-
-			AssertUnorderedListsAreEqual(categories, NorthwindData.Categories);
-			AssertUnorderedListsAreEqual(customers, NorthwindData.Customers);
-			AssertUnorderedListsAreEqual(employees, NorthwindData.Employees);
-			AssertUnorderedListsAreEqual(shippers, NorthwindData.Shippers);
-			AssertUnorderedListsAreEqual(orders, NorthwindData.Orders);
-			AssertUnorderedListsAreEqual(products, NorthwindData.Products);
-			AssertUnorderedListsAreEqual(orderDetails, NorthwindData.OrderDetails);
-			AssertUnorderedListsAreEqual(customerCustomerDemos, NorthwindData.CustomerCustomerDemos);
-			AssertUnorderedListsAreEqual(regions, NorthwindData.Regions);
-			AssertUnorderedListsAreEqual(territories, NorthwindData.Territories);
-			AssertUnorderedListsAreEqual(employeeTerritories, NorthwindData.EmployeeTerritories);
-		}
-
-        [Test]
-        public void Can_Store_And_Get_Entities_As_Hashes()
-        {
-            var entity = NorthwindData.Customers[0];
-            Redis.StoreAsHash(entity);
-            var fromDb = Redis.GetFromHash<Northwind.Common.DataModel.Customer>(entity.Id);
-
-            Assert.AreEqual(entity.Address, fromDb.Address);
-            Assert.AreEqual(entity.CompanyName,fromDb.CompanyName);
-            Assert.AreEqual(entity.Region,fromDb.Region);
-        }
-
-        private class ComplexShipper : Shipper
-        {
-            public ComplexShipper()
-            {
-                SomeIds = new List<long>();
-                Addresses = new Dictionary<string, string>();
-            }
-            public IList<long> SomeIds { get; set; }
-            public IDictionary<string, string> Addresses { get; set; }
-        }
-
-        [Test, Ignore("Dictionary serialized differently")]
-        public void Can_Store_Complex_Entity_As_Hash()
-        {
-            var entity = new ComplexShipper()
-            {
-                CompanyName = "Test Company",
-                Phone = "0123456789",
-                SomeIds = new List<long>() { 123, 456, 789 },
-                Addresses =
-                    new Dictionary<string, string>()
-                        {
-                            { "Home", "1 Some Street, some town" },
-                            { "Work", "2 Office Street, City" }
-                        }
-            };
-
-            entity.Id = (int)(Redis.As<ComplexShipper>().GetNextSequence());
-            Redis.As<ComplexShipper>().StoreAsHash(entity);
-
-            var fromDb = Redis.As<ComplexShipper>().GetFromHash(entity.Id);
-            Assert.AreEqual(entity.CompanyName, fromDb.CompanyName);
-            Assert.AreEqual(entity.Phone,fromDb.Phone);
-            Assert.AreEqual(entity.SomeIds, fromDb.SomeIds);
-            Assert.AreEqual(entity.Addresses, fromDb.Addresses);
-            var addressesSerialized = JsonSerializer.SerializeToString(entity.Addresses);
-            Assert.AreEqual(addressesSerialized, Redis.GetValueFromHash(entity.CreateUrn(), "Addresses"));
-        }
-
+        
 		public class Dummy
 		{
 			public int Id { get; set; }

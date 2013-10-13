@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using Northwind.Common.DataModel;
 using NUnit.Framework;
+using ServiceStack.Common.Tests.Models;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Integration
@@ -17,9 +17,9 @@ namespace ServiceStack.Redis.Tests.Integration
 		[TestFixtureSetUp]
 		public void onBeforeTestFixture()
 		{
-			NorthwindData.LoadData(false);
+		    var results = 100.Times(x => ModelWithFieldsOfDifferentTypes.Create(x));
 
-			testData = TypeSerializer.SerializeToString(NorthwindData.Customers);
+            testData = TypeSerializer.SerializeToString(results);
 		}
 
 		[Test]
