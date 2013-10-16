@@ -45,6 +45,7 @@ namespace ServiceStack.Redis
                 {
                     socket.Close();
                     socket = null;
+                    HadExceptions = true;
                     return;
                 }
                 Bstream = new BufferedStream(new NetworkStream(socket), 16 * 1024);
