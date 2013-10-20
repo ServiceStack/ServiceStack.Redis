@@ -243,7 +243,7 @@
             Retrieves a User Session
             </summary>
         </member>
-        <member name="M:ServiceStack.Caching.ISessionFactory.GetOrCreateSession(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse)">
+        <member name="M:ServiceStack.Caching.ISessionFactory.GetOrCreateSession(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse)">
             <summary>
             Gets the session for this request, creates one if it doesn't exist.
             </summary>
@@ -1017,7 +1017,7 @@
             which adds an request filter for the specific request DTO the attribute marked.
             </summary>
         </member>
-        <member name="M:ServiceStack.Web.IHasRequestFilter.RequestFilter(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse,System.Object)">
+        <member name="M:ServiceStack.Web.IHasRequestFilter.RequestFilter(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.Object)">
             <summary>
             The request filter is executed before the service.
             </summary>
@@ -1044,7 +1044,7 @@
             which adds an response filter for the specific response DTO the attribute marked.
             </summary>
         </member>
-        <member name="M:ServiceStack.Web.IHasResponseFilter.ResponseFilter(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse,System.Object)">
+        <member name="M:ServiceStack.Web.IHasResponseFilter.ResponseFilter(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.Object)">
             <summary>
             The response filter is executed after the service
             </summary>
@@ -1109,50 +1109,95 @@
             A thin wrapper around ASP.NET or HttpListener's HttpRequest
             </summary>
         </member>
-        <member name="M:ServiceStack.Web.IHttpRequest.GetRawBody">
+        <member name="T:ServiceStack.Web.IRequest">
+            <summary>
+            A thin wrapper around each host's Request e.g: ASP.NET, HttpListener, MQ, etc
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Web.IRequest.GetRawBody">
             <summary>
             The entire string contents of Request.InputStream
             </summary>
             <returns></returns>
         </member>
-        <member name="P:ServiceStack.Web.IHttpRequest.OriginalRequest">
+        <member name="P:ServiceStack.Web.IRequest.OriginalRequest">
             <summary>
             The underlying ASP.NET or HttpListener HttpRequest
             </summary>
         </member>
-        <member name="P:ServiceStack.Web.IHttpRequest.OperationName">
+        <member name="P:ServiceStack.Web.IRequest.OperationName">
             <summary>
             The name of the service being called (e.g. Request DTO Name)
             </summary>
         </member>
-        <member name="P:ServiceStack.Web.IHttpRequest.ContentType">
+        <member name="P:ServiceStack.Web.IRequest.Verb">
+            <summary>
+            The Verb / HttpMethod or Action for this request
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Web.IRequest.RequestPreferences">
+            <summary>
+            Optional preferences for the processing of this Request
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Web.IRequest.Dto">
+            <summary>
+            The Request DTO, after it has been deserialized.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Web.IRequest.ContentType">
             <summary>
             The request ContentType
             </summary>
         </member>
-        <member name="P:ServiceStack.Web.IHttpRequest.ResponseContentType">
+        <member name="P:ServiceStack.Web.IRequest.ResponseContentType">
             <summary>
             The expected Response ContentType for this request
             </summary>
         </member>
-        <member name="P:ServiceStack.Web.IHttpRequest.Items">
+        <member name="P:ServiceStack.Web.IRequest.Items">
             <summary>
             Attach any data to this request that all filters and services can access.
             </summary>
         </member>
-        <member name="P:ServiceStack.Web.IHttpRequest.UseBufferedStream">
+        <member name="P:ServiceStack.Web.IRequest.UseBufferedStream">
             <summary>
             Buffer the Request InputStream so it can be re-read
             </summary>
         </member>
-        <member name="P:ServiceStack.Web.IHttpRequest.UserHostAddress">
+        <member name="P:ServiceStack.Web.IRequest.UserHostAddress">
             <summary>
             The Remote Ip as reported by Request.UserHostAddress
             </summary>
         </member>
-        <member name="P:ServiceStack.Web.IHttpRequest.RemoteIp">
+        <member name="P:ServiceStack.Web.IRequest.RemoteIp">
             <summary>
             The Remote Ip as reported by X-Forwarded-For, X-Real-IP or Request.UserHostAddress
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Web.IRequest.IsSecureConnection">
+            <summary>
+            e.g. is https or not
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Web.IRequest.Files">
+            <summary>
+            Access to the multi-part/formdata files posted on this request
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Web.IRequest.UrlReferrer">
+            <summary>
+            The value of the Referrer, null if not available
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Web.IHttpRequest.HttpResponse">
+            <summary>
+            The HttpResponse
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Web.IHttpRequest.HttpMethod">
+            <summary>
+            The HTTP Verb
             </summary>
         </member>
         <member name="P:ServiceStack.Web.IHttpRequest.XForwardedFor">
@@ -1165,49 +1210,39 @@
             The value of the X-Real-IP header, null if null or empty
             </summary>
         </member>
-        <member name="P:ServiceStack.Web.IHttpRequest.IsSecureConnection">
-            <summary>
-            e.g. is https or not
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Web.IHttpRequest.Files">
-            <summary>
-            Access to the multi-part/formdata files posted on this request
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Web.IHttpRequest.UrlReferrer">
-            <summary>
-            The value of the Referrer, null if not available
-            </summary>
-        </member>
         <member name="T:ServiceStack.Web.IHttpResponse">
             <summary>
             A thin wrapper around ASP.NET or HttpListener's HttpResponse
             </summary>
         </member>
-        <member name="M:ServiceStack.Web.IHttpResponse.Close">
+        <member name="T:ServiceStack.Web.IResponse">
+            <summary>
+            A thin wrapper around each host's Response e.g: ASP.NET, HttpListener, MQ, etc
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Web.IResponse.Close">
             <summary>
             Signal that this response has been handled and no more processing should be done.
             When used in a request or response filter, no more filters or processing is done on this request.
             </summary>
         </member>
-        <member name="M:ServiceStack.Web.IHttpResponse.End">
+        <member name="M:ServiceStack.Web.IResponse.End">
             <summary>
             Calls Response.End() on ASP.NET HttpResponse otherwise is an alias for Close().
             Useful when you want to prevent ASP.NET to provide it's own custom error page.
             </summary>
         </member>
-        <member name="M:ServiceStack.Web.IHttpResponse.Flush">
+        <member name="M:ServiceStack.Web.IResponse.Flush">
             <summary>
             Response.Flush() and OutputStream.Flush() seem to have different behaviour in ASP.NET
             </summary>
         </member>
-        <member name="P:ServiceStack.Web.IHttpResponse.OriginalResponse">
+        <member name="P:ServiceStack.Web.IResponse.OriginalResponse">
             <summary>
             The underlying ASP.NET or HttpListener HttpResponse
             </summary>
         </member>
-        <member name="P:ServiceStack.Web.IHttpResponse.IsClosed">
+        <member name="P:ServiceStack.Web.IResponse.IsClosed">
             <summary>
             Gets a value indicating whether this instance is closed.
             </summary>
@@ -1217,11 +1252,11 @@
             Log every service request
             </summary>
         </member>
-        <member name="M:ServiceStack.Web.IRequestLogger.Log(ServiceStack.Web.IRequestContext,System.Object,System.Object,System.TimeSpan)">
+        <member name="M:ServiceStack.Web.IRequestLogger.Log(ServiceStack.Web.IRequest,System.Object,System.Object,System.TimeSpan)">
             <summary>
             Log a request
             </summary>
-            <param name="requestContext">The RequestContext</param>
+            <param name="request">The RequestContext</param>
             <param name="requestDto">Request DTO</param>
             <param name="response">Response DTO or Exception</param>
             <param name="elapsed">How long did the Request take</param>
@@ -1269,7 +1304,7 @@
             By default Auth and Registration requests are hidden.
             </summary>
         </member>
-        <member name="T:ServiceStack.Web.IRequiresRequestContext">
+        <member name="T:ServiceStack.Web.IRequiresRequest">
             <summary>
             Implement on services that need access to the RequestContext
             </summary>
@@ -1290,12 +1325,12 @@
             Executes the MQ DTO request.
             </summary>
         </member>
-        <member name="M:ServiceStack.Web.IServiceController.ExecuteMessage``1(ServiceStack.Messaging.IMessage{``0},ServiceStack.Web.IRequestContext)">
+        <member name="M:ServiceStack.Web.IServiceController.ExecuteMessage``1(ServiceStack.Messaging.IMessage{``0},ServiceStack.Web.IRequest)">
             <summary>
             Executes the MQ DTO request with the supplied requestContext
             </summary>
         </member>
-        <member name="M:ServiceStack.Web.IServiceController.Execute(System.Object,ServiceStack.Web.IRequestContext)">
+        <member name="M:ServiceStack.Web.IServiceController.Execute(System.Object,ServiceStack.Web.IRequest)">
             <summary>
             Executes the DTO request under the supplied requestContext.
             </summary>
@@ -1642,7 +1677,7 @@
             Can hold a specific error message for each named field.
             </summary>
         </member>
-        <member name="M:ServiceStack.Web.IPartialWriter.WritePartialTo(ServiceStack.Web.IHttpResponse)">
+        <member name="M:ServiceStack.Web.IPartialWriter.WritePartialTo(ServiceStack.Web.IResponse)">
             <summary>
             Write a partial content result
             </summary>

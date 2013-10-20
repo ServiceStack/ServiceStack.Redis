@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using NUnit.Framework;
 using System.Text;
-using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {

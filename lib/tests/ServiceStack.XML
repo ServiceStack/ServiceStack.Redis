@@ -15,7 +15,7 @@
             </summary>
             <param name="applyTo">Defines when the filter should be executed</param>
         </member>
-        <member name="M:ServiceStack.RequestFilterAttribute.Execute(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse,System.Object)">
+        <member name="M:ServiceStack.RequestFilterAttribute.Execute(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.Object)">
             <summary>
             This method is only executed if the HTTP method matches the <see cref="P:ServiceStack.RequestFilterAttribute.ApplyTo"/> property.
             </summary>
@@ -70,7 +70,7 @@
             rangeHeader should be of the format "bytes=0-" or "bytes=0-12345" or "bytes=123-456"
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResultExtensions.AddHttpRangeResponseHeaders(ServiceStack.Web.IHttpResponse,System.Int64,System.Int64,System.Int64)">
+        <member name="M:ServiceStack.HttpResultExtensions.AddHttpRangeResponseHeaders(ServiceStack.Web.IResponse,System.Int64,System.Int64,System.Int64)">
             <summary>
             Adds 206 PartialContent Status, Content-Range and Content-Length headers
             </summary>
@@ -2487,27 +2487,27 @@
             behaves in this manner.
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpExtensions.EndRequest(System.Web.HttpResponse,System.Boolean)">
+        <member name="M:ServiceStack.HttpExtensions.EndRequest(System.Web.HttpResponseBase,System.Boolean)">
             <summary>
             End a ServiceStack Request
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpExtensions.EndRequest(ServiceStack.Web.IHttpResponse,System.Boolean)">
+        <member name="M:ServiceStack.HttpExtensions.EndRequest(ServiceStack.Web.IResponse,System.Boolean)">
             <summary>
             End a ServiceStack Request
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpExtensions.EndHttpHandlerRequest(System.Web.HttpResponse,System.Boolean,System.Boolean,System.Boolean,System.Action{System.Web.HttpResponse})">
+        <member name="M:ServiceStack.HttpExtensions.EndHttpHandlerRequest(System.Web.HttpResponseBase,System.Boolean,System.Boolean,System.Boolean,System.Action{System.Web.HttpResponseBase})">
             <summary>
             End a HttpHandler Request
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpExtensions.EndHttpHandlerRequest(ServiceStack.Web.IHttpResponse,System.Boolean,System.Boolean,System.Action{ServiceStack.Web.IHttpResponse})">
+        <member name="M:ServiceStack.HttpExtensions.EndHttpHandlerRequest(ServiceStack.Web.IResponse,System.Boolean,System.Boolean,System.Action{ServiceStack.Web.IResponse})">
             <summary>
             End a HttpHandler Request
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpExtensions.EndRequestWithNoContent(ServiceStack.Web.IHttpResponse)">
+        <member name="M:ServiceStack.HttpExtensions.EndRequestWithNoContent(ServiceStack.Web.IResponse)">
             <summary>
             End a ServiceStack Request with no content
             </summary>
@@ -4577,17 +4577,17 @@
             Understands how to route and respond to MiniProfiler UI urls.
             </summary>
         </member>
-        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.ProcessRequest(System.Web.HttpContext)">
+        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.ProcessRequest(System.Web.HttpContextBase)">
             <summary>
             Returns either includes' css/javascript or results' html.
             </summary>
         </member>
-        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.Includes(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse,System.String)">
+        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.Includes(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.String)">
             <summary>
             Handles rendering static content files.
             </summary>
         </member>
-        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.Results(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse)">
+        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.Results(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse)">
             <summary>
             Handles rendering a previous MiniProfiler session, identified by its "?id=GUID" on the query.
             </summary>
@@ -4597,7 +4597,7 @@
             Embedded resource contents keyed by filename.
             </summary>
         </member>
-        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.NotFound(ServiceStack.Web.IHttpResponse,System.String,System.String)">
+        <member name="M:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.NotFound(ServiceStack.Web.IResponse,System.String,System.String)">
             <summary>
             Helper method that sets a proper 404 response code.
             </summary>
@@ -4671,11 +4671,11 @@
             can only execute, if the user has specific roles.
             </summary>
         </member>
-        <member name="M:ServiceStack.RequiredRoleAttribute.AssertRequiredRoles(ServiceStack.Web.IRequestContext,System.String[])">
+        <member name="M:ServiceStack.RequiredRoleAttribute.AssertRequiredRoles(ServiceStack.Web.IRequest,System.String[])">
             <summary>
             Check all session is in all supplied roles otherwise a 401 HttpError is thrown
             </summary>
-            <param name="requestContext"></param>
+            <param name="request"></param>
             <param name="requiredRoles"></param>
         </member>
         <member name="T:ServiceStack.RequiresAnyPermissionAttribute">
@@ -4690,11 +4690,11 @@
             can only execute, if the user has any of the specified roles.
             </summary>
         </member>
-        <member name="M:ServiceStack.RequiresAnyRoleAttribute.AssertRequiredRoles(ServiceStack.Web.IRequestContext,System.String[])">
+        <member name="M:ServiceStack.RequiresAnyRoleAttribute.AssertRequiredRoles(ServiceStack.Web.IRequest,System.String[])">
             <summary>
             Check all session is in any supplied roles otherwise a 401 HttpError is thrown
             </summary>
-            <param name="requestContext"></param>
+            <param name="request"></param>
             <param name="requiredRoles"></param>
         </member>
         <member name="T:ServiceStack.ResponseFilterAttribute">
@@ -4708,7 +4708,7 @@
             </summary>
             <param name="applyTo">Defines when the filter should be executed</param>
         </member>
-        <member name="M:ServiceStack.ResponseFilterAttribute.Execute(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse,System.Object)">
+        <member name="M:ServiceStack.ResponseFilterAttribute.Execute(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.Object)">
             <summary>
             This method is only executed if the HTTP method matches the <see cref="P:ServiceStack.ResponseFilterAttribute.ApplyTo"/> property.
             </summary>
@@ -4754,11 +4754,6 @@
             Deletes a specified cookie by setting its value to empty and expiration to -1 days
             </summary>
         </member>
-        <member name="M:ServiceStack.Host.Cookies.AddCookie(System.Net.Cookie)">
-            <summary>
-            Sets a persistent cookie which expires after the given time
-            </summary>
-        </member>
         <member name="T:ServiceStack.DefaultRequestAttribute">
             <summary>
             Lets you Register new Services and the optional restPaths will be registered against 
@@ -4774,22 +4769,17 @@
             <summary>
             Register dependency in AppHost IOC on Startup
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="instance"></param>
         </member>
         <member name="M:ServiceStack.IAppHost.RegisterAs``2">
             <summary>
             AutoWired Registration of an interface with a concrete type in AppHost IOC on Startup.
             </summary>
-            <typeparam name="T"></typeparam>
-            <typeparam name="TAs"></typeparam>
         </member>
         <member name="M:ServiceStack.IAppHost.Release(System.Object)">
             <summary>
             Allows the clean up for executed autowired services and filters.
             Calls directly after services and filters are executed.
             </summary>
-            <param name="instance"></param>
         </member>
         <member name="M:ServiceStack.IAppHost.OnEndRequest">
             <summary>
@@ -4800,23 +4790,25 @@
             <summary>
             Register an Adhoc web service on Startup
             </summary>
-            <param name="serviceType"></param>
-            <param name="atRestPaths"></param>
         </member>
         <member name="M:ServiceStack.IAppHost.LoadPlugin(ServiceStack.IPlugin[])">
             <summary>
             Apply plugins to this AppHost
             </summary>
-            <param name="plugins"></param>
         </member>
         <member name="M:ServiceStack.IAppHost.CreateServiceRunner``1(ServiceStack.Host.ActionContext)">
             <summary>
             Create a service runner for IService actions
             </summary>
         </member>
-        <member name="M:ServiceStack.IAppHost.ResolveAbsoluteUrl(System.String,ServiceStack.Web.IHttpRequest)">
+        <member name="M:ServiceStack.IAppHost.ResolveAbsoluteUrl(System.String,ServiceStack.Web.IRequest)">
             <summary>
             Resolve the absolute url for this request
+            </summary>
+        </member>
+        <member name="M:ServiceStack.IAppHost.ResolveLocalizedString(System.String)">
+            <summary>
+            Resolve localized text, returns itself by default.
             </summary>
         </member>
         <member name="P:ServiceStack.IAppHost.Routes">
@@ -4859,9 +4851,19 @@
             Provide an exception handler for un-caught exceptions
             </summary>
         </member>
+        <member name="P:ServiceStack.IAppHost.RawHttpHandlers">
+            <summary>
+            Skip the ServiceStack Request Pipeline and process the returned IHttpHandler instead
+            </summary>
+        </member>
         <member name="P:ServiceStack.IAppHost.CatchAllHandlers">
             <summary>
             Provide a catch-all handler that doesn't match any routes
+            </summary>
+        </member>
+        <member name="P:ServiceStack.IAppHost.CustomErrorHttpHandlers">
+            <summary>
+            Use a Custom Error Handler for handling specific error HttpStatusCodes
             </summary>
         </member>
         <member name="P:ServiceStack.IAppHost.RequestBinders">
@@ -4884,41 +4886,41 @@
             Virtual access to file resources
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceStackHost.OnPreExecuteServiceFilter(ServiceStack.IService,System.Object,ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse)">
+        <member name="M:ServiceStack.ServiceStackHost.OnPreExecuteServiceFilter(ServiceStack.IService,System.Object,ServiceStack.Web.IRequest,ServiceStack.Web.IResponse)">
             <summary>
             Executed immediately before a Service is executed. Use return to change the request DTO used, must be of the same type.
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceStackHost.OnPostExecuteServiceFilter(ServiceStack.IService,System.Object,ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse)">
+        <member name="M:ServiceStack.ServiceStackHost.OnPostExecuteServiceFilter(ServiceStack.IService,System.Object,ServiceStack.Web.IRequest,ServiceStack.Web.IResponse)">
             <summary>
             Executed immediately after a service is executed. Use return to change response used.
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceStackHost.OnServiceException(ServiceStack.Web.IHttpRequest,System.Object,System.Exception)">
+        <member name="M:ServiceStack.ServiceStackHost.OnServiceException(ServiceStack.Web.IRequest,System.Object,System.Exception)">
             <summary>
             Occurs when the Service throws an Exception.
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceStackHost.OnUncaughtException(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse,System.String,System.Exception)">
+        <member name="M:ServiceStack.ServiceStackHost.OnUncaughtException(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.String,System.Exception)">
             <summary>
             Occurs when an exception is thrown whilst processing a request.
             </summary>
         </member>
-        <member name="M:ServiceStack.ServiceStackHost.ApplyPreRequestFilters(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse)">
+        <member name="M:ServiceStack.ServiceStackHost.ApplyPreRequestFilters(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse)">
             <summary>
             Applies the raw request filters. Returns whether or not the request has been handled 
             and no more processing should be done.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.ServiceStackHost.ApplyRequestFilters(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse,System.Object)">
+        <member name="M:ServiceStack.ServiceStackHost.ApplyRequestFilters(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.Object)">
             <summary>
             Applies the request filters. Returns whether or not the request has been handled 
             and no more processing should be done.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.ServiceStackHost.ApplyResponseFilters(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse,System.Object)">
+        <member name="M:ServiceStack.ServiceStackHost.ApplyResponseFilters(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.Object)">
             <summary>
             Applies the response filters. Returns whether or not the request has been handled 
             and no more processing should be done.
@@ -4974,13 +4976,13 @@
             Configure ServiceStack to have ISession support
             </summary>
         </member>
-        <member name="M:ServiceStack.SessionExtensions.CreateSessionId(ServiceStack.Web.IHttpResponse,ServiceStack.Web.IHttpRequest)">
+        <member name="M:ServiceStack.SessionExtensions.CreateSessionId(ServiceStack.Web.IResponse,ServiceStack.Web.IRequest)">
             <summary>
             Create the active Session or Permanent Session Id cookie.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.SessionExtensions.CreateSessionIds(ServiceStack.Web.IHttpResponse,ServiceStack.Web.IHttpRequest)">
+        <member name="M:ServiceStack.SessionExtensions.CreateSessionIds(ServiceStack.Web.IResponse,ServiceStack.Web.IRequest)">
             <summary>
             Create both Permanent and Session Id cookies and return the active sessionId
             </summary>
@@ -5185,7 +5187,7 @@
               Looks up a localized string similar to Unknown scope..
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpRequestExtensions.GetItemOrCookie(ServiceStack.Web.IHttpRequest,System.String)">
+        <member name="M:ServiceStack.HttpRequestExtensions.GetItemOrCookie(ServiceStack.Web.IRequest,System.String)">
             <summary>
             Gets string value from Items[name] then Cookies[name] if exists.
             Useful when *first* setting the users response cookie in the request filter.
@@ -5193,7 +5195,7 @@
             </summary>
             <returns>string value or null if it doesn't exist</returns>
         </member>
-        <member name="M:ServiceStack.HttpRequestExtensions.GetParam(ServiceStack.Web.IHttpRequest,System.String)">
+        <member name="M:ServiceStack.HttpRequestExtensions.GetParam(ServiceStack.Web.IRequest,System.String)">
             <summary>
             Gets request paramater string value by looking in the following order:
             - QueryString[name]
@@ -5238,54 +5240,54 @@
             calculating them multiple times.
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResponseExtensions.SetPermanentCookie(ServiceStack.Web.IHttpResponse,System.String,System.String)">
+        <member name="M:ServiceStack.HttpResponseExtensions.SetPermanentCookie(ServiceStack.Web.IResponse,System.String,System.String)">
             <summary>
             Sets a persistent cookie which never expires
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResponseExtensions.SetSessionCookie(ServiceStack.Web.IHttpResponse,System.String,System.String)">
+        <member name="M:ServiceStack.HttpResponseExtensions.SetSessionCookie(ServiceStack.Web.IResponse,System.String,System.String)">
             <summary>
             Sets a session cookie which expires after the browser session closes
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResponseExtensions.SetCookie(ServiceStack.Web.IHttpResponse,System.String,System.String,System.TimeSpan)">
+        <member name="M:ServiceStack.HttpResponseExtensions.SetCookie(ServiceStack.Web.IResponse,System.String,System.String,System.TimeSpan)">
             <summary>
             Sets a persistent cookie which expires after the given time
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResponseExtensions.SetCookie(ServiceStack.Web.IHttpResponse,System.String,System.String,System.DateTime,System.String)">
+        <member name="M:ServiceStack.HttpResponseExtensions.SetCookie(ServiceStack.Web.IResponse,System.String,System.String,System.DateTime,System.String)">
             <summary>
             Sets a persistent cookie with an expiresAt date
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResponseExtensions.DeleteCookie(ServiceStack.Web.IHttpResponse,System.String)">
+        <member name="M:ServiceStack.HttpResponseExtensions.DeleteCookie(ServiceStack.Web.IResponse,System.String)">
             <summary>
             Deletes a specified cookie by setting its value to empty and expiration to -1 days
             </summary>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.ToOptimizedResult``1(ServiceStack.Web.IRequestContext,``0)">
+        <member name="M:ServiceStack.RequestExtensions.ToOptimizedResult``1(ServiceStack.Web.IRequest,``0)">
             <summary>
             Returns the optimized result for the IRequestContext. 
             Does not use or store results in any cache.
             </summary>
-            <param name="requestContext"></param>
+            <param name="request"></param>
             <param name="dto"></param>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.ToOptimizedResultUsingCache``1(ServiceStack.Web.IRequestContext,ServiceStack.Caching.ICacheClient,System.String,System.Func{``0})">
+        <member name="M:ServiceStack.RequestExtensions.ToOptimizedResultUsingCache``1(ServiceStack.Web.IRequest,ServiceStack.Caching.ICacheClient,System.String,System.Func{``0})">
             <summary>
             Overload for the <see cref="!:ContentCacheManager.Resolve"/> method returning the most
             optimized result based on the MimeType and CompressionType from the IRequestContext.
             </summary>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.ToOptimizedResultUsingCache``1(ServiceStack.Web.IRequestContext,ServiceStack.Caching.ICacheClient,System.String,System.Nullable{System.TimeSpan},System.Func{``0})">
+        <member name="M:ServiceStack.RequestExtensions.ToOptimizedResultUsingCache``1(ServiceStack.Web.IRequest,ServiceStack.Caching.ICacheClient,System.String,System.Nullable{System.TimeSpan},System.Func{``0})">
             <summary>
             Overload for the <see cref="!:ContentCacheManager.Resolve"/> method returning the most
             optimized result based on the MimeType and CompressionType from the IRequestContext.
             <param name="expireCacheIn">How long to cache for, null is no expiration</param>
             </summary>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.RemoveFromCache(ServiceStack.Web.IRequestContext,ServiceStack.Caching.ICacheClient,System.String[])">
+        <member name="M:ServiceStack.RequestExtensions.RemoveFromCache(ServiceStack.Web.IRequest,ServiceStack.Caching.ICacheClient,System.String[])">
             <summary>
             Clears all the serialized and compressed caches set 
             by the 'Resolve' method for the cacheKey provided
@@ -5294,22 +5296,12 @@
             <param name="cacheClient"></param>
             <param name="cacheKeys"></param>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.SetItem(ServiceStack.Web.IRequestContext,System.String,System.Object)">
+        <member name="M:ServiceStack.RequestExtensions.SetItem(ServiceStack.Web.IRequest,System.String,System.Object)">
             <summary>
             Store an entry in the IHttpRequest.Items Dictionary
             </summary>
         </member>
-        <member name="M:ServiceStack.RequestContextExtensions.SetItem(ServiceStack.Web.IHttpRequest,System.String,System.Object)">
-            <summary>
-            Store an entry in the IHttpRequest.Items Dictionary
-            </summary>
-        </member>
-        <member name="M:ServiceStack.RequestContextExtensions.GetItem(ServiceStack.Web.IRequestContext,System.String)">
-            <summary>
-            Get an entry from the IHttpRequest.Items Dictionary
-            </summary>
-        </member>
-        <member name="M:ServiceStack.RequestContextExtensions.GetItem(ServiceStack.Web.IHttpRequest,System.String)">
+        <member name="M:ServiceStack.RequestExtensions.GetItem(ServiceStack.Web.IRequest,System.String)">
             <summary>
             Get an entry from the IHttpRequest.Items Dictionary
             </summary>
@@ -5355,7 +5347,7 @@
             Execute MQ
             </summary>
         </member>
-        <member name="M:ServiceStack.Host.ServiceController.ExecuteMessage``1(ServiceStack.Messaging.IMessage{``0},ServiceStack.Web.IRequestContext)">
+        <member name="M:ServiceStack.Host.ServiceController.ExecuteMessage``1(ServiceStack.Messaging.IMessage{``0},ServiceStack.Web.IRequest)">
             <summary>
             Execute MQ with requestContext
             </summary>
@@ -5365,7 +5357,7 @@
             Execute using empty RequestContext
             </summary>
         </member>
-        <member name="M:ServiceStack.Host.ServiceController.Execute(System.Object,ServiceStack.Web.IRequestContext)">
+        <member name="M:ServiceStack.Host.ServiceController.Execute(System.Object,ServiceStack.Web.IRequest)">
             <summary>
             Execute HTTP
             </summary>
@@ -5406,7 +5398,7 @@
             <summary>
             Starts the Web Service
             </summary>
-            <param name="urlBase">
+            <param name="listeningAtUrlBase">
             A Uri that acts as the base that the server is listening on.
             Format should be: http://127.0.0.1:8080/ or http://127.0.0.1:8080/somevirtual/
             Note: the trailing slash is required! For more info see the
@@ -5418,7 +5410,7 @@
             Shut down the Web Service
             </summary>
         </member>
-        <member name="M:ServiceStack.Host.HttpListener.HttpListenerBase.ProcessRequest(System.Net.HttpListenerContext)">
+        <member name="M:ServiceStack.Host.HttpListener.HttpListenerBase.ProcessRequestAsync(System.Net.HttpListenerContext)">
             <summary>
             Overridable method that can be used to implement a custom hnandler
             </summary>
@@ -5436,6 +5428,15 @@
             Exécute les tâches définies par l'application associées à la libération ou à la redéfinition des ressources non managées.
             </summary>
             <filterpriority>2</filterpriority>
+        </member>
+        <member name="T:ServiceStack.Templates.HtmlTemplates">
+            <summary>
+            Load Embedded Resource Templates in ServiceStack.
+            To get ServiceStack to use your own instead just add a copy of one or more of the following to your Web Root:
+            ~/Templates/IndexOperations.html
+            ~/Templates/OperationControl.html
+            ~/Templates/HtmlFormat.html
+            </summary>
         </member>
         <member name="P:MarkdownSharp.MarkdownOptions.AutoHyperlink">
             <summary>
@@ -5783,18 +5784,18 @@
             see http://code.google.com/p/markdownsharp/ for the latest code or to contribute
             </summary>
         </member>
-        <member name="M:ServiceStack.Formats.MarkdownFormat.SerializeToStream(ServiceStack.Web.IRequestContext,System.Object,System.IO.Stream)">
+        <member name="M:ServiceStack.Formats.MarkdownFormat.SerializeToStream(ServiceStack.Web.IRequest,System.Object,System.IO.Stream)">
             <summary>
             Render Markdown for text/markdown and text/plain ContentTypes
             </summary>
         </member>
-        <member name="M:ServiceStack.Host.RestHandler.CreateRequest(ServiceStack.Web.IHttpRequest,System.String)">
+        <member name="M:ServiceStack.Host.RestHandler.CreateRequest(ServiceStack.Web.IRequest,System.String)">
             <summary>
             Used in Unit tests
             </summary>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.Host.Handlers.RedirectHttpHandler.ProcessRequest(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse,System.String)">
+        <member name="M:ServiceStack.Host.Handlers.RedirectHttpHandler.ProcessRequest(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.String)">
             <summary>
             Non ASP.NET requests
             </summary>
@@ -5802,13 +5803,13 @@
             <param name="response"></param>
             <param name="operationName"></param>
         </member>
-        <member name="M:ServiceStack.Host.Handlers.RedirectHttpHandler.ProcessRequest(System.Web.HttpContext)">
+        <member name="M:ServiceStack.Host.Handlers.RedirectHttpHandler.ProcessRequest(System.Web.HttpContextBase)">
             <summary>
             ASP.NET requests
             </summary>
             <param name="context"></param>
         </member>
-        <member name="M:ServiceStack.HttpResponseExtensionsInternal.WriteToResponse(ServiceStack.Web.IHttpResponse,System.Object,ServiceStack.Web.ResponseSerializerDelegate,ServiceStack.Web.IRequestContext,System.Byte[],System.Byte[])">
+        <member name="M:ServiceStack.HttpResponseExtensionsInternal.WriteToResponse(ServiceStack.Web.IResponse,System.Object,ServiceStack.Web.ResponseSerializerDelegate,ServiceStack.Web.IRequest,System.Byte[],System.Byte[])">
             <summary>
             Writes to response.
             Response headers are customizable by implementing IHasOptions an returning Dictionary of Http headers.
@@ -5816,16 +5817,9 @@
             <param name="response">The response.</param>
             <param name="result">Whether or not it was implicity handled by ServiceStack's built-in handlers.</param>
             <param name="defaultAction">The default action.</param>
-            <param name="serializerCtx">The serialization context.</param>
+            <param name="request">The serialization context.</param>
             <param name="bodyPrefix">Add prefix to response body if any</param>
             <param name="bodySuffix">Add suffix to response body if any</param>
-            <returns></returns>
-        </member>
-        <member name="M:ServiceStack.HttpHandlerFactory.ReturnRequestInfo(System.Web.HttpRequest)">
-            <summary>
-            If enabled, just returns the Request Info as it understands
-            </summary>
-            <param name="context"></param>
             <returns></returns>
         </member>
         <member name="T:ServiceStack.Support.WebHost.GzipOptimizationTest">
@@ -5844,19 +5838,15 @@
             Changes the links for the servicestack/metadata page
             </summary>
         </member>
-        <member name="M:ServiceStack.Host.Handlers.IndexPageHttpHandler.ProcessRequest(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse,System.String)">
+        <member name="M:ServiceStack.Host.Handlers.IndexPageHttpHandler.ProcessRequest(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.String)">
             <summary>
             Non ASP.NET requests
             </summary>
-            <param name="request"></param>
-            <param name="response"></param>
-            <param name="operationName"></param>
         </member>
-        <member name="M:ServiceStack.Host.Handlers.IndexPageHttpHandler.ProcessRequest(System.Web.HttpContext)">
+        <member name="M:ServiceStack.Host.Handlers.IndexPageHttpHandler.ProcessRequest(System.Web.HttpContextBase)">
             <summary>
             ASP.NET requests
             </summary>
-            <param name="context"></param>
         </member>
         <member name="M:ServiceStack.Host.Handlers.StaticFileHandler.SetDefaultFile(System.String,System.Byte[],System.DateTime)">
             <summary>
@@ -5879,12 +5869,7 @@
             Resolves and auto-wires a ServiceStack Service from a HttpListenerContext.
             </summary>
         </member>
-        <member name="M:ServiceStack.HostContext.ResolveService``1(System.Net.HttpListenerRequest,System.Net.HttpListenerResponse)">
-            <summary>
-            Resolves and auto-wires a ServiceStack Service from a HttpListener Request and Response.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HostContext.ResolveService``1(ServiceStack.Web.IHttpRequest,ServiceStack.Web.IHttpResponse)">
+        <member name="M:ServiceStack.HostContext.ResolveService``1(ServiceStack.Web.IHttpRequest)">
             <summary>
             Resolves and auto-wires a ServiceStack Service.
             </summary>
