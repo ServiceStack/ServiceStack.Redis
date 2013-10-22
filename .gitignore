@@ -35,4 +35,5 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 App_Data/
 NuGet/
+NuGet.Signed/
 build/
