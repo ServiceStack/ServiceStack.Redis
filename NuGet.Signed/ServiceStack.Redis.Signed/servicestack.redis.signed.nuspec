@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>ServiceStack.Redis.Signed</id>
+    <title>ServiceStack.Redis.Signed</title>
+    <version>4.0.0</version>
+    <authors>Demis Bellot</authors>
+    <owners>Demis Bellot</owners>
+    <description>
+      C# Redis Client for the worlds fastest distributed NoSQL datastore. Byte[], String and POCO Typed clients.
+      Thread-Safe Basic and Pooled client managers included.
+    </description>
+    <projectUrl>https://github.com/ServiceStack/ServiceStack.Redis</projectUrl>
+    <licenseUrl>https://github.com/ServiceStack/ServiceStack/blob/master/license.txt</licenseUrl>
+    <iconUrl>http://www.servicestack.net/logo-100x100.png</iconUrl>
+    <tags>Redis NoSQL Client Distributed Cache PubSub Messaging Transactions</tags>
+    <language>en-US</language>
+    <copyright>ServiceStack 2013 and contributors</copyright>
+    <dependencies>
+      <dependency id="ServiceStack.Common.Signed" version="4.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="lib\**\*.*" target="lib" />
+    <file src="..\..\src\ServiceStack.Redis\**\*.cs" target="src" />
+  </files>
+</package>
