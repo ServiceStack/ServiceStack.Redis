@@ -145,7 +145,7 @@ For multi-threaded applications you can choose from our different client connect
 
 ## Install ServiceStack.Redis
 
-    PM> Install-Pacakage ServiceStack.Redis
+    PM> Install-Package ServiceStack.Redis
 
 _Commercial support will be available for ServiceStack, contact team@servicestack.net for details_
 
