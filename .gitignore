@@ -34,6 +34,9 @@ obj/
 _ReSharper*/
 [Tt]est[Rr]esult*
 App_Data/
+
 NuGet/
 NuGet.Signed/
+*.pfx
+
 build/
