@@ -89,8 +89,8 @@
     <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis/ServiceStack.Redis.Signed.csproj"
              Targets="Build" Properties="Configuration=$(Configuration)" />
  
-    <MakeDir Directories="$(NuGetPackageDir)/ServiceStack.Redis/lib/net40" Condition="!Exists('$(NuGetPackageDir)/ServiceStack.Redis/lib/net40')" />
-    <Copy SourceFiles="%(RedisFiles.Identity)" DestinationFolder="$(NuGetPackageDir)/ServiceStack.Redis/lib/net40" />
+    <MakeDir Directories="$(NuGetPackageDir)/ServiceStack.Redis.Signed/lib/net40" Condition="!Exists('$(NuGetPackageDir)/ServiceStack.Redis.Signed/lib/net40')" />
+    <Copy SourceFiles="%(RedisFiles.Identity)" DestinationFolder="$(NuGetPackageDir)/ServiceStack.Redis.Signed/lib/net40" />
 
     <Exec Command="&quot;$(NuGetPath)&quot; pack &quot;$(NuGetPackageDir)/ServiceStack.Redis.Signed/servicestack.redis.signed.nuspec&quot; -OutputDirectory &quot;$(NuGetPackageDir)&quot; -Version $(PackageVersion) -Symbols"
             LogStandardErrorAsError="true" />
