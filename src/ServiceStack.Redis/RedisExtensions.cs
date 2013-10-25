@@ -15,11 +15,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Sockets;
 using ServiceStack.Model;
-using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
-    internal static class RedisExtensions
+    public static class RedisExtensions
     {
         public static List<RedisEndpoint> ToRedisEndPoints(this IEnumerable<string> hosts)
         {
@@ -61,8 +60,11 @@ namespace ServiceStack.Redis
                            : Int32.Parse(hostParts[portIndex]);
 
             return new RedisEndpoint(hostParts[hostOrIpAddressIndex], port);
-        }
+        }        
+    }
 
+    internal static class RedisExtensionsInternal
+    {
         public static bool IsConnected(this Socket socket)
         {
             try
