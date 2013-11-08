@@ -265,7 +265,6 @@
     <Compile Include="Support\CustomType.cs" />
     <Compile Include="Support\CustomTypeFactory.cs" />
     <Compile Include="Support\TcpClientWithTimeout.cs" />
-    <Compile Include="TestBase.cs" />
     <Compile Include="TestConfig.cs" />
     <Compile Include="RedisPersistenceProviderTests.cs" />
     <Compile Include="ShippersExample.cs" />
@@ -275,6 +274,7 @@
     <Compile Include="QueueTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="Examples\BlogPostExample.cd" />
     <None Include="packages.config" />
   </ItemGroup>

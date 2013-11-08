@@ -4,12 +4,27 @@
 
 using System.Data;
 using NUnit.Framework;
+using ServiceStack.Configuration;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
     [TestFixture]
     public class FreeLicenseUsageTests : LicenseUsageTests
     {
+        [SetUp]
+        public void SetUp()
+        {
+            LicenseUtils.RemoveLicense();
+            JsConfig.Reset();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Licensing.RegisterLicense(new AppSettings().GetString("servicestack:license"));
+        }
+
         [Test]
         public void Allows_access_of_21_types()
         {
@@ -56,7 +71,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Allows_access_of_21_types()
         {
-            Licensing.RegisterLicense("1001-e1JlZjoxMDAxLE5hbWU6VGVzdCBCdXNpbmVzcyxUeXBlOkJ1c2luZXNzLEhhc2g6UHVNTVRPclhvT2ZIbjQ5MG5LZE1mUTd5RUMzQnBucTFEbTE3TDczVEF4QUNMT1FhNXJMOWkzVjFGL2ZkVTE3Q2pDNENqTkQyUktRWmhvUVBhYTBiekJGUUZ3ZE5aZHFDYm9hL3lydGlwUHI5K1JsaTBYbzNsUC85cjVJNHE5QVhldDN6QkE4aTlvdldrdTgyTk1relY2eis2dFFqTThYN2lmc0JveHgycFdjPSxFeHBpcnk6MjAxMy0wMS0wMX0=");
+            Licensing.RegisterLicense(new AppSettings().GetString("servicestack:license"));
 
             using (var client = new RedisClient(TestConfig.SingleHost))
             {
@@ -70,7 +85,7 @@ namespace ServiceStack.Redis.Tests
         [Test, Explicit("Takes too long - but works!")]
         public void Allows_access_of_10100_operations()
         {
-            Licensing.RegisterLicense("1001-e1JlZjoxMDAxLE5hbWU6VGVzdCBCdXNpbmVzcyxUeXBlOkJ1c2luZXNzLEhhc2g6UHVNTVRPclhvT2ZIbjQ5MG5LZE1mUTd5RUMzQnBucTFEbTE3TDczVEF4QUNMT1FhNXJMOWkzVjFGL2ZkVTE3Q2pDNENqTkQyUktRWmhvUVBhYTBiekJGUUZ3ZE5aZHFDYm9hL3lydGlwUHI5K1JsaTBYbzNsUC85cjVJNHE5QVhldDN6QkE4aTlvdldrdTgyTk1relY2eis2dFFqTThYN2lmc0JveHgycFdjPSxFeHBpcnk6MjAxMy0wMS0wMX0=");
+            Licensing.RegisterLicense(new AppSettings().GetString("servicestack:license"));
 
             using (var client = new RedisClient(TestConfig.SingleHost))
             {
