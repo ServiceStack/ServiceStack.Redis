@@ -46,21 +46,21 @@ namespace ServiceStack.Redis.Tests
         }
 
         [Test, Explicit("Takes too long - but works!")]
-        public void Allows_access_of_10000_operations()
+        public void Allows_access_of_6000_operations()
         {
             using (var client = new RedisClient(TestConfig.SingleHost))
             {
-                10000.Times(() => client.Get("any key"));
+                6000.Times(() => client.Get("any key"));
             }
         }
 
         [Test, Explicit("Takes too long - but works!")]
-        public void Throws_on_access_of_10100_operations()
+        public void Throws_on_access_of_6100_operations()
         {
             using (var client = new RedisClient(TestConfig.SingleHost))
             {
                 Assert.Throws<LicenseException>(() =>
-                    10100.Times(() => client.Get("any key")));
+                    6100.Times(() => client.Get("any key")));
             }
         }
     }
@@ -83,13 +83,13 @@ namespace ServiceStack.Redis.Tests
         }
 
         [Test, Explicit("Takes too long - but works!")]
-        public void Allows_access_of_10100_operations()
+        public void Allows_access_of_6100_operations()
         {
             Licensing.RegisterLicense(new AppSettings().GetString("servicestack:license"));
 
             using (var client = new RedisClient(TestConfig.SingleHost))
             {
-                10100.Times(() => client.Get("any key"));
+                6100.Times(() => client.Get("any key"));
             }
         }
     }
