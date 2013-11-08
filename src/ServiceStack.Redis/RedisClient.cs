@@ -36,6 +36,8 @@ namespace ServiceStack.Redis
             Init();
         }
 
+        internal static HashSet<Type> __uniqueTypes = new HashSet<Type>();
+        
         public static Func<RedisClient> NewFactoryFn = () => new RedisClient();
 
         /// <summary>
@@ -67,7 +69,7 @@ namespace ServiceStack.Redis
         public RedisClient(Uri uri)
             : base(uri.Host, uri.Port)
         {
-            var password = !string.IsNullOrEmpty(uri.UserInfo) ? uri.UserInfo.Split(':')[1] : null;
+            var password = !String.IsNullOrEmpty(uri.UserInfo) ? uri.UserInfo.Split(':')[1] : null;
             Password = password;
             Init();
         }
@@ -88,17 +90,17 @@ namespace ServiceStack.Redis
 
         public string GetTypeSequenceKey<T>()
         {
-            return string.Concat(NamespacePrefix, "seq:", typeof(T).Name);
+            return String.Concat(NamespacePrefix, "seq:", typeof(T).Name);
         }
 
         public string GetTypeIdsSetKey<T>()
         {
-            return string.Concat(NamespacePrefix, "ids:", typeof(T).Name);
+            return String.Concat(NamespacePrefix, "ids:", typeof(T).Name);
         }
 
         public string GetTypeIdsSetKey(Type type)
         {
-            return string.Concat(NamespacePrefix, "ids:", type.Name);
+            return String.Concat(NamespacePrefix, "ids:", type.Name);
         }
 
         public void RewriteAppendOnlyFileAsync()
@@ -177,7 +179,7 @@ namespace ServiceStack.Redis
             var lines = clientList.Split('\n');
             foreach (var line in lines)
             {
-                if (string.IsNullOrEmpty(line)) continue;
+                if (String.IsNullOrEmpty(line)) continue;
 
                 var map = new Dictionary<string, string>();
                 var parts = line.Split(' ');
@@ -333,7 +335,14 @@ namespace ServiceStack.Redis
 
         public IRedisTypedClient<T> As<T>()
         {
-            return new RedisTypedClient<T>(this);
+            try
+            {
+                return new RedisTypedClient<T>(this);
+            }
+            catch (TypeInitializationException ex)
+            {
+                throw ex.GetInnerMostException();
+            }
         }
 
         public IDisposable AcquireLock(string key)
@@ -738,7 +747,7 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         internal string UrnKey<T>(T value)
         {
-            return string.Concat(NamespacePrefix, value.CreateUrn());
+            return String.Concat(NamespacePrefix, value.CreateUrn());
         }
 
         /// <summary>
@@ -748,7 +757,7 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         internal string UrnKey<T>(object id)
         {
-            return string.Concat(NamespacePrefix, IdUtils.CreateUrn<T>(id));
+            return String.Concat(NamespacePrefix, IdUtils.CreateUrn<T>(id));
         }
 
         /// <summary>
@@ -759,7 +768,7 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         internal string UrnKey(Type type, object id)
         {
-            return string.Concat(NamespacePrefix, IdUtils.CreateUrn(type, id));
+            return String.Concat(NamespacePrefix, IdUtils.CreateUrn(type, id));
         }
 
 

@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace ServiceStack.Redis.Tests.Generic
 {
-	public abstract class RedisClientSetTestsBase<T>
+    public abstract class RedisClientSetTestsBase<T> : TestBase
 	{
 		private const string SetId = "testset";
 		private const string SetId2 = "testset2";

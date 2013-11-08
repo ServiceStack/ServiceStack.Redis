@@ -28,6 +28,12 @@ namespace ServiceStack.Redis.Generic
 	public partial class RedisTypedClient<T>
 		: IRedisTypedClient<T>
 	{
+        static RedisTypedClient()
+        {
+            Redis.RedisClient.__uniqueTypes.Add(typeof(T));
+            LicenseUtils.AssertValidUsage(LicenseFeature.Redis, QuotaType.Types, Redis.RedisClient.__uniqueTypes.Count);
+        }
+
 		readonly ITypeSerializer<T> serializer = new JsonSerializer<T>();
 		private readonly RedisClient client;
 
@@ -59,7 +65,7 @@ namespace ServiceStack.Redis.Generic
 		}
 
         private readonly string RecentSortedSetKey;
-		public string TypeIdsSetKey { get; set; }
+	    public string TypeIdsSetKey { get; set; }
 		public string TypeLockKey { get; set; }
 
 		public IRedisTypedTransaction<T> CreateTransaction()

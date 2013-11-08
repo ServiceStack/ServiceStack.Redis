@@ -8,7 +8,7 @@ using System.Linq;
 namespace ServiceStack.Redis.Tests.Generic
 {
 	[TestFixture]
-	public abstract class RedisClientHashTestsBase<T>
+    public abstract class RedisClientHashTestsBase<T> : TestBase
 	{
 		private const string HashId = "testhash";
 

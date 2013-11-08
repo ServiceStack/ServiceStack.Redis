@@ -51,7 +51,7 @@ namespace ServiceStack.Redis
 
 		public static double GetLexicalScore(string value)
 		{
-			if (string.IsNullOrEmpty(value))
+			if (String.IsNullOrEmpty(value))
 				return 0;
 
 			var lexicalValue = 0;
@@ -219,7 +219,7 @@ namespace ServiceStack.Redis
 			{
 				var key = multiDataList[i].FromUtf8Bytes();
 				double value;
-                double.TryParse(multiDataList[i + 1].FromUtf8Bytes(), NumberStyles.Any, CultureInfo.InvariantCulture, out value);
+                Double.TryParse(multiDataList[i + 1].FromUtf8Bytes(), NumberStyles.Any, CultureInfo.InvariantCulture, out value);
 				map[key] = value;
 			}
 

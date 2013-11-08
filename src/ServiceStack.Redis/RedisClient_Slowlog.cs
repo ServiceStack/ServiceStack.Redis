@@ -35,9 +35,9 @@ namespace ServiceStack.Redis
 
 
                 list[i] = new SlowlogItem(
-                    int.Parse((string) log[0], CultureInfo.InvariantCulture),
-                    DateTimeExtensions.FromUnixTime(int.Parse((string) log[1], CultureInfo.InvariantCulture)),
-                    int.Parse((string) log[2], CultureInfo.InvariantCulture),
+                    Int32.Parse((string) log[0], CultureInfo.InvariantCulture),
+                    DateTimeExtensions.FromUnixTime(Int32.Parse((string) log[1], CultureInfo.InvariantCulture)),
+                    Int32.Parse((string) log[2], CultureInfo.InvariantCulture),
                     arguments
                     );
             }

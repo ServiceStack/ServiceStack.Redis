@@ -202,7 +202,6 @@ namespace ServiceStack.Redis
        
             MSet(keys, valBytes);
         }
-
 	}
 
 

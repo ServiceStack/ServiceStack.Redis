@@ -17,14 +17,43 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
     public partial class RedisNativeClient
     {
+        private static Timer UsageTimer;
+        private static int __requestsPerHour = 0;
+
+        public static void DisposeTimers()
+        {
+            if (UsageTimer == null) return;
+            try
+            {
+                UsageTimer.Dispose();
+            }
+            finally
+            {
+                UsageTimer = null;
+            }
+        }
+
         private void Connect()
         {
+            if (UsageTimer == null)
+            {
+                //Save Timer Resource for licensed usage
+                if (!LicenseUtils.HasLicensedFeature(LicenseFeature.Redis))
+                {
+                    UsageTimer = new Timer(delegate
+                    {
+                        __requestsPerHour = 0;
+                    }, null, TimeSpan.FromMilliseconds(0), TimeSpan.FromHours(1));
+                }
+            }
+
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp) {
                 SendTimeout = SendTimeout,
                 ReceiveTimeout = ReceiveTimeout
@@ -198,6 +227,10 @@ namespace ServiceStack.Redis
         protected bool SendCommand(params byte[][] cmdWithBinaryArgs)
         {
             if (!AssertConnectedSocket()) return false;
+
+            Interlocked.Increment(ref __requestsPerHour);
+            if (__requestsPerHour % 20 == 0)
+                LicenseUtils.AssertValidUsage(LicenseFeature.Redis, QuotaType.RequestsPerHour, __requestsPerHour);
 
             try
             {
