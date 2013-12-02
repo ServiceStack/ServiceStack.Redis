@@ -4,8 +4,8 @@
     <id>ServiceStack.Redis</id>
     <title>C# Redis client for the Redis NoSQL DB</title>
     <version>4.0.0</version>
-    <authors>Demis Bellot</authors>
-    <owners>Demis Bellot</owners>
+    <authors>Service Stack</authors>
+    <owners>Service Stack</owners>
     <description>
       C# Redis Client for the worlds fastest distributed NoSQL datastore. Byte[], String and POCO Typed clients.
       Thread-Safe Basic and Pooled client managers included.
