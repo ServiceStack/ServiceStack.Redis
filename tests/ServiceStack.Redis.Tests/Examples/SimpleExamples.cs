@@ -81,7 +81,7 @@ namespace ServiceStack.Redis.Tests.Examples
             //retrieve all blogs
             var blogs = redisBlogs.GetAll();
 
-            //Recursively print the values of the POCO (For T.Dump() Extension method see: http://www.servicestack.net/mythz_blog/?p=202)
+            //Recursively print the values of the POCO (For T.Dump() Extension method see: http://mono.servicestack.net/mythz_blog/?p=202)
             blogs.PrintDump();
             
             /*Output
