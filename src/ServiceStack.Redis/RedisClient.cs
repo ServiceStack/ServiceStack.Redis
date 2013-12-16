@@ -165,12 +165,6 @@ namespace ServiceStack.Redis
                 base.Set(key, bytesValue, (int)expireIn.TotalSeconds, 0, exists: false);
         }
 
-        public void ChangeDb(long db)
-        {
-            Db = db;
-            SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
-        }
-
         public List<Dictionary<string, string>> GetClientList()
         {
             var clientList = base.ClientList().FromUtf8Bytes();
