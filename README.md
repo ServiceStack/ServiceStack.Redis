@@ -135,7 +135,7 @@ Each client provides a different layer of abstraction:
   * The RedisTypedClient provides a generic interface allowing you to add POCO values. The POCO types are serialized using [.NETs fastest JSON Serializer](http://www.servicestack.net/mythz_blog/?p=344) which is then converted to UTF8 bytes and sent to Redis.
 
 ### Redis Client API Overview
-[![Redis Client API](http://servicestack.net/img/Redis-annotated-preview.png)](http://servicestack.net/img/Redis-annotated.png)
+[![Redis Client API](http://mono.servicestack.net/img/Redis-annotated-preview.png)](http://mono.servicestack.net/img/Redis-annotated.png)
 
 ### Thread-safe client managers
 For multi-threaded applications you can choose from our different client connection managers:
