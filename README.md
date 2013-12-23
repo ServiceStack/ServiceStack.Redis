@@ -147,11 +147,14 @@ For multi-threaded applications you can choose from our different client connect
 
     PM> Install-Package ServiceStack.Redis
 
-_Commercial support will be available for ServiceStack, contact team@servicestack.net for details_
+_Commercial support is now available for ServiceStack, see https://servicestack.net/pricing for details_
+
+### [Docs and Downloads for v3](https://github.com/ServiceStackV3/ServiceStackV3)
 
 ## Copying
 
-Since September 2013, ServiceStack source code is available under GNU Affero General Public License/FOSS License Exception, see license.txt in the source. Alternative commercial licensing is also available, contact team@servicestack.net for details.
+Since September 2013, ServiceStack source code is available under GNU Affero General Public License/FOSS License Exception, see license.txt in the source. 
+Alternative commercial licensing is also available, see https://servicestack.net/pricing for details.
 
 ## Contributing
 
