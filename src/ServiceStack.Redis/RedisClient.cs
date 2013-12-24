@@ -37,7 +37,7 @@ namespace ServiceStack.Redis
         }
 
         internal static HashSet<Type> __uniqueTypes = new HashSet<Type>();
-        
+
         public static Func<RedisClient> NewFactoryFn = () => new RedisClient();
 
         /// <summary>
@@ -128,8 +128,8 @@ namespace ServiceStack.Redis
                 ? value.ToUtf8Bytes()
                 : null;
 
-            SetEx(key, (int)expireIn.TotalSeconds, bytesValue); 
-            
+            SetEx(key, (int)expireIn.TotalSeconds, bytesValue);
+
             //New in 2.6.x - TODO change when 2.6 is most popular
             //if (expireIn.Milliseconds > 0)
             //    base.Set(key, bytesValue, 0, (long)expireIn.TotalMilliseconds);
@@ -872,6 +872,18 @@ namespace ServiceStack.Redis
         }
 
         #endregion
+
+        public void RemoveByPattern(string pattern)
+        {
+            List<string> keys = Keys(pattern).ToStringList();
+            if (keys.Count > 0)
+                Del(keys.ToArray());
+        }
+
+        public void RemoveByRegex(string pattern)
+        {
+            RemoveByPattern(pattern.Replace(".*", "*").Replace(".+", "?"));
+        }
     }
 
 }

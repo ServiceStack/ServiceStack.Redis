@@ -20,7 +20,7 @@ using ServiceStack.Text;
 namespace ServiceStack.Redis
 {
 	public partial class RedisClient
-		: ICacheClient
+        : ICacheClient, IRemoveByPattern
 	{
 		public void RemoveAll(IEnumerable<string> keys)
 		{
