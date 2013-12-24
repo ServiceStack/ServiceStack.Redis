@@ -72,5 +72,36 @@ namespace ServiceStack.Redis.Tests
 
 			Assert.That(resultValue, Is.EquivalentTo(value));
 		}
+
+        [Test]
+        public void Can_Replace_By_Pattern()
+        {
+            var model = ModelWithIdAndName.Create(1);
+            string modelKey = "model:" + model.CreateUrn();
+            cacheClient.Add(modelKey, model);
+
+            model = ModelWithIdAndName.Create(2);
+            string modelKey2 = "xxmodelxx:" + model.CreateUrn();
+            cacheClient.Add(modelKey2, model);
+
+            string s = "this is a string";
+            cacheClient.Add("string1", s);
+
+            cacheClient.RemoveByPattern("*model*");
+
+            ModelWithIdAndName result = cacheClient.Get<ModelWithIdAndName>(modelKey);
+            Assert.That(result, Is.Null);
+
+            result = cacheClient.Get<ModelWithIdAndName>(modelKey2);
+            Assert.That(result, Is.Null);
+
+            string result2 = cacheClient.Get<string>("string1");
+            Assert.That(result2, Is.EqualTo(s));
+
+            cacheClient.RemoveByPattern("string*");
+
+            result2 = cacheClient.Get<string>("string1");
+            Assert.That(result2, Is.Null);
+        }
 	}
 }

@@ -4,7 +4,7 @@ using ServiceStack.Caching;
 
 namespace ServiceStack.Redis
 {
-    public class RedisClientManagerCacheClient : ICacheClient
+    public class RedisClientManagerCacheClient : ICacheClient, IRemoveByPattern
     {
         private readonly IRedisClientsManager redisManager;
 
@@ -18,7 +18,7 @@ namespace ServiceStack.Redis
         /// <summary>
         /// Ignore dispose on RedisClientsManager, which should be registered as a singleton
         /// </summary>
-        public void Dispose() {}
+        public void Dispose() { }
 
         public T Get<T>(string key)
         {
@@ -38,10 +38,10 @@ namespace ServiceStack.Redis
 
         private void AssertNotReadOnly()
         {
-            if (this.ReadOnly) 
+            if (this.ReadOnly)
                 throw new InvalidOperationException("Cannot perform write operations on a Read-only client");
         }
-        
+
         public ICacheClient GetClient()
         {
             AssertNotReadOnly();
@@ -166,6 +166,25 @@ namespace ServiceStack.Redis
             {
                 client.SetAll(values);
             }
+        }
+
+        public void RemoveByPattern(string pattern)
+        {
+            using (var client = GetClient())
+            {
+                var redisClient = client as RedisClient;
+                if (redisClient != null)
+                {
+                    List<string> keys = redisClient.Keys(pattern).ToStringList();
+                    if (keys.Count > 0)
+                        redisClient.Del(keys.ToArray());
+                }
+            }
+        }
+
+        public void RemoveByRegex(string pattern)
+        {
+            RemoveByPattern(pattern.Replace(".*", "*").Replace(".+", "?"));
         }
     }
 }
