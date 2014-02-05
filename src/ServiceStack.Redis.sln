@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Redis", "Servi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Redis.Tests", "..\tests\ServiceStack.Redis.Tests\ServiceStack.Redis.Tests.csproj", "{951D28EE-5D22-4C62-AC0F-1661A8CEEC5A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console.Tests", "..\tests\Console.Tests\Console.Tests.csproj", "{8368C965-B4F6-4263-9ABB-731A175B2E77}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,15 @@ Global
 		{951D28EE-5D22-4C62-AC0F-1661A8CEEC5A}.Signed|Any CPU.Build.0 = Signed|Any CPU
 		{951D28EE-5D22-4C62-AC0F-1661A8CEEC5A}.Signed|x86.ActiveCfg = Signed|x86
 		{951D28EE-5D22-4C62-AC0F-1661A8CEEC5A}.Signed|x86.Build.0 = Signed|x86
+		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Release|x86.ActiveCfg = Release|Any CPU
+		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Signed|Any CPU.ActiveCfg = Release|Any CPU
+		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Signed|Any CPU.Build.0 = Release|Any CPU
+		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Signed|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
