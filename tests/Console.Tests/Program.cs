@@ -30,51 +30,58 @@ namespace TestRedisConnection
 
         private static void CheckThisConnection()
         {
-            "CheckThisConnection()...".Print();
-            using (var redisClient = Manager.GetClient())
+            try
             {
-                using (var trans = redisClient.CreateTransaction())
+                "CheckThisConnection()...".Print();
+                using (var redisClient = Manager.GetClient())
                 {
-                    trans.QueueCommand(
-                             r => r.SetEntryInHash("Test", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test2", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test3", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test4", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test5", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test6", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test7", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test8", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test9", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test10", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test11", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test12", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test13", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test14", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test15", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test16", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test17", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test18", "Price", "123"));
-                    trans.QueueCommand(
-                            r => r.SetEntryInHash("Test19", "Price", "123"));
-                    trans.Commit();
+                    using (var trans = redisClient.CreateTransaction())
+                    {
+                        trans.QueueCommand(
+                                 r => r.SetEntryInHash("Test", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test2", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test3", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test4", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test5", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test6", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test7", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test8", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test9", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test10", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test11", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test12", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test13", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test14", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test15", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test16", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test17", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test18", "Price", "123"));
+                        trans.QueueCommand(
+                                r => r.SetEntryInHash("Test19", "Price", "123"));
+                        trans.Commit();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                "ERROR: {0}".Print();
             }
         }
     }
