@@ -81,7 +81,7 @@ namespace TestRedisConnection
             }
             catch (Exception ex)
             {
-                "ERROR: {0}".Print();
+                "ERROR: {0}".Print(ex.ToString());
             }
         }
     }
