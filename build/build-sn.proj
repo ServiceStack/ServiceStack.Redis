@@ -15,6 +15,7 @@
     <Configuration Condition="$(Configuration) == ''">Signed</Configuration>
     <NuGetPath>$(BuildSolutionDir)/src/.nuget/nuget.exe</NuGetPath>
     <NuGetPackageDir>$(BuildSolutionDir)/NuGet.Signed/</NuGetPackageDir>
+    <NuGetVersion>$(MajorVersion).$(MinorVersion).$(PatchVersion)</NuGetVersion>
     <Version>$(MajorVersion).$(MinorVersion).$(PatchVersion).0</Version>
     <UnstableTag Condition="$(RELEASE) == ''">-unstable</UnstableTag>
     <PackageVersion>$(MajorVersion).$(MinorVersion).$(PatchVersion)$(UnstableTag)</PackageVersion>
@@ -70,6 +71,12 @@
       <RegexTransform Include="$(SrcDir)/**/AssemblyInfo.cs">
         <Find>AssemblyVersion\(\"\d+\.\d+\.\d+\.\d+\"\)</Find>
         <ReplaceWith>AssemblyVersion("4.0.0.0")</ReplaceWith>
+      </RegexTransform>
+
+      <!--Update Min Dependency Version -->
+      <RegexTransform Include="$(NuGetPackageDir)/**/*.nuspec">
+        <Find>version="4\.0[^"]*"</Find>
+        <ReplaceWith>version="$(NuGetVersion)"</ReplaceWith>
       </RegexTransform>
     </ItemGroup>
 
