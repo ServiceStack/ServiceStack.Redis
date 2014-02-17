@@ -174,41 +174,25 @@
             Not an actual client.
             </summary>
         </member>
-        <member name="M:ServiceStack.Messaging.Rcon.ProcessingClient.Publish(System.String,System.Byte[])">
+        <member name="M:ServiceStack.Messaging.Rcon.ProcessingClient.Publish(System.String,ServiceStack.Messaging.IMessage)">
             <summary>
             Publish the specified message into the durable queue @queueName
             </summary>
-            <param name="queueName"></param>
-            <param name="messageBytes"></param>
         </member>
-        <member name="M:ServiceStack.Messaging.Rcon.ProcessingClient.Notify(System.String,System.Byte[])">
+        <member name="M:ServiceStack.Messaging.Rcon.ProcessingClient.Notify(System.String,ServiceStack.Messaging.IMessage)">
             <summary>
             Publish the specified message into the transient queue @queueName
             </summary>
-            <param name="queueName"></param>
-            <param name="messageBytes"></param>
         </member>
-        <member name="M:ServiceStack.Messaging.Rcon.ProcessingClient.Get(System.String,System.Nullable{System.TimeSpan})">
+        <member name="M:ServiceStack.Messaging.Rcon.ProcessingClient.Get``1(System.String,System.Nullable{System.TimeSpan})">
             <summary>
             Synchronous blocking get.
             </summary>
-            <param name="queueName"></param>
-            <param name="timeOut"></param>
-            <returns></returns>
         </member>
-        <member name="M:ServiceStack.Messaging.Rcon.ProcessingClient.GetAsync(System.String)">
+        <member name="M:ServiceStack.Messaging.Rcon.ProcessingClient.GetAsync``1(System.String)">
             <summary>
             Non blocking get message
             </summary>
-            <param name="queueName"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ServiceStack.Messaging.Rcon.ProcessingClient.WaitForNotifyOnAny(System.String[])">
-            <summary>
-            Blocking wait for notifications on any of the supplied channels
-            </summary>
-            <param name="channelNames"></param>
-            <returns></returns>
         </member>
         <member name="T:ServiceStack.Messaging.Redis.RedisMqServer">
             <summary>
@@ -328,7 +312,6 @@
             </summary>
             <remarks>
             Works in sql server and sqlite (with documented removals).
-            TODO: add indexes
             </remarks>
         </member>
         <member name="M:ServiceStack.MiniProfiler.Storage.SqlServerStorage.#ctor(System.String)">
@@ -340,21 +323,6 @@
             <summary>
             Stores <param name="profiler"/> to dbo.MiniProfilers under its <see cref="P:ServiceStack.MiniProfiler.Profiler.Id"/>; 
             stores all child Timings and SqlTimings to their respective tables.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Storage.SqlServerStorage.SaveTiming(System.Data.Common.DbConnection,ServiceStack.MiniProfiler.Profiler,ServiceStack.MiniProfiler.Timing)">
-            <summary>
-            Saves parameter Timing to the dbo.MiniProfilerTimings table.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Storage.SqlServerStorage.SaveSqlTiming(System.Data.Common.DbConnection,ServiceStack.MiniProfiler.Profiler,ServiceStack.MiniProfiler.SqlTiming)">
-            <summary>
-            Saves parameter SqlTiming to the dbo.MiniProfilerSqlTimings table.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Storage.SqlServerStorage.SaveSqlTimingParameters(System.Data.Common.DbConnection,ServiceStack.MiniProfiler.Profiler,ServiceStack.MiniProfiler.SqlTiming)">
-            <summary>
-            Saves any SqlTimingParameters used in the profiled SqlTiming to the dbo.MiniProfilerSqlTimingParameters table.
             </summary>
         </member>
         <member name="M:ServiceStack.MiniProfiler.Storage.SqlServerStorage.Load(System.Guid)">
@@ -371,12 +339,6 @@
         <member name="M:ServiceStack.MiniProfiler.Storage.SqlServerStorage.GetConnection">
             <summary>
             Returns a connection to Sql Server.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.MiniProfiler.Storage.SqlServerStorage.EnableBatchSelects">
-            <summary>
-            A full install of Sql Server can return multiple result sets in one query, allowing the use of <see cref="!:SqlMapper.QueryMultiple"/>.
-            However, Sql Server CE and Sqlite cannot do this, so inheritors for those providers can return false here.
             </summary>
         </member>
     </members>

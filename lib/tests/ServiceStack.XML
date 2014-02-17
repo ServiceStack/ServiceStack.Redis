@@ -29,6 +29,11 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:ServiceStack.Auth.UserAuthRepositoryExtensions.InitSchema(ServiceStack.Auth.IAuthRepository)">
+            <summary>
+            Creates the required missing tables or DB schema 
+            </summary>
+        </member>
         <member name="T:ServiceStack.EnsureHttpsAttribute">
             <summary>
             Redirect to the https:// version of this url if not already.
@@ -64,6 +69,11 @@
             <param name="queueName">The queue to process</param>
             <param name="doNext">A predicate on whether to continue processing the next message if any</param>
             <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Messaging.IMessageHandler.ProcessMessage(ServiceStack.Messaging.IMessageQueueClient,System.Object)">
+            <summary>
+            Process a single message
+            </summary>
         </member>
         <member name="M:ServiceStack.Messaging.IMessageHandler.GetStats">
             <summary>
@@ -562,11 +572,6 @@
             <summary>
             Create an app at https://dev.twitter.com/apps to get your ConsumerKey and ConsumerSecret for your app.
             The Callback URL for your app should match the CallbackUrl provided.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Auth.UserAuthExtensions.InitSchema(ServiceStack.Auth.IUserAuthRepository)">
-            <summary>
-            Creates the required missing tables or DB schema 
             </summary>
         </member>
         <member name="T:ServiceStack.Auth.YammerAuthProvider">
@@ -3852,6 +3857,14 @@
             Ticks since this MiniProfiler was started.
             </summary>
         </member>
+        <member name="P:ServiceStack.MiniProfiler.Profiler.Json">
+            <summary>
+            Json representing the collection of CustomTimings relating to this Profiler
+            </summary>
+            <remarks>
+            Is used when storing the Profiler in SqlStorage
+            </remarks>
+        </member>
         <member name="P:ServiceStack.MiniProfiler.Profiler.Head">
             <summary>
             Points to the currently executing Timing. 
@@ -4440,12 +4453,6 @@
             Returns a DbConnection already opened for execution.
             </summary>
         </member>
-        <member name="M:ServiceStack.MiniProfiler.Storage.DatabaseStorageBase.MapTimings(ServiceStack.MiniProfiler.Profiler,System.Collections.Generic.List{ServiceStack.MiniProfiler.Timing},System.Collections.Generic.List{ServiceStack.MiniProfiler.SqlTiming},System.Collections.Generic.List{ServiceStack.MiniProfiler.SqlTimingParameter})">
-            <summary>
-            Giving freshly selected collections, this method puts them in the correct
-            hierarchy under the 'result' MiniProfiler.
-            </summary>
-        </member>
         <member name="P:ServiceStack.MiniProfiler.Storage.DatabaseStorageBase.ConnectionString">
             <summary>
             How we connect to the database used to save/load MiniProfiler results.
@@ -4778,7 +4785,7 @@
             <summary>
             Check all session is in all supplied roles otherwise a 401 HttpError is thrown
             </summary>
-            <param name="request"></param>
+            <param name="req"></param>
             <param name="requiredRoles"></param>
         </member>
         <member name="T:ServiceStack.RequiresAnyPermissionAttribute">
