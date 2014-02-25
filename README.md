@@ -145,9 +145,9 @@ For multi-threaded applications you can choose from our different client connect
 
     PM> Install-Package ServiceStack.Redis
 
-_Commercial support is now available for ServiceStack, see https://servicestack.net/pricing for details_
+_Latest v4+ release on NuGet is a commercial library with [free quotas](https://servicestack.net/download#free-quotas), see https://servicestack.net/pricing for details._
 
-### [Docs and Downloads for v3](https://github.com/ServiceStackV3/ServiceStackV3)
+### [Docs and Downloads for older v3 BSD releases](https://github.com/ServiceStackV3/ServiceStackV3)
 
 ## Copying
 
