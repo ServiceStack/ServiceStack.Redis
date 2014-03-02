@@ -333,6 +333,16 @@ namespace ServiceStack.Redis
             return sb.ToString();
         }
 
+        public DateTime GetServerTime()
+        {
+            var parts = base.Time();
+            var unixTime = long.Parse(parts[0].FromUtf8Bytes());
+            var ms = long.Parse(parts[1].FromUtf8Bytes());
+
+            var date = unixTime.FromUnixTime();
+            return date + TimeSpan.FromMilliseconds(ms);
+        }
+
         public IRedisTypedClient<T> As<T>()
         {
             try

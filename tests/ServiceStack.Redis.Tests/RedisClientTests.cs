@@ -200,6 +200,22 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(ttl.TotalSeconds, Is.LessThanOrEqualTo(9));
 		}
 
+        [Test]
+        public void Can_GetServerTime()
+        {
+            var now = Redis.GetServerTime();
+
+            now.Kind.PrintDump();
+            now.ToLongDateString().Print();
+            now.ToLongTimeString().Print();
+
+            "UtcNow".Print();
+            DateTime.UtcNow.ToLongDateString().Print();
+            DateTime.UtcNow.ToLongTimeString().Print();
+
+            Assert.That(now.Date, Is.EqualTo(DateTime.UtcNow.Date));
+        }
+
 		[Test]
 		public void Can_Ping()
 		{
