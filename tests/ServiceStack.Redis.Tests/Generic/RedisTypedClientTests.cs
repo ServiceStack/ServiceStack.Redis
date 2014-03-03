@@ -42,9 +42,10 @@ namespace ServiceStack.Redis.Tests.Generic
             base.OnBeforeEachTest();
 
 			if (Redis != null) Redis.Dispose();
-			Redis = new RedisClient(TestConfig.SingleHost);
-		    Redis.NamespacePrefix = "RedisTypedClientTests:";
-			RedisTyped = Redis.As<CacheRecord>();
+			Redis = new RedisClient(TestConfig.SingleHost) {
+			    NamespacePrefix = "RedisTypedClientTests:"
+			};
+		    RedisTyped = Redis.As<CacheRecord>();
 		}
 
         [TearDown]
@@ -93,7 +94,7 @@ namespace ServiceStack.Redis.Tests.Generic
 
 			RedisTyped.Store(cachedRecord);
 
-			var in2Secs = DateTime.Now.AddSeconds(2);
+			var in2Secs = DateTime.UtcNow.AddSeconds(2);
 
 			RedisTyped.ExpireAt("key", in2Secs);
 

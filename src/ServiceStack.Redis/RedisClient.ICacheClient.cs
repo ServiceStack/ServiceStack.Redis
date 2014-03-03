@@ -90,7 +90,7 @@ namespace ServiceStack.Redis
 		{
 			if (Add(key, value))
 			{
-				ExpireEntryAt(key, expiresAt);
+                ExpireEntryAt(key, ConvertToServerDate(expiresAt));
 				return true;
 			}
 			return false;
@@ -113,7 +113,7 @@ namespace ServiceStack.Redis
 		public bool Set<T>(string key, T value, DateTime expiresAt)
 		{
 			Set(key, value);
-			ExpireEntryAt(key, expiresAt);
+            ExpireEntryAt(key, ConvertToServerDate(expiresAt));
 			return true;
 		}
 
@@ -121,7 +121,7 @@ namespace ServiceStack.Redis
 		{
 			if (Replace(key, value))
 			{
-				ExpireEntryAt(key, expiresAt);
+                ExpireEntryAt(key, ConvertToServerDate(expiresAt));
 				return true;
 			}
 			return false;
