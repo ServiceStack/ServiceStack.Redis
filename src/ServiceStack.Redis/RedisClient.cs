@@ -136,13 +136,17 @@ namespace ServiceStack.Redis
                 ? value.ToUtf8Bytes()
                 : null;
 
-            SetEx(key, (int)expireIn.TotalSeconds, bytesValue);
-
-            //New in 2.6.x - TODO change when 2.6 is most popular
-            //if (expireIn.Milliseconds > 0)
-            //    base.Set(key, bytesValue, 0, (long)expireIn.TotalMilliseconds);
-            //else
-            //    base.Set(key, bytesValue, (int)expireIn.TotalSeconds, 0);
+            if (ServerVersionNumber >= 2600)
+            {
+                if (expireIn.Milliseconds > 0)
+                    base.Set(key, bytesValue, 0, (long)expireIn.TotalMilliseconds);
+                else
+                    base.Set(key, bytesValue, (int)expireIn.TotalSeconds, 0);
+            }
+            else
+            {
+                SetEx(key, (int)expireIn.TotalSeconds, bytesValue);
+            }
         }
 
         public void SetEntryIfExists(string key, string value, TimeSpan expireIn)
@@ -309,12 +313,27 @@ namespace ServiceStack.Redis
 
         public bool ExpireEntryIn(string key, TimeSpan expireIn)
         {
+            if (ServerVersionNumber >= 2600)
+            {
+                if (expireIn.Milliseconds > 0)
+                {
+                    return PExpire(key, (long)expireIn.TotalMilliseconds);
+                }
+            }
+ 
             return Expire(key, (int)expireIn.TotalSeconds);
         }
 
         public bool ExpireEntryAt(string key, DateTime expireAt)
         {
-            return ExpireAt(key, ConvertToServerDate(expireAt).ToUnixTime());
+            if (ServerVersionNumber >= 2600)
+            {
+                return PExpireAt(key, ConvertToServerDate(expireAt).ToUnixTimeMs());
+            }
+            else
+            {
+                return ExpireAt(key, ConvertToServerDate(expireAt).ToUnixTime());
+            }
         }
 
         public TimeSpan GetTimeToLive(string key)

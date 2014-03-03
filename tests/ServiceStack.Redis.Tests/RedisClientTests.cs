@@ -161,15 +161,25 @@ namespace ServiceStack.Redis.Tests
 			Assert.That(Redis.ContainsKey("newkey"), Is.True);
 		}
 
-		[Test]
-		public void Can_Expire()
-		{
-			Redis.SetEntry("key", "val");
-			Redis.Expire("key", 1);
-			Assert.That(Redis.ContainsKey("key"), Is.True);
-			Thread.Sleep(2000);
-			Assert.That(Redis.ContainsKey("key"), Is.False);
-		}
+        [Test]
+        public void Can_Expire()
+        {
+            Redis.SetEntry("key", "val");
+            Redis.Expire("key", 1);
+            Assert.That(Redis.ContainsKey("key"), Is.True);
+            Thread.Sleep(2000);
+            Assert.That(Redis.ContainsKey("key"), Is.False);
+        }
+
+        [Test]
+        public void Can_Expire_Ms()
+        {
+            Redis.SetEntry("key", "val");
+            Redis.ExpireEntryIn("key", TimeSpan.FromMilliseconds(100));
+            Assert.That(Redis.ContainsKey("key"), Is.True);
+            Thread.Sleep(500);
+            Assert.That(Redis.ContainsKey("key"), Is.False);
+        }
 
 		[Test]
 		public void Can_ExpireAt()

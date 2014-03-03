@@ -283,7 +283,7 @@ namespace ServiceStack.Redis.Generic
 
 		public bool ExpireEntryIn(string key, TimeSpan expireIn)
 		{
-			return client.Expire(key, (int)expireIn.TotalSeconds);
+            return client.ExpireEntryIn(key, expireIn);
 		}
 
 		public bool ExpireEntryAt(string key, DateTime expireAt)
@@ -294,7 +294,7 @@ namespace ServiceStack.Redis.Generic
 		public bool ExpireIn(object id, TimeSpan expireIn)
 		{
 			var key = client.UrnKey<T>(id);
-			return client.Expire(key, (int)expireIn.TotalSeconds);
+			return client.ExpireEntryIn(key, expireIn);
 		}
 
 		public bool ExpireAt(object id, DateTime expireAt)

@@ -101,7 +101,14 @@ namespace ServiceStack.Redis
 			var bytesValue = value as byte[];
 			if (bytesValue != null)
 			{
-				base.SetEx(key, (int)expiresIn.TotalSeconds, bytesValue);
+                if (ServerVersionNumber >= 2600)
+                {
+                    base.PSetEx(key, (long)expiresIn.TotalMilliseconds, bytesValue);
+                }
+                else
+                {
+                    base.SetEx(key, (int)expiresIn.TotalSeconds, bytesValue);                    
+                }
 				return true;
 			}
 

@@ -162,7 +162,7 @@ namespace ServiceStack.Redis
             get
             {
                 var t = SendExpectLong(Commands.LastSave);
-                return DateTimeExtensions.FromUnixTime(t);
+                return t.FromUnixTime();
             }
         }
 
