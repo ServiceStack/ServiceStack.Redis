@@ -88,6 +88,14 @@ namespace ServiceStack.Redis
             set { SetEntry(key, value); }
         }
 
+        public override void OnConnected() {}
+
+        public DateTime ConvertToServerDate(DateTime expiresAt)
+        {
+            //placeholder if we ever try to compensate for differences in server-time
+            return expiresAt;
+        }
+
         public string GetTypeSequenceKey<T>()
         {
             return String.Concat(NamespacePrefix, "seq:", typeof(T).Name);
@@ -306,7 +314,7 @@ namespace ServiceStack.Redis
 
         public bool ExpireEntryAt(string key, DateTime expireAt)
         {
-            return ExpireAt(key, expireAt.ToUnixTime());
+            return ExpireAt(key, ConvertToServerDate(expireAt).ToUnixTime());
         }
 
         public TimeSpan GetTimeToLive(string key)
@@ -337,10 +345,12 @@ namespace ServiceStack.Redis
         {
             var parts = base.Time();
             var unixTime = long.Parse(parts[0].FromUtf8Bytes());
-            var ms = long.Parse(parts[1].FromUtf8Bytes());
+            var microSecs = long.Parse(parts[1].FromUtf8Bytes());
+            var ticks = microSecs / 1000 * TimeSpan.TicksPerMillisecond;
 
             var date = unixTime.FromUnixTime();
-            return date + TimeSpan.FromMilliseconds(ms);
+            var timeSpan = TimeSpan.FromTicks(ticks);
+            return date + timeSpan;
         }
 
         public IRedisTypedClient<T> As<T>()
