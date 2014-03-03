@@ -84,12 +84,14 @@ namespace ServiceStack.Redis
 
                 if (db != 0)
                     SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
-
+                    
                 var ipEndpoint = socket.LocalEndPoint as IPEndPoint;
                 clientPort = ipEndpoint != null ? ipEndpoint.Port : -1;
                 lastCommand = null;
                 lastSocketException = null;
                 LastConnectedAtTimestamp = Stopwatch.GetTimestamp();
+
+                OnConnected();
 
                 if (ConnectionFilter != null)
                 {
@@ -107,6 +109,10 @@ namespace ServiceStack.Redis
                 log.Error(throwEx.Message, ex);
                 throw throwEx;
             }
+        }
+
+        public virtual void OnConnected()
+        {
         }
 
         protected string ReadLine()
