@@ -26,6 +26,7 @@ namespace ServiceStack.Redis
     {
         private static Timer UsageTimer;
         private static int __requestsPerHour = 0;
+        public int ServerVersionNumber { get; set; }
 
         public static void DisposeTimers()
         {
@@ -84,6 +85,15 @@ namespace ServiceStack.Redis
 
                 if (db != 0)
                     SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
+
+                try
+                {
+                    if (ServerVersionNumber == 0)
+                    {
+                        ServerVersionNumber = int.Parse(ServerVersion.Replace(".", "").PadRight(4, '0'));
+                    }
+                }
+                catch {}
                     
                 var ipEndpoint = socket.LocalEndPoint as IPEndPoint;
                 clientPort = ipEndpoint != null ? ipEndpoint.Port : -1;
