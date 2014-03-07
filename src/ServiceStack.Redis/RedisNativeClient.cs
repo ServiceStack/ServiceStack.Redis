@@ -517,7 +517,7 @@ namespace ServiceStack.Redis
 			if (key == null)
 				throw new ArgumentNullException("key");
 
-			return SendExpectDouble(Commands.IncrBy, key.ToUtf8Bytes(), incrBy.ToUtf8Bytes());
+			return SendExpectDouble(Commands.IncrByFloat, key.ToUtf8Bytes(), incrBy.ToUtf8Bytes());
 		}
 
     	public long Decr(string key)
