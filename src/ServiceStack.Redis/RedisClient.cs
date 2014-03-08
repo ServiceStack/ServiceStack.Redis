@@ -274,6 +274,17 @@ namespace ServiceStack.Redis
             return IncrBy(key, count);
         }
 
+        public long IncrementValueBy(string key, long count)
+        {
+            return IncrBy(key, count);
+        }
+
+        public double IncrementValueBy(string key, double count)
+        {
+            return IncrByFloat(key, count);
+        }
+
+
         public long DecrementValue(string key)
         {
             return Decr(key);
