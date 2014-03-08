@@ -86,6 +86,11 @@ namespace ServiceStack.Redis
             return base.HIncrby(hashId, key.ToUtf8Bytes(), incrementBy);
         }
 
+        public double IncrementValueInHash(string hashId, string key, double incrementBy)
+        {
+            return base.HIncrbyFloat(hashId, key.ToUtf8Bytes(), incrementBy);
+        }
+
         public string GetValueFromHash(string hashId, string key)
 		{
 			return base.HGet(hashId, key.ToUtf8Bytes()).FromUtf8Bytes();
