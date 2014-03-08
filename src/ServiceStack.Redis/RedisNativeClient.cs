@@ -503,12 +503,19 @@ namespace ServiceStack.Redis
             return SendExpectLong(Commands.IncrBy, key.ToUtf8Bytes(), count.ToUtf8Bytes());
         }
 
+        public long IncrBy(string key, long count)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
+            return SendExpectLong(Commands.IncrBy, key.ToUtf8Bytes(), count.ToUtf8Bytes());
+        }
+
     	public double IncrByFloat(string key, double incrBy)
     	{
 			if (key == null)
 				throw new ArgumentNullException("key");
 
-			return SendExpectDouble(Commands.IncrBy, key.ToUtf8Bytes(), incrBy.ToUtf8Bytes());
+			return SendExpectDouble(Commands.IncrByFloat, key.ToUtf8Bytes(), incrBy.ToUtf8Bytes());
 		}
 
     	public long Decr(string key)
