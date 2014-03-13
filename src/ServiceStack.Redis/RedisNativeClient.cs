@@ -1209,23 +1209,23 @@ namespace ServiceStack.Redis
             return result.Length == 0 ? null : result[1];
         }
 
-		public object[] Sentinel(string command, string master = null)
-		{
-			if (command == null)
-				throw new ArgumentNullException("command");
+        public object[] Sentinel(string command, string master = null)
+        {
+            if (command == null)
+                throw new ArgumentNullException("command");
 
-			var args = new List<byte[]>()
-			{
-				Commands.Sentinel,
-				command.ToUtf8Bytes()
-			};
+            var args = new List<byte[]>()
+            {
+                Commands.Sentinel,
+                command.ToUtf8Bytes()
+            };
 
-			if (master != null)
-			{
-				args.Add(master.ToUtf8Bytes());
-			}
-			return SendExpectDeeplyNestedMultiData(args.ToArray());
-		}
+            if (master != null)
+            {
+                args.Add(master.ToUtf8Bytes());
+            }
+            return SendExpectDeeplyNestedMultiData(args.ToArray());
+        }
 
         #endregion
 

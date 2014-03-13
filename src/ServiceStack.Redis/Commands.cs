@@ -181,7 +181,7 @@ namespace ServiceStack.Redis
         public readonly static byte[] Nx = "NX".ToUtf8Bytes();
         public readonly static byte[] Xx = "XX".ToUtf8Bytes();
 
-		// Sentinel commands
-		public readonly static byte[] Sentinel = "SENTINEL".ToUtf8Bytes();
+        // Sentinel commands
+        public readonly static byte[] Sentinel = "SENTINEL".ToUtf8Bytes();
     }
 }
