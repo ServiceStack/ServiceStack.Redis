@@ -4,7 +4,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Examples
 {
-    [TestFixture]
+    [TestFixture, Explicit]
     public class ServiceStack_Redis_UseCase
     {
         public class Todo
