@@ -55,22 +55,22 @@ namespace ServiceStack.Redis.Tests.Examples
 
             //create some blogs using unique Ids from the Blog sequence. Also adding references
             var mythzBlogs = new List<Blog>
+			{
+				new Blog
 				{
-					new Blog
-					{
-						Id = redisBlogs.GetNextSequence(),
-						UserId = mythz.Id,
-						UserName = mythz.Name,
-						Tags = new List<string> { "Architecture", ".NET", "Redis" },
-					},
-					new Blog
-					{
-						Id = redisBlogs.GetNextSequence(),
-						UserId = mythz.Id,
-						UserName = mythz.Name,
-						Tags = new List<string> { "Music", "Twitter", "Life" },
-					},
-				};
+					Id = redisBlogs.GetNextSequence(),
+					UserId = mythz.Id,
+					UserName = mythz.Name,
+					Tags = new List<string> { "Architecture", ".NET", "Redis" },
+				},
+				new Blog
+				{
+					Id = redisBlogs.GetNextSequence(),
+					UserId = mythz.Id,
+					UserName = mythz.Name,
+					Tags = new List<string> { "Music", "Twitter", "Life" },
+				},
+			};
             //Add the blog references
             mythzBlogs.ForEach(x => mythz.BlogIds.Add(x.Id));
 

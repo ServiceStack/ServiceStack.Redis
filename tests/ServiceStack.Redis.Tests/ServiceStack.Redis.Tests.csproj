@@ -177,6 +177,7 @@
   <ItemGroup>
     <Compile Include="AdhocClientTests.cs" />
     <Compile Include="DiagnosticTests.cs" />
+    <Compile Include="Examples\ServiceStack_Redis_UseCase.cs" />
     <Compile Include="Generic\RedisClientListTestExtra.cs" />
     <Compile Include="LicenseUsageTests.cs" />
     <Compile Include="ManagedListGenericTests.cs" />
