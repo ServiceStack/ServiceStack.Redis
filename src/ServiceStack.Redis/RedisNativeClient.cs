@@ -384,7 +384,7 @@ namespace ServiceStack.Redis
 			if (key == null)
 				throw new ArgumentNullException("key");
 
-			SendExpectSuccess(Commands.PSetEx, expireInMs.ToUtf8Bytes(), key.ToUtf8Bytes(), value);
+            SendExpectSuccess(Commands.PSetEx, key.ToUtf8Bytes(), expireInMs.ToUtf8Bytes(), value);
 		}
 
     	public long SetNX(string key, byte[] value)
