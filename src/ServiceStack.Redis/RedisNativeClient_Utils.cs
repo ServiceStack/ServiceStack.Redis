@@ -199,22 +199,15 @@ namespace ServiceStack.Redis
         {
             if (!AssertConnectedSocket()) return false;
 
-            try
-            {
-                CmdLog(cmdWithBinaryArgs);
+            CmdLog(cmdWithBinaryArgs);
 
-                //Total command lines count
-                WriteAllToSendBuffer(cmdWithBinaryArgs);
+            //Total command lines count
+            WriteAllToSendBuffer(cmdWithBinaryArgs);
 
-                //pipeline will handle flush, if pipelining is turned on
-                if (Pipeline == null)
-                    FlushSendBuffer();
-            }
-            catch (SocketException ex)
-            {
-                cmdBuffer.Clear();
-                return HandleSocketException(ex);
-            }
+            //pipeline will handle flush, if pipelining is turned on
+            if (Pipeline == null)
+                return FlushSendBuffer();
+          
             return true;
         }
 
@@ -271,27 +264,35 @@ namespace ServiceStack.Redis
             currentBufferIndex = 0;
         }
 
-        public void FlushSendBuffer()
-        {
-            if (currentBufferIndex > 0)
-                PushCurrentBuffer();
-
-            if (!Env.IsMono)
-            {
-                socket.Send(cmdBuffer); //Optimized for Windows
-            }
-            else
-            {
-                //Sendling IList<ArraySegment> Throws 'Message to Large' SocketException in Mono
-                foreach (var segment in cmdBuffer)
-                {
-                    var buffer = segment.Array;
-                    socket.Send(buffer, segment.Offset, segment.Count, SocketFlags.None);
-                }
-            }
-            ResetSendBuffer();
-        }
-
+        public bool FlushSendBuffer()
+ 	{
+ 		try
+ 		{
+ 			if (currentBufferIndex > 0)
+ 				PushCurrentBuffer();
+ 
+ 			if (!Env.IsMono)
+ 			{
+ 				socket.Send(cmdBuffer); //Optimized for Windows
+ 			}
+ 			else
+ 			{
+ 			//Sendling IList<ArraySegment> Throws 'Message to Large' SocketException in Mono
+ 				foreach (var segment in cmdBuffer)
+ 				{
+ 					var buffer = segment.Array;
+ 					socket.Send(buffer, segment.Offset, segment.Count, SocketFlags.None);
+ 				}
+ 			}
+ 			ResetSendBuffer();
+ 		}
+ 		catch (SocketException ex)
+ 		{
+ 			cmdBuffer.Clear();
+ 			return HandleSocketException(ex);
+ 		}
+ 		return true;
+ 	}
         /// <summary>
         /// reset buffer index in send buffer
         /// </summary>
