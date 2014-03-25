@@ -97,8 +97,8 @@ namespace ServiceStack.Redis.Tests
 			Debug.WriteLine(BitConverter.ToString(res1));
 			Debug.WriteLine(BitConverter.ToString(res2));
 
-			var ticks1 = PerfUtils.Measure(1000000, () => GetCmdBytes1('$', 2));
-			var ticks2 = PerfUtils.Measure(1000000, () => GetCmdBytes2('$', 2));
+			var ticks1 = PerfUtils.Measure(() => GetCmdBytes1('$', 2));
+			var ticks2 = PerfUtils.Measure(() => GetCmdBytes2('$', 2));
 
 			Debug.WriteLine(String.Format("{0} : {1} = {2}", ticks1, ticks2, ticks1 / (double)ticks2));
 		}
