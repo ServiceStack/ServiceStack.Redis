@@ -169,6 +169,7 @@
     <Compile Include="Pipeline\RedisCommand.cs" />
     <Compile Include="RedisClient_Slowlog.cs" />
     <Compile Include="RedisEndpoint.cs" />
+    <Compile Include="ScanResult.cs" />
     <Compile Include="ShardedConnectionPool.cs" />
     <Compile Include="ShardedRedisClientManager.cs" />
     <Compile Include="Support\ConsistentHash.cs" />
