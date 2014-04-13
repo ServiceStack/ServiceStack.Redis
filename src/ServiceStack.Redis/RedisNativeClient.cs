@@ -16,6 +16,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using System.Text;
 using ServiceStack.Logging;
 using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
@@ -768,10 +769,12 @@ namespace ServiceStack.Redis
             SendExpectCode(cmdWithArgs);
 
         }
+
         public void UnWatch()
         {
             SendExpectCode(Commands.UnWatch);
         }
+
         internal void Multi()
         {
             //make sure socket is connected. Otherwise, fetch of server info will interfere
@@ -795,6 +798,77 @@ namespace ServiceStack.Redis
         internal void Discard()
         {
             SendExpectSuccess(Commands.Discard);
+        }
+
+        public ScanResult Scan(ulong cursor, int count = 10, string match = null)
+        {
+            if (match == null)
+                return SendExpectScanResult(Commands.Scan, cursor.ToUtf8Bytes(),
+                                            Commands.Count, count.ToUtf8Bytes());
+
+            return SendExpectScanResult(Commands.Scan, cursor.ToUtf8Bytes(),
+                                        Commands.Match, match.ToUtf8Bytes(),
+                                        Commands.Count, count.ToUtf8Bytes());
+        }
+
+        public ScanResult SScan(string setId, ulong cursor, int count = 10, string match = null)
+        {
+            if (match == null)
+            {
+                return SendExpectScanResult(Commands.SScan, setId.ToUtf8Bytes(), cursor.ToUtf8Bytes(),
+                                            Commands.Count, count.ToUtf8Bytes());
+            }
+
+            return SendExpectScanResult(Commands.SScan, setId.ToUtf8Bytes(), cursor.ToUtf8Bytes(),
+                                        Commands.Match, match.ToUtf8Bytes(),
+                                        Commands.Count, count.ToUtf8Bytes());
+        }
+
+        public ScanResult ZScan(string setId, ulong cursor, int count = 10, string match = null)
+        {
+            if (match == null)
+            {
+                return SendExpectScanResult(Commands.ZScan, setId.ToUtf8Bytes(), cursor.ToUtf8Bytes(),
+                                            Commands.Count, count.ToUtf8Bytes());
+            }
+
+            return SendExpectScanResult(Commands.ZScan, setId.ToUtf8Bytes(), cursor.ToUtf8Bytes(),
+                                        Commands.Match, match.ToUtf8Bytes(),
+                                        Commands.Count, count.ToUtf8Bytes());
+        }
+
+        public ScanResult HScan(string hashId, ulong cursor, int count = 10, string match = null)
+        {
+            if (match == null)
+            {
+                return SendExpectScanResult(Commands.HScan, hashId.ToUtf8Bytes(), cursor.ToUtf8Bytes(),
+                                            Commands.Count, count.ToUtf8Bytes());
+            }
+
+            return SendExpectScanResult(Commands.HScan, hashId.ToUtf8Bytes(), cursor.ToUtf8Bytes(),
+                                        Commands.Match, match.ToUtf8Bytes(),
+                                        Commands.Count, count.ToUtf8Bytes());
+        }
+
+
+        internal ScanResult SendExpectScanResult(byte[] cmd, params byte[][] args)
+        {
+            var cmdWithArgs = MergeCommandWithArgs(cmd, args);
+            var multiData = SendExpectDeeplyNestedMultiData(cmdWithArgs);
+            var counterBytes = (byte[]) multiData[0];
+
+            var ret = new ScanResult {
+                Cursor = ulong.Parse(counterBytes.FromUtf8Bytes()),
+                Results = new List<string>()
+            };
+            var keysBytes = (object[])multiData[1];
+
+            foreach (var keyBytes in keysBytes)
+            {
+                ret.Results.Add(((byte[])keyBytes).FromUtf8Bytes());
+            }
+
+            return ret;
         }
 
         #endregion
