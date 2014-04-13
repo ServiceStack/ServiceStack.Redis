@@ -192,6 +192,7 @@
     <Compile Include="Generic\RedisTypedPipelineTests.cs" />
     <Compile Include="RedisClientEvalTests.cs" />
     <Compile Include="RedisClientsManagerExtensionsTests.cs" />
+    <Compile Include="RedisHyperLogTests.cs" />
     <Compile Include="RedisPipelineCommonTests.cs" />
     <Compile Include="RedisPipelineTests.cs" />
     <Compile Include="Examples\BestPractice\IBlogRepository.cs" />

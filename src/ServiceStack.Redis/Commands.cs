@@ -86,6 +86,10 @@ namespace ServiceStack.Redis
         public readonly static byte[] Match = "MATCH".ToUtf8Bytes();
         public readonly static byte[] Count = "COUNT".ToUtf8Bytes();
 
+        public readonly static byte[] PfAdd = "PFADD".ToUtf8Bytes();
+        public readonly static byte[] PfCount = "PFCOUNT".ToUtf8Bytes();
+        public readonly static byte[] PfMerge = "PFMERGE".ToUtf8Bytes();
+
         public readonly static byte[] RPush = "RPUSH".ToUtf8Bytes();
         public readonly static byte[] LPush = "LPUSH".ToUtf8Bytes();
         public readonly static byte[] RPushX = "RPUSHX".ToUtf8Bytes();
