@@ -614,7 +614,7 @@ namespace ServiceStack.Redis
         {
             Log("R: {0}", r);
             if (r.Length == 0)
-                throw CreateResponseError("Zero length respose");
+                throw CreateResponseError("Zero length response");
 
             char c = r[0];
             if (c == '-')
