@@ -19,7 +19,7 @@ namespace ServiceStack.Redis.Tests
             var ret = Redis.Scan(0);
 
             Assert.That(ret.Cursor, Is.GreaterThanOrEqualTo(0));
-            Assert.That(ret.Results, Is.EquivalentTo(keys));
+            Assert.That(ret.AsStrings(), Is.EquivalentTo(keys));
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace ServiceStack.Redis.Tests
             {
                 ret = Redis.Scan(ret.Cursor, 10);
                 i++;
-                ret.Results.ForEach(x => allKeys.Add(x));
+                ret.AsStrings().ForEach(x => allKeys.Add(x));
                 if (ret.Cursor == 0) break;
             }
 
@@ -55,7 +55,7 @@ namespace ServiceStack.Redis.Tests
             var ret = Redis.Scan(0, 10, match: "KEY1*");
 
             Assert.That(ret.Cursor, Is.GreaterThanOrEqualTo(0));
-            Assert.That(ret.Results, Is.EquivalentTo(new[] { "KEY1", "KEY10" }));
+            Assert.That(ret.AsStrings(), Is.EquivalentTo(new[] { "KEY1", "KEY10" }));
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace ServiceStack.Redis.Tests
             var ret = Redis.SScan("scanset", 0);
 
             Assert.That(ret.Cursor, Is.GreaterThanOrEqualTo(0));
-            Assert.That(ret.Results, Is.EquivalentTo(items));
+            Assert.That(ret.AsStrings(), Is.EquivalentTo(items));
         }
 
         [Test]

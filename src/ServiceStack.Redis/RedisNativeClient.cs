@@ -859,16 +859,35 @@ namespace ServiceStack.Redis
 
             var ret = new ScanResult {
                 Cursor = ulong.Parse(counterBytes.FromUtf8Bytes()),
-                Results = new List<string>()
+                Results = new List<byte[]>()
             };
             var keysBytes = (object[])multiData[1];
 
             foreach (var keyBytes in keysBytes)
             {
-                ret.Results.Add(((byte[])keyBytes).FromUtf8Bytes());
+                ret.Results.Add((byte[])keyBytes);
             }
 
             return ret;
+        }
+
+        public bool PfAdd(string key, params byte[][] elements)
+        {
+            var cmdWithArgs = MergeCommandWithArgs(Commands.PfAdd, key.ToUtf8Bytes(), elements);
+            return SendExpectLong(cmdWithArgs) == 1;
+        }
+
+        public long PfCount(string key)
+        {
+            var cmdWithArgs = MergeCommandWithArgs(Commands.PfCount, key.ToUtf8Bytes());
+            return SendExpectLong(cmdWithArgs);
+        }
+
+        public void PfMerge(string toKeyId, params string[] fromKeys)
+        {
+            var fromKeyBytes = fromKeys.Map(x => x.ToUtf8Bytes()).ToArray();
+            var cmdWithArgs = MergeCommandWithArgs(Commands.PfMerge, toKeyId.ToUtf8Bytes(), fromKeyBytes);
+            SendExpectSuccess(cmdWithArgs);
         }
 
         #endregion

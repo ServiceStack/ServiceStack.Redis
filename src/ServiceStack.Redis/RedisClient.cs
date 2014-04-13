@@ -945,7 +945,7 @@ namespace ServiceStack.Redis
 
                 foreach (var key in ret.Results)
                 {
-                    yield return key;
+                    yield return key.FromUtf8Bytes();
                 }
 
                 if (ret.Cursor == 0) break;
@@ -963,7 +963,7 @@ namespace ServiceStack.Redis
 
                 foreach (var key in ret.Results)
                 {
-                    yield return key;
+                    yield return key.FromUtf8Bytes();
                 }
 
                 if (ret.Cursor == 0) break;
@@ -1004,6 +1004,21 @@ namespace ServiceStack.Redis
 
                 if (ret.Cursor == 0) break;
             }
+        }
+
+        public bool AddToHyperLog(string key, params string[] elements)
+        {
+            return base.PfAdd(key, elements.Map(x => x.ToUtf8Bytes()).ToArray());
+        }
+        
+        public long CountHyperLog(string key)
+        {
+            return base.PfCount(key);
+        }
+        
+        public void MergeHyperLogs(string toKey, params string[] fromKeys)
+        {
+            base.PfMerge(toKey, fromKeys);
         }
 
     }
