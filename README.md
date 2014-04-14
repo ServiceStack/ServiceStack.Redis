@@ -3,6 +3,56 @@ follow [@servicestack](http://twitter.com/servicestack) for updates.
 
 # C#/.NET Client for Redis
 
+### New HyperLog API
+
+The development branch of Redis server (available when v3.0 is released) includes an ingenious algorithm to approximate the unique elements in a set with maximum space and time efficiency. For details about how it works see Redis's creator Salvatore's blog who [explains it in great detail](http://antirez.com/news/75). Essentially it lets you maintain an efficient way to count and merge unique elements in a set without having to store its elements. 
+A Simple example of it in action:
+
+```csharp
+redis.AddToHyperLog("set1", "a", "b", "c");
+redis.AddToHyperLog("set1", "c", "d");
+var count = redis.CountHyperLog("set1"); //4
+
+redis.AddToHyperLog("set2", "c", "d", "e", "f");
+
+redis.MergeHyperLogs("mergedset", "set1", "set2");
+
+var mergeCount = redis.CountHyperLog("mergedset"); //6
+```
+
+### New Scan APIs Added
+
+Redis v2.8 introduced a beautiful new [SCAN](http://redis.io/commands/scan) operation that provides an optimal strategy for traversing a redis instance entire keyset in managable-size chunks utilizing only a client-side cursor and without introducing any server state. It's a higher performance alternative and should be used instead of [KEYS](http://redis.io/commands/keys) in application code. SCAN and its related operations for traversing members of Sets, Sorted Sets and Hashes are now available in the Redis Client in the following API's:
+
+```csharp
+public interface IRedisClient
+{
+    ...
+    IEnumerable<string> ScanAllKeys(string pattern = null, int pageSize = 1000);
+    IEnumerable<string> ScanAllSetItems(string setId, string pattern = null, int pageSize = 1000);
+    IEnumerable<KeyValuePair<string, double>> ScanAllSortedSetItems(string setId, string pattern = null, int pageSize = 1000);
+    IEnumerable<KeyValuePair<string, string>> ScanAllHashEntries(string hashId, string pattern = null, int pageSize = 1000);    
+}
+
+//Low-level API
+public interface IRedisNativeClient
+{
+    ...
+    ScanResult Scan(ulong cursor, int count = 10, string match = null);
+    ScanResult SScan(string setId, ulong cursor, int count = 10, string match = null);
+    ScanResult ZScan(string setId, ulong cursor, int count = 10, string match = null);
+    ScanResult HScan(string hashId, ulong cursor, int count = 10, string match = null);
+}
+```
+
+The `IRedisClient` provides a higher-level API that abstracts away the client cursor to expose a lazy Enumerable sequence to provide an optimal way to stream scanned results that integrates nicely with LINQ, e.g:
+
+```csharp
+var scanUsers = Redis.ScanAllKeys("urn:User:*");
+var sampleUsers = scanUsers.Take(10000).ToList(); //Stop after retrieving 10000 user keys 
+```
+
+
 ### New IRedisClient LUA API's
 
 The `IRedisClient` API's for [redis server-side LUA support](http://redis.io/commands/eval) have been re-factored into the more user-friendly API's below:
