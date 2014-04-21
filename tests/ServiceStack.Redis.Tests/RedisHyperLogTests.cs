@@ -4,7 +4,6 @@ namespace ServiceStack.Redis.Tests
 {
     [TestFixture, Explicit]
     public class RedisHyperLogTests
-        : RedisClientTestsBase
     {
         [Test]
         public void Can_Add_to_Hyperlog()
