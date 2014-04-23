@@ -90,7 +90,14 @@ namespace ServiceStack.Redis
                 {
                     if (ServerVersionNumber == 0)
                     {
-                        ServerVersionNumber = int.Parse(ServerVersion.Replace(".", "").PadRight(4, '0'));
+                        var parts = ServerVersion.Split('.');
+                        var version = int.Parse(parts[0]) * 1000;
+                        if (parts.Length > 1)
+                            version += int.Parse(parts[1])*100;
+                        if (parts.Length > 2)
+                            version += int.Parse(parts[2]);
+
+                        ServerVersionNumber = version;
                     }
                 }
                 catch {}
