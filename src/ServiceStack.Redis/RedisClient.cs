@@ -136,7 +136,7 @@ namespace ServiceStack.Redis
                 ? value.ToUtf8Bytes()
                 : null;
 
-            if (ServerVersionNumber >= 2600)
+            if (ServerVersionNumber >= 2610)
             {
                 if (expireIn.Milliseconds > 0)
                     base.Set(key, bytesValue, 0, (long)expireIn.TotalMilliseconds);

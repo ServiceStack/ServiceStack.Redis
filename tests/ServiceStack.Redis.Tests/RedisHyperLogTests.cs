@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -8,7 +10,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_Add_to_Hyperlog()
         {
-            var redis = new RedisClient("10.0.0.64");
+            var redis = new RedisClient("10.0.0.14");
             redis.FlushAll();
 
             redis.AddToHyperLog("hyperlog", "a", "b", "c");
@@ -25,6 +27,22 @@ namespace ServiceStack.Redis.Tests
             var mergeCount = redis.CountHyperLog("hypermerge");
 
             Assert.That(mergeCount, Is.EqualTo(6));
-        } 
+        }
+
+        [Test]
+        public void Test_on_old_redisserver()
+        {
+            var redis = new RedisClient("10.0.0.14");
+            //var redis = new RedisClient();
+            redis.FlushAll();
+
+            //redis.ExpireEntryIn("key", TimeSpan.FromDays(14));
+
+            redis.Set("key", "value", TimeSpan.FromDays(14));
+
+            var value = redis.Get("key");
+
+            value.FromUtf8Bytes().Print();
+        }
     }
 }
