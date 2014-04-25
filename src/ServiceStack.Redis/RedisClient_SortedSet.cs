@@ -417,5 +417,42 @@ namespace ServiceStack.Redis
 		{
 			return base.ZUnionStore(intoSetId, setIds);
 		}
-	}
+
+        private static string GetSearchStart(string start)
+        {
+            return start == null
+                ? "-"
+                : start.IndexOfAny("[", "(", "-") != 0
+                    ? "[" + start
+                    : start;
+        }
+
+        private static string GetSearchEnd(string end)
+        {
+            return end == null
+                ? "+"
+                : end.IndexOfAny("[", "(", "+") != 0
+                    ? "[" + end
+                    : end;
+        }
+
+        public List<string> SearchSortedSet(string setId, string start = null, string end = null, int? skip=null, int? take=null)
+        {
+            start = GetSearchStart(start);
+            end = GetSearchEnd(end);
+
+            var ret = base.ZRangeByLex(setId, start, end, skip, take);
+            return ret.ToStringList();
+        }
+
+	    public long SearchSortedSetCount(string setId, string start = null, string end = null)
+        {
+            return base.ZLexCount(setId, GetSearchStart(start), GetSearchEnd(end));
+        }
+
+        public long RemoveRangeFromSortedSetBySearch(string setId, string start = null, string end = null)
+        {
+            return base.ZRemRangeByLex(setId, GetSearchStart(start), GetSearchEnd(end));
+        }
+    }
 }

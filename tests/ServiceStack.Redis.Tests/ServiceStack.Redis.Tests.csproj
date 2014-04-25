@@ -179,6 +179,7 @@
     <Compile Include="DiagnosticTests.cs" />
     <Compile Include="Examples\ServiceStack_Redis_UseCase.cs" />
     <Compile Include="Generic\RedisClientListTestExtra.cs" />
+    <Compile Include="LexTests.cs" />
     <Compile Include="LicenseUsageTests.cs" />
     <Compile Include="ManagedListGenericTests.cs" />
     <Compile Include="RedisExtensionTests.cs" />

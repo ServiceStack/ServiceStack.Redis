@@ -1647,6 +1647,44 @@ namespace ServiceStack.Redis
             return SendExpectLong(cmdWithArgs);
         }
 
+        public byte[][] ZRangeByLex(string setId, string min, string max, int? skip=null, int? take=null)
+        {
+            if (setId == null)
+                throw new ArgumentNullException("setId");
+
+            var cmdWithArgs = new List<byte[]>
+           	{
+           		Commands.ZRangeByLex, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes()
+           	};
+
+            if (skip.HasValue || take.HasValue)
+            {
+                cmdWithArgs.Add(Commands.Limit);
+                cmdWithArgs.Add(skip.GetValueOrDefault(0).ToUtf8Bytes());
+                cmdWithArgs.Add(take.GetValueOrDefault(0).ToUtf8Bytes());
+            }
+
+            return SendExpectMultiData(cmdWithArgs.ToArray());
+        }
+
+        public long ZLexCount(string setId, string min, string max)
+        {
+            if (setId == null)
+                throw new ArgumentNullException("setId");
+
+            return SendExpectLong(
+                Commands.ZLexCount, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes());
+        }
+
+        public long ZRemRangeByLex(string setId, string min, string max)
+        {
+            if (setId == null)
+                throw new ArgumentNullException("setId");
+
+            return SendExpectLong(
+                Commands.ZRemRangeByLex, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes());
+        }
+
         #endregion
 
 
