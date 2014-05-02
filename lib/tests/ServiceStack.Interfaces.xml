@@ -4,7 +4,7 @@
         <name>ServiceStack.Interfaces</name>
     </assembly>
     <members>
-        <member name="P:ServiceStack.AttributeBase.TypeId">
+        <member name="F:ServiceStack.AttributeBase.typeId">
             <summary>
             Required when using a TypeDescriptor to make it unique
             </summary>
@@ -311,6 +311,11 @@
             use to indicate that property is part of the pk
             </summary>
         </member>
+        <member name="T:ServiceStack.DataAnnotations.RowVersionAttribute">
+            <summary>
+            Used to indicate that property is a row version incremented automatically by the database
+            </summary>
+        </member>
         <member name="T:ServiceStack.DataAnnotations.SchemaAttribute">
             <summary>
             Used to annotate an Entity with its DB schema
@@ -328,9 +333,9 @@
             Decorate any type or property with adhoc info
             </summary>
         </member>
-        <member name="T:ServiceStack.Logging.ConsoleLogFactory">
+        <member name="T:ServiceStack.Logging.DebugLogFactory">
             <summary>
-            Creates a Console Logger, that logs all messages to: System.Console
+            Creates a Debug Logger, that logs all messages to: System.Diagnostics.Debug
             
             Made public so its testable
             </summary>
@@ -350,9 +355,9 @@
             Gets the logger.
             </summary>
         </member>
-        <member name="T:ServiceStack.Logging.ConsoleLogger">
+        <member name="T:ServiceStack.Logging.DebugLogger">
             <summary>
-            Default logger is to Console.WriteLine
+            Default logger is to System.Diagnostics.Debug.WriteLine
             
             Made public so its testable
             </summary>
@@ -469,45 +474,6 @@
             <value>
             	<c>true</c> if this instance is debug enabled; otherwise, <c>false</c>.
             </value>
-        </member>
-        <member name="M:ServiceStack.Logging.ConsoleLogger.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:ServiceStack.Logging.DebugLogger"/> class.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Logging.ConsoleLogger.#ctor(System.Type)">
-            <summary>
-            Initializes a new instance of the <see cref="T:ServiceStack.Logging.DebugLogger"/> class.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Logging.ConsoleLogger.Log(System.Object,System.Exception)">
-            <summary>
-            Logs the specified message.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Logging.ConsoleLogger.LogFormat(System.Object,System.Object[])">
-            <summary>
-            Logs the format.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Logging.ConsoleLogger.Log(System.Object)">
-            <summary>
-            Logs the specified message.
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Logging.DebugLogFactory">
-            <summary>
-            Creates a Debug Logger, that logs all messages to: System.Diagnostics.Debug
-            
-            Made public so its testable
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Logging.DebugLogger">
-            <summary>
-            Default logger is to System.Diagnostics.Debug.WriteLine
-            
-            Made public so its testable
-            </summary>
         </member>
         <member name="M:ServiceStack.Logging.DebugLogger.#ctor(System.String)">
             <summary>
@@ -639,6 +605,11 @@
             </summary>
             <param name="message">The message.</param>
         </member>
+        <member name="T:ServiceStack.IHasResponseStatus">
+            <summary>
+            Contract indication that the Response DTO has a ResponseStatus
+            </summary>
+        </member>
         <member name="T:ServiceStack.Logging.LogManager">
             <summary>
             Logging API for this library. You can inject your own implementation otherwise
@@ -661,41 +632,40 @@
             Use this to override the factory that is used to create loggers
             </summary>
         </member>
-        <member name="M:ServiceStack.Messaging.IMessageQueueClient.Publish(System.String,System.Byte[])">
+        <member name="M:ServiceStack.Messaging.IMessageQueueClient.Publish(System.String,ServiceStack.Messaging.IMessage)">
             <summary>
             Publish the specified message into the durable queue @queueName
             </summary>
-            <param name="queueName"></param>
-            <param name="messageBytes"></param>
         </member>
-        <member name="M:ServiceStack.Messaging.IMessageQueueClient.Notify(System.String,System.Byte[])">
+        <member name="M:ServiceStack.Messaging.IMessageQueueClient.Notify(System.String,ServiceStack.Messaging.IMessage)">
             <summary>
             Publish the specified message into the transient queue @queueName
             </summary>
-            <param name="queueName"></param>
-            <param name="messageBytes"></param>
         </member>
-        <member name="M:ServiceStack.Messaging.IMessageQueueClient.Get(System.String,System.Nullable{System.TimeSpan})">
+        <member name="M:ServiceStack.Messaging.IMessageQueueClient.Get``1(System.String,System.Nullable{System.TimeSpan})">
             <summary>
             Synchronous blocking get.
             </summary>
-            <param name="queueName"></param>
-            <param name="timeOut"></param>
-            <returns></returns>
         </member>
-        <member name="M:ServiceStack.Messaging.IMessageQueueClient.GetAsync(System.String)">
+        <member name="M:ServiceStack.Messaging.IMessageQueueClient.GetAsync``1(System.String)">
             <summary>
             Non blocking get message
             </summary>
-            <param name="queueName"></param>
-            <returns></returns>
         </member>
-        <member name="M:ServiceStack.Messaging.IMessageQueueClient.WaitForNotifyOnAny(System.String[])">
+        <member name="M:ServiceStack.Messaging.IMessageQueueClient.Ack(ServiceStack.Messaging.IMessage)">
             <summary>
-            Blocking wait for notifications on any of the supplied channels
+            Acknowledge the message has been successfully received or processed
             </summary>
-            <param name="channelNames"></param>
-            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Messaging.IMessageQueueClient.Nak(ServiceStack.Messaging.IMessage,System.Boolean,System.Exception)">
+            <summary>
+            Negative acknowledgement the message was not processed correctly
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Messaging.IMessageQueueClient.CreateMessage``1(System.Object)">
+            <summary>
+            Create a typed message from a raw MQ Response artefact
+            </summary>
         </member>
         <member name="T:ServiceStack.Messaging.IMessageService">
             <summary>
@@ -755,21 +725,11 @@
             Get a list of all message types registered on this MQ Host
             </summary>
         </member>
-        <member name="T:ServiceStack.Messaging.MessageError">
-            <summary>
-            An Error Message Type that can be easily serialized
-            </summary>
-        </member>
         <member name="T:ServiceStack.Messaging.Message`1">
             <summary>
             Basic implementation of IMessage[T]
             </summary>
             <typeparam name="T"></typeparam>
-        </member>
-        <member name="T:ServiceStack.Messaging.MessagingException">
-            <summary>
-            Base Exception for all ServiceStack.Messaging exceptions
-            </summary>
         </member>
         <member name="T:ServiceStack.Messaging.QueueNames`1">
             <summary>
@@ -1155,6 +1115,11 @@
             The expected Response ContentType for this request
             </summary>
         </member>
+        <member name="P:ServiceStack.Web.IRequest.HasExplicitResponseContentType">
+            <summary>
+            Whether the ResponseContentType has been explicitly overrided or whether it was just the default
+            </summary>
+        </member>
         <member name="P:ServiceStack.Web.IRequest.Items">
             <summary>
             Attach any data to this request that all filters and services can access.
@@ -1202,7 +1167,17 @@
         </member>
         <member name="P:ServiceStack.Web.IHttpRequest.XForwardedFor">
             <summary>
-            The value of the X-Forwarded-For header, null if null or empty
+            The IP Address of the X-Forwarded-For header, null if null or empty
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Web.IHttpRequest.XForwardedPort">
+            <summary>
+            The Port number of the X-Forwarded-Port header, null if null or empty
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Web.IHttpRequest.XForwardedProtocol">
+            <summary>
+            The http or https scheme of the X-Forwarded-Proto header, null if null or empty
             </summary>
         </member>
         <member name="P:ServiceStack.Web.IHttpRequest.XRealIp">
@@ -1240,6 +1215,11 @@
         <member name="P:ServiceStack.Web.IResponse.OriginalResponse">
             <summary>
             The underlying ASP.NET or HttpListener HttpResponse
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Web.IResponse.Dto">
+            <summary>
+            The Response DTO
             </summary>
         </member>
         <member name="P:ServiceStack.Web.IResponse.IsClosed">
@@ -1320,12 +1300,12 @@
             Returns the first matching RestPath
             </summary>
         </member>
-        <member name="M:ServiceStack.Web.IServiceController.ExecuteMessage``1(ServiceStack.Messaging.IMessage{``0})">
+        <member name="M:ServiceStack.Web.IServiceController.ExecuteMessage(ServiceStack.Messaging.IMessage)">
             <summary>
             Executes the MQ DTO request.
             </summary>
         </member>
-        <member name="M:ServiceStack.Web.IServiceController.ExecuteMessage``1(ServiceStack.Messaging.IMessage{``0},ServiceStack.Web.IRequest)">
+        <member name="M:ServiceStack.Web.IServiceController.ExecuteMessage(ServiceStack.Messaging.IMessage,ServiceStack.Web.IRequest)">
             <summary>
             Executes the MQ DTO request with the supplied requestContext
             </summary>
@@ -1393,6 +1373,17 @@
             </param>
             <returns>The same <see cref="T:ServiceStack.Web.IServiceRoutes"/> instance;
             	never <see langword="null"/>.</returns>
+        </member>
+        <member name="M:ServiceStack.Web.IServiceRoutes.Add(System.Type,System.String,System.String,System.Int32)">
+            <summary>
+            	Maps the specified REST path to the specified request DTO, 
+            	specifies the HTTP verbs supported by the path, and indicates
+            	the default MIME type of the returned response.
+            </summary>
+            <param name="priority">
+                Used to rank the precedences of route definitions in reverse routing. 
+                i.e. Priorities below 0 are auto-generated have less precedence.
+            </param>
         </member>
         <member name="M:ServiceStack.Web.IServiceRoutes.Add(System.Type,System.String,System.String,System.String,System.String)">
             <summary>
@@ -1517,6 +1508,12 @@
             	by the service, <see langword="null"/> or empty if all verbs are supported.
             </value>
         </member>
+        <member name="P:ServiceStack.RouteAttribute.Priority">
+            <summary>
+            Used to rank the precedences of route definitions in reverse routing. 
+            i.e. Priorities below 0 are auto-generated have less precedence.
+            </summary>
+        </member>
         <member name="T:ServiceStack.FallbackRouteAttribute">
             <summary>
             Fallback routes have the lowest precedence, i.e. after normal Routes, static files or any matching Catch All Handlers.
@@ -1526,11 +1523,6 @@
             <summary>
             Generic ResponseStatus for when Response Type can't be inferred.
             In schemaless formats like JSON, JSV it has the same shape as a typed Response DTO
-            </summary>
-        </member>
-        <member name="T:ServiceStack.IHasResponseStatus">
-            <summary>
-            Contract indication that the Response DTO has a ResponseStatus
             </summary>
         </member>
         <member name="T:ServiceStack.RequestLogEntry">
