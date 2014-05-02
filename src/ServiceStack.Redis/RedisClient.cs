@@ -246,6 +246,14 @@ namespace ServiceStack.Redis
             base.MSet(keyBytes, valBytes);
         }
 
+        /// <summary>
+        /// Alias for GetValue
+        /// </summary>
+        public string GetEntry(string key)
+        {
+            return GetValue(key);
+        }
+
         public string GetValue(string key)
         {
             var bytes = Get(key);
