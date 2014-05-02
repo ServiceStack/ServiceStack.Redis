@@ -26,6 +26,7 @@ namespace ServiceStack.Redis
     {
         private static Timer UsageTimer;
         private static int __requestsPerHour = 0;
+        private const int Unknown = -1;
         public int ServerVersionNumber { get; set; }
 
         public static void DisposeTimers()
@@ -91,7 +92,7 @@ namespace ServiceStack.Redis
                     if (ServerVersionNumber == 0)
                     {
                         var parts = ServerVersion.Split('.');
-                        var version = int.Parse(parts[0]) * 1000;
+                        var version = int.Parse(parts[0])*1000;
                         if (parts.Length > 1)
                             version += int.Parse(parts[1])*100;
                         if (parts.Length > 2)
@@ -100,7 +101,14 @@ namespace ServiceStack.Redis
                         ServerVersionNumber = version;
                     }
                 }
-                catch {}
+                catch (Exception)
+                {
+                    //Twemproxy doesn't support the INFO command so automatically closes the socket
+                    //Fallback to ServerVersionNumber=Unknown then try re-connecting
+                    ServerVersionNumber = Unknown;
+                    Connect();
+                    return;
+                }
                     
                 var ipEndpoint = socket.LocalEndPoint as IPEndPoint;
                 clientPort = ipEndpoint != null ? ipEndpoint.Port : -1;

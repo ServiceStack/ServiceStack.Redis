@@ -274,6 +274,7 @@
     <Compile Include="RedisPersistenceProviderTests.cs" />
     <Compile Include="ShippersExample.cs" />
     <Compile Include="TestData\PopulateTestData.cs" />
+    <Compile Include="TwemproxyTests.cs" />
     <Compile Include="UserSessionRedisClientTests.cs" />
     <Compile Include="ValueTypeExamples.cs" />
     <Compile Include="QueueTests.cs" />
