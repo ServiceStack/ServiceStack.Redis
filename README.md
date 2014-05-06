@@ -14,7 +14,7 @@ These new operations are available as a 1:1 mapping with redis-server on `IRedis
 public interface IRedisNativeClient
 {
     ...
-    byte[][] ZRangeByLex(string setId, string min, string max, int? skip = null, int? take = null);
+    byte[][] ZRangeByLex(string setId, string min, string max, int? skip=null, int? take=null);
     long ZLexCount(string setId, string min, string max);
     long ZRemRangeByLex(string setId, string min, string max);
 }
@@ -26,7 +26,7 @@ And the more user-friendly APIs under `IRedisClient`:
 public interface IRedisClient
 {
     ...
-    List<string> SearchSortedSet(string setId, string start=null, string end=null, int? skip=null, int? take=null);
+    List<string> SearchSortedSet(string setId, string start=null, string end=null);
     long SearchSortedSetCount(string setId, string start=null, string end=null);
     long RemoveRangeFromSortedSetBySearch(string setId, string start=null, string end=null);
 }
