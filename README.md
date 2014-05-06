@@ -3,6 +3,52 @@ follow [@servicestack](http://twitter.com/servicestack) for updates.
 
 # C#/.NET Client for Redis
 
+### New Lex Operations
+
+The new [ZRANGEBYLEX](http://redis.io/commands/zrangebylex) sorted set operations allowing you to query a sorted set lexically have been added. 
+A good showcase for this is available on [autocomplete.redis.io](http://autocomplete.redis.io/).
+
+These new operations are available as a 1:1 mapping with redis-server on `IRedisNativeClient`:
+
+```csharp
+public interface IRedisNativeClient
+{
+    ...
+    byte[][] ZRangeByLex(string setId, string min, string max, int? skip = null, int? take = null);
+    long ZLexCount(string setId, string min, string max);
+    long ZRemRangeByLex(string setId, string min, string max);
+}
+```
+
+And the more user-friendly APIs under `IRedisClient`:
+
+```csharp
+public interface IRedisClient
+{
+    ...
+    List<string> SearchSortedSet(string setId, string start=null, string end=null, int? skip=null, int? take=null);
+    long SearchSortedSetCount(string setId, string start=null, string end=null);
+    long RemoveRangeFromSortedSetBySearch(string setId, string start=null, string end=null);
+}
+```
+
+Just like NuGet version matchers, Redis uses `[` char to express inclusiveness and `(` char for exclusiveness.
+Since the `IRedisClient` APIs defaults to inclusive searches, these two APIs are the same:
+
+```csharp
+Redis.SearchSortedSetCount("zset", "a", "c")
+Redis.SearchSortedSetCount("zset", "[a", "[c")
+```
+
+Alternatively you can specify one or both bounds to be exclusive by using the `(` prefix, e.g:
+
+```csharp
+Redis.SearchSortedSetCount("zset", "a", "(c")
+Redis.SearchSortedSetCount("zset", "(a", "(c")
+```
+
+More API examples are available in [LexTests.cs](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/LexTests.cs).
+
 ### New HyperLog API
 
 The development branch of Redis server (available when v3.0 is released) includes an ingenious algorithm to approximate the unique elements in a set with maximum space and time efficiency. For details about how it works see Redis's creator Salvatore's blog who [explains it in great detail](http://antirez.com/news/75). Essentially it lets you maintain an efficient way to count and merge unique elements in a set without having to store its elements. 
