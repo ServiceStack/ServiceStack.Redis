@@ -52,7 +52,7 @@ namespace ServiceStack.Redis.Tests
             var keys = 11.Times(x => "KEY" + x);
             Redis.SetAll(keys.ToSafeDictionary(x => x));
 
-            var ret = Redis.Scan(0, 10, match: "KEY1*");
+            var ret = Redis.Scan(0, 11, match: "KEY1*");
 
             Assert.That(ret.Cursor, Is.GreaterThanOrEqualTo(0));
             Assert.That(ret.AsStrings(), Is.EquivalentTo(new[] { "KEY1", "KEY10" }));
