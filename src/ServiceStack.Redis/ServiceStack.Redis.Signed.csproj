@@ -173,6 +173,10 @@
     <Compile Include="ShardedConnectionPool.cs" />
     <Compile Include="ShardedRedisClientManager.cs" />
     <Compile Include="Support\ConsistentHash.cs" />
+    <Compile Include="Support\Diagnostic\InvokeEventArgs.cs" />
+    <Compile Include="Support\Diagnostic\TrackingFrame.cs" />
+    <Compile Include="Support\Diagnostic\TrackingRedisClientProxy.cs" />
+    <Compile Include="Support\Diagnostic\TrackingRedisClientsManager.cs" />
     <Compile Include="Support\Locking\IDistributedLock.cs" />
     <Compile Include="Support\OptimizedObjectSerializer.cs" />
     <Compile Include="Support\Queue\ISequentialData.cs" />
