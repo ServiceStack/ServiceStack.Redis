@@ -493,7 +493,6 @@ namespace ServiceStack.Redis
             return ReadDeeplyNestedMultiData();
         }
 
-        [Conditional("DEBUG")]
         protected void Log(string fmt, params object[] args)
         {
             log.DebugFormat("{0}", string.Format(fmt, args).Trim());
