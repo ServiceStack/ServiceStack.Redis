@@ -263,7 +263,8 @@ namespace ServiceStack.Redis
             if (__requestsPerHour % 20 == 0)
                 LicenseUtils.AssertValidUsage(LicenseFeature.Redis, QuotaType.RequestsPerHour, __requestsPerHour);
 
-            CmdLog(cmdWithBinaryArgs);
+            if (log.IsDebugEnabled)
+                CmdLog(cmdWithBinaryArgs);
 
             //Total command lines count
             WriteAllToSendBuffer(cmdWithBinaryArgs);
@@ -498,7 +499,6 @@ namespace ServiceStack.Redis
             log.DebugFormat("{0}", string.Format(fmt, args).Trim());
         }
 
-        [Conditional("DEBUG")]
         protected void CmdLog(byte[][] args)
         {
             var sb = new StringBuilder();
@@ -526,7 +526,8 @@ namespace ServiceStack.Redis
 
             var s = ReadLine();
 
-            Log((char)c + s);
+            if (log.IsDebugEnabled)
+                Log((char)c + s);
 
             if (c == '-')
                 throw CreateResponseError(s.StartsWith("ERR") && s.Length >= 4 ? s.Substring(4) : s);
@@ -540,7 +541,8 @@ namespace ServiceStack.Redis
 
             var s = ReadLine();
 
-            Log((char)c + s);
+            if (log.IsDebugEnabled)
+                Log((char)c + s);
 
             if (c == '-')
                 throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
@@ -557,7 +559,8 @@ namespace ServiceStack.Redis
 
             var s = ReadLine();
 
-            Log((char)c + s);
+            if (log.IsDebugEnabled)
+                Log((char)c + s);
 
             if (c == '-')
                 throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
@@ -583,7 +586,8 @@ namespace ServiceStack.Redis
 
             var s = ReadLine();
 
-            Log("R: {0}", s);
+            if (log.IsDebugEnabled)
+                Log("R: {0}", s);
 
             if (c == '-')
                 throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
@@ -605,7 +609,8 @@ namespace ServiceStack.Redis
 
             var s = ReadLine();
 
-            Log("R: {0}", s);
+            if (log.IsDebugEnabled)
+                Log("R: {0}", s);
 
             if (c == '-')
                 throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
@@ -627,7 +632,8 @@ namespace ServiceStack.Redis
 
         private byte[] ParseSingleLine(string r)
         {
-            Log("R: {0}", r);
+            if (log.IsDebugEnabled)
+                Log("R: {0}", r);
             if (r.Length == 0)
                 throw CreateResponseError("Zero length response");
 
@@ -679,7 +685,8 @@ namespace ServiceStack.Redis
                 throw CreateResponseError("No more data");
 
             var s = ReadLine();
-            Log("R: {0}", s);
+            if (log.IsDebugEnabled)
+                Log("R: {0}", s);
 
             switch (c)
             {
@@ -727,7 +734,8 @@ namespace ServiceStack.Redis
                 throw CreateResponseError("No more data");
 
             var s = ReadLine();
-            Log("R: {0}", s);
+            if (log.IsDebugEnabled)
+                Log("R: {0}", s);
 
             switch (c)
             {
@@ -765,7 +773,8 @@ namespace ServiceStack.Redis
                 throw CreateResponseError("No more data");
 
             var s = ReadLine();
-            Log("R: {0}", s);
+            if (log.IsDebugEnabled)
+                Log("R: {0}", s);
             if (c == '-')
                 throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
             if (c == '*')
