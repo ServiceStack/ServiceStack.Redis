@@ -528,6 +528,12 @@
             Only generate specified Verb entries for "ANY" routes
             </summary>
         </member>
+        <member name="F:ServiceStack.RequestContext.UseThreadStatic">
+            <summary>
+            Tell ServiceStack to use ThreadStatic Items Collection for RequestScoped items.
+            Warning: ThreadStatic Items aren't pinned to the same request in async services which callback on different threads.
+            </summary>
+        </member>
         <member name="M:ServiceStack.RequestContext.TrackDisposable(System.IDisposable)">
             <summary>
             Track any IDisposable's to dispose of at the end of the request in IAppHost.OnEndRequest()
