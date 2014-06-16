@@ -667,6 +667,12 @@
             Create a typed message from a raw MQ Response artefact
             </summary>
         </member>
+        <member name="M:ServiceStack.Messaging.IMessageQueueClient.GetTempQueueName">
+            <summary>
+            Create a temporary Queue for Request / Reply
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:ServiceStack.Messaging.IMessageService">
             <summary>
             Simple definition of an MQ Host
@@ -1062,6 +1068,11 @@
         <member name="P:ServiceStack.Web.IHttpResult.RequestContext">
             <summary>
             Holds the request call context
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Web.IHttpResult.PaddingLength">
+            <summary>
+            The padding length written with the body, to be added to ContentLength of body
             </summary>
         </member>
         <member name="T:ServiceStack.Web.IHttpRequest">
