@@ -3089,7 +3089,7 @@
         </member>
         <member name="M:ServiceStack.Auth.RegisterService`1.UpdateUserAuth(ServiceStack.Register)">
             <summary>
-                Logic to update UserAuth from Registration info, not enabled on OnPut because of security.
+            Logic to update UserAuth from Registration info, not enabled on PUT because of security.
             </summary>
         </member>
         <member name="T:ServiceStack.Auth.SaltedHash">
