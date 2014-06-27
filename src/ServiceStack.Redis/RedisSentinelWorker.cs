@@ -1,4 +1,5 @@
 ﻿using ServiceStack;
+using ServiceStack.Logging;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ namespace ServiceStack.Redis
 {
     internal class RedisSentinelWorker : IDisposable
     {
+        protected static readonly ILog Log = LogManager.GetLogger(typeof(RedisSentinelWorker));
+
         private RedisClient sentinelClient;
         private RedisClient sentinelPubSubClient;
         private PooledRedisClientManager clientsManager;
@@ -29,6 +32,8 @@ namespace ServiceStack.Redis
             this.sentinelSubscription = this.sentinelPubSubClient.CreateSubscription();
             this.sentinelSubscription.OnMessage = SentinelMessageReceived;
             this.clientsManager = clientsManager;
+
+            Log.Info("Set up Redis Sentinel on {0}".Fmt(host));
         }
 
         private void SubscribeForChanges(object arg)
@@ -40,6 +45,7 @@ namespace ServiceStack.Redis
             }
             catch (Exception)
             {
+                Log.Error("Problem Subscribing to Redis Channel on {0}:{1}".Fmt(this.sentinelClient.Host, this.sentinelClient.Port));
                 // problem communicating to sentinel
                 if (SentinelError != null)
                 {
@@ -55,11 +61,11 @@ namespace ServiceStack.Redis
         /// <param name="message"></param>
         private void SentinelMessageReceived(string channel, string message)
         {
-            Debug.WriteLine("{0} - {1}".Fmt(channel, message));
-
             // {+|-}sdown is the event for server coming up or down
             if (channel.ToLower().Contains("sdown"))
             {
+                Log.Info("Sentinel detected server down/up with message:{0}".Fmt(message));
+
                 ConfigureRedisFromSentinel();
             }
         }
@@ -69,6 +75,8 @@ namespace ServiceStack.Redis
         /// </summary>
         private void ConfigureRedisFromSentinel()
         {
+            Log.Info("Configuring Redis Clients");
+
             var masters = ConvertMasterArrayToList(this.sentinelClient.Sentinel("master", this.sentinelName));
             var slaves = ConvertSlaveArrayToList(this.sentinelClient.Sentinel("slaves", this.sentinelName));
 
