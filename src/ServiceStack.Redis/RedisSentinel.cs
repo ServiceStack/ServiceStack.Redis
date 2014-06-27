@@ -18,6 +18,7 @@ namespace ServiceStack.Redis
 {
     public class RedisSentinel : IRedisSentinel
     {
+        private readonly string sentinelName;
         private int failures = 0;
         private int sentinelIndex = -1;
         private List<string> sentinels;
@@ -25,10 +26,11 @@ namespace ServiceStack.Redis
         private PooledRedisClientManager clientManager;
         private static int MaxFailures = 5;
 
-        public RedisSentinel(IEnumerable<string> sentinelHosts)
+        public RedisSentinel(IEnumerable<string> sentinelHosts, string sentinelName)
         {
             if (sentinelHosts == null || sentinelHosts.Count() == 0) throw new ArgumentException("sentinels must have at least one entry");
 
+            this.sentinelName = sentinelName;
             this.sentinels = new List<string>(sentinelHosts);
         }
 
@@ -80,7 +82,7 @@ namespace ServiceStack.Redis
                 sentinelIndex = 0;
             }
 
-            var sentinelWorker = new RedisSentinelWorker(sentinels[sentinelIndex], "mymaster", this.clientManager);
+            var sentinelWorker = new RedisSentinelWorker(sentinels[sentinelIndex], this.sentinelName, this.clientManager);
 
             sentinelWorker.SentinelError += Worker_SentinelError;
             return sentinelWorker;
