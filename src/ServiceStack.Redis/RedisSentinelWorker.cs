@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -131,7 +132,7 @@ namespace ServiceStack.Redis
                 {
                     if (item is byte[])
                     {
-                        value = System.Text.Encoding.Default.GetString((byte[])item);
+                        value = Encoding.UTF8.GetString((byte[])item);
                         if (value == "ip")
                         {
                             fetchIP = true;
@@ -199,7 +200,7 @@ namespace ServiceStack.Redis
             {
                 if (item is byte[])
                 {
-                    value = System.Text.Encoding.Default.GetString((byte[])item);
+                    value = Encoding.UTF8.GetString((byte[])item);
                     if (value == "ip")
                     {
                         fetchIP = true;
