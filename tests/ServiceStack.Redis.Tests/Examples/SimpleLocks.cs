@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
-using ServiceStack.Common;
 
 namespace ServiceStack.Redis.Tests.Examples
 {
@@ -109,6 +107,43 @@ namespace ServiceStack.Redis.Tests.Examples
             {
                 
             }
+        }
+
+        [Test]
+        public void AcquireLock_using_Tasks()
+        {
+            const int noOfClients = 4;
+            var tasks = new Task[noOfClients];
+            for (var i = 0; i < noOfClients; i++)
+            {
+                Thread.Sleep(2000);
+                tasks[i] = Task.Factory.StartNew((object clientNo) =>
+                {
+                    try
+                    {
+                        Console.WriteLine("About to process " + clientNo);
+                        //var redisClient = new RedisClient("xxxx.redis.cache.windows.net", 6379, "xxxx");
+                        var redisClient = new RedisClient("localhost", 6379);
+
+                        using (redisClient.AcquireLock("testlock1", TimeSpan.FromMinutes(3)))
+                        {
+                            Console.WriteLine("client {0} acquired lock", (int)clientNo);
+                            var counter = redisClient.Get<int>("atomic-counter");
+
+                            //Add an artificial delay to demonstrate locking behaviour
+                            Thread.Sleep(100);
+
+                            redisClient.Set("atomic-counter", counter + 1);
+                            Console.WriteLine("client {0} released lock", (int)clientNo);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+
+                }, i + 1);
+            }            
         }
 
 	}
