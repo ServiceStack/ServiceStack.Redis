@@ -144,12 +144,12 @@ namespace ServiceStack.Redis
 
 		public void StoreFromIntersect(params IRedisSortedSet[] ofSets)
 		{
-			client.StoreIntersectFromSets(setId, ofSets.GetIds());
+			client.StoreIntersectFromSortedSets(setId, ofSets.GetIds());
 		}
 
 		public void StoreFromUnion(params IRedisSortedSet[] ofSets)
 		{
-			client.StoreUnionFromSets(setId, ofSets.GetIds());
+			client.StoreUnionFromSortedSets(setId, ofSets.GetIds());
 		}
 
 		public long GetItemIndex(string value)
