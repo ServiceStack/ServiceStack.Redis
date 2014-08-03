@@ -6,6 +6,7 @@ using NUnit.Framework;
 
 namespace ServiceStack.Redis.Tests
 {
+    [Explicit("Reenable when CI has Sentinel")]
 	[TestFixture, Category("Integration")]
 	public class RedisSentinelTests
 		: RedisClientTestsBase
