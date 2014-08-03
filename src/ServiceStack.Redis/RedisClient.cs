@@ -622,9 +622,10 @@ namespace ServiceStack.Redis
             foreach (var entry in registeredTypeIdsWithinPipelineMap)
             {
                 var typeIdsSetKey = entry.Key;
+                var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
+
                 foreach (var id in entry.Value)
                 {
-                    var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
                     registeredTypeIdsWithinPipeline.Each(x => this.AddItemToSet(typeIdsSetKey, id));
                 }
             }
