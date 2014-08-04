@@ -617,17 +617,12 @@ namespace ServiceStack.Redis
             }
         }
 
+        // Called just after original Pipeline is closed.
         internal void AddTypeIdsRegisteredDuringPipeline()
         {
             foreach (var entry in registeredTypeIdsWithinPipelineMap)
             {
-                var typeIdsSetKey = entry.Key;
-                var registeredTypeIdsWithinPipeline = GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey);
-
-                foreach (var id in entry.Value)
-                {
-                    registeredTypeIdsWithinPipeline.Each(x => this.AddItemToSet(typeIdsSetKey, id));
-                }
+                AddRangeToSet(entry.Key, entry.Value.ToList());
             }
             registeredTypeIdsWithinPipelineMap = new Dictionary<string, HashSet<string>>();
         }
@@ -636,7 +631,6 @@ namespace ServiceStack.Redis
         {
             registeredTypeIdsWithinPipelineMap = new Dictionary<string, HashSet<string>>();
         }
-
 
         public T GetById<T>(object id)
         {
