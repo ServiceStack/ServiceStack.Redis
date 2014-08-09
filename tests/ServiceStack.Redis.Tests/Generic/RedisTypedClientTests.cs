@@ -81,7 +81,8 @@ namespace ServiceStack.Redis.Tests.Generic
 			Assert.That(RedisTyped.GetById("key"), Is.Null);
 		}
 
-		[Test]
+        [Explicit("Changes in system clock can break test")]
+        [Test]
 		public void Can_ExpireAt()
 		{
 			var cachedRecord = new CacheRecord
