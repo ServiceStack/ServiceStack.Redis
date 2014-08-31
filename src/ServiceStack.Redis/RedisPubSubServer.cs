@@ -204,7 +204,9 @@ namespace ServiceStack.Redis
                 if (KeepAliveRetryAfterMs != null)
                 {
                     Thread.Sleep(KeepAliveRetryAfterMs.Value);
-                    Start();
+
+                    if (Interlocked.CompareExchange(ref status, 0, 0) != Status.Disposed)
+                        Start();
                 }
             }
         }
