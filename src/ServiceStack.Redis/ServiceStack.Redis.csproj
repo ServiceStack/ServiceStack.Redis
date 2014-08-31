@@ -165,6 +165,7 @@
     <Compile Include="Pipeline\RedisCommand.cs" />
     <Compile Include="RedisClient_Slowlog.cs" />
     <Compile Include="RedisEndpoint.cs" />
+    <Compile Include="RedisPubSubServer.cs" />
     <Compile Include="RedisSentinel.cs" />
     <Compile Include="RedisSentinelWorker.cs" />
     <Compile Include="ScanResult.cs" />

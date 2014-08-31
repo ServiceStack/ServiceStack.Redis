@@ -5,10 +5,34 @@ using ServiceStack.Redis.Generic;
 namespace ServiceStack.Redis
 {
 	/// <summary>
-	/// Useful wrapper IRedisClientsManager to cut down the boiler plat of most IRedisClient access
+	/// Useful wrapper IRedisClientsManager to cut down the boiler plate of most IRedisClient access
 	/// </summary>
 	public static class RedisClientsManagerExtensions
 	{
+        /// <summary>
+        /// Creates a PubSubServer that uses a background thread to listen and process for
+        /// Redis Pub/Sub messages published to the specified channel. 
+        /// Use optional callbacks to listen for message, error and life-cycle events.
+        /// Callbacks can be assigned later, then call Start() for PubSubServer to start listening for messages
+        /// </summary>
+        public static IRedisPubSubServer CreatePubSubServer(this IRedisClientsManager redisManager, 
+            string channel,
+            Action<string, string> onMessage = null,
+            Action<Exception> onError = null,
+            Action onInit = null,
+            Action onStart = null,
+            Action onStop = null)
+        {
+            return new RedisPubSubServer(redisManager, channel)
+            {
+                OnMessage = onMessage,
+                OnError = onError,
+                OnInit = onInit,
+                OnStart = onStart,
+                OnStop = onStop,
+            };
+        }
+
 		public static void Exec(this IRedisClientsManager redisManager, Action<IRedisClient> lambda)
 		{
 			using (var redis = redisManager.GetClient())
