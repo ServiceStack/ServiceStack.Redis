@@ -186,6 +186,11 @@
             The AppHost config
             </summary>
         </member>
+        <member name="P:ServiceStack.IAppHost.AppSettings">
+            <summary>
+            The AppHost AppSettings. Defaults to App or Web.config appSettings.
+            </summary>
+        </member>
         <member name="P:ServiceStack.IAppHost.Plugins">
             <summary>
             List of pre-registered and user-defined plugins to be enabled in this AppHost
@@ -346,6 +351,11 @@
         <member name="P:ServiceStack.Auth.AspNetWindowsAuthProvider.LimitAccessToRoles">
             <summary>
             Only allow access to users in specified roles
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.AuthEvents">
+            <summary>
+            Conveneint base class with empty virtual methods so subclasses only need to override the hooks they need.
             </summary>
         </member>
         <member name="T:ServiceStack.Auth.OdnoklassnikiAuthProvider">
