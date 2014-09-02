@@ -105,6 +105,38 @@ namespace ServiceStack.Redis
             }
         }
 
+        private Dictionary<string, string> ParseDataArray(object[] items)
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            bool isKey = false;
+            string key = null;
+            string value = null;
+
+            foreach (var item in items)
+            {
+                if (item is byte[])
+                {
+                    isKey = !isKey;
+
+                    if (isKey)
+                    {
+                        key = Encoding.UTF8.GetString((byte[])item);
+                    }
+                    else
+                    {
+                        value = Encoding.UTF8.GetString((byte[])item);
+
+                        if (!data.ContainsKey(key))
+                        {
+                            data.Add(key, value);
+                        }
+                    }
+                }
+            }
+
+            return data;
+        }
+
         /// <summary>
         /// Takes output from sentinel slaves command and converts into a list of servers
         /// </summary>
@@ -113,69 +145,26 @@ namespace ServiceStack.Redis
         private IEnumerable<string> ConvertSlaveArrayToList(object[] slaves)
         {
             var servers = new List<string>();
-            bool fetchIP = false;
-            bool fetchPort = false;
-            bool fetchFlags = false;
             string ip = null;
             string port = null;
-            string value = null;
             string flags = null;
 
             foreach (var slave in slaves.OfType<object[]>())
             {
-                fetchIP = false;
-                fetchPort = false;
-                ip = null;
-                port = null;
+                var data = ParseDataArray(slave);
 
-                foreach (var item in slave)
+                data.TryGetValue("flags", out flags);
+                data.TryGetValue("ip", out ip);
+                data.TryGetValue("port", out port);
+
+                if (ip == "127.0.0.1")
                 {
-                    if (item is byte[])
-                    {
-                        value = Encoding.UTF8.GetString((byte[])item);
-                        if (value == "ip")
-                        {
-                            fetchIP = true;
-                            continue;
-                        }
-                        else if (value == "port")
-                        {
-                            fetchPort = true;
-                            continue;
-                        }
-                        else if (value == "flags")
-                        {
-                            fetchFlags = true;
-                            continue;
-                        }
-                        else if (fetchIP)
-                        {
-                            ip = value;
+                    ip = this.sentinelClient.Host;
+                }
 
-                            if (ip == "127.0.0.1")
-                            {
-                                ip = this.sentinelClient.Host;
-                            }
-                            fetchIP = false;
-                        }
-                        else if (fetchPort)
-                        {
-                            port = value;
-                            fetchPort = false;
-                        }
-                        else if (fetchFlags)
-                        {
-                            flags = value;
-                            fetchFlags = false;
-
-                            if (ip != null && port != null && !flags.Contains("s_down"))
-                            {
-                                servers.Add("{0}:{1}".Fmt(ip, port));
-                            }
-                        }
-
-
-                    }
+                if (ip != null && port != null && !flags.Contains("s_down") && !flags.Contains("o_down"))
+                {
+                    servers.Add("{0}:{1}".Fmt(ip, port));
                 }
             }
 
@@ -190,48 +179,17 @@ namespace ServiceStack.Redis
         private IEnumerable<string> ConvertMasterArrayToList(object[] items)
         {
             var servers = new List<string>();
-            bool fetchIP = false;
-            bool fetchPort = false;
             string ip = null;
             string port = null;
-            string value = null;
 
-            foreach (var item in items)
+            var data = ParseDataArray(items);
+
+            data.TryGetValue("ip", out ip);
+            data.TryGetValue("port", out port);
+
+            if (ip != null && port != null)
             {
-                if (item is byte[])
-                {
-                    value = Encoding.UTF8.GetString((byte[])item);
-                    if (value == "ip")
-                    {
-                        fetchIP = true;
-                        continue;
-                    }
-                    else if (value == "port")
-                    {
-                        fetchPort = true;
-                        continue;
-                    }
-                    else if (fetchIP)
-                    {
-                        ip = value;
-                        if (ip == "127.0.0.1")
-                        {
-                            ip = this.sentinelClient.Host;
-                        }
-                        fetchIP = false;
-                    }
-                    else if (fetchPort)
-                    {
-                        port = value;
-                        fetchPort = false;
-                    }
-
-                    if (ip != null && port != null)
-                    {
-                        servers.Add("{0}:{1}".Fmt(ip, port));
-                        break;
-                    }
-                }
+                servers.Add("{0}:{1}".Fmt(ip, port));
             }
 
             return servers;

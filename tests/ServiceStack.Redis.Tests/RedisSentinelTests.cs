@@ -63,5 +63,20 @@ namespace ServiceStack.Redis.Tests
 			Assert.AreEqual(host, "127.0.0.1");		// IP of localhost
 			Assert.AreEqual(port, TestConfig.RedisPort.ToString());
 		}
+
+        [Test]
+        public void Can_Get_Redis_ClientsManager()
+        {
+            var sentinel = new RedisSentinel(new[] { "{0}:{1}".Fmt(TestConfig.SingleHost, TestConfig.RedisSentinelPort) }, TestConfig.MasterName);
+
+            var clientsManager = sentinel.Setup();
+            var client = clientsManager.GetClient();
+
+            Assert.AreEqual(client.Host, "127.0.0.1");
+            Assert.AreEqual(client.Port, TestConfig.RedisPort);
+
+            client.Dispose();
+            sentinel.Dispose();
+        }
 	}
 }
