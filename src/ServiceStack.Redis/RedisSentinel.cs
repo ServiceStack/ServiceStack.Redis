@@ -52,25 +52,35 @@ namespace ServiceStack.Redis
 
         private void GetValidSentinel()
         {
-            while (this.clientManager == null && failures < RedisSentinel.MaxFailures)
+            while (this.clientManager == null && ShouldRetry())
             {
                 try
                 {
-                    worker = GetNextSentinel();
-                    clientManager = worker.GetClientManager();
-                    worker.BeginListeningForConfigurationChanges();
+                    this.worker = GetNextSentinel();
+                    this.clientManager = worker.GetClientManager();
+                    this.worker.BeginListeningForConfigurationChanges();
                 }
                 catch (RedisException)
                 {
-                    if (worker != null)
+                    if (this.worker != null)
                     {
-                        worker.SentinelError -= Worker_SentinelError;
-                        worker.Dispose();
+                        this.worker.SentinelError -= Worker_SentinelError;
+                        this.worker.Dispose();
                     }
 
-                    failures++;
+                    this.failures++;
                 }
             }
+        }
+
+        /// <summary>
+        /// Check if GetValidSentinel should try the next sentinel server
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>This will be true if the failures is less than either RedisSentinel.MaxFailures or the # of sentinels, whatever is greater</remarks>
+        private bool ShouldRetry()
+        {
+            return this.failures < Math.Max(RedisSentinel.MaxFailures, this.sentinels.Count);
         }
 
         private RedisSentinelWorker GetNextSentinel()
@@ -88,15 +98,22 @@ namespace ServiceStack.Redis
             return sentinelWorker;
         }
 
+        /// <summary>
+        /// Raised if there is an error from a sentinel worker
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Worker_SentinelError(object sender, EventArgs e)
         {
             var worker = sender as RedisSentinelWorker;
 
             if (worker != null)
             {
+                // dispose the worker
                 worker.SentinelError -= Worker_SentinelError;
                 worker.Dispose();
 
+                // get a new worker and start looking for more changes
                 this.worker = GetNextSentinel();
                 this.worker.BeginListeningForConfigurationChanges();
             }
