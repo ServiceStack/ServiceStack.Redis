@@ -1740,7 +1740,7 @@ namespace ServiceStack.Redis
     	{
 			AssertHashIdAndKey(hashId, key);
 
-			return SendExpectDouble(Commands.HIncrBy, hashId.ToUtf8Bytes(), key, incrementBy.ToString(CultureInfo.InvariantCulture).ToUtf8Bytes());
+			return SendExpectDouble(Commands.HIncrByFloat, hashId.ToUtf8Bytes(), key, incrementBy.ToString(CultureInfo.InvariantCulture).ToUtf8Bytes());
 		}
 
     	public byte[] HGet(string hashId, byte[] key)
