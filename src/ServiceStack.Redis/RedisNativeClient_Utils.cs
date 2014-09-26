@@ -29,6 +29,14 @@ namespace ServiceStack.Redis
         private const int Unknown = -1;
         public int ServerVersionNumber { get; set; }
 
+        public int AssertServerVersionNumber()
+        {
+            if (ServerVersionNumber == 0)
+                AssertConnectedSocket();
+
+            return ServerVersionNumber;
+        }
+
         public static void DisposeTimers()
         {
             if (UsageTimer == null) return;
@@ -163,7 +171,7 @@ namespace ServiceStack.Redis
             return !(part1 & part2);
         }
 
-        private bool AssertConnectedSocket()
+        internal bool AssertConnectedSocket()
         {
             if (LastConnectedAtTimestamp > 0)
             {

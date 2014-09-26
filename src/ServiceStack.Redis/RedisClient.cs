@@ -136,7 +136,7 @@ namespace ServiceStack.Redis
                 ? value.ToUtf8Bytes()
                 : null;
 
-            if (ServerVersionNumber >= 2610)
+            if (AssertServerVersionNumber() >= 2610)
             {
                 if (expireIn.Milliseconds > 0)
                     base.Set(key, bytesValue, 0, (long)expireIn.TotalMilliseconds);
@@ -331,7 +331,7 @@ namespace ServiceStack.Redis
 
         public bool ExpireEntryIn(string key, TimeSpan expireIn)
         {
-            if (ServerVersionNumber >= 2600)
+            if (AssertServerVersionNumber() >= 2600)
             {
                 if (expireIn.Milliseconds > 0)
                 {
@@ -344,7 +344,7 @@ namespace ServiceStack.Redis
 
         public bool ExpireEntryAt(string key, DateTime expireAt)
         {
-            if (ServerVersionNumber >= 2600)
+            if (AssertServerVersionNumber() >= 2600)
             {
                 return PExpireAt(key, ConvertToServerDate(expireAt).ToUnixTimeMs());
             }
@@ -416,6 +416,7 @@ namespace ServiceStack.Redis
 
         public IRedisTransaction CreateTransaction()
         {
+            AssertServerVersionNumber(); // pre-fetch call to INFO before transaction if needed
             return new RedisTransaction(this);
         }
 
