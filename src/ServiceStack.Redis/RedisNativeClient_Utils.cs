@@ -515,6 +515,9 @@ namespace ServiceStack.Redis
                     sb.Append(" ");
 
                 sb.Append(arg.FromUtf8Bytes());
+
+                if (sb.Length > 100)
+                    break;
             }
             this.lastCommand = sb.ToString();
             if (this.lastCommand.Length > 100)
