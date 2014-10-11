@@ -9,7 +9,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [Explicit("Requires ~/azureconfig.txt")]
+    [Ignore("Requires ~/azureconfig.txt")]
     [TestFixture, Category("Integration")]
     public class SslTests
     {
@@ -18,7 +18,8 @@ namespace ServiceStack.Redis.Tests
         private string Password;
         private string connectionString;
 
-        public SslTests()
+        [TestFixtureSetUp]
+        public void TestFixtureSetUp()
         {
             var settings = new TextFileSettings("~/azureconfig.txt".MapProjectPath());
             Host = settings.GetString("Host");
