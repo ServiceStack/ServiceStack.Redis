@@ -269,6 +269,7 @@
     <Compile Include="Shared\Shipper.cs" />
     <Compile Include="Shared\ShipperFactory.cs" />
     <Compile Include="Shared\TaskQueue.cs" />
+    <Compile Include="SslTests.cs" />
     <Compile Include="Support\CustomType.cs" />
     <Compile Include="Support\CustomTypeFactory.cs" />
     <Compile Include="Support\TcpClientWithTimeout.cs" />

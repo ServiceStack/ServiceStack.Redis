@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Sockets;
 using ServiceStack.Model;
 
@@ -22,45 +23,71 @@ namespace ServiceStack.Redis
     {
         public static List<RedisEndpoint> ToRedisEndPoints(this IEnumerable<string> hosts)
         {
-            if (hosts == null) return new List<RedisEndpoint>();
-
-            var redisEndpoints = new List<RedisEndpoint>();
-            foreach (var host in hosts)
-            {
-                RedisEndpoint endpoint;
-                string[] hostParts;
-                if (host.Contains("@"))
-                {
-                    hostParts = host.SplitOnLast('@');
-                    var password = hostParts[0];
-                    hostParts = hostParts[1].Split(':');
-                    endpoint = GetRedisEndPoint(hostParts);
-                    endpoint.Password = password;
-                }
-                else
-                {
-                    hostParts = host.Split(':');
-                    endpoint = GetRedisEndPoint(hostParts);
-                }
-                redisEndpoints.Add(endpoint);
-            }
-            return redisEndpoints;
+            return hosts == null 
+                ? new List<RedisEndpoint>() : 
+                hosts.Select(ToRedisEndpoint).ToList();
         }
 
-        private static RedisEndpoint GetRedisEndPoint(string[] hostParts)
+        public static RedisEndpoint ToRedisEndpoint(this string connectionString)
         {
-            const int hostOrIpAddressIndex = 0;
-            const int portIndex = 1;
+            if (connectionString == null)
+                throw new ArgumentNullException("connectionString");
+            if (connectionString.StartsWith("redis://"))
+                connectionString = connectionString.Substring("redis://".Length);
 
-            if (hostParts.Length == 0)
-                throw new ArgumentException("'{0}' is not a valid Host or IP Address: e.g. '127.0.0.0[:11211]'");
+            var domainParts = connectionString.SplitOnLast('@');
+            var qsParts = domainParts.Last().SplitOnFirst('?');
+            var hostParts = qsParts[0].SplitOnLast(':');
+            var useDefaultPort = true;
+            var port = RedisNativeClient.DefaultPort;
+            if (hostParts.Length > 1)
+            {
+                port = int.Parse(hostParts[1]);
+                useDefaultPort = false;
+            }
+            var endpoint = new RedisEndpoint(hostParts[0], port);
+            if (domainParts.Length > 1)
+                endpoint.Password = domainParts[0];
 
-            var port = (hostParts.Length == 1)
-                           ? RedisNativeClient.DefaultPort
-                           : Int32.Parse(hostParts[portIndex]);
+            if (qsParts.Length > 1)
+            {
+                var qsParams = qsParts[1].Split('&');
+                foreach (var param in qsParams)
+                {
+                    var entry = param.Split('=');
+                    var value = entry.Length > 1 ? entry[1] : null;
+                    if (value == null) continue;
 
-            return new RedisEndpoint(hostParts[hostOrIpAddressIndex], port);
-        }        
+                    var name = entry[0].ToLower(); 
+                    switch (name)
+                    {
+                        case "db":
+                            endpoint.Db = int.Parse(value);
+                            break;
+                        case "ssl":
+                            endpoint.Ssl = bool.Parse(value);
+                            if (useDefaultPort)
+                                endpoint.Port = RedisNativeClient.DefaultPortSsl;
+                            break;
+                        case "password":
+                            endpoint.Password = value;
+                            break;
+                        case "sendtimeout":
+                            endpoint.SendTimeout = int.Parse(value);
+                            break;
+                        case "receivetimeout":
+                            endpoint.ReceiveTimeout = int.Parse(value);
+                            break;
+                        case "idletimeout":
+                        case "idletimeoutsecs":
+                            endpoint.IdleTimeOutSecs = int.Parse(value);
+                            break;
+                    }
+                }
+            }
+
+            return endpoint;
+        }
     }
 
     internal static class RedisExtensionsInternal

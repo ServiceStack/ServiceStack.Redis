@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
@@ -87,7 +88,25 @@ namespace ServiceStack.Redis
                     HadExceptions = true;
                     return;
                 }
-                Bstream = new BufferedStream(new NetworkStream(socket), 16 * 1024);
+                Stream networkStream = new NetworkStream(socket);
+
+                if (Ssl)
+                {
+                    sslStream = new SslStream(networkStream,
+                        leaveInnerStreamOpen: false,
+                        userCertificateValidationCallback: RedisConfig.CertificateValidationCallback,
+                        userCertificateSelectionCallback: RedisConfig.CertificateSelectionCallback,
+                        encryptionPolicy: EncryptionPolicy.RequireEncryption);
+
+                    sslStream.AuthenticateAsClient(Host);
+
+                    if (!sslStream.IsEncrypted)
+                        throw new Exception("Could not establish an encrypted connection to " + Host);
+
+                    networkStream = sslStream;
+                }
+
+                Bstream = new BufferedStream(networkStream, 16 * 1024);
 
                 if (Password != null)
                     SendExpectSuccess(Commands.Auth, Password.ToUtf8Bytes());
@@ -344,7 +363,7 @@ namespace ServiceStack.Redis
                 if (currentBufferIndex > 0)
                     PushCurrentBuffer();
 
-                if (!Env.IsMono)
+                if (!Env.IsMono && sslStream == null)
                 {
                     socket.Send(cmdBuffer); //Optimized for Windows
                 }
@@ -354,7 +373,14 @@ namespace ServiceStack.Redis
                     foreach (var segment in cmdBuffer)
                     {
                         var buffer = segment.Array;
-                        socket.Send(buffer, segment.Offset, segment.Count, SocketFlags.None);
+                        if (sslStream == null)
+                        {
+                            socket.Send(buffer, segment.Offset, segment.Count, SocketFlags.None);
+                        }
+                        else
+                        {
+                            sslStream.Write(buffer, segment.Offset, segment.Count);
+                        }
                     }
                 }
                 ResetSendBuffer();

@@ -15,6 +15,7 @@ using System.Globalization;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
 using ServiceStack.Logging;
@@ -36,6 +37,7 @@ namespace ServiceStack.Redis
 
         public const long DefaultDb = 0;
         public const int DefaultPort = 6379;
+        public const int DefaultPortSsl = 6380;
         public const string DefaultHost = "localhost";
         public const int DefaultIdleTimeOutSecs = 240; //default on redis is 300
 
@@ -50,6 +52,7 @@ namespace ServiceStack.Redis
 
         protected Socket socket;
         protected BufferedStream Bstream;
+        protected SslStream sslStream;
 
         private IRedisTransactionBase transaction;
         private IRedisPipelineShared pipeline;
@@ -67,6 +70,7 @@ namespace ServiceStack.Redis
 
         public string Host { get; private set; }
         public int Port { get; private set; }
+        public bool Ssl { get; private set; }
         
         /// <summary>
         /// Gets or sets object key prefix.
@@ -111,8 +115,13 @@ namespace ServiceStack.Redis
             }
         }
 
-        public RedisNativeClient(string host)
-            : this(host.SplitOnLast(':')[0], host.Contains(':') ? int.Parse(host.SplitOnLast(':')[1]) : DefaultPort) { }
+        public RedisNativeClient(string connectionString)
+            : this(connectionString.ToRedisEndpoint()) {}
+
+        public RedisNativeClient(RedisEndpoint config)
+        {
+            Init(config);
+        }
 
         public RedisNativeClient(string host, int port)
             : this(host, port, null) {}
@@ -122,13 +131,19 @@ namespace ServiceStack.Redis
             if (host == null)
                 throw new ArgumentNullException("host");
 
-            Host = host;
-            Port = port;
-            SendTimeout = -1;
-			ReceiveTimeout = -1;
-            Password = password;
-            Db = db;
-            IdleTimeOutSecs = DefaultIdleTimeOutSecs;
+            Init(new RedisEndpoint(host, port, password, db));
+        }
+
+        private void Init(RedisEndpoint config)
+        {
+            Host = config.Host;
+            Port = config.Port;
+            SendTimeout = config.SendTimeout;
+            ReceiveTimeout = config.ReceiveTimeout;
+            Password = config.Password;
+            Db = config.Db;
+            Ssl = config.Ssl;
+            IdleTimeOutSecs = config.IdleTimeOutSecs;
         }
 
         public RedisNativeClient()
@@ -1933,11 +1948,19 @@ namespace ServiceStack.Redis
             catch { }
             try
             {
+                if (sslStream != null)
+                    sslStream.Close();
+            }
+            catch { }
+            try
+            {
                 if (socket != null)
                     socket.Close();
             }
             catch { }
+
             Bstream = null;
+            sslStream = null;
             socket = null;
         }
     }

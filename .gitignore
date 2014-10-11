@@ -40,3 +40,4 @@ NuGet.Signed/
 *.pfx
 
 build/
+tests/ServiceStack.Redis.Tests/azureconfig.txt

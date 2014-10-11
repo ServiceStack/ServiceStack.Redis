@@ -164,6 +164,7 @@
     <Compile Include="Pipeline\QueuedRedisCommand.cs" />
     <Compile Include="Pipeline\RedisCommand.cs" />
     <Compile Include="RedisClient_Slowlog.cs" />
+    <Compile Include="RedisConfig.cs" />
     <Compile Include="RedisEndpoint.cs" />
     <Compile Include="RedisPubSubServer.cs" />
     <Compile Include="RedisSentinel.cs" />

@@ -54,6 +54,12 @@ namespace ServiceStack.Redis
             Init();
         }
 
+        public RedisClient(RedisEndpoint config)
+            : base(config)
+        {
+            Init();
+        }
+
         public RedisClient(string host, int port)
             : base(host, port)
         {
