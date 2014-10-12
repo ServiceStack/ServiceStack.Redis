@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using NUnit.Framework;
+using ServiceStack.Common.Tests.Models;
 using ServiceStack.Configuration;
 using ServiceStack.Text;
 
@@ -189,6 +193,101 @@ namespace ServiceStack.Redis.Tests
                 sb.Append((char)c);
             }
             return sb.ToString();
+        }
+
+        //[Conditional("DEBUG")]
+        protected static void Log(string fmt, params object[] args)
+        {
+            //Debug.WriteLine(String.Format(fmt, args));
+            Console.WriteLine(fmt, args);
+        }
+
+        [Test]
+        public void SSL_can_support_64_threads_using_the_client_sequentially()
+        {
+            var results = 100.Times(x => ModelWithFieldsOfDifferentTypes.Create(x));
+            var testData = TypeSerializer.SerializeToString(results);
+
+            var before = Stopwatch.GetTimestamp();
+
+            const int noOfConcurrentClients = 64; //WaitHandle.WaitAll limit is <= 64
+
+            using (var redisClient = new RedisClient(connectionString))
+            {
+                for (var i = 0; i < noOfConcurrentClients; i++)
+                {
+                    var clientNo = i;
+                    UseClient(redisClient, clientNo, testData);
+                }
+            }
+
+            Debug.WriteLine(String.Format("Time Taken: {0}", (Stopwatch.GetTimestamp() - before) / 1000));
+        }
+
+        [Test]
+        public void SSL_can_support_64_threads_using_the_client_simultaneously()
+        {
+            var results = 100.Times(x => ModelWithFieldsOfDifferentTypes.Create(x));
+            var testData = TypeSerializer.SerializeToString(results);
+
+            var before = Stopwatch.GetTimestamp();
+
+            const int noOfConcurrentClients = 64; //WaitHandle.WaitAll limit is <= 64
+
+            var clientAsyncResults = new List<IAsyncResult>();
+            using (var manager = new PooledRedisClientManager(TestConfig.MasterHosts, TestConfig.SlaveHosts))
+            {
+                manager.GetClient().Run(x => x.FlushAll());
+
+                for (var i = 0; i < noOfConcurrentClients; i++)
+                {
+                    var clientNo = i;
+                    var action = (Action)(() => UseClientAsync(manager, clientNo, testData));
+                    clientAsyncResults.Add(action.BeginInvoke(null, null));
+                }
+            }
+
+            WaitHandle.WaitAll(clientAsyncResults.ConvertAll(x => x.AsyncWaitHandle).ToArray());
+
+            Debug.WriteLine(String.Format("Completed in {0} ticks", (Stopwatch.GetTimestamp() - before)));
+        }
+
+        private static void UseClientAsync(IRedisClientsManager manager, int clientNo, string testData)
+        {
+            using (var client = manager.GetReadOnlyClient())
+            {
+                UseClient(client, clientNo, testData);
+            }
+        }
+
+        private static void UseClient(IRedisClient client, int clientNo, string testData)
+        {
+            var host = "";
+
+            try
+            {
+                host = client.Host;
+
+                Log("Client '{0}' is using '{1}'", clientNo, client.Host);
+
+                var testClientKey = "test:" + host + ":" + clientNo;
+                client.SetEntry(testClientKey, testData);
+                var result = client.GetValue(testClientKey) ?? "";
+
+                Log("\t{0} => {1} len {2} {3} len", testClientKey,
+                    testData.Length, testData.Length == result.Length ? "==" : "!=", result.Length);
+            }
+            catch (NullReferenceException ex)
+            {
+                Debug.WriteLine("NullReferenceException StackTrace: \n" + ex.StackTrace);
+                Assert.Fail(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(String.Format("\t[ERROR@{0}]: {1} => {2}",
+                    host, ex.GetType().Name, ex.Message));
+                Assert.Fail(ex.Message);
+            }
         }
     }
 }
