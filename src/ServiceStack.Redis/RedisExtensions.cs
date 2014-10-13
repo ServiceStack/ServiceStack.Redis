@@ -47,7 +47,13 @@ namespace ServiceStack.Redis
             }
             var endpoint = new RedisEndpoint(hostParts[0], port);
             if (domainParts.Length > 1)
-                endpoint.Password = domainParts[0];
+            {
+                var authParts = domainParts[0].SplitOnFirst(':');
+                if (authParts.Length > 1)
+                    endpoint.Client = authParts[0];
+
+                endpoint.Password = authParts.Last();
+            }
 
             if (qsParts.Length > 1)
             {
@@ -68,6 +74,9 @@ namespace ServiceStack.Redis
                             endpoint.Ssl = bool.Parse(value);
                             if (useDefaultPort)
                                 endpoint.Port = RedisNativeClient.DefaultPortSsl;
+                            break;
+                        case "client":
+                            endpoint.Client = value;
                             break;
                         case "password":
                             endpoint.Password = value;
