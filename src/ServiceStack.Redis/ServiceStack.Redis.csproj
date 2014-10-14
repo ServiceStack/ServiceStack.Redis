@@ -150,6 +150,9 @@
     <Compile Include="BufferPool.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="ConnectionUtils.cs" />
+    <Compile Include="IHandleClientDispose.cs" />
+    <Compile Include="RedisManagerPool.cs" />
+    <Compile Include="RedisClient_Admin.cs" />
     <Compile Include="Generic\ManagedListGeneric.cs" />
     <Compile Include="Generic\QueuedRedisTypedCommand.cs" />
     <Compile Include="Generic\RedisClientsManagerExtensionsGeneric.cs" />
@@ -165,6 +168,7 @@
     <Compile Include="Pipeline\RedisCommand.cs" />
     <Compile Include="RedisClient_Slowlog.cs" />
     <Compile Include="RedisConfig.cs" />
+    <Compile Include="RedisDataExtensions.cs" />
     <Compile Include="RedisEndpoint.cs" />
     <Compile Include="RedisPubSubServer.cs" />
     <Compile Include="RedisSentinel.cs" />
@@ -185,7 +189,6 @@
     <Compile Include="Support\SerializedObjectWrapper.cs" />
     <Compile Include="Support\ISerializer.cs" />
     <Compile Include="Support\Locking\DisposableDistributedLock.cs" />
-    <Compile Include="PooledRedisClientManager.Disposable.cs" />
     <Compile Include="Support\Queue\IChronologicalWorkQueue.cs" />
     <Compile Include="Support\Queue\ISequentialWorkQueue.cs" />
     <Compile Include="Support\Queue\ISimpleWorkQueue.cs" />
@@ -216,7 +219,6 @@
     <Compile Include="RedisClientFactory.cs" />
     <Compile Include="Generic\RedisClientSet.Generic.cs" />
     <Compile Include="Generic\RedisClientList.Generic.cs" />
-    <Compile Include="PooledRedisClientManager.ICacheClient.cs" />
     <Compile Include="RedisClient.ICacheClient.cs" />
     <Compile Include="Generic\RedisTypedClient.cs" />
     <Compile Include="RedisCacheClientFactory.cs" />

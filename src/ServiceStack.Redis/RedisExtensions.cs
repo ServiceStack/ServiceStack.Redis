@@ -61,7 +61,7 @@ namespace ServiceStack.Redis
                 foreach (var param in qsParams)
                 {
                     var entry = param.Split('=');
-                    var value = entry.Length > 1 ? entry[1] : null;
+                    var value = entry.Length > 1 ? entry[1].UrlDecode() : null;
                     if (value == null) continue;
 
                     var name = entry[0].ToLower(); 
@@ -80,6 +80,12 @@ namespace ServiceStack.Redis
                             break;
                         case "password":
                             endpoint.Password = value;
+                            break;
+                        case "namespaceprefix":
+                            endpoint.NamespacePrefix = value;
+                            break;
+                        case "connecttimeout":
+                            endpoint.ConnectTimeout = int.Parse(value);
                             break;
                         case "sendtimeout":
                             endpoint.SendTimeout = int.Parse(value);

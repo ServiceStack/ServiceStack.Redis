@@ -184,6 +184,7 @@
     <Compile Include="LexTests.cs" />
     <Compile Include="LicenseUsageTests.cs" />
     <Compile Include="ManagedListGenericTests.cs" />
+    <Compile Include="RedisClientConfigTests.cs" />
     <Compile Include="RedisExtensionTests.cs" />
     <Compile Include="Examples\TodoApp.cs" />
     <Compile Include="Issues\DomainEventsTests.cs" />
