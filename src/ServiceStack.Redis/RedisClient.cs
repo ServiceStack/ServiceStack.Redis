@@ -189,26 +189,10 @@ namespace ServiceStack.Redis
             SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
         }
 
+        [Obsolete("Use GetClientsInfo")]
         public List<Dictionary<string, string>> GetClientList()
         {
-            var clientList = base.ClientList().FromUtf8Bytes();
-            var results = new List<Dictionary<string, string>>();
-
-            var lines = clientList.Split('\n');
-            foreach (var line in lines)
-            {
-                if (String.IsNullOrEmpty(line)) continue;
-
-                var map = new Dictionary<string, string>();
-                var parts = line.Split(' ');
-                foreach (var part in parts)
-                {
-                    var keyValue = part.SplitOnFirst('=');
-                    map[keyValue[0]] = keyValue[1];
-                }
-                results.Add(map);
-            }
-            return results;
+            return GetClientsInfo();
         }
 
         public void SetAll(IEnumerable<string> keys, IEnumerable<string> values)
@@ -363,37 +347,6 @@ namespace ServiceStack.Redis
         public TimeSpan GetTimeToLive(string key)
         {
             return TimeSpan.FromSeconds(Ttl(key));
-        }
-
-        public void SetConfig(string configItem, string value)
-        {
-            base.ConfigSet(configItem, value.ToUtf8Bytes());
-        }
-
-        public string GetConfig(string configItem)
-        {
-            var sb = new StringBuilder();
-            var byteArray = base.ConfigGet(configItem);
-            foreach (var bytes in byteArray)
-            {
-                if (sb.Length > 0)
-                    sb.Append(" ");
-
-                sb.Append(bytes.FromUtf8Bytes());
-            }
-            return sb.ToString();
-        }
-
-        public DateTime GetServerTime()
-        {
-            var parts = base.Time();
-            var unixTime = long.Parse(parts[0].FromUtf8Bytes());
-            var microSecs = long.Parse(parts[1].FromUtf8Bytes());
-            var ticks = microSecs / 1000 * TimeSpan.TicksPerMillisecond;
-
-            var date = unixTime.FromUnixTime();
-            var timeSpan = TimeSpan.FromTicks(ticks);
-            return date + timeSpan;
         }
 
         public IRedisTypedClient<T> As<T>()

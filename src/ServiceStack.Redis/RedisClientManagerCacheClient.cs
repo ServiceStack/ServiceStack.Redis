@@ -4,6 +4,14 @@ using ServiceStack.Caching;
 
 namespace ServiceStack.Redis
 {
+    /// <summary>
+    /// For interoperabilty GetCacheClient() and GetReadOnlyCacheClient()
+    /// return an ICacheClient wrapper around the redis manager which has the affect of calling 
+    /// GetClient() for all write operations and GetReadOnlyClient() for the read ones.
+    /// 
+    /// This works well for master-slave replication scenarios where you have 
+    /// 1 master that replicates to multiple read slaves.
+    /// </summary>
     public class RedisClientManagerCacheClient : ICacheClient, IRemoveByPattern
     {
         private readonly IRedisClientsManager redisManager;

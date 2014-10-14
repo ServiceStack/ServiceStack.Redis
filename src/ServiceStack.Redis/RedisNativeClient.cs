@@ -62,7 +62,7 @@ namespace ServiceStack.Redis
         /// Used to manage connection pooling
         /// </summary>
         internal bool Active { get; set; }
-        internal PooledRedisClientManager ClientManager { get; set; }
+        internal IHandleClientDispose ClientManager { get; set; }
 
         internal long LastConnectedAtTimestamp;
 
@@ -82,6 +82,7 @@ namespace ServiceStack.Redis
         public int SendTimeout { get; set; }
 		public int ReceiveTimeout { get; set; }
         public string Password { get; set; }
+        public string Client { get; set; }
         public int IdleTimeOutSecs { get; set; }
 
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
@@ -138,9 +139,12 @@ namespace ServiceStack.Redis
         {
             Host = config.Host;
             Port = config.Port;
+            ConnectTimeout = config.ConnectTimeout;
             SendTimeout = config.SendTimeout;
             ReceiveTimeout = config.ReceiveTimeout;
             Password = config.Password;
+            NamespacePrefix = config.NamespacePrefix;
+            Client = config.Client;
             Db = config.Db;
             Ssl = config.Ssl;
             IdleTimeOutSecs = config.IdleTimeOutSecs;
@@ -249,7 +253,12 @@ namespace ServiceStack.Redis
 			SendExpectSuccess(Commands.Config, Commands.ResetStat);
 		}
 
-    	public byte[][] Time()
+        public void ConfigRewrite()
+        {
+            SendExpectSuccess(Commands.Config, Commands.Rewrite);
+        }
+
+        public byte[][] Time()
     	{
 			return SendExpectMultiData(Commands.Time);
 		}
@@ -296,7 +305,7 @@ namespace ServiceStack.Redis
 			return SendExpectLong(Commands.Object, Commands.IdleTime, key.ToUtf8Bytes());
 		}
 
-    	public string Type(string key)
+        public string Type(string key)
         {
             if (key == null)
                 throw new ArgumentNullException("key");
@@ -714,6 +723,11 @@ namespace ServiceStack.Redis
             SendExpectSuccess(Commands.FlushAll);
         }
 
+        public RedisText Role()
+        {
+            return SendExpectComplexResponse(Commands.Role).ToRedisText();
+        }
+
         public string ClientGetName()
         {
             return SendExpectString(Commands.Client, Commands.GetName);
@@ -730,6 +744,11 @@ namespace ServiceStack.Redis
             SendExpectSuccess(Commands.Client, Commands.SetName, name.ToUtf8Bytes());
         }
 
+        public void ClientPause(int timeOutMs)
+        {
+            SendExpectSuccess(Commands.Client, Commands.Pause, timeOutMs.ToUtf8Bytes());
+        }
+
         public byte[] ClientList()
         {
             return SendExpectData(Commands.Client, Commands.List);
@@ -738,6 +757,40 @@ namespace ServiceStack.Redis
         public void ClientKill(string clientAddr)
         {
             SendExpectSuccess(Commands.Client, Commands.Kill, clientAddr.ToUtf8Bytes());
+        }
+
+        public long ClientKill(string addr = null, string id = null, string type = null, string skipMe = null)
+        {
+            var cmdWithArgs = new List<byte[]>
+           	{
+           		Commands.Client, Commands.Kill,
+           	};
+
+            if (addr != null)
+            {
+                cmdWithArgs.Add(Commands.Addr);
+                cmdWithArgs.Add(addr.ToUtf8Bytes());
+            }
+
+            if (id != null)
+            {
+                cmdWithArgs.Add(Commands.Id);
+                cmdWithArgs.Add(id.ToUtf8Bytes());
+            }
+
+            if (type != null)
+            {
+                cmdWithArgs.Add(Commands.Type);
+                cmdWithArgs.Add(type.ToUtf8Bytes());
+            }
+
+            if (skipMe != null)
+            {
+                cmdWithArgs.Add(Commands.SkipMe);
+                cmdWithArgs.Add(skipMe.ToUtf8Bytes());
+            }
+
+            return SendExpectLong(cmdWithArgs.ToArray());
         }
 
         public byte[][] Keys(string pattern)
