@@ -255,8 +255,8 @@ namespace ServiceStack.Redis.Tests
                 Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));
                 Assert.That(Redis.GetValue(KeySquared), Is.EqualTo("1"));
             }
-
         }
+
         [Test]
         public void Pipeline_can_be_contain_watch()
         {
@@ -273,7 +273,6 @@ namespace ServiceStack.Redis.Tests
                 Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));
                 Assert.That(Redis.GetValue(KeySquared), Is.EqualTo("1"));
             }
-
         }
 
 	}

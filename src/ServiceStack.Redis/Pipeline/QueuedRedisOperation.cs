@@ -75,11 +75,15 @@ namespace ServiceStack.Redis.Pipeline
 				else if (LongReadCommand != null)
 				{
 					var result = LongReadCommand();
-					if (OnSuccessLongCallback != null)
+                    if (OnSuccessIntCallback != null)
+                    {
+                        OnSuccessIntCallback((int)result);
+                    }
+                    if (OnSuccessLongCallback != null)
 					{
 						OnSuccessLongCallback(result);
 					}
-					if (OnSuccessBoolCallback != null)
+                    if (OnSuccessBoolCallback != null)
 					{
 						var success = result == RedisNativeClient.Success;
 						OnSuccessBoolCallback(success);
