@@ -55,13 +55,26 @@ namespace ServiceStack.Redis.Tests
         }
 
         [Test]
-        public void Can_connect_to_ssl_azure_redis_with_PooledClientsManager()
+        public void Can_connect_to_ssl_azure_redis_with_UrlFormat()
         {
-            using (var redisManager = new PooledRedisClientManager(connectionString))
-            using (var client = redisManager.GetClient())
+            var url = "redis://{0}?ssl=true&password={1}".Fmt(Host, Password.UrlEncode());
+            using (var client = new RedisClient(url))
             {
                 client.Set("foo", "bar");
                 var foo = client.GetValue("foo");
+                foo.Print();
+            }
+        }
+
+        [Test]
+        public void Can_connect_to_ssl_azure_redis_with_PooledClientsManager()
+        {
+            using (var redisManager = new PooledRedisClientManager(connectionString))
+            using (var client1 = redisManager.GetClient())
+            using (var client2 = redisManager.GetClient())
+            {
+                client1.Set("foo", "bar");
+                var foo = client2.GetValue("foo");
                 foo.Print();
             }
         }
