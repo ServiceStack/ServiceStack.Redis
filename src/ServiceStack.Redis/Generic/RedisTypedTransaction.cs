@@ -16,18 +16,18 @@ using ServiceStack.Redis.Pipeline;
 
 namespace ServiceStack.Redis.Generic
 {
-	/// <summary>
-	/// Adds support for Redis Transactions (i.e. MULTI/EXEC/DISCARD operations).
-	/// </summary>
-	internal class RedisTypedTransaction<T>
-		: RedisTypedPipeline<T>, IRedisTypedTransaction<T>, IRedisTransactionBase
-	{
-	    private int _numCommands = 0;
-		internal RedisTypedTransaction(RedisTypedClient<T> redisClient)
-			: base(redisClient)
-		{
-		 
-		}
+    /// <summary>
+    /// Adds support for Redis Transactions (i.e. MULTI/EXEC/DISCARD operations).
+    /// </summary>
+    internal class RedisTypedTransaction<T>
+        : RedisTypedPipeline<T>, IRedisTypedTransaction<T>, IRedisTransactionBase
+    {
+        private int _numCommands = 0;
+        internal RedisTypedTransaction(RedisTypedClient<T> redisClient)
+            : base(redisClient)
+        {
+
+        }
 
         protected override void Init()
         {

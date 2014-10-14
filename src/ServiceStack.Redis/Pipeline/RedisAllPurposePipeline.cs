@@ -4,17 +4,18 @@ using ServiceStack.Redis.Pipeline;
 namespace ServiceStack.Redis
 {
 
-	public class RedisAllPurposePipeline: RedisCommandQueue, IRedisPipeline
-	{
+    public class RedisAllPurposePipeline : RedisCommandQueue, IRedisPipeline
+    {
         /// <summary>
         /// General purpose pipeline
         /// </summary>
         /// <param name="redisClient"></param>
-        public RedisAllPurposePipeline(RedisClient redisClient) : base(redisClient)
-		{
+        public RedisAllPurposePipeline(RedisClient redisClient)
+            : base(redisClient)
+        {
             Init();
-    
-		}
+
+        }
 
         protected virtual void Init()
         {
@@ -24,25 +25,25 @@ namespace ServiceStack.Redis
             if (RedisClient.Pipeline != null)
                 throw new InvalidOperationException("A pipeline is already in use");
 
-            RedisClient.Pipeline = this; 
+            RedisClient.Pipeline = this;
         }
-      
+
         /// <summary>
         /// Flush send buffer, and read responses
         /// </summary>
-	    public void Flush()
-	    {
-	       // flush send buffers
+        public void Flush()
+        {
+            // flush send buffers
             RedisClient.FlushSendBuffer();
 
             //receive expected results
-           foreach (var queuedCommand in QueuedCommands)
+            foreach (var queuedCommand in QueuedCommands)
             {
                 queuedCommand.ProcessResult();
             }
             ClosePipeline();
-            
-	    }
+
+        }
 
         protected void Execute()
         {
@@ -56,15 +57,15 @@ namespace ServiceStack.Redis
             }
         }
 
-	    public bool Replay()
-	    {
-	        Init();
-	        Execute();
-	        Flush();
-	        return true;
-	    }
+        public bool Replay()
+        {
+            Init();
+            Execute();
+            Flush();
+            return true;
+        }
 
-	    protected void ClosePipeline()
+        protected void ClosePipeline()
         {
             RedisClient.ResetSendBuffer();
             RedisClient.Pipeline = null;
@@ -74,5 +75,5 @@ namespace ServiceStack.Redis
         {
             ClosePipeline();
         }
-	}
+    }
 }

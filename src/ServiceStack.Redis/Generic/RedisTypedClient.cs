@@ -21,82 +21,82 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Generic
 {
-	/// <summary>
-	/// Allows you to get Redis value operations to operate against POCO types.
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	public partial class RedisTypedClient<T>
-		: IRedisTypedClient<T>
-	{
+    /// <summary>
+    /// Allows you to get Redis value operations to operate against POCO types.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public partial class RedisTypedClient<T>
+        : IRedisTypedClient<T>
+    {
         static RedisTypedClient()
         {
             Redis.RedisClient.__uniqueTypes.Add(typeof(T));
         }
 
-		readonly ITypeSerializer<T> serializer = new JsonSerializer<T>();
-		private readonly RedisClient client;
+        readonly ITypeSerializer<T> serializer = new JsonSerializer<T>();
+        private readonly RedisClient client;
 
         public IRedisClient RedisClient
         {
             get { return client; }
         }
 
-		public IRedisNativeClient NativeClient
-		{
-			get { return client; }
-		}
+        public IRedisNativeClient NativeClient
+        {
+            get { return client; }
+        }
 
-		/// <summary>
-		/// Use this to share the same redis connection with another
-		/// </summary>
-		/// <param name="client">The client.</param>
-		public RedisTypedClient(RedisClient client)
-		{
-			this.client = client;
-			this.Lists = new RedisClientLists(this);
-			this.Sets = new RedisClientSets(this);
-			this.SortedSets = new RedisClientSortedSets(this);
+        /// <summary>
+        /// Use this to share the same redis connection with another
+        /// </summary>
+        /// <param name="client">The client.</param>
+        public RedisTypedClient(RedisClient client)
+        {
+            this.client = client;
+            this.Lists = new RedisClientLists(this);
+            this.Sets = new RedisClientSets(this);
+            this.SortedSets = new RedisClientSortedSets(this);
 
-			this.SequenceKey = client.GetTypeSequenceKey<T>();
-			this.TypeIdsSetKey = client.GetTypeIdsSetKey<T>();
-			this.TypeLockKey = string.Concat(client.NamespacePrefix, "lock:", typeof(T).Name);
+            this.SequenceKey = client.GetTypeSequenceKey<T>();
+            this.TypeIdsSetKey = client.GetTypeIdsSetKey<T>();
+            this.TypeLockKey = string.Concat(client.NamespacePrefix, "lock:", typeof(T).Name);
             this.RecentSortedSetKey = string.Concat(client.NamespacePrefix, "recent:", typeof(T).Name);
-		}
+        }
 
         private readonly string RecentSortedSetKey;
-	    public string TypeIdsSetKey { get; set; }
-		public string TypeLockKey { get; set; }
+        public string TypeIdsSetKey { get; set; }
+        public string TypeLockKey { get; set; }
 
-		public IRedisTypedTransaction<T> CreateTransaction()
-		{
-			return new RedisTypedTransaction<T>(this);
-		}
+        public IRedisTypedTransaction<T> CreateTransaction()
+        {
+            return new RedisTypedTransaction<T>(this);
+        }
 
         public IRedisTypedPipeline<T> CreatePipeline()
         {
             return new RedisTypedPipeline<T>(this);
         }
-		public IDisposable AcquireLock()
-		{
-			return client.AcquireLock(this.TypeLockKey);
-		}
+        public IDisposable AcquireLock()
+        {
+            return client.AcquireLock(this.TypeLockKey);
+        }
 
-		public IDisposable AcquireLock(TimeSpan timeOut)
-		{
-			return client.AcquireLock(this.TypeLockKey, timeOut);
-		}
+        public IDisposable AcquireLock(TimeSpan timeOut)
+        {
+            return client.AcquireLock(this.TypeLockKey, timeOut);
+        }
 
-		public IRedisTransactionBase Transaction
-		{
-			get
-			{
-				return client.Transaction;
-			}
-			set
-			{
-				client.Transaction = value;
-			}
-		}
+        public IRedisTransactionBase Transaction
+        {
+            get
+            {
+                return client.Transaction;
+            }
+            set
+            {
+                client.Transaction = value;
+            }
+        }
 
         public IRedisPipelineShared Pipeline
         {
@@ -120,244 +120,244 @@ namespace ServiceStack.Redis.Generic
             client.UnWatch();
         }
 
-		public void Multi()
-		{
-			this.client.Multi();
-		}
+        public void Multi()
+        {
+            this.client.Multi();
+        }
 
-		public void Discard()
-		{
-			this.client.Discard();
-		}
+        public void Discard()
+        {
+            this.client.Discard();
+        }
 
-		public void Exec()
-		{
-			client.Exec();
-		}
+        public void Exec()
+        {
+            client.Exec();
+        }
 
-		internal void AddTypeIdsRegisteredDuringPipeline()
-		{
-			client.AddTypeIdsRegisteredDuringPipeline();
-		}
+        internal void AddTypeIdsRegisteredDuringPipeline()
+        {
+            client.AddTypeIdsRegisteredDuringPipeline();
+        }
 
-		internal void ClearTypeIdsRegisteredDuringPipeline()
-		{
-			client.ClearTypeIdsRegisteredDuringPipeline();
-		}
+        internal void ClearTypeIdsRegisteredDuringPipeline()
+        {
+            client.ClearTypeIdsRegisteredDuringPipeline();
+        }
 
-		public List<string> GetAllKeys()
-		{
-			return client.GetAllKeys();
-		}
+        public List<string> GetAllKeys()
+        {
+            return client.GetAllKeys();
+        }
 
-	    public IRedisSet TypeIdsSet
-		{
-			get
-			{
-				return new RedisClientSet(client, client.GetTypeIdsSetKey<T>());
-			}
-		}
+        public IRedisSet TypeIdsSet
+        {
+            get
+            {
+                return new RedisClientSet(client, client.GetTypeIdsSetKey<T>());
+            }
+        }
 
-		public T this[string key]
-		{
-			get { return GetValue(key); }
-			set { SetEntry(key, value); }
-		}
+        public T this[string key]
+        {
+            get { return GetValue(key); }
+            set { SetEntry(key, value); }
+        }
 
-		public byte[] SerializeValue(T value)
-		{
-			var strValue = serializer.SerializeToString(value);
-			return Encoding.UTF8.GetBytes(strValue);
-		}
+        public byte[] SerializeValue(T value)
+        {
+            var strValue = serializer.SerializeToString(value);
+            return Encoding.UTF8.GetBytes(strValue);
+        }
 
-		public T DeserializeValue(byte[] value)
-		{
-			var strValue = value != null ? Encoding.UTF8.GetString(value) : null;
-			return serializer.DeserializeFromString(strValue);
-		}
+        public T DeserializeValue(byte[] value)
+        {
+            var strValue = value != null ? Encoding.UTF8.GetString(value) : null;
+            return serializer.DeserializeFromString(strValue);
+        }
 
-		public void SetEntry(string key, T value)
-		{
-			if (key == null)
-				throw new ArgumentNullException("key");
+        public void SetEntry(string key, T value)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
 
-			client.Set(key, SerializeValue(value));
-			client.RegisterTypeId(value);
-		}
+            client.Set(key, SerializeValue(value));
+            client.RegisterTypeId(value);
+        }
 
-		public void SetEntry(string key, T value, TimeSpan expireIn)
-		{
-			if (key == null)
-				throw new ArgumentNullException("key");
+        public void SetEntry(string key, T value, TimeSpan expireIn)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
 
-			client.Set(key, SerializeValue(value), expireIn);
-			client.RegisterTypeId(value);
-		}
+            client.Set(key, SerializeValue(value), expireIn);
+            client.RegisterTypeId(value);
+        }
 
-		public bool SetEntryIfNotExists(string key, T value)
-		{
-			var success = client.SetNX(key, SerializeValue(value)) == RedisNativeClient.Success;
-			if (success) client.RegisterTypeId(value);
-			return success;
-		}
+        public bool SetEntryIfNotExists(string key, T value)
+        {
+            var success = client.SetNX(key, SerializeValue(value)) == RedisNativeClient.Success;
+            if (success) client.RegisterTypeId(value);
+            return success;
+        }
 
-		public T GetValue(string key)
-		{
-			return DeserializeValue(client.Get(key));
-		}
+        public T GetValue(string key)
+        {
+            return DeserializeValue(client.Get(key));
+        }
 
-		public T GetAndSetValue(string key, T value)
-		{
-			return DeserializeValue(client.GetSet(key, SerializeValue(value)));
-		}
+        public T GetAndSetValue(string key, T value)
+        {
+            return DeserializeValue(client.GetSet(key, SerializeValue(value)));
+        }
 
-		public bool ContainsKey(string key)
-		{
-			return client.Exists(key) == RedisNativeClient.Success;
-		}
+        public bool ContainsKey(string key)
+        {
+            return client.Exists(key) == RedisNativeClient.Success;
+        }
 
-		public bool RemoveEntry(string key)
-		{
-			return client.Del(key) == RedisNativeClient.Success;
-		}
+        public bool RemoveEntry(string key)
+        {
+            return client.Del(key) == RedisNativeClient.Success;
+        }
 
-		public bool RemoveEntry(params string[] keys)
-		{
-			return client.Del(keys) == RedisNativeClient.Success;
-		}
+        public bool RemoveEntry(params string[] keys)
+        {
+            return client.Del(keys) == RedisNativeClient.Success;
+        }
 
-		public bool RemoveEntry(params IHasStringId[] entities)
-		{
+        public bool RemoveEntry(params IHasStringId[] entities)
+        {
             var ids = entities.Map(x => x.Id);
-			var success = client.Del(ids.ToArray()) == RedisNativeClient.Success;
-			if (success) client.RemoveTypeIds(ids.ToArray());
-			return success;
-		}
+            var success = client.Del(ids.ToArray()) == RedisNativeClient.Success;
+            if (success) client.RemoveTypeIds(ids.ToArray());
+            return success;
+        }
 
-		public long IncrementValue(string key)
-		{
-			return client.Incr(key);
-		}
+        public long IncrementValue(string key)
+        {
+            return client.Incr(key);
+        }
 
-		public long IncrementValueBy(string key, int count)
-		{
-			return client.IncrBy(key, count);
-		}
+        public long IncrementValueBy(string key, int count)
+        {
+            return client.IncrBy(key, count);
+        }
 
-		public long DecrementValue(string key)
-		{
-			return client.Decr(key);
-		}
+        public long DecrementValue(string key)
+        {
+            return client.Decr(key);
+        }
 
-		public long DecrementValueBy(string key, int count)
-		{
-			return client.DecrBy(key, count);
-		}
+        public long DecrementValueBy(string key, int count)
+        {
+            return client.DecrBy(key, count);
+        }
 
-		public string SequenceKey { get; set; }
+        public string SequenceKey { get; set; }
 
-		public void SetSequence(int value)
-		{
-			client.GetSet(SequenceKey, Encoding.UTF8.GetBytes(value.ToString()));
-		}
+        public void SetSequence(int value)
+        {
+            client.GetSet(SequenceKey, Encoding.UTF8.GetBytes(value.ToString()));
+        }
 
-		public long GetNextSequence()
-		{
-			return IncrementValue(SequenceKey);
-		}
+        public long GetNextSequence()
+        {
+            return IncrementValue(SequenceKey);
+        }
 
-		public long GetNextSequence(int incrBy)
-		{
-			return IncrementValueBy(SequenceKey, incrBy);
-		}
+        public long GetNextSequence(int incrBy)
+        {
+            return IncrementValueBy(SequenceKey, incrBy);
+        }
 
-		public RedisKeyType GetEntryType(string key)
-		{
-			return client.GetEntryType(key);
-		}
+        public RedisKeyType GetEntryType(string key)
+        {
+            return client.GetEntryType(key);
+        }
 
-		public string GetRandomKey()
-		{
-			return client.RandomKey();
-		}
+        public string GetRandomKey()
+        {
+            return client.RandomKey();
+        }
 
-		public bool ExpireEntryIn(string key, TimeSpan expireIn)
-		{
+        public bool ExpireEntryIn(string key, TimeSpan expireIn)
+        {
             return client.ExpireEntryIn(key, expireIn);
-		}
+        }
 
-		public bool ExpireEntryAt(string key, DateTime expireAt)
-		{
+        public bool ExpireEntryAt(string key, DateTime expireAt)
+        {
             return client.ExpireEntryAt(key, expireAt);
-		}
+        }
 
-		public bool ExpireIn(object id, TimeSpan expireIn)
-		{
-			var key = client.UrnKey<T>(id);
-			return client.ExpireEntryIn(key, expireIn);
-		}
+        public bool ExpireIn(object id, TimeSpan expireIn)
+        {
+            var key = client.UrnKey<T>(id);
+            return client.ExpireEntryIn(key, expireIn);
+        }
 
-		public bool ExpireAt(object id, DateTime expireAt)
-		{
-			var key = client.UrnKey<T>(id);
+        public bool ExpireAt(object id, DateTime expireAt)
+        {
+            var key = client.UrnKey<T>(id);
             return client.ExpireEntryAt(key, expireAt);
-		}
+        }
 
-		public TimeSpan GetTimeToLive(string key)
-		{
-			return TimeSpan.FromSeconds(client.Ttl(key));
-		}
+        public TimeSpan GetTimeToLive(string key)
+        {
+            return TimeSpan.FromSeconds(client.Ttl(key));
+        }
 
-		public void Save()
-		{
-			client.Save();
-		}
+        public void Save()
+        {
+            client.Save();
+        }
 
-		public void SaveAsync()
-		{
-			client.SaveAsync();
-		}
+        public void SaveAsync()
+        {
+            client.SaveAsync();
+        }
 
-		public void FlushDb()
-		{
-			client.FlushDb();
-		}
+        public void FlushDb()
+        {
+            client.FlushDb();
+        }
 
-		public void FlushAll()
-		{
-			client.FlushAll();
-		}
+        public void FlushAll()
+        {
+            client.FlushAll();
+        }
 
-		public T[] SearchKeys(string pattern)
-		{
-			var strKeys = client.SearchKeys(pattern);
-			var keysCount = strKeys.Count;
+        public T[] SearchKeys(string pattern)
+        {
+            var strKeys = client.SearchKeys(pattern);
+            var keysCount = strKeys.Count;
 
-			var keys = new T[keysCount];
-			for (var i=0; i < keysCount; i++)
-			{
-				keys[i] = serializer.DeserializeFromString(strKeys[i]);
-			}
-			return keys;
-		}
+            var keys = new T[keysCount];
+            for (var i = 0; i < keysCount; i++)
+            {
+                keys[i] = serializer.DeserializeFromString(strKeys[i]);
+            }
+            return keys;
+        }
 
-		public List<T> GetValues(List<string> keys)
-		{
-			if (keys.IsNullOrEmpty()) return  new List<T>();
+        public List<T> GetValues(List<string> keys)
+        {
+            if (keys.IsNullOrEmpty()) return new List<T>();
 
-			var resultBytesArray = client.MGet(keys.ToArray());
+            var resultBytesArray = client.MGet(keys.ToArray());
 
-			var results = new List<T>();
-			foreach (var resultBytes in resultBytesArray)
-			{
-				if (resultBytes == null) continue;
+            var results = new List<T>();
+            foreach (var resultBytes in resultBytesArray)
+            {
+                if (resultBytes == null) continue;
 
-				var result = DeserializeValue(resultBytes);
-				results.Add(result);
-			}
+                var result = DeserializeValue(resultBytes);
+                results.Add(result);
+            }
 
-			return results;
-		}
+            return results;
+        }
 
         public void StoreAsHash(T entity)
         {
@@ -370,78 +370,78 @@ namespace ServiceStack.Redis.Generic
         }
 
 
-		#region Implementation of IBasicPersistenceProvider<T>
+        #region Implementation of IBasicPersistenceProvider<T>
 
-		public T GetById(object id)
-		{
-			var key = client.UrnKey<T>(id);
-			return this.GetValue(key);
-		}
+        public T GetById(object id)
+        {
+            var key = client.UrnKey<T>(id);
+            return this.GetValue(key);
+        }
 
-		public IList<T> GetByIds(IEnumerable ids)
-		{
-			if (ids != null)
-			{
+        public IList<T> GetByIds(IEnumerable ids)
+        {
+            if (ids != null)
+            {
                 var urnKeys = ids.Map(x => client.UrnKey<T>(x));
-				if (urnKeys.Count != 0)
-					return GetValues(urnKeys);
-			}
+                if (urnKeys.Count != 0)
+                    return GetValues(urnKeys);
+            }
 
-			return new List<T>();
-		}
+            return new List<T>();
+        }
 
-		public IList<T> GetAll()
-		{
-			var allKeys = client.GetAllItemsFromSet(this.TypeIdsSetKey);
-			return this.GetByIds(allKeys.ToArray());
-		}
+        public IList<T> GetAll()
+        {
+            var allKeys = client.GetAllItemsFromSet(this.TypeIdsSetKey);
+            return this.GetByIds(allKeys.ToArray());
+        }
 
-		public T Store(T entity)
-		{
+        public T Store(T entity)
+        {
             var urnKey = client.UrnKey(entity);
-			this.SetEntry(urnKey, entity);
+            this.SetEntry(urnKey, entity);
 
-			return entity;
-		}
+            return entity;
+        }
 
-		public void StoreAll(IEnumerable<T> entities)
-		{
-			if (entities == null) return;
+        public void StoreAll(IEnumerable<T> entities)
+        {
+            if (entities == null) return;
 
-			var entitiesList = entities.ToList();
-			var len = entitiesList.Count;
+            var entitiesList = entities.ToList();
+            var len = entitiesList.Count;
 
-			var keys = new byte[len][];
-			var values = new byte[len][];
+            var keys = new byte[len][];
+            var values = new byte[len][];
 
-			for (var i = 0; i < len; i++)
-			{
+            for (var i = 0; i < len; i++)
+            {
                 keys[i] = client.UrnKey(entitiesList[i]).ToUtf8Bytes();
-				values[i] = Redis.RedisClient.SerializeToUtf8Bytes(entitiesList[i]);
-			}
+                values[i] = Redis.RedisClient.SerializeToUtf8Bytes(entitiesList[i]);
+            }
 
-			client.MSet(keys, values);
-			client.RegisterTypeIds(entitiesList);
-		}
+            client.MSet(keys, values);
+            client.RegisterTypeIds(entitiesList);
+        }
 
-		public void Delete(T entity)
-		{
+        public void Delete(T entity)
+        {
             var urnKey = client.UrnKey(entity);
-			this.RemoveEntry(urnKey);
-			client.RemoveTypeIds(entity);
-		}
+            this.RemoveEntry(urnKey);
+            client.RemoveTypeIds(entity);
+        }
 
-		public void DeleteById(object id)
-		{
-			var urnKey = client.UrnKey<T>(id);
+        public void DeleteById(object id)
+        {
+            var urnKey = client.UrnKey<T>(id);
 
-			this.RemoveEntry(urnKey);
-			client.RemoveTypeIds<T>(id.ToString());
-		}
+            this.RemoveEntry(urnKey);
+            client.RemoveTypeIds<T>(id.ToString());
+        }
 
-		public void DeleteByIds(IEnumerable ids)
-		{
-			if (ids == null) return;
+        public void DeleteByIds(IEnumerable ids)
+        {
+            if (ids == null) return;
 
             var urnKeys = ids.Map(t => client.UrnKey<T>(t));
             if (urnKeys.Count > 0)
@@ -449,21 +449,21 @@ namespace ServiceStack.Redis.Generic
                 this.RemoveEntry(urnKeys.ToArray());
                 client.RemoveTypeIds<T>(ids.Map(x => x.ToString()).ToArray());
             }
-		}
+        }
 
-		public void DeleteAll()
-		{
-			var ids = client.GetAllItemsFromSet(this.TypeIdsSetKey);
+        public void DeleteAll()
+        {
+            var ids = client.GetAllItemsFromSet(this.TypeIdsSetKey);
             var urnKeys = ids.Map(t => client.UrnKey<T>(t));
             if (urnKeys.Count > 0)
             {
-                
+
                 this.RemoveEntry(urnKeys.ToArray());
                 this.RemoveEntry(this.TypeIdsSetKey);
             }
-		}
+        }
 
-		#endregion
+        #endregion
 
         internal void ExpectQueued()
         {
@@ -487,6 +487,6 @@ namespace ServiceStack.Redis.Generic
         }
 
         [Obsolete("Does nothing currently, RedisTypedClient will not be IDisposable in a future version")]
-	    public void Dispose() {}
-	}
+        public void Dispose() { }
+    }
 }

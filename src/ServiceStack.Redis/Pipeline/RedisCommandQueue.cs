@@ -19,9 +19,9 @@ namespace ServiceStack.Redis
     /// <summary>
     /// </summary>
     public class RedisCommandQueue : RedisQueueCompletableOperation
-   {
+    {
         protected readonly RedisClient RedisClient;
-  
+
         public RedisCommandQueue(RedisClient redisClient)
         {
             this.RedisClient = redisClient;

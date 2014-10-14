@@ -43,7 +43,7 @@ namespace ServiceStack.Redis
             AddCurrentQueuedOperation();
         }
 
-        public virtual  void CompleteIntQueuedCommand(Func<int> intReadCommand)
+        public virtual void CompleteIntQueuedCommand(Func<int> intReadCommand)
         {
             //AssertCurrentOperation();
             // this can happen when replaying pipeline/transaction

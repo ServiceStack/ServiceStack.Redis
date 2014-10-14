@@ -30,7 +30,7 @@ namespace ServiceStack.Redis.Generic
                 return client.Lists[key].ToList();
             }
         }
-		public int IndexOf(T item)
+        public int IndexOf(T item)
         {
             return GetRedisList().IndexOf(item);
         }
@@ -93,7 +93,7 @@ namespace ServiceStack.Redis.Generic
             GetRedisList().CopyTo(array, arrayIndex);
         }
 
-		public int Count
+        public int Count
         {
             get { return GetRedisList().Count(); }
         }
