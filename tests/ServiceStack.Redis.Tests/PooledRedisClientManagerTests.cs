@@ -38,7 +38,7 @@ namespace ServiceStack.Redis.Tests
 			mockFactory = new Mock<IRedisClientFactory>();
 			mockFactory.Expect(x => x.CreateRedisClient(
                 It.IsAny<RedisEndpoint>()))
-				.Returns((Func<string, int, RedisClient>)((host, port) => new RedisClient(host, port)));
+                .Returns((Func<RedisEndpoint, RedisClient>)((config) => new RedisClient(config)));
 		}
 
 		public PooledRedisClientManager CreateManager(
