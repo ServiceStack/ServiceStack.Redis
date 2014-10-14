@@ -16,5 +16,29 @@ namespace ServiceStack.Redis
 
              return to;
          }
+
+         public static string GetResult(this RedisText from)
+         {
+             return from.Text;
+         }
+
+         public static T GetResult<T>(this RedisText from)
+         {
+             return from.Text.FromJson<T>();
+         }
+
+         public static List<string> GetResults(this RedisText from)
+         {
+             return from.Children == null
+                 ? new List<string>()
+                 : from.Children.ConvertAll(x => x.Text);
+         }
+
+         public static List<T> GetResults<T>(this RedisText from)
+         {
+             return from.Children == null
+                 ? new List<T>()
+                 : from.Children.ConvertAll(x => x.Text.FromJson<T>());
+         }
     }
 }

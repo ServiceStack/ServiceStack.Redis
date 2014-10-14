@@ -218,6 +218,44 @@ namespace ServiceStack.Redis
             }
         }
 
+        public RedisData RawCommand(params object[] cmdWithArgs)
+        {
+            var byteArgs = new List<byte[]>();
+
+            foreach (var arg in cmdWithArgs)
+            {
+                if (arg == null)
+                {
+                    byteArgs.Add(new byte[0]);
+                    continue;
+                }
+
+                var bytes = arg as byte[];
+                if (bytes != null)
+                {
+                    byteArgs.Add(bytes);
+                }
+                else if (arg.GetType().IsUserType())
+                {
+                    var json = arg.ToJson();
+                    byteArgs.Add(json.ToUtf8Bytes());
+                }
+                else 
+                {
+                    var str = arg.ToString();
+                    byteArgs.Add(str.ToUtf8Bytes());
+                }
+            }
+
+            var data = SendExpectComplexResponse(byteArgs.ToArray());
+            return data;
+        }
+
+        public RedisData RawCommand(params byte[][] cmdWithBinaryArgs)
+        {
+            return SendExpectComplexResponse(cmdWithBinaryArgs);
+        }
+
         public bool Ping()
         {
             return SendExpectCode(Commands.Ping) == "PONG";

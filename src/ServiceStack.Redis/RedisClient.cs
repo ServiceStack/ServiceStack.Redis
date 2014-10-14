@@ -96,6 +96,13 @@ namespace ServiceStack.Redis
 
         public override void OnConnected() {}
 
+        public RedisText Custom(params object[] cmdWithArgs)
+        {
+            var data = base.RawCommand(cmdWithArgs);
+            var ret = data.ToRedisText();
+            return ret;
+        }
+
         public DateTime ConvertToServerDate(DateTime expiresAt)
         {
             //placeholder if we ever try to compensate for differences in server-time
