@@ -7,9 +7,9 @@
     {
         public static SerializingRedisClientFactory Instance = new SerializingRedisClientFactory();
 
-        public RedisClient CreateRedisClient(string host, int port)
+        public RedisClient CreateRedisClient(RedisEndpoint config)
         {
-            return new SerializingRedisClient(host, port);
+            return new SerializingRedisClient(config);
         }
     }
 }

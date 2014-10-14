@@ -16,6 +16,6 @@ namespace ServiceStack.Redis
 {
 	public interface IRedisClientFactory
 	{
-	    RedisClient CreateRedisClient(string host, int port);
+	    RedisClient CreateRedisClient(RedisEndpoint config);
 	}
 }

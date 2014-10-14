@@ -22,9 +22,9 @@ namespace ServiceStack.Redis
 	{
 		public static RedisCacheClientFactory Instance = new RedisCacheClientFactory();
 
-		public RedisClient CreateRedisClient(string host, int port)
-		{
-			return new RedisClient(host, port);
-		}
-	}
+        public RedisClient CreateRedisClient(RedisEndpoint config)
+        {
+            return new RedisClient(config);
+        }
+    }
 }

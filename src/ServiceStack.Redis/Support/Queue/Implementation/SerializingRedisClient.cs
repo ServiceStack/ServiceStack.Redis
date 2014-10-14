@@ -7,11 +7,15 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
     public class SerializingRedisClient : RedisClient
     {
         private ISerializer serializer = new ObjectSerializer();
+
+        public SerializingRedisClient(string host)
+            : base(host) {}
+
+        public SerializingRedisClient(RedisEndpoint config)
+            : base(config) {}
    
         public SerializingRedisClient(string host, int port)
-            : base(host, port)
-        {
-        }
+            : base(host, port) {}
         
         /// <summary>
         /// customize the client serializer

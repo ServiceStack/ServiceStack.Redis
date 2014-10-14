@@ -37,7 +37,7 @@ namespace ServiceStack.Redis.Tests
 		{
 			mockFactory = new Mock<IRedisClientFactory>();
 			mockFactory.Expect(x => x.CreateRedisClient(
-				It.IsAny<string>(), It.IsAny<int>()))
+                It.IsAny<RedisEndpoint>()))
 				.Returns((Func<string, int, RedisClient>)((host, port) => new RedisClient(host, port)));
 		}
 
