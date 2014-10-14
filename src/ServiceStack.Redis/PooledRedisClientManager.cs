@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using ServiceStack.Caching;
 using ServiceStack.Logging;
 
 namespace ServiceStack.Redis
@@ -23,12 +24,12 @@ namespace ServiceStack.Redis
     /// 1 master and multiple replicated read slaves.
     /// </summary>
     public partial class PooledRedisClientManager
-        : IRedisClientsManager, IRedisFailover
+        : IRedisClientsManager, IRedisFailover, IHandleClientDispose
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PooledRedisClientManager));
 
         private const string PoolTimeoutError =
-                   "Redis Timeout expired. The timeout period elapsed prior to obtaining a connection from the pool. This may have occurred because all pooled connections were in use.";
+            "Redis Timeout expired. The timeout period elapsed prior to obtaining a connection from the pool. This may have occurred because all pooled connections were in use.";
 
         protected readonly int PoolSizeMultiplier = 10;
         public int RecheckPoolAfterMs = 100;
@@ -218,31 +219,7 @@ namespace ServiceStack.Redis
                 WritePoolIndex++;
                 inActiveClient.Active = true;
 
-                if (this.ConnectTimeout != null)
-                {
-                    inActiveClient.ConnectTimeout = this.ConnectTimeout.Value;
-                }
-
-                if (this.SocketSendTimeout.HasValue)
-                {
-                    inActiveClient.SendTimeout = this.SocketSendTimeout.Value;
-                }
-                if (this.SocketReceiveTimeout.HasValue)
-                {
-                    inActiveClient.ReceiveTimeout = this.SocketReceiveTimeout.Value;
-                }
-                if (this.IdleTimeOutSecs.HasValue)
-                {
-                    inActiveClient.IdleTimeOutSecs = this.IdleTimeOutSecs.Value;
-                }
-
-                inActiveClient.NamespacePrefix = NamespacePrefix;
-
-                //Reset database to default if changed
-                if (inActiveClient.Db != Db)
-                {
-                    inActiveClient.ChangeDb(Db);
-                }
+                InitClient(inActiveClient);
 
                 return inActiveClient;
             }
@@ -260,7 +237,7 @@ namespace ServiceStack.Redis
             for (int x = 0; x < ReadWriteHosts.Count; x++)
             {
                 var nextHostIndex = (desiredIndex + x) % ReadWriteHosts.Count;
-                var nextHost = ReadWriteHosts[nextHostIndex];
+                RedisEndpoint nextHost = ReadWriteHosts[nextHostIndex];
                 for (var i = nextHostIndex; i < writeClients.Length; i += ReadWriteHosts.Count)
                 {
                     if (writeClients[i] != null && !writeClients[i].Active && !writeClients[i].HadExceptions)
@@ -269,16 +246,8 @@ namespace ServiceStack.Redis
                     {
                         if (writeClients[i] != null)
                             writeClients[i].DisposeConnection();
-                        var client = RedisClientFactory.CreateRedisClient(nextHost.Host, nextHost.Port);
 
-                        if (nextHost.RequiresAuth)
-                            client.Password = nextHost.Password;
-
-                        client.Id = RedisClientCounter++;
-                        client.ClientManager = this;
-                        client.NamespacePrefix = NamespacePrefix;
-                        client.ConnectionFilter = ConnectionFilter;
-
+                        var client = InitNewClient(nextHost);
                         writeClients[i] = client;
 
                         return client;
@@ -286,6 +255,34 @@ namespace ServiceStack.Redis
                 }
             }
             return null;
+        }
+
+        private RedisClient InitNewClient(RedisEndpoint nextHost)
+        {
+            var client = RedisClientFactory.CreateRedisClient(nextHost);
+            client.Id = Interlocked.Increment(ref RedisClientCounter);
+            client.ClientManager = this;
+            client.ConnectionFilter = ConnectionFilter;
+            if (NamespacePrefix != null)
+                client.NamespacePrefix = NamespacePrefix;
+
+            return client;
+        }
+
+        private void InitClient(RedisClient client)
+        {
+            if (this.ConnectTimeout != null)
+                client.ConnectTimeout = this.ConnectTimeout.Value;
+            if (this.SocketSendTimeout.HasValue)
+                client.SendTimeout = this.SocketSendTimeout.Value;
+            if (this.SocketReceiveTimeout.HasValue)
+                client.ReceiveTimeout = this.SocketReceiveTimeout.Value;
+            if (this.IdleTimeOutSecs.HasValue)
+                client.IdleTimeOutSecs = this.IdleTimeOutSecs.Value;
+            if (this.NamespacePrefix != null)
+                client.NamespacePrefix = NamespacePrefix;
+            if (client.Db != Db) //Reset database to default if changed
+                client.ChangeDb(Db);
         }
 
         /// <summary>
@@ -314,31 +311,7 @@ namespace ServiceStack.Redis
                 ReadPoolIndex++;
                 inActiveClient.Active = true;
 
-                if (this.ConnectTimeout != null)
-                {
-                    inActiveClient.ConnectTimeout = this.ConnectTimeout.Value;
-                }
-
-                if (this.SocketSendTimeout.HasValue)
-                {
-                    inActiveClient.SendTimeout = this.SocketSendTimeout.Value;
-                }
-                if (this.SocketReceiveTimeout.HasValue)
-                {
-                    inActiveClient.ReceiveTimeout = this.SocketReceiveTimeout.Value;
-                }
-                if (this.IdleTimeOutSecs.HasValue)
-                {
-                    inActiveClient.IdleTimeOutSecs = this.IdleTimeOutSecs.Value;
-                }
-
-                inActiveClient.NamespacePrefix = NamespacePrefix;
-
-                //Reset database to default if changed
-                if (inActiveClient.Db != Db)
-                {
-                    inActiveClient.ChangeDb(Db);
-                }
+                InitClient(inActiveClient);
 
                 return inActiveClient;
             }
@@ -365,14 +338,8 @@ namespace ServiceStack.Redis
                     {
                         if (readClients[i] != null)
                             readClients[i].DisposeConnection();
-                        var client = RedisClientFactory.CreateRedisClient(nextHost.Host, nextHost.Port);
 
-                        if (nextHost.RequiresAuth)
-                            client.Password = nextHost.Password;
-
-                        client.ClientManager = this;
-                        client.ConnectionFilter = ConnectionFilter;
-
+                        var client = InitNewClient(nextHost);
                         readClients[i] = client;
 
                         return client;
@@ -500,19 +467,19 @@ namespace ServiceStack.Redis
             }
 
             var ret = new Dictionary<string, string>
-                {
-                    {"writeClientsPoolSize", "" + writeClientsPoolSize},
-                    {"writeClientsCreated", "" + writeClientsCreated},
-                    {"writeClientsWithExceptions", "" + writeClientsWithExceptions},
-                    {"writeClientsInUse", "" + writeClientsInUse},
-                    {"writeClientsConnected", "" + writeClientsConnected},
+            {
+                {"writeClientsPoolSize", "" + writeClientsPoolSize},
+                {"writeClientsCreated", "" + writeClientsCreated},
+                {"writeClientsWithExceptions", "" + writeClientsWithExceptions},
+                {"writeClientsInUse", "" + writeClientsInUse},
+                {"writeClientsConnected", "" + writeClientsConnected},
 
-                    {"readClientsPoolSize", "" + readClientsPoolSize},
-                    {"readClientsCreated", "" + readClientsCreated},
-                    {"readClientsWithExceptions", "" + readClientsWithExceptions},
-                    {"readClientsInUse", "" + readClientsInUse},
-                    {"readClientsConnected", "" + readClientsConnected},
-                };
+                {"readClientsPoolSize", "" + readClientsPoolSize},
+                {"readClientsCreated", "" + readClientsCreated},
+                {"readClientsWithExceptions", "" + readClientsWithExceptions},
+                {"readClientsInUse", "" + readClientsInUse},
+                {"readClientsConnected", "" + readClientsConnected},
+            };
 
             return ret;
         }
@@ -613,5 +580,60 @@ namespace ServiceStack.Redis
                     redisClient.Host, redisClient.Port), ex);
             }
         }
+
+        public ICacheClient GetCacheClient()
+        {
+            return new RedisClientManagerCacheClient(this);
+        }
+
+        public ICacheClient GetReadOnlyCacheClient()
+        {
+            return new RedisClientManagerCacheClient(this) { ReadOnly = true };
+        }
     }
+
+    public partial class PooledRedisClientManager : IRedisClientCacheManager
+    {
+        /// <summary>
+        /// Manage a client acquired from the PooledRedisClientManager
+        /// Dispose method will release the client back to the pool.
+        /// </summary>
+        public class DisposablePooledClient<T> : IDisposable where T : RedisNativeClient
+        {
+            private T client;
+            private readonly PooledRedisClientManager clientManager;
+
+            /// <summary>
+            /// wrap the acquired client
+            /// </summary>
+            /// <param name="clientManager"></param>
+            public DisposablePooledClient(PooledRedisClientManager clientManager)
+            {
+                this.clientManager = clientManager;
+                if (clientManager != null)
+                    client = (T)clientManager.GetClient();
+            }
+
+            /// <summary>
+            /// access the wrapped client
+            /// </summary>
+            public T Client { get { return client; } }
+
+            /// <summary>
+            /// release the wrapped client back to the pool
+            /// </summary>
+            public void Dispose()
+            {
+                if (client != null)
+                    clientManager.DisposeClient(client);
+                client = null;
+            }
+        }
+
+        public DisposablePooledClient<T> GetDisposableClient<T>() where T : RedisNativeClient
+        {
+            return new DisposablePooledClient<T>(this);
+        }
+    }
+
 }
