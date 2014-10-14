@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace ServiceStack.Redis
 {
@@ -25,6 +26,9 @@ namespace ServiceStack.Redis
         private List<RedisEndpoint> ReadWriteHosts { get; set; }
         private List<RedisEndpoint> ReadOnlyHosts { get; set; }
         public int? ConnectTimeout { get; set; }
+        public int? SocketSendTimeout { get; set; }
+        public int? SocketReceiveTimeout { get; set; }
+        public int? IdleTimeOutSecs { get; set; }
 
         /// <summary>
         /// Gets or sets object key prefix.
@@ -32,6 +36,8 @@ namespace ServiceStack.Redis
         public string NamespacePrefix { get; set; }
         private int readWriteHostsIndex;
         private int readOnlyHostsIndex;
+
+        protected int RedisClientCounter = 0;
 
         public IRedisClientFactory RedisClientFactory { get; set; }
 
@@ -91,26 +97,7 @@ namespace ServiceStack.Redis
         public IRedisClient GetClient()
         {
             var nextHost = ReadWriteHosts[readWriteHostsIndex++ % ReadWriteHosts.Count];
-            var client = RedisClientFactory.CreateRedisClient(
-                nextHost.Host, nextHost.Port);
-
-            if (this.ConnectTimeout != null)
-            {
-                client.ConnectTimeout = this.ConnectTimeout.Value;
-            }
-
-            //Set database to userSpecified if different
-            if (Db != RedisNativeClient.DefaultDb)
-            {
-                client.ChangeDb(Db);
-            }
-
-            if (nextHost.RequiresAuth)
-                client.Password = nextHost.Password;
-
-            client.NamespacePrefix = NamespacePrefix;
-            client.ConnectionFilter = ConnectionFilter;
-
+            var client = InitNewClient(nextHost);
             return client;
         }
 
@@ -121,25 +108,27 @@ namespace ServiceStack.Redis
         public virtual IRedisClient GetReadOnlyClient()
         {
             var nextHost = ReadOnlyHosts[readOnlyHostsIndex++ % ReadOnlyHosts.Count];
-            var client = RedisClientFactory.CreateRedisClient(
-                nextHost.Host, nextHost.Port);
+            var client = InitNewClient(nextHost);
+            return client;
+        }
 
-            if (this.ConnectTimeout != null)
-            {
-                client.ConnectTimeout = this.ConnectTimeout.Value;
-            }
-
-            //Set database to userSpecified if different
-            if (Db != RedisNativeClient.DefaultDb)
-            {
-                client.ChangeDb(Db);
-            }
-
-            if (nextHost.RequiresAuth)
-                client.Password = nextHost.Password;
-
-            client.NamespacePrefix = NamespacePrefix;
+        private RedisClient InitNewClient(RedisEndpoint nextHost)
+        {
+            var client = RedisClientFactory.CreateRedisClient(nextHost);
+            client.Id = Interlocked.Increment(ref RedisClientCounter);
             client.ConnectionFilter = ConnectionFilter;
+            if (this.ConnectTimeout != null)
+                client.ConnectTimeout = this.ConnectTimeout.Value;
+            if (this.SocketSendTimeout.HasValue)
+                client.SendTimeout = this.SocketSendTimeout.Value;
+            if (this.SocketReceiveTimeout.HasValue)
+                client.ReceiveTimeout = this.SocketReceiveTimeout.Value;
+            if (this.IdleTimeOutSecs.HasValue)
+                client.IdleTimeOutSecs = this.IdleTimeOutSecs.Value;
+            if (this.NamespacePrefix != null)
+                client.NamespacePrefix = NamespacePrefix;
+            if (client.Db != Db) //Reset database to default if changed
+                client.ChangeDb(Db);
 
             return client;
         }

@@ -32,8 +32,8 @@ namespace ServiceStack.Redis
 	{
 		public ICacheClient GetCacheClient()
 		{
-			return ConfigureRedisClient(this.GetClient());
-		}
+            return new RedisClientManagerCacheClient(this);
+        }
 
 		public ICacheClient GetReadOnlyCacheClient()
 		{
