@@ -10,6 +10,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -113,6 +114,9 @@ namespace ServiceStack.Redis
 
                 if (db != 0)
                     SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
+
+                if (Client != null)
+                    SendExpectSuccess(Commands.Client, Commands.SetName, Client.ToUtf8Bytes());
 
                 try
                 {
@@ -527,6 +531,19 @@ namespace ServiceStack.Redis
             return ReadDeeplyNestedMultiData();
         }
 
+        protected RedisData SendExpectComplexResponse(params byte[][] cmdWithBinaryArgs)
+        {
+            if (!SendCommand(cmdWithBinaryArgs))
+                throw CreateConnectionError();
+
+            if (Pipeline != null)
+            {
+                throw new NotSupportedException("Pipeline is not supported.");
+            }
+
+            return ReadComplexResponse();
+        }
+
         protected void Log(string fmt, params object[] args)
         {
             log.DebugFormat("{0}", string.Format(fmt, args).Trim());
@@ -797,6 +814,47 @@ namespace ServiceStack.Redis
 
                 default:
                     return s;
+            }
+
+            throw CreateResponseError("Unknown reply on multi-request: " + c + s);
+        }
+
+        internal RedisData ReadComplexResponse()
+        {
+            int c = SafeReadByte();
+            if (c == -1)
+                throw CreateResponseError("No more data");
+
+            var s = ReadLine();
+            if (log.IsDebugEnabled)
+                Log("R: {0}", s);
+
+            switch (c)
+            {
+                case '$':
+                    return new RedisData {
+                        Data = ParseSingleLine(string.Concat(char.ToString((char) c), s))
+                    };
+
+                case '-':
+                    throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
+
+                case '*':
+                    int count;
+                    if (int.TryParse(s, out count))
+                    {
+                        var ret = new RedisData { Children = new List<RedisData>() };
+                        for (var i = 0; i < count; i++)
+                        {
+                            ret.Children.Add(ReadComplexResponse());
+                        }
+
+                        return ret;
+                    }
+                    break;
+
+                default:
+                    return new RedisData { Data = s.ToUtf8Bytes() };
             }
 
             throw CreateResponseError("Unknown reply on multi-request: " + c + s);
