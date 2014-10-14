@@ -37,6 +37,7 @@ namespace ServiceStack.Redis
         public readonly static byte[] No = "NO".ToUtf8Bytes();
         public readonly static byte[] One = "ONE".ToUtf8Bytes();
         public readonly static byte[] ResetStat = "RESETSTAT".ToUtf8Bytes();
+        public readonly static byte[] Rewrite = "REWRITE".ToUtf8Bytes();
         public readonly static byte[] Time = "TIME".ToUtf8Bytes();
         public readonly static byte[] Segfault = "SEGFAULT".ToUtf8Bytes();
         public readonly static byte[] Dump = "DUMP".ToUtf8Bytes();
@@ -51,8 +52,13 @@ namespace ServiceStack.Redis
         public readonly static byte[] Client = "CLIENT".ToUtf8Bytes();
         public readonly static byte[] List = "LIST".ToUtf8Bytes();
         public readonly static byte[] Kill = "KILL".ToUtf8Bytes();
+        public readonly static byte[] Addr = "ADDR".ToUtf8Bytes();
+        public readonly static byte[] Id = "ID".ToUtf8Bytes();
+        public readonly static byte[] SkipMe = "SKIPME".ToUtf8Bytes();
         public readonly static byte[] SetName = "SETNAME".ToUtf8Bytes();
         public readonly static byte[] GetName = "GETNAME".ToUtf8Bytes();
+        public readonly static byte[] Pause = "PAUSE".ToUtf8Bytes();
+        public readonly static byte[] Role = "ROLE".ToUtf8Bytes();
         //public readonly static byte[] Get = "GET".ToUtf8Bytes();
         //public readonly static byte[] Set = "SET".ToUtf8Bytes();
 
