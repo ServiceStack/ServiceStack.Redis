@@ -311,7 +311,7 @@ namespace ServiceStack.Redis
 			if (key == null)
 				throw new ArgumentNullException("key");
 			
-			return SendExpectData(Commands.Dump);
+			return SendExpectData(Commands.Dump, key.ToUtf8Bytes());
 		}
 
     	public byte[] Restore(string key, long expireMs, byte[] dumpValue)
