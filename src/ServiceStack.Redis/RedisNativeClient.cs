@@ -322,9 +322,12 @@ namespace ServiceStack.Redis
 			return SendExpectData(Commands.Restore, key.ToUtf8Bytes(), expireMs.ToUtf8Bytes(), dumpValue);
 		}
 
-    	public void Migrate(string host, int port, int destinationDb, long timeoutMs)
+    	public void Migrate(string host, int port, string key, int destinationDb, long timeoutMs)
     	{
-			SendExpectSuccess(Commands.Migrate, host.ToUtf8Bytes(), port.ToUtf8Bytes(), destinationDb.ToUtf8Bytes(), timeoutMs.ToUtf8Bytes());
+            if (key == null)
+                throw new ArgumentNullException("key");
+
+			SendExpectSuccess(Commands.Migrate, host.ToUtf8Bytes(), port.ToUtf8Bytes(), key.ToUtf8Bytes(), destinationDb.ToUtf8Bytes(), timeoutMs.ToUtf8Bytes());
 		}
 
     	public bool Move(string key, int db)
