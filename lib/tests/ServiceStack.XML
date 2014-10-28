@@ -157,6 +157,11 @@
             Provide callbacks to be fired after the AppHost has finished initializing
             </summary>
         </member>
+        <member name="P:ServiceStack.IAppHost.OnDisposeCallbacks">
+            <summary>
+            Provide callbacks to be fired when AppHost is being disposed
+            </summary>
+        </member>
         <member name="P:ServiceStack.IAppHost.RawHttpHandlers">
             <summary>
             Skip the ServiceStack Request Pipeline and process the returned IHttpHandler instead
