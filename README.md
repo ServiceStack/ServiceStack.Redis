@@ -77,7 +77,7 @@ Any additional configuration can be specified as QueryString parameters. The ful
 
 The recommended way to access the RedisClient is to use one of the available Client Managers:
 
-### RedisManagerPool
+#### `RedisManagerPool`
 
 With the enhanced Redis URI Connection Strings we've been able to simplify and streamline the existing `PooledRedisClientManager` 
 implementation that's been extracted out into a new clients manager called `RedisManagerPool`. 
@@ -90,7 +90,7 @@ container.Register<IRedisClientsManager>(c =>
     new RedisManagerPool(redisConnectionString));
 ```
 
-### PooledRedisClientManager
+#### `PooledRedisClientManager`
 
 If you prefer to define options on the Client Manager itself or you want to provide separate Read/Write and ReadOnly 
 (i.e. Master and Slave) redis-servers, use the `PooledRedisClientManager` instead:
@@ -103,7 +103,7 @@ container.Register<IRedisClientsManager>(c =>
 	});
 ```
 
-### BasicRedisClientManager
+#### `BasicRedisClientManager`
 
 If don't want to use connection pooling (i.e. your accessing a local redis-server instance) 
 you can use a basic (non-pooled) Clients Manager:
@@ -113,7 +113,7 @@ container.Register<IRedisClientsManager>(c =>
     new BasicRedisClientManager(redisConnectionString));
 ```
 
-### Accessing Redis Client
+### Accessing the Redis Client
 
 Once registered, accessing the RedisClient is the same in all Client Managers, e.g:
 
@@ -143,7 +143,7 @@ using (IRedisClient redis = clientsManager.GetClient())
 }
 ```
 
-A more detailed list of the available API's used in the example can be seen in the C# interfaces below:
+A more detailed list of the available RedisClient API's used in the example can be seen in the C# interfaces below:
 
  - [IRedisClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClient.cs)
  - [IRedisTypedClient<T>](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisTypedClient.cs)
