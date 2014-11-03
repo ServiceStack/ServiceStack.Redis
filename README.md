@@ -3,6 +3,233 @@ follow [@servicestack](http://twitter.com/servicestack) for updates.
 
 # C#/.NET Client for Redis
 
+### Redis Connection Strings
+
+Redis Connection strings have been expanded to support the more versatile URI format which is now able to capture most of Redis Client 
+settings in a single connection string (akin to DB Connection strings).
+
+Redis Connection Strings supports multiple URI-like formats, from a simple **hostname** or **IP Address and port** pair to a 
+fully-qualified **URI** with multiple options specified on the QueryString. 
+
+Some examples of supported formats:
+
+    localhost
+    127.0.0.1:6379
+    redis://localhost:6379
+    password@localhost:6379
+    clientid:password@localhost:6379
+    redis://clientid:password@localhost:6380?ssl=true&db=1
+
+> More examples can be seen in 
+[ConfigTests.cs](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/ConfigTests.cs)
+
+Any additional configuration can be specified as QueryString parameters. The full list of options that can be specified include:
+
+<table>
+    <tr>
+        <td><b>Ssl</b></td>
+        <td>bool</td>
+        <td>If this is an SSL connection</td>
+    </tr>
+    <tr>
+        <td><b>Db</b></td>
+        <td>int</td>
+        <td>The Redis DB this connection should be set to</td>
+    </tr>
+    <tr>
+        <td><b>Client</b></td>
+        <td>string</td>
+        <td>A text alias to specify for this connection for analytic purposes</td>
+    </tr>
+    <tr>
+        <td><b>Password</b></td>
+        <td>string</td>
+        <td>UrlEncoded version of the Password for this connection</td>
+    </tr>
+    <tr>
+        <td><b>ConnectTimeout</b></td>
+        <td>int</td>
+        <td>Timeout in ms for making a TCP Socket connection</td>
+    </tr>
+    <tr>
+        <td><b>SendTimeout</b></td>
+        <td>int</td>
+        <td>Timeout in ms for making a synchronous TCP Socket Send</td>
+    </tr>
+    <tr>
+        <td><b>ReceiveTimeout</b></td>
+        <td>int</td>
+        <td>Timeout in ms for waiting for a synchronous TCP Socket Receive</td>
+    </tr>
+    <tr>
+        <td><b>IdleTimeOutSecs</b></td>
+        <td>int</td>
+        <td>Timeout in Seconds for an Idle connection to be considered active</td>
+    </tr>
+    <tr>
+        <td><b>NamespacePrefix</b></td>
+        <td>string</td>
+        <td>Use a custom prefix for ServiceStack.Redis internal index colletions</td>
+    </tr>
+</table>
+
+## Redis Client Managers
+
+The recommended way to access the RedisClient is to use one of the available Client Managers:
+
+### RedisManagerPool
+
+With the enhanced Redis URI Connection Strings we've been able to simplify and streamline the existing `PooledRedisClientManager` 
+implementation that's been extracted out into a new clients manager called `RedisManagerPool`. 
+
+In addition to removing all above options on the Client Manager itself, we've also removed readonly connection strings so the configuration 
+ends up much simpler and more aligned with the common use-case:
+
+```csharp
+container.Register<IRedisClientsManager>(c => 
+    new RedisManagerPool(redisConnectionString));
+```
+
+### PooledRedisClientManager
+
+If you prefer to define options on the Client Manager itself or you want to provide separate Read/Write and ReadOnly 
+(i.e. Master and Slave) redis-servers, use the `PooledRedisClientManager` instead:
+
+```csharp
+container.Register<IRedisClientsManager>(c => 
+    new PooledRedisClientManager(redisReadWriteHosts, redisReadOnlyHosts) { 
+		ConnectTimeout = 100,
+		//...
+	});
+```
+
+### BasicRedisClientManager
+
+If don't want to use connection pooling (i.e. your accessing a local redis-server instance) 
+you can use a basic (non-pooled) Clients Manager:
+
+```csharp
+container.Register<IRedisClientsManager>(c => 
+    new BasicRedisClientManager(redisConnectionString));
+```
+
+### Accessing Redis Client
+
+Once registered, accessing the RedisClient is the same in all Client Managers, e.g:
+
+```csharp
+var clientsManager = container.Resolve<IRedisClientsManager>();
+
+using (IRedisClient redis = clientsManager.GetClient())
+{
+	redis.IncrementValue("counter");
+	List<string> days = redis.GetAllItemsFromList("days");
+
+	//Access Typed API
+	var redisTodos = redis.As<Todo>();
+
+    redisTodos.Store(new Todo {
+        Id = redisTodos.GetNextSequence(),
+        Content = "Learn Redis",
+    });
+
+	var todo = redisTodos.GetById(1);
+
+	//Access Native Client
+	var redisNative = (IRedisNativeClient)redis;
+
+	redisNative.Incr("counter");
+	List<string> days = redisNative.LRange("days", 0, -1);
+}
+```
+
+A more detailed list of the available API's used in the example can be seen in the C# interfaces below:
+
+ - [IRedisClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClient.cs)
+ - [IRedisTypedClient<T>](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisTypedClient.cs)
+ - [IRedisNativeClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisNativeClient.cs)
+
+## [ServiceStack.Redis SSL Support](https://github.com/ServiceStack/ServiceStack/wiki/Secure-SSL-Redis-connections-to-Azure-Redis)
+
+ServiceStack.Redis now supporting **SSL connections** making it suitable for accessing remote Redis server instances over a 
+**secure SSL connection**.
+
+![Azure Redis Cache](https://github.com/ServiceStack/Assets/raw/master/img/wikis/redis/azure-redis-instance.png)
+
+### [Connecting to Azure Redis](https://github.com/ServiceStack/ServiceStack/wiki/Secure-SSL-Redis-connections-to-Azure-Redis)
+
+As connecting to [Azure Redis Cache](http://azure.microsoft.com/en-us/services/cache/) via SSL was the primary use-case for this feature, 
+we've added a new 
+[Getting connected to Azure Redis via SSL](https://github.com/ServiceStack/ServiceStack/wiki/Secure-SSL-Redis-connections-to-Azure-Redis) 
+to help you get started.
+
+## New Generic API's for calling Custom Redis commands
+
+Most of the time when waiting to use a new [Redis Command](http://redis.io/commands) you'll need to wait for an updated version of 
+**ServiceStack.Redis** to add support for the new commands likewise there are times when the Redis Client doesn't offer every permutation 
+that redis-server supports. 
+
+With the new `Custom` and `RawCommand` API's on `IRedisClient` and `IRedisNativeClient` you can now use the RedisClient to send your own 
+custom commands that can call adhoc Redis commands:
+
+```csharp
+public interface IRedisClient
+{
+    ...
+    RedisText Custom(params object[] cmdWithArgs);
+}
+
+public interface IRedisNativeClient
+{
+    ...
+    RedisData RawCommand(params object[] cmdWithArgs);
+    RedisData RawCommand(params byte[][] cmdWithBinaryArgs);
+}
+```
+
+These Custom API's take a flexible `object[]` arguments which accepts any serializable value e.g. 
+`byte[]`, `string`, `int` as well as any user-defined Complex Types which are transparently serialized 
+as JSON and send across the wire as UTF-8 bytes. 
+
+```csharp
+var ret = Redis.Custom("SET", "foo", 1);          // ret.Text = "OK"
+
+byte[] cmdSet = Commands.Set;
+ret = Redis.Custom(cmdSet, "bar", "b");           // ret.Text = "OK"
+
+ret = Redis.Custom("GET", "foo");                 // ret.Text = "1"
+```
+
+There are also 
+[convenient extension methods](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/src/ServiceStack.Redis/RedisDataExtensions.cs) 
+on `RedisData` and `RedisText` that make it easy to access structured data, e.g:
+
+```csharp
+var ret = Redis.Custom(Commands.Keys, "*");
+var keys = ret.GetResults();                      // keys = ["foo", "bar"]
+
+ret = Redis.Custom(Commands.MGet, "foo", "bar");
+var values = ret.GetResults();                    // values = ["1", "b"]
+
+Enum.GetNames(typeof(DayOfWeek)).ToList()
+    .ForEach(x => Redis.Custom(Commands.RPush, "DaysOfWeek", x));
+ret = Redis.Custom(Commands.LRange, "DaysOfWeek", 1, -2);
+var weekDays = ret.GetResults();      
+
+weekDays.PrintDump(); // ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+```
+
+and some more examples using Complex Types with the Custom API's:
+
+```csharp
+var ret = Redis.Custom(Commands.Set, "foo", new Poco { Name = "Bar" }); // ret.Text = "OK"
+
+ret = Redis.Custom(Commands.Get, "foo");          // ret.Text =  {"Name":"Bar"}
+Poco dto = ret.GetResult<Poco>();
+
+dto.Name.Print(); // Bar
+```
+
 ## New Managed Pub/Sub Server 
 
 The Pub/Sub engine powering 
