@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -89,15 +90,35 @@ namespace ServiceStack.Redis
                     HadExceptions = true;
                     return;
                 }
+
                 Stream networkStream = new NetworkStream(socket);
 
                 if (Ssl)
                 {
-                    sslStream = new SslStream(networkStream,
-                        leaveInnerStreamOpen: false,
-                        userCertificateValidationCallback: RedisConfig.CertificateValidationCallback,
-                        userCertificateSelectionCallback: RedisConfig.CertificateSelectionCallback,
-                        encryptionPolicy: EncryptionPolicy.RequireEncryption);
+                    if (Env.IsMono)
+                    {
+                        //Mono doesn't support EncryptionPolicy
+                        sslStream = new SslStream(networkStream,
+                            leaveInnerStreamOpen: false,
+                            userCertificateValidationCallback: RedisConfig.CertificateValidationCallback,
+                            userCertificateSelectionCallback: RedisConfig.CertificateSelectionCallback);
+                    }
+                    else
+                    {
+                        var ctor = typeof(SslStream).GetConstructors()
+                            .First(x => x.GetParameters().Length == 5);
+
+                        var policyType = AssemblyUtils.FindType("System.Net.Security.EncryptionPolicy");
+                        var policyValue = Enum.Parse(policyType, "RequireEncryption");
+
+                        sslStream = (SslStream)ctor.Invoke(new[] {
+                            networkStream,
+                            false,
+                            RedisConfig.CertificateValidationCallback,
+                            RedisConfig.CertificateSelectionCallback,
+                            policyValue,
+                        });
+                    }
 
                     sslStream.AuthenticateAsClient(Host);
 
