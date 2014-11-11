@@ -187,12 +187,15 @@ namespace ServiceStack.Redis
 
         public void DisposeClient(RedisNativeClient client)
         {
-            for (var i = 0; i < clients.Length; i++)
+            lock (clients)
             {
-                var writeClient = clients[i];
-                if (client != writeClient) continue;
-                client.Active = false;
-                return;
+                for (var i = 0; i < clients.Length; i++)
+                {
+                    var writeClient = clients[i];
+                    if (client != writeClient) continue;
+                    client.Active = false;
+                    return;
+                }
             }
         }
 
@@ -202,7 +205,10 @@ namespace ServiceStack.Redis
         /// <param name="client">The client.</param>
         public void DisposeWriteClient(RedisNativeClient client)
         {
-            client.Active = false;
+            lock (clients)
+            {
+                client.Active = false;
+            }
         }
 
         public Dictionary<string, string> GetStats()
@@ -249,15 +255,18 @@ namespace ServiceStack.Redis
 
         public int[] GetClientPoolActiveStates()
         {
-            var activeStates = new int[clients.Length];
-            for (int i = 0; i < clients.Length; i++)
+            lock (clients)
             {
-                var client = clients[i];
-                activeStates[i] = client == null
-                    ? -1
-                    : client.Active ? 1 : 0;
+                var activeStates = new int[clients.Length];
+                for (int i = 0; i < clients.Length; i++)
+                {
+                    var client = clients[i];
+                    activeStates[i] = client == null
+                        ? -1
+                        : client.Active ? 1 : 0;
+                }
+                return activeStates;
             }
-            return activeStates;
         }
 
         ~RedisManagerPool()
