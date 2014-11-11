@@ -116,6 +116,14 @@ namespace ServiceStack.Redis
             });
         }
 
+        public bool Add<T>(string key, T value, TimeSpan expiresIn)
+        {
+            return Exec(r => {
+                r.SetEntryIfNotExists(key, value.ToJson(), expiresIn);
+                return true;
+            });
+        }
+
         public bool Set<T>(string key, T value, TimeSpan expiresIn)
         {
             var bytesValue = value as byte[];
@@ -153,19 +161,6 @@ namespace ServiceStack.Redis
                 if (r.Replace(key, value))
                 {
                     r.ExpireEntryAt(key, ConvertToServerDate(expiresAt));
-                    return true;
-                }
-                return false;
-            });
-        }
-
-        public bool Add<T>(string key, T value, TimeSpan expiresIn)
-        {
-            return Exec(r =>
-            {
-                if (r.Add(key, value))
-                {
-                    r.ExpireEntryIn(key, expiresIn);
                     return true;
                 }
                 return false;

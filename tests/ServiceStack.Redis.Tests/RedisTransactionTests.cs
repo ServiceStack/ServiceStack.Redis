@@ -244,7 +244,8 @@ namespace ServiceStack.Redis.Tests
                 Assert.That(Redis.GetValue(KeySquared), Is.EqualTo("1"));
             }
         }
-            [Test]
+
+        [Test]
         public void Transaction_can_issue_watch()
         {
             Redis.Del(Key);
@@ -265,7 +266,50 @@ namespace ServiceStack.Redis.Tests
 
             Assert.That(Redis.GetValue(Key), Is.EqualTo("7"));
             Assert.That(Redis.GetValue(KeySquared), Is.Null);   
+        }
 
+        [Test]
+        public void Can_set_Expiry_on_key_in_transaction()
+        {
+            var expiresIn = TimeSpan.FromMinutes(15);
+
+            const string key = "No TTL-Transaction";
+            var keyWithTtl = "{0}s TTL-Transaction".Fmt(expiresIn.TotalSeconds);
+
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.Add(key, "Foo"));
+                trans.QueueCommand(r => r.Add(keyWithTtl, "Bar", expiresIn));
+
+                if (!trans.Commit())
+                    throw new Exception("Transaction Failed");
+            }
+
+            Assert.That(Redis.Get<string>(key), Is.EqualTo("Foo"));
+            Assert.That(Redis.Get<string>(keyWithTtl), Is.EqualTo("Bar"));
+
+            Assert.That(Redis.GetTimeToLive(key).TotalSeconds, Is.EqualTo(-1));
+            Assert.That(Redis.GetTimeToLive(keyWithTtl).TotalSeconds, Is.GreaterThan(1));
+        }
+
+        [Test]
+        public void Does_not_set_Expiry_on_existing_key_in_transaction()
+        {
+            var expiresIn = TimeSpan.FromMinutes(15);
+
+            var key = "Exting TTL-Transaction";
+            Redis.Add(key, "Foo");
+
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.Add(key, "Bar", expiresIn));
+
+                if (!trans.Commit())
+                    throw new Exception("Transaction Failed");
+            }
+
+            Assert.That(Redis.Get<string>(key), Is.EqualTo("Foo"));
+            Assert.That(Redis.GetTimeToLive(key).TotalSeconds, Is.EqualTo(-1));
         }
     }
 }
