@@ -11,16 +11,13 @@ namespace ServiceStack.Redis
 {
     public class RedisPoolConfig
     {
-        public const int DefaultPoolTimeoutMs = 2000;
-        public const int DefaultMaxPoolSize = 50;
+        public const int DefaultMaxPoolSize = 20;
 
         public RedisPoolConfig()
         {
             MaxPoolSize = DefaultMaxPoolSize;
-            PoolTimeout = TimeSpan.FromMilliseconds(DefaultPoolTimeoutMs);
         }
 
-        public TimeSpan PoolTimeout { get; set; }        
         public int MaxPoolSize { get; set; }
     }
 
@@ -50,7 +47,6 @@ namespace ServiceStack.Redis
 
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
 
-        public int PoolTimeoutMs { get; set; }        
         public int MaxPoolSize { get; set; }
 
         public RedisManagerPool() : this(RedisNativeClient.DefaultHost) {}
@@ -74,7 +70,6 @@ namespace ServiceStack.Redis
 
             this.OnFailover = new List<Action<IRedisClientsManager>>();
 
-            this.PoolTimeoutMs = (int) config.PoolTimeout.TotalMilliseconds;
             this.MaxPoolSize = config.MaxPoolSize;
 
             clients = new RedisClient[MaxPoolSize];
@@ -121,9 +116,13 @@ namespace ServiceStack.Redis
                 RedisClient inActiveClient;
                 while ((inActiveClient = GetInActiveClient()) == null)
                 {
-                    // wait for a connection, cry out if made to wait too long
-                    if (!Monitor.Wait(clients, PoolTimeoutMs))
-                        throw new TimeoutException(PoolTimeoutError);
+                    //Create new client outside of pool when max pool size exceeded
+                    var nextIndex = poolIndex % clients.Length;
+                    var nextHost = Hosts[nextIndex];
+                    var newClient = InitNewClient(nextHost);
+                    //Don't handle callbacks for new client outside pool
+                    newClient.ClientManager = null; 
+                    return newClient;
                 }
 
                 poolIndex++;
@@ -188,21 +187,13 @@ namespace ServiceStack.Redis
 
         public void DisposeClient(RedisNativeClient client)
         {
-            lock (clients)
+            for (var i = 0; i < clients.Length; i++)
             {
-                for (var i = 0; i < clients.Length; i++)
-                {
-                    var writeClient = clients[i];
-                    if (client != writeClient) continue;
-                    client.Active = false;
-                    Monitor.PulseAll(clients);
-                    return;
-                }
+                var writeClient = clients[i];
+                if (client != writeClient) continue;
+                client.Active = false;
+                return;
             }
-
-            //Client not found in any pool, pulse both pools.
-            lock (clients)
-                Monitor.PulseAll(clients);
         }
 
         /// <summary>
@@ -211,11 +202,7 @@ namespace ServiceStack.Redis
         /// <param name="client">The client.</param>
         public void DisposeWriteClient(RedisNativeClient client)
         {
-            lock (clients)
-            {
-                client.Active = false;
-                Monitor.PulseAll(clients);
-            }
+            client.Active = false;
         }
 
         public Dictionary<string, string> GetStats()
@@ -263,14 +250,12 @@ namespace ServiceStack.Redis
         public int[] GetClientPoolActiveStates()
         {
             var activeStates = new int[clients.Length];
-            lock (clients)
+            for (int i = 0; i < clients.Length; i++)
             {
-                for (int i = 0; i < clients.Length; i++)
-                {
-                    activeStates[i] = clients[i] == null
-                        ? -1
-                        : clients[i].Active ? 1 : 0;
-                }
+                var client = clients[i];
+                activeStates[i] = client == null
+                    ? -1
+                    : client.Active ? 1 : 0;
             }
             return activeStates;
         }

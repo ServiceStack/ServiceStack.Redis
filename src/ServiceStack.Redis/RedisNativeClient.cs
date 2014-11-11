@@ -1984,6 +1984,11 @@ namespace ServiceStack.Redis
 
         internal bool IsDisposed { get; set; }
 
+        public bool IsManagedClient
+        {
+            get { return ClientManager != null; }
+        }
+
         public void Dispose()
         {
             Dispose(true);

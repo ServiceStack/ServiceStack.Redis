@@ -158,7 +158,7 @@ namespace ServiceStack.Redis.Tests
 		}
 
 		[Test]
-		public void Does_block_ReadWrite_clients_pool()
+		public void Does_not_block_ReadWrite_clients_pool()
 		{
             using (var manager = new RedisManagerPool(
                     hosts,
@@ -174,6 +174,11 @@ namespace ServiceStack.Redis.Tests
 				var client3 = manager.GetClient();
 				var client4 = manager.GetClient();
 
+                Assert.That(((RedisClient)client1).IsManagedClient, Is.True);
+                Assert.That(((RedisClient)client2).IsManagedClient, Is.True);
+                Assert.That(((RedisClient)client3).IsManagedClient, Is.True);
+                Assert.That(((RedisClient)client4).IsManagedClient, Is.True); 
+
 				Action func = delegate {
 					Thread.Sleep(delay + TimeSpan.FromSeconds(0.5));
 					client4.Dispose();
@@ -185,13 +190,15 @@ namespace ServiceStack.Redis.Tests
 
 				var client5 = manager.GetClient();
 
-				Assert.That(DateTime.Now - start, Is.GreaterThanOrEqualTo(delay));
+                Assert.That(((RedisClient)client5).IsManagedClient, Is.False); //outside of pool
+
+				Assert.That(DateTime.Now - start, Is.LessThan(delay));
 
 				AssertClientHasHost(client1, hosts[0]);
 				AssertClientHasHost(client2, hosts[1]);
 				AssertClientHasHost(client3, hosts[2]);
 				AssertClientHasHost(client4, hosts[3]);
-				AssertClientHasHost(client5, hosts[3]);
+				AssertClientHasHost(client5, hosts[0]);
 
 				mockFactory.VerifyAll();
 			}
