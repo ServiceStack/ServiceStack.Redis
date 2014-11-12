@@ -394,7 +394,7 @@ namespace ServiceStack.Redis
             SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value);
         }
 
-    	public void Set(string key, byte[] value, int expirySeconds, long expiryMs = 0, bool? exists = null)
+    	public void Set(string key, byte[] value, int expirySeconds, long expiryMs = 0)
         {
             if (key == null)
                 throw new ArgumentNullException("key");
@@ -403,26 +403,24 @@ namespace ServiceStack.Redis
             if (value.Length > OneGb)
                 throw new ArgumentException("value exceeds 1G", "value");
 
-            if (exists == null)
-            {
-                if (expirySeconds > 0)
-                    SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.Ex, expirySeconds.ToUtf8Bytes());
-                else if (expiryMs > 0)
-                    SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.Px, expiryMs.ToUtf8Bytes());
-                else
-                    SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value);
-            }
+            if (expirySeconds > 0)
+                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.Ex, expirySeconds.ToUtf8Bytes());
+            else if (expiryMs > 0)
+                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.Px, expiryMs.ToUtf8Bytes());
             else
-            {
-                var entryExists = exists.Value ? Commands.Xx : Commands.Nx;
+                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value);
+        }
 
-                if (expirySeconds > 0)
-                    SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.Ex, expirySeconds.ToUtf8Bytes(), entryExists);
-                else if (expiryMs > 0)
-                    SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.Px, expiryMs.ToUtf8Bytes(), entryExists);
-                else
-                    SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, entryExists);
-            }
+        public bool Set(string key, byte[] value, bool exists, int expirySeconds = 0, long expiryMs = 0)
+        {
+            var entryExists = exists ? Commands.Xx : Commands.Nx;
+
+            if (expirySeconds > 0)
+                return SendExpectString(Commands.Set, key.ToUtf8Bytes(), value, Commands.Ex, expirySeconds.ToUtf8Bytes(), entryExists) == OK;
+            if (expiryMs > 0)
+                return SendExpectString(Commands.Set, key.ToUtf8Bytes(), value, Commands.Px, expiryMs.ToUtf8Bytes(), entryExists) == OK;
+            
+            return SendExpectString(Commands.Set, key.ToUtf8Bytes(), value, entryExists) == OK;
         }
 
         public void SetEx(string key, int expireInSeconds, byte[] value)

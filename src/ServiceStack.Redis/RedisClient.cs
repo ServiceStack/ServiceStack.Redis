@@ -162,32 +162,38 @@ namespace ServiceStack.Redis
             }
         }
 
-        public void SetEntryIfExists(string key, string value, TimeSpan expireIn)
+        public bool SetEntryIfExists(string key, string value)
+        {
+            var bytesValue = value != null ? value.ToUtf8Bytes() : null;
+
+            return base.Set(key, bytesValue, exists:true);
+        }
+
+        public bool SetEntryIfExists(string key, string value, TimeSpan expireIn)
         {
             var bytesValue = value != null ? value.ToUtf8Bytes() : null;
 
             if (expireIn.Milliseconds > 0)
-                base.Set(key, bytesValue, 0, (long)expireIn.TotalMilliseconds, exists: true);
+                return base.Set(key, bytesValue, exists:true, expiryMs:(long)expireIn.TotalMilliseconds);
             else
-                base.Set(key, bytesValue, (int)expireIn.TotalSeconds, 0, exists: true);
+                return base.Set(key, bytesValue, exists:true, expirySeconds:(int)expireIn.TotalSeconds);
         }
 
         public bool SetEntryIfNotExists(string key, string value)
         {
-            if (value == null)
-                throw new ArgumentNullException("value");
+            var bytesValue = value != null ? value.ToUtf8Bytes() : null;
 
-            return SetNX(key, value.ToUtf8Bytes()) == Success;
+            return base.Set(key, bytesValue, exists: false);
         }
 
-        public void SetEntryIfNotExists(string key, string value, TimeSpan expireIn)
+        public bool SetEntryIfNotExists(string key, string value, TimeSpan expireIn)
         {
             var bytesValue = value != null ? value.ToUtf8Bytes() : null;
 
             if (expireIn.Milliseconds > 0)
-                base.Set(key, bytesValue, 0, (long)expireIn.TotalMilliseconds, exists: false);
+                return base.Set(key, bytesValue, exists: false, expiryMs: (long)expireIn.TotalMilliseconds);
             else
-                base.Set(key, bytesValue, (int)expireIn.TotalSeconds, 0, exists: false);
+                return base.Set(key, bytesValue, exists: false, expirySeconds: (int)expireIn.TotalSeconds);
         }
 
         public void ChangeDb(long db)
@@ -384,6 +390,12 @@ namespace ServiceStack.Redis
         {
             AssertServerVersionNumber(); // pre-fetch call to INFO before transaction if needed
             return new RedisTransaction(this);
+        }
+
+        public void AssertNotInTransaction()
+        {
+            if (Transaction != null)
+                throw new NotSupportedException("Only atomic redis-server operations are supported in a transaction");
         }
 
         public IRedisPipeline CreatePipeline()

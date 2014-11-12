@@ -27,6 +27,8 @@ namespace ServiceStack.Redis
 {
     public partial class RedisNativeClient
     {
+        private const string OK = "OK";
+        private const string QUEUED = "QUEUED";
         private static Timer UsageTimer;
         private static int __requestsPerHour = 0;
         private const int Unknown = -1;
@@ -644,12 +646,12 @@ namespace ServiceStack.Redis
 
         internal void ExpectOk()
         {
-            ExpectWord("OK");
+            ExpectWord(OK);
         }
 
         internal void ExpectQueued()
         {
-            ExpectWord("QUEUED");
+            ExpectWord(QUEUED);
         }
 
 		public long ReadInt()
@@ -744,7 +746,7 @@ namespace ServiceStack.Redis
                 throw CreateResponseError("Invalid length");
             }
 
-            if (c == ':')
+            if (c == ':' || c == '+')
             {
                 //match the return value
                 return r.Substring(1).ToUtf8Bytes();
