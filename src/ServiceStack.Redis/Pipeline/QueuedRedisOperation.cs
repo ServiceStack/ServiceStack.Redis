@@ -104,6 +104,9 @@ namespace ServiceStack.Redis.Pipeline
                 else if (BytesReadCommand != null)
                 {
                     var result = BytesReadCommand();
+                    if (result != null && result.Length == 0)
+                        result = null;
+
                     if (OnSuccessBytesCallback != null)
                     {
                         OnSuccessBytesCallback(result);
