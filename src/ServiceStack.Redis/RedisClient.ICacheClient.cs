@@ -52,6 +52,14 @@ namespace ServiceStack.Redis
             );
         }
 
+        private static byte[] ToBytes<T>(T value)
+        {
+            var bytesValue = value as byte[];
+            if (bytesValue == null && !Equals(value, default(T)))
+                bytesValue = value.ToJson().ToUtf8Bytes();
+            return bytesValue;
+        }
+
         public long Increment(string key, uint amount)
         {
             return Exec(r => r.IncrementValueBy(key, (int)amount));
@@ -64,47 +72,24 @@ namespace ServiceStack.Redis
 
         public bool Add<T>(string key, T value)
         {
-            var bytesValue = value as byte[];
-            if (bytesValue != null)
-            {
-                return Exec(r => r.SetNX(key, bytesValue) == Success);
-            }
-
-            var valueString = JsonSerializer.SerializeToString(value);
-            return Exec(r => r.SetEntryIfNotExists(key, valueString));
+            return Exec(r => r.Set(key, ToBytes(value), exists:false));
         }
 
         public bool Set<T>(string key, T value)
         {
-            var bytesValue = value as byte[];
-            if (bytesValue != null)
-            {
-                Exec(r => ((RedisNativeClient)r).Set(key, bytesValue));
-                return true;
-            }
-
-            Exec(r => r.SetEntry(key, JsonSerializer.SerializeToString(value)));
+            Exec(r => ((RedisNativeClient)r).Set(key, ToBytes(value)));
             return true;
         }
 
         public bool Replace<T>(string key, T value)
         {
-            var exists = ContainsKey(key);
-            if (!exists) return false;
-
-            var bytesValue = value as byte[];
-            if (bytesValue != null)
-            {
-                Exec(r => ((RedisNativeClient)r).Set(key, bytesValue));
-                return true;
-            }
-
-            Exec(r => r.SetEntry(key, JsonSerializer.SerializeToString(value)));
-            return true;
+            return Exec(r => r.Set(key, ToBytes(value), exists: true));
         }
 
         public bool Add<T>(string key, T value, DateTime expiresAt)
         {
+            AssertNotInTransaction();
+
             return Exec(r =>
             {
                 if (r.Add(key, value))
@@ -118,34 +103,26 @@ namespace ServiceStack.Redis
 
         public bool Add<T>(string key, T value, TimeSpan expiresIn)
         {
-            return Exec(r => {
-                r.SetEntryIfNotExists(key, value.ToJson(), expiresIn);
-                return true;
-            });
+            return Exec(r => r.Set(key, ToBytes(value), exists:false, expiryMs:(long)expiresIn.TotalMilliseconds));
         }
 
         public bool Set<T>(string key, T value, TimeSpan expiresIn)
         {
-            var bytesValue = value as byte[];
-            if (bytesValue != null)
+            if (AssertServerVersionNumber() >= 2600)
             {
-                if (AssertServerVersionNumber() >= 2600)
-                {
-                    Exec(r => r.PSetEx(key, (long)expiresIn.TotalMilliseconds, bytesValue));
-                }
-                else
-                {
-                    Exec(r => r.SetEx(key, (int)expiresIn.TotalSeconds, bytesValue));
-                }
-                return true;
+                Exec(r => r.Set(key, ToBytes(value), 0, expiryMs: (long)expiresIn.TotalMilliseconds));
             }
-
-            Exec(r => r.SetEntry(key, JsonSerializer.SerializeToString(value), expiresIn));
+            else
+            {
+                Exec(r => r.Set(key, ToBytes(value), (int)expiresIn.TotalSeconds));
+            }
             return true;
         }
 
         public bool Set<T>(string key, T value, DateTime expiresAt)
         {
+            AssertNotInTransaction();
+
             Exec(r =>
             {
                 Set(key, value);
@@ -156,6 +133,8 @@ namespace ServiceStack.Redis
 
         public bool Replace<T>(string key, T value, DateTime expiresAt)
         {
+            AssertNotInTransaction();
+
             return Exec(r =>
             {
                 if (r.Replace(key, value))
@@ -169,15 +148,7 @@ namespace ServiceStack.Redis
 
         public bool Replace<T>(string key, T value, TimeSpan expiresIn)
         {
-            return Exec(r =>
-            {
-                if (r.Replace(key, value))
-                {
-                    r.ExpireEntryIn(key, expiresIn);
-                    return true;
-                }
-                return false;
-            });
+            return Exec(r => r.Set(key, ToBytes(value), exists:true, expiryMs: (long)expiresIn.TotalMilliseconds));
         }
 
         public IDictionary<string, T> GetAll<T>(IEnumerable<string> keys)
