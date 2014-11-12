@@ -412,6 +412,15 @@ namespace ServiceStack.Redis
                 }
                 ResetSendBuffer();
             }
+            catch (IOException ex)  // several stream commands wrap SocketException in IOException
+            {
+                var socketEx = ex.InnerException as SocketException;
+                if (socketEx == null)
+                    throw;
+
+                cmdBuffer.Clear();
+                return HandleSocketException(socketEx);
+            }
             catch (SocketException ex)
             {
                 cmdBuffer.Clear();
