@@ -270,9 +270,11 @@ namespace ServiceStack.Redis
         private RedisResponseException CreateResponseError(string error)
         {
             HadExceptions = true;
+            string safeLastCommand = (Password == null) ? lastCommand : lastCommand.Replace(Password, "");
+
             var throwEx = new RedisResponseException(
                 string.Format("{0}, sPort: {1}, LastCommand: {2}",
-                    error, clientPort, lastCommand));
+                    error, clientPort, safeLastCommand));
             log.Error(throwEx.Message);
             throw throwEx;
         }
@@ -586,10 +588,13 @@ namespace ServiceStack.Redis
             var sb = new StringBuilder();
             foreach (var arg in args)
             {
+                var strArg = arg.FromUtf8Bytes();
+                if (strArg == Password) continue;
+
                 if (sb.Length > 0)
                     sb.Append(" ");
-
-                sb.Append(arg.FromUtf8Bytes());
+                
+                sb.Append(strArg);
 
                 if (sb.Length > 100)
                     break;
@@ -599,7 +604,7 @@ namespace ServiceStack.Redis
             {
                 this.lastCommand = this.lastCommand.Substring(0, 100) + "...";
             }
-
+            
             log.Debug("S: " + this.lastCommand);
         }
 
