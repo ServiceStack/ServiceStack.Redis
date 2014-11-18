@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using ServiceStack.Caching;
 using ServiceStack.Logging;
@@ -101,6 +102,11 @@ namespace ServiceStack.Redis
                     }
                 }
             }
+        }
+
+        public void FailoverTo(IEnumerable<string> readWriteHosts, IEnumerable<string> readOnlyHosts)
+        {
+            FailoverTo(readWriteHosts.ToArray()); //only use readWriteHosts
         }
 
         /// <summary>
