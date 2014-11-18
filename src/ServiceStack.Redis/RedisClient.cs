@@ -671,8 +671,7 @@ namespace ServiceStack.Redis
         public T GetFromHash<T>(object id)
         {
             var key = UrnKey<T>(id);
-            return
-                GetAllEntriesFromHash(key).ToJson().FromJson<T>();
+            return GetAllEntriesFromHash(key).ToJson().FromJson<T>();
         }
 
         public void StoreAsHash<T>(T entity)
