@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
@@ -18,7 +16,7 @@ namespace ServiceStack.Redis.Tests
 		{
 			base.OnBeforeEachTest();
 
-			RedisSentinel = new RedisClient(TestConfig.SingleHost, TestConfig.RedisSentinelPort);
+            RedisSentinel = new RedisClient(TestConfig.SentinelHost, TestConfig.RedisSentinelPort);
 		}
 
 
@@ -49,7 +47,7 @@ namespace ServiceStack.Redis.Tests
 		{
 			object[] slaves = RedisSentinel.Sentinel("slaves", TestConfig.MasterName);
 
-			Assert.AreEqual(slaves.Count(), TestConfig.SlaveHosts.Count());
+            Assert.That(slaves.Count(), Is.GreaterThan(0));
 		}
 
 		[Test]
@@ -60,23 +58,44 @@ namespace ServiceStack.Redis.Tests
 			string host = Encoding.UTF8.GetString((byte[])addr[0]);
 			string port = Encoding.UTF8.GetString((byte[])addr[1]);
 
-			Assert.AreEqual(host, "127.0.0.1");		// IP of localhost
+            // IP of localhost
+            Assert.That(host, Is.EqualTo("127.0.0.1").Or.EqualTo(TestConfig.SentinelHost));
 			Assert.AreEqual(port, TestConfig.RedisPort.ToString());
 		}
 
         [Test]
         public void Can_Get_Redis_ClientsManager()
         {
-            var sentinel = new RedisSentinel(new[] { "{0}:{1}".Fmt(TestConfig.SingleHost, TestConfig.RedisSentinelPort) }, TestConfig.MasterName);
+            var sentinel = new RedisSentinel(new[] { "{0}:{1}".Fmt(TestConfig.SentinelHost, TestConfig.RedisSentinelPort) }, TestConfig.MasterName);
 
             var clientsManager = sentinel.Setup();
             var client = clientsManager.GetClient();
 
-            Assert.AreEqual(client.Host, "127.0.0.1");
+            Assert.That(client.Host, Is.EqualTo("127.0.0.1").Or.EqualTo(TestConfig.SentinelHost));
             Assert.AreEqual(client.Port, TestConfig.RedisPort);
 
             client.Dispose();
             sentinel.Dispose();
+        }
+
+        [Test]
+        public void Can_specify_Timeout_on_RedisManager()
+        {
+            var sentinel = new RedisSentinel(new[] { "{0}:{1}".Fmt(TestConfig.SentinelHost, TestConfig.RedisSentinelPort) }, TestConfig.MasterName)
+            {
+                RedisManagerFactory = {
+                    OnInit = r => {
+                        ((PooledRedisClientManager)r).IdleTimeOutSecs = 20;
+                    }
+                }
+            };
+
+            using (var clientsManager = (PooledRedisClientManager)sentinel.Setup())
+            using (var client = clientsManager.GetClient())
+            {
+                Assert.That(clientsManager.IdleTimeOutSecs, Is.EqualTo(20));
+                Assert.That(((RedisNativeClient)client).IdleTimeOutSecs, Is.EqualTo(20));
+            }
         }
 	}
 }

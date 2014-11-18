@@ -5,33 +5,32 @@
 // Upon a s_down event, the RedisClientsManager will be failed over to the new set of slaves/masters
 //
 
-using ServiceStack;
-using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace ServiceStack.Redis
 {
     public class RedisSentinel : IRedisSentinel
     {
+        public RedisManagerFactory RedisManagerFactory { get; set; }
+
         private readonly string sentinelName;
         private int failures = 0;
         private int sentinelIndex = -1;
         private List<string> sentinels;
         private RedisSentinelWorker worker;
-        private PooledRedisClientManager clientManager;
+        internal IRedisClientsManager redisManager;
         private static int MaxFailures = 5;
 
         public RedisSentinel(IEnumerable<string> sentinelHosts, string sentinelName)
         {
-            if (sentinelHosts == null || sentinelHosts.Count() == 0) throw new ArgumentException("sentinels must have at least one entry");
+            this.sentinels = sentinelHosts != null ? sentinelHosts.ToList() : null;
+            if (sentinelHosts == null || sentinels.Count == 0) 
+                throw new ArgumentException("sentinels must have at least one entry");
 
             this.sentinelName = sentinelName;
-            this.sentinels = new List<string>(sentinelHosts);
+            this.RedisManagerFactory = new RedisManagerFactory();
         }
 
         /// <summary>
@@ -42,22 +41,22 @@ namespace ServiceStack.Redis
         {
             GetValidSentinel();
 
-            if (this.clientManager == null)
+            if (this.redisManager == null)
             {
                 throw new ApplicationException("Unable to resolve sentinels!");
             }
 
-            return this.clientManager;
+            return this.redisManager;
         }
 
         private void GetValidSentinel()
         {
-            while (this.clientManager == null && ShouldRetry())
+            while (this.redisManager == null && ShouldRetry())
             {
                 try
                 {
                     this.worker = GetNextSentinel();
-                    this.clientManager = worker.GetClientManager();
+                    this.redisManager = worker.GetClientManager();
                     this.worker.BeginListeningForConfigurationChanges();
                 }
                 catch (RedisException)
@@ -80,7 +79,7 @@ namespace ServiceStack.Redis
         /// <remarks>This will be true if the failures is less than either RedisSentinel.MaxFailures or the # of sentinels, whatever is greater</remarks>
         private bool ShouldRetry()
         {
-            return this.failures < Math.Max(RedisSentinel.MaxFailures, this.sentinels.Count);
+            return this.failures < Math.Max(MaxFailures, this.sentinels.Count);
         }
 
         private RedisSentinelWorker GetNextSentinel()
@@ -92,7 +91,7 @@ namespace ServiceStack.Redis
                 sentinelIndex = 0;
             }
 
-            var sentinelWorker = new RedisSentinelWorker(sentinels[sentinelIndex], this.sentinelName, this.clientManager);
+            var sentinelWorker = new RedisSentinelWorker(this, sentinels[sentinelIndex], this.sentinelName);
 
             sentinelWorker.SentinelError += Worker_SentinelError;
             return sentinelWorker;

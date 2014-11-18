@@ -1,14 +1,9 @@
-﻿using ServiceStack;
-using ServiceStack.Logging;
-using ServiceStack.Redis;
+﻿using ServiceStack.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace ServiceStack.Redis
 {
@@ -16,23 +11,25 @@ namespace ServiceStack.Redis
     {
         protected static readonly ILog Log = LogManager.GetLogger(typeof(RedisSentinelWorker));
 
-        private RedisClient sentinelClient;
-        private RedisClient sentinelPubSubClient;
-        private PooledRedisClientManager clientsManager;
-        private IRedisSubscription sentinelSubscription;
-        private string sentinelName;
+        private readonly RedisSentinel redisSentinel;
+        private readonly RedisClient sentinelClient;
+        private readonly RedisClient sentinelPubSubClient;
+        private readonly IRedisSubscription sentinelSubscription;
+        private readonly string sentinelName;
         private string host;
+        private IRedisClientsManager redisManager;
 
         public event EventHandler SentinelError;
 
-        public RedisSentinelWorker(string host, string sentinelName, PooledRedisClientManager clientsManager = null)
+        public RedisSentinelWorker(RedisSentinel redisSentinel, string host, string sentinelName)
         {
+            this.redisSentinel = redisSentinel;
+            this.redisManager = redisSentinel.redisManager;
             this.sentinelName = sentinelName;
             this.sentinelClient = new RedisClient(host);
             this.sentinelPubSubClient = new RedisClient(host);
             this.sentinelSubscription = this.sentinelPubSubClient.CreateSubscription();
             this.sentinelSubscription.OnMessage = SentinelMessageReceived;
-            this.clientsManager = clientsManager;
 
             Log.Info("Set up Redis Sentinel on {0}".Fmt(host));
         }
@@ -81,33 +78,19 @@ namespace ServiceStack.Redis
             var masters = ConvertMasterArrayToList(this.sentinelClient.Sentinel("master", this.sentinelName));
             var slaves = ConvertSlaveArrayToList(this.sentinelClient.Sentinel("slaves", this.sentinelName));
 
-            if (this.clientsManager == null)
+            if (redisManager == null)
             {
-                if (slaves.Count() > 0)
-                {
-                    this.clientsManager = new PooledRedisClientManager(masters, slaves);
-                }
-                else
-                {
-                    this.clientsManager = new PooledRedisClientManager(masters.ToArray());
-                }
+                redisManager = redisSentinel.RedisManagerFactory.Create(masters, slaves);
             }
             else
             {
-                if (slaves.Count() > 0)
-                {
-                    this.clientsManager.FailoverTo(masters, slaves);
-                }
-                else
-                {
-                    this.clientsManager.FailoverTo(masters.ToArray());
-                }
+                ((IRedisFailover)redisManager).FailoverTo(masters, slaves);
             }
         }
 
         private Dictionary<string, string> ParseDataArray(object[] items)
         {
-            Dictionary<string, string> data = new Dictionary<string, string>();
+            var data = new Dictionary<string, string>();
             bool isKey = false;
             string key = null;
             string value = null;
@@ -142,7 +125,7 @@ namespace ServiceStack.Redis
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        private IEnumerable<string> ConvertSlaveArrayToList(object[] slaves)
+        private List<string> ConvertSlaveArrayToList(object[] slaves)
         {
             var servers = new List<string>();
             string ip = null;
@@ -176,7 +159,7 @@ namespace ServiceStack.Redis
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        private IEnumerable<string> ConvertMasterArrayToList(object[] items)
+        private List<string> ConvertMasterArrayToList(object[] items)
         {
             var servers = new List<string>();
             string ip = null;
@@ -195,11 +178,11 @@ namespace ServiceStack.Redis
             return servers;
         }
 
-        public PooledRedisClientManager GetClientManager()
+        public IRedisClientsManager GetClientManager()
         {
             ConfigureRedisFromSentinel();
 
-            return this.clientsManager;
+            return this.redisManager;
         }
 
         public void Dispose()
