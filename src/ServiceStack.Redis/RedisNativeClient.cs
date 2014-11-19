@@ -143,10 +143,13 @@ namespace ServiceStack.Redis
             {
                 return db;
             }
-
             set
             {
-                db = value;
+                if (db != value)
+                {
+                    db = value;
+                    SendExpectSuccess (Commands.Select, db.ToUtf8Bytes ());
+                }
             }
         }
 

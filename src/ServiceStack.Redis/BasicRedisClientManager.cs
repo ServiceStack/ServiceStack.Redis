@@ -100,12 +100,6 @@ namespace ServiceStack.Redis
                 client.ConnectTimeout = this.ConnectTimeout.Value;
             }
 
-            //Set database to userSpecified if different
-            if (Db != RedisNativeClient.DefaultDb)
-            {
-                client.ChangeDb(Db);
-            }
-
             if (nextHost.RequiresAuth)
                 client.Password = nextHost.Password;
 
@@ -128,12 +122,6 @@ namespace ServiceStack.Redis
             if (this.ConnectTimeout != null)
             {
                 client.ConnectTimeout = this.ConnectTimeout.Value;
-            }
-
-            //Set database to userSpecified if different
-            if (Db != RedisNativeClient.DefaultDb)
-            {
-                client.ChangeDb(Db);
             }
 
             if (nextHost.RequiresAuth)

@@ -241,11 +241,7 @@ namespace ServiceStack.Redis
 
                 inActiveClient.NamespacePrefix = NamespacePrefix;
 
-                //Reset database to default if changed
-                if (inActiveClient.Db != Db)
-                {
-                    inActiveClient.ChangeDb(Db);
-                }
+                inActiveClient.Db = Db;
 
                 return inActiveClient;
             }
@@ -337,11 +333,7 @@ namespace ServiceStack.Redis
 
                 inActiveClient.NamespacePrefix = NamespacePrefix;
 
-                //Reset database to default if changed
-                if (inActiveClient.Db != Db)
-                {
-                    inActiveClient.ChangeDb(Db);
-                }
+                inActiveClient.Db = Db;
 
                 return inActiveClient;
             }
