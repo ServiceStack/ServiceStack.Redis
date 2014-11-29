@@ -13,11 +13,19 @@ namespace ServiceStack.Redis
         private DateTime serverTimeAtStart;
         private Stopwatch startedAt;
 
+        public TimeSpan? HeartbeatInterval = TimeSpan.FromSeconds(10);
+        public TimeSpan HeartbeatTimeout = TimeSpan.FromSeconds(30);
+        private long lastHeartbeatTicks;
+        private Timer heartbeatTimer;
+
         public Action OnInit { get; set; }
         public Action OnStart { get; set; }
+        public Action OnHeartbeatSent { get; set; }
+        public Action OnHeartbeatReceived { get; set; }
         public Action OnStop { get; set; }
         public Action OnDispose { get; set; }
         public Action<string, string> OnMessage { get; set; }
+        public Action<string> OnControlCommand { get; set; }
         public Action<string> OnUnSubscribe { get; set; }
         public Action<Exception> OnError { get; set; }
         public Action<IRedisPubSubServer> OnFailover { get; set; }
@@ -34,6 +42,10 @@ namespace ServiceStack.Redis
         private int status;
         private Thread bgThread; //Subscription controller thread
         private long bgThreadCount = 0;
+        private int autoRestart = YES;
+
+        private const int NO = 0;
+        private const int YES = 1;
 
         public DateTime CurrentServerTime
         {
@@ -62,6 +74,8 @@ namespace ServiceStack.Redis
 
         public IRedisPubSubServer Start()
         {
+            Interlocked.CompareExchange(ref autoRestart, 0, autoRestart);
+
             if (Interlocked.CompareExchange(ref status, 0, 0) == Status.Started)
             {
                 //Start any stopped worker threads
@@ -122,8 +136,61 @@ namespace ServiceStack.Redis
                 startedAt = Stopwatch.StartNew();
             }
 
+            DisposeHeartbeatTimer();
+
+            if (HeartbeatInterval != null)
+            {
+                heartbeatTimer = new Timer(SendHeartbeat, null, 
+                    TimeSpan.FromMilliseconds(0), HeartbeatInterval.Value);
+            }
+
+            Interlocked.CompareExchange(ref lastHeartbeatTicks, DateTime.UtcNow.Ticks, lastHeartbeatTicks);
+
             if (OnInit != null)
                 OnInit();
+        }
+
+        void SendHeartbeat(object state)
+        {
+            if (OnHeartbeatSent != null)
+                OnHeartbeatSent();
+
+            if (Interlocked.CompareExchange(ref status, 0, 0) != Status.Started)
+                return;
+
+            NotifyAllSubscribers(ControlCommand.Pulse);
+
+            if (DateTime.UtcNow - new DateTime(lastHeartbeatTicks) > HeartbeatTimeout)
+            {
+                if (Interlocked.CompareExchange(ref status, 0, 0) == Status.Started)
+                {
+                    Restart();
+                }
+            }
+        }
+
+        void Pulse()
+        {
+            Interlocked.CompareExchange(ref lastHeartbeatTicks, DateTime.UtcNow.Ticks, lastHeartbeatTicks);
+
+            if (OnHeartbeatReceived != null)
+                OnHeartbeatReceived();
+        }
+
+        private void DisposeHeartbeatTimer()
+        {
+            if (heartbeatTimer == null)
+                return;
+
+            try
+            {
+                heartbeatTimer.Dispose();
+            }
+            catch (Exception ex)
+            {
+                if (this.OnError != null) this.OnError(ex);
+            }
+            heartbeatTimer = null;
         }
 
         private IRedisClient masterClient;
@@ -150,9 +217,21 @@ namespace ServiceStack.Redis
 
                             subscription.OnMessage = (channel, msg) =>
                             {
-                                if (msg == Operation.ControlCommand)
+                                if (string.IsNullOrEmpty(msg)) 
+                                    return;
+
+                                var ctrlMsg = msg.SplitOnFirst(':');
+                                if (ctrlMsg[0] == ControlCommand.Control)
                                 {
                                     var op = Interlocked.CompareExchange(ref doOperation, Operation.NoOp, doOperation);
+                                    
+                                    var msgType = ctrlMsg.Length > 1
+                                        ? ctrlMsg[1]
+                                        : null;
+
+                                    if (OnControlCommand != null)
+                                        OnControlCommand(msgType ?? Operation.GetName(op));
+
                                     switch (op)
                                     {
                                         case Operation.Stop:
@@ -169,9 +248,15 @@ namespace ServiceStack.Redis
                                             subscription.UnSubscribeFromAllChannels(); //Un block thread.
                                             return;
                                     }
-                                }
 
-                                if (!string.IsNullOrEmpty(msg))
+                                    switch (msgType)
+                                    {
+                                        case ControlCommand.Pulse:
+                                            Pulse();
+                                            break;
+                                    }
+                                }
+                                else
                                 {
                                     OnMessage(channel, msg);
                                 }
@@ -200,19 +285,22 @@ namespace ServiceStack.Redis
 
                 if (this.OnError != null)
                     this.OnError(ex);
+            }
 
+            if (Interlocked.CompareExchange(ref autoRestart, 0, 0) == YES
+                && Interlocked.CompareExchange(ref status, 0, 0) != Status.Disposed)
+            {
                 if (KeepAliveRetryAfterMs != null)
-                {
                     Thread.Sleep(KeepAliveRetryAfterMs.Value);
 
-                    if (Interlocked.CompareExchange(ref status, 0, 0) != Status.Disposed)
-                        Start();
-                }
+                Start();
             }
         }
 
         public void Stop()
         {
+            Interlocked.CompareExchange(ref autoRestart, NO, autoRestart);
+
             if (Interlocked.CompareExchange(ref status, 0, 0) == Status.Disposed)
                 throw new ObjectDisposedException("RedisPubSubServer has been disposed");
 
@@ -221,20 +309,36 @@ namespace ServiceStack.Redis
                 Log.Debug("Stopping RedisPubSubServer...");
 
                 //Unblock current bgthread by issuing StopCommand
-                try
+                SendControlCommand(Operation.Stop);
+            }
+        }
+
+        private void SendControlCommand(int operation)
+        {
+            Interlocked.CompareExchange(ref doOperation, operation, doOperation);
+            NotifyAllSubscribers();
+        }
+
+        private void NotifyAllSubscribers(string commandType=null)
+        {
+            var msg = ControlCommand.Control;
+            if (commandType != null)
+                msg += ":" + commandType;
+
+            try
+            {
+                using (var redis = ClientsManager.GetClient())
                 {
-                    using (var redis = ClientsManager.GetClient())
+                    foreach (var channel in Channels)
                     {
-                        Interlocked.CompareExchange(ref doOperation, Operation.Stop, doOperation);
-                        Channels.Each(x =>
-                            redis.PublishMessage(x, Operation.ControlCommand));
+                        redis.PublishMessage(channel, msg);
                     }
                 }
-                catch (Exception ex)
-                {
-                    if (this.OnError != null) this.OnError(ex);
-                    Log.Warn("Could not send STOP message to bg thread: " + ex.Message);
-                }
+            }
+            catch (Exception ex)
+            {
+                if (this.OnError != null) this.OnError(ex);
+                Log.Warn("Could not send '{0}' message to bg thread: {1}".Fmt(msg, ex.Message));
             }
         }
 
@@ -251,8 +355,10 @@ namespace ServiceStack.Redis
                     using (var currentlySubscribedClient = ((RedisClient)masterClient).CloneClient())
                     {
                         Interlocked.CompareExchange(ref doOperation, Operation.Reset, doOperation);
-                        Channels.Each(x =>
-                            currentlySubscribedClient.PublishMessage(x, Operation.ControlCommand));
+                        foreach (var channel in Channels)
+                        {
+                            currentlySubscribedClient.PublishMessage(channel, ControlCommand.Control);
+                        }
                     }
                 }
                 else
@@ -279,7 +385,7 @@ namespace ServiceStack.Redis
         public void Restart()
         {
             Stop();
-            Start();
+            Interlocked.CompareExchange(ref autoRestart, YES, autoRestart);
         }
 
         private void KillBgThreadIfExists()
@@ -319,12 +425,33 @@ namespace ServiceStack.Redis
 
         public static class Operation //dep-free copy of WorkerOperation
         {
-            public const string ControlCommand = "CTRL";
-
             public const int NoOp = 0;
             public const int Stop = 1;
             public const int Reset = 2;
             public const int Restart = 3;
+
+            public static string GetName(int op)
+            {
+                switch (op)
+                {
+                    case NoOp:
+                        return "NoOp";
+                    case Stop:
+                        return "Stop";
+                    case Reset:
+                        return "Reset";
+                    case Restart:
+                        return "Restart";
+                    default:
+                        return null;
+                }
+            }
+        }
+
+        public static class ControlCommand
+        {
+            public const string Control = "CTRL";
+            public const string Pulse = "PULSE";
         }
 
         class Status //dep-free copy of WorkerStatus
@@ -396,6 +523,8 @@ namespace ServiceStack.Redis
             {
                 if (this.OnError != null) this.OnError(ex);
             }
+
+            DisposeHeartbeatTimer();
         }
     }
 }
