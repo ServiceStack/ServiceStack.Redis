@@ -5,7 +5,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [Ignore, Explicit("Ignore long running tests")]
+    [Ignore("Ignore long running tests")]
     [TestFixture]
     public class RedisPubSubServerTests
     {
