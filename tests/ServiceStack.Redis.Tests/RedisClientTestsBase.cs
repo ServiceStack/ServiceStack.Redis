@@ -5,7 +5,6 @@ using NUnit.Framework;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture, Category("Integration")]
 	public class RedisClientTestsBase
 	{
 	    protected string CleanMask = null;
