@@ -12,7 +12,7 @@ namespace ServiceStack.Redis
 {
     public class RedisPoolConfig
     {
-        public const int DefaultMaxPoolSize = 20;
+        public const int DefaultMaxPoolSize = 40;
 
         public RedisPoolConfig()
         {
