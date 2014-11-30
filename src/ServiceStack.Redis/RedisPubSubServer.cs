@@ -42,10 +42,16 @@ namespace ServiceStack.Redis
         private int status;
         private Thread bgThread; //Subscription controller thread
         private long bgThreadCount = 0;
-        private int autoRestart = YES;
 
         private const int NO = 0;
         private const int YES = 1;
+
+        private int autoRestart = YES;
+        public bool AutoRestart
+        {
+            get { return Interlocked.CompareExchange(ref autoRestart, 0, 0) == YES; }
+            set { Interlocked.CompareExchange(ref autoRestart, value ? YES : NO, autoRestart); }
+        }
 
         public DateTime CurrentServerTime
         {
@@ -74,7 +80,7 @@ namespace ServiceStack.Redis
 
         public IRedisPubSubServer Start()
         {
-            Interlocked.CompareExchange(ref autoRestart, 0, autoRestart);
+            AutoRestart = true;
 
             if (Interlocked.CompareExchange(ref status, 0, 0) == Status.Started)
             {
@@ -287,8 +293,7 @@ namespace ServiceStack.Redis
                     this.OnError(ex);
             }
 
-            if (Interlocked.CompareExchange(ref autoRestart, 0, 0) == YES
-                && Interlocked.CompareExchange(ref status, 0, 0) != Status.Disposed)
+            if (AutoRestart && Interlocked.CompareExchange(ref status, 0, 0) != Status.Disposed)
             {
                 if (KeepAliveRetryAfterMs != null)
                     Thread.Sleep(KeepAliveRetryAfterMs.Value);
@@ -299,7 +304,12 @@ namespace ServiceStack.Redis
 
         public void Stop()
         {
-            Interlocked.CompareExchange(ref autoRestart, NO, autoRestart);
+            Stop(shouldRestart:false);
+        }
+
+        private void Stop(bool shouldRestart)
+        {
+            AutoRestart = shouldRestart;
 
             if (Interlocked.CompareExchange(ref status, 0, 0) == Status.Disposed)
                 throw new ObjectDisposedException("RedisPubSubServer has been disposed");
@@ -384,8 +394,7 @@ namespace ServiceStack.Redis
 
         public void Restart()
         {
-            Stop();
-            Interlocked.CompareExchange(ref autoRestart, YES, autoRestart);
+            Stop(shouldRestart:true);
         }
 
         private void KillBgThreadIfExists()
