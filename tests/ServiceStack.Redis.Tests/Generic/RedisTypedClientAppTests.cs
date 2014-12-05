@@ -102,6 +102,40 @@ namespace ServiceStack.Redis.Tests.Generic
 			Assert.That(actualAnswers.EquivalentTo(q1Answers));
 		}
 
+        public class Customer
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        public class CustomerAddress
+        {
+            public string Id { get; set; }
+            public string Address { get; set; }
+        }
+
+        [Test]
+        public void Can_StoreRelatedEntities_with_StringId()
+        {
+            var redisCustomers = Redis.As<Customer>();
+            var customer = new Customer { Id = "CUST-01", Name = "Customer" };
+
+            redisCustomers.Store(customer);
+
+            var addresses = new[]
+            {
+                new CustomerAddress { Id = "ADDR-01", Address = "1 Home Street" },
+                new CustomerAddress { Id = "ADDR-02", Address = "2 Work Road" },
+            };
+
+            redisCustomers.StoreRelatedEntities(customer.Id, addresses);
+
+            var actualAddresses = redisCustomers.GetRelatedEntities<CustomerAddress>(customer.Id);
+
+            Assert.That(actualAddresses.Map(x => x.Id),
+                Is.EquivalentTo(new[] { "ADDR-01", "ADDR-02" }));
+        }
+
 		[Test]
 		public void Can_GetRelatedEntities_When_Empty()
 		{
