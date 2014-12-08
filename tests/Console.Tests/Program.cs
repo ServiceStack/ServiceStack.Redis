@@ -1,87 +1,120 @@
 ﻿
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-using ServiceStack;
 using ServiceStack.Redis;
 using ServiceStack.Text;
+using Timer = System.Timers.Timer;
 
 namespace TestRedisConnection
 {
+    public class Incr
+    {
+        public long Id { get; set; }
+    }
+
+    public class IncrResponse
+    {
+        public long Result { get; set; }
+    }
+
     class Program
     {
-        public static BasicRedisClientManager Manager { get; set; }
+        private const string Channel = "longrunningtest";
+        private static DateTime StartedAt;
+
+        private static long MessagesSent = 0;
+        private static long HeartbeatsSent = 0;
+        private static long HeartbeatsReceived = 0;
+        private static long StartCount = 0;
+        private static long StopCount = 0;
+        private static long DisposeCount = 0;
+        private static long ErrorCount = 0;
+        private static long FailoverCount = 0;
+        private static long UnSubscribeCount = 0;
+
+        public static RedisManagerPool Manager { get; set; }
+        public static RedisPubSubServer PubSubServer { get; set; }
+
         static void Main(string[] args)
         {
-            Manager = new BasicRedisClientManager("localhost");
+            Manager = new RedisManagerPool("10.0.0.9");
+            StartedAt = DateTime.UtcNow;
 
-            var q = new System.Timers.Timer { Interval = 2 };
-            q.Elapsed += CheckConnection;
+            var q = new Timer { Interval = 1000 };
+            q.Elapsed += OnInterval;
             q.Enabled = true;
 
-            if ("q" == Console.ReadLine())
-                return;
+            using (PubSubServer = new RedisPubSubServer(Manager, Channel)
+            {
+                OnStart = () =>
+                {
+                    Console.WriteLine("OnStart: #" + Interlocked.Increment(ref StartCount));
+                },
+                OnHeartbeatSent = () =>
+                {
+                    Console.WriteLine("OnHeartbeatSent: #" + Interlocked.Increment(ref HeartbeatsSent));
+                },
+                OnHeartbeatReceived = () =>
+                {
+                    Console.WriteLine("OnHeartbeatReceived: #" + Interlocked.Increment(ref HeartbeatsReceived));
+                },
+                OnMessage = (channel, msg) =>
+                {
+                    Console.WriteLine("OnMessage: @" + channel + ": " + msg);
+                },
+                OnStop = () =>
+                {
+                    Console.WriteLine("OnStop: #" + Interlocked.Increment(ref StopCount));
+                },
+                OnError = ex =>
+                {
+                    Console.WriteLine("OnError: #" + Interlocked.Increment(ref ErrorCount) + " ERROR: " + ex);
+                },
+                OnFailover = server => 
+                {
+                    Console.WriteLine("OnFailover: #" + Interlocked.Increment(ref FailoverCount));
+                },
+                OnDispose = () =>
+                {
+                    Console.WriteLine("OnDispose: #" + Interlocked.Increment(ref DisposeCount));
+                },
+                OnUnSubscribe = channel =>
+                {                        
+                    Console.WriteLine("OnUnSubscribe: #" + Interlocked.Increment(ref UnSubscribeCount) + " channel: " + channel);
+                },
+            })
+            {
+                Console.WriteLine("PubSubServer StartedAt: " + StartedAt.ToLongTimeString());
+                PubSubServer.Start();
+
+                "Press Enter to Quit...".Print();
+                Console.ReadLine();
+                Console.WriteLine("PubSubServer EndedAt: " + DateTime.UtcNow.ToLongTimeString());
+                Console.WriteLine("PubSubServer TimeTaken: " + (DateTime.UtcNow - StartedAt).TotalSeconds + "s");
+            }
         }
 
-        private static void CheckConnection(object sender, ElapsedEventArgs e)
+        private static void OnInterval(object sender, ElapsedEventArgs e)
         {
-            Task.Factory.StartNew(CheckThisConnection);
+            Task.Factory.StartNew(PublishMessage);
         }
 
-        private static void CheckThisConnection()
+        private static void PublishMessage()
         {
             try
             {
-                "CheckThisConnection()...".Print();
-                using (var redisClient = Manager.GetClient())
+                var message = "MSG: #" + Interlocked.Increment(ref MessagesSent);
+                Console.WriteLine("PublishMessage(): " + message);
+                using (var redis = Manager.GetClient())
                 {
-                    using (var trans = redisClient.CreateTransaction())
-                    {
-                        trans.QueueCommand(
-                                 r => r.SetEntryInHash("Test", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test2", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test3", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test4", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test5", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test6", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test7", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test8", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test9", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test10", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test11", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test12", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test13", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test14", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test15", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test16", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test17", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test18", "Price", "123"));
-                        trans.QueueCommand(
-                                r => r.SetEntryInHash("Test19", "Price", "123"));
-                        trans.Commit();
-                    }
+                    redis.PublishMessage(Channel, message);
                 }
             }
             catch (Exception ex)
             {
-                "ERROR: {0}".Print(ex.ToString());
+                Console.WriteLine("ERROR PublishMessage: " + ex);
             }
         }
     }
