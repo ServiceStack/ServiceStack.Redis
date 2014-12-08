@@ -126,8 +126,8 @@ namespace ServiceStack.Redis
                 }
                 catch (Exception ex)
                 {
-                    ex.Message.Print();
-                    if (this.OnError != null) this.OnError(ex);
+                    if (this.OnError != null) 
+                        this.OnError(ex);
                 }
             }
 
@@ -136,10 +136,18 @@ namespace ServiceStack.Redis
 
         private void Init()
         {
-            using (var redis = ClientsManager.GetReadOnlyClient())
+            try
             {
-                serverTimeAtStart = redis.GetServerTime();
-                startedAt = Stopwatch.StartNew();
+                using (var redis = ClientsManager.GetReadOnlyClient())
+                {
+                    startedAt = Stopwatch.StartNew();
+                    serverTimeAtStart = redis.GetServerTime();
+                }
+            }
+            catch (Exception ex)
+            {
+                if (OnError != null)
+                    OnError(ex);
             }
 
             DisposeHeartbeatTimer();
@@ -161,14 +169,18 @@ namespace ServiceStack.Redis
             if (OnHeartbeatSent != null)
                 OnHeartbeatSent();
 
-            if (Interlocked.CompareExchange(ref status, 0, 0) != Status.Started)
+            var currentStatus = Interlocked.CompareExchange(ref status, 0, 0);
+            if (currentStatus != Status.Started)
+            {
                 return;
+            }
 
             NotifyAllSubscribers(ControlCommand.Pulse);
 
             if (DateTime.UtcNow - new DateTime(lastHeartbeatTicks) > HeartbeatTimeout)
             {
-                if (Interlocked.CompareExchange(ref status, 0, 0) == Status.Started)
+                currentStatus = Interlocked.CompareExchange(ref status, 0, 0);
+                if (currentStatus == Status.Started)
                 {
                     Restart();
                 }
