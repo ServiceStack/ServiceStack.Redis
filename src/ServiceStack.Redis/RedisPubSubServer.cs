@@ -31,7 +31,6 @@ namespace ServiceStack.Redis
         public Action<IRedisPubSubServer> OnFailover { get; set; }
 
         readonly Random rand = new Random(Environment.TickCount);
-        public int? KeepAliveRetryAfterMs { get; set; }
 
         private int doOperation = Operation.NoOp;
 
@@ -65,6 +64,7 @@ namespace ServiceStack.Redis
 
         public IRedisClientsManager ClientsManager { get; set; }
         public string[] Channels { get; set; }
+        public TimeSpan? WaitBeforeNextRestart { get; set; }
 
         public RedisPubSubServer(IRedisClientsManager clientsManager, params string[] channels)
         {
@@ -307,8 +307,8 @@ namespace ServiceStack.Redis
 
             if (AutoRestart && Interlocked.CompareExchange(ref status, 0, 0) != Status.Disposed)
             {
-                if (KeepAliveRetryAfterMs != null)
-                    Thread.Sleep(KeepAliveRetryAfterMs.Value);
+                if (WaitBeforeNextRestart != null)
+                    Thread.Sleep(WaitBeforeNextRestart.Value);
 
                 Start();
             }
