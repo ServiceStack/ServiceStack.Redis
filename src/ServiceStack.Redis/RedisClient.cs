@@ -15,6 +15,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ServiceStack.Caching;
 using ServiceStack.Redis.Generic;
 using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
@@ -357,9 +358,16 @@ namespace ServiceStack.Redis
             }
         }
 
-        public TimeSpan GetTimeToLive(string key)
+        public TimeSpan? GetTimeToLive(string key)
         {
-            return TimeSpan.FromSeconds(Ttl(key));
+            var ttlSecs = Ttl(key);
+            if (ttlSecs == -1)
+                return TimeSpan.MaxValue; //no expiry set
+
+            if (ttlSecs == -2)
+                return null; //key does not exist
+
+            return TimeSpan.FromSeconds(ttlSecs);
         }
 
         public IRedisTypedClient<T> As<T>()

@@ -203,11 +203,11 @@ namespace ServiceStack.Redis.Tests
 			Redis.Expire("key", 10);
 
 			var ttl = Redis.GetTimeToLive("key");
-			Assert.That(ttl.TotalSeconds, Is.GreaterThanOrEqualTo(9));
+			Assert.That(ttl.Value.TotalSeconds, Is.GreaterThanOrEqualTo(9));
 			Thread.Sleep(1700);
 
 			ttl = Redis.GetTimeToLive("key");
-			Assert.That(ttl.TotalSeconds, Is.LessThanOrEqualTo(9));
+            Assert.That(ttl.Value.TotalSeconds, Is.LessThanOrEqualTo(9));
 		}
 
         [Test]

@@ -12,7 +12,7 @@ namespace ServiceStack.Redis
     /// This works well for master-slave replication scenarios where you have 
     /// 1 master that replicates to multiple read slaves.
     /// </summary>
-    public class RedisClientManagerCacheClient : ICacheClient, IRemoveByPattern
+    public class RedisClientManagerCacheClient : ICacheClient, IRemoveByPattern, ICacheClientExtended
     {
         private readonly IRedisClientsManager redisManager;
 
@@ -193,6 +193,19 @@ namespace ServiceStack.Redis
         public void RemoveByRegex(string pattern)
         {
             RemoveByPattern(pattern.Replace(".*", "*").Replace(".+", "?"));
+        }
+
+        public TimeSpan? GetTimeToLive(string key)
+        {
+            using (var client = GetClient())
+            {
+                var redisClient = client as RedisClient;
+                if (redisClient != null)
+                {
+                    return redisClient.GetTimeToLive(key);
+                }
+            }
+            return null;
         }
     }
 }

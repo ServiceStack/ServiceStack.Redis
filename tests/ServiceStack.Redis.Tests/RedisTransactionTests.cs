@@ -288,8 +288,8 @@ namespace ServiceStack.Redis.Tests
             Assert.That(Redis.Get<string>(key), Is.EqualTo("Foo"));
             Assert.That(Redis.Get<string>(keyWithTtl), Is.EqualTo("Bar"));
 
-            Assert.That(Redis.GetTimeToLive(key).TotalSeconds, Is.EqualTo(-1));
-            Assert.That(Redis.GetTimeToLive(keyWithTtl).TotalSeconds, Is.GreaterThan(1));
+            Assert.That(Redis.GetTimeToLive(key), Is.EqualTo(TimeSpan.MaxValue));
+            Assert.That(Redis.GetTimeToLive(keyWithTtl).Value.TotalSeconds, Is.GreaterThan(1));
         }
 
         [Test]
@@ -309,7 +309,7 @@ namespace ServiceStack.Redis.Tests
             }
 
             Assert.That(Redis.Get<string>(key), Is.EqualTo("Foo"));
-            Assert.That(Redis.GetTimeToLive(key).TotalSeconds, Is.EqualTo(-1));
+            Assert.That(Redis.GetTimeToLive(key), Is.EqualTo(TimeSpan.MaxValue));
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using ServiceStack.Caching;
 using ServiceStack.Common.Tests.Models;
@@ -7,7 +8,7 @@ namespace ServiceStack.Redis.Tests
 	[TestFixture]
 	public class RedisCacheClientTests
 	{
-		private ICacheClient cacheClient;
+		private ICacheClientExtended cacheClient;
 
 		[SetUp]
 		public void OnBeforeEachTest()
@@ -102,6 +103,26 @@ namespace ServiceStack.Redis.Tests
 
             result2 = cacheClient.Get<string>("string1");
             Assert.That(result2, Is.Null);
+        }
+
+	    [Test]
+	    public void Can_GetTimeToLive()
+	    {
+            var model = ModelWithIdAndName.Create(1);
+            string key = "model:" + model.CreateUrn();
+            cacheClient.Add(key, model);
+
+	        var ttl = cacheClient.GetTimeToLive(key);
+            Assert.That(ttl, Is.EqualTo(TimeSpan.MaxValue));
+
+	        cacheClient.Set(key, model, expiresIn: TimeSpan.FromSeconds(10));
+            ttl = cacheClient.GetTimeToLive(key);
+            Assert.That(ttl.Value, Is.GreaterThanOrEqualTo(TimeSpan.FromSeconds(9)));
+            Assert.That(ttl.Value, Is.LessThanOrEqualTo(TimeSpan.FromSeconds(10)));
+
+	        cacheClient.Remove(key);
+            ttl = cacheClient.GetTimeToLive(key);
+            Assert.That(ttl, Is.Null);
         }
 	}
 }
