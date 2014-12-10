@@ -123,8 +123,9 @@ namespace ServiceStack.Redis
                 while ((inActiveClient = GetInActiveClient()) == null)
                 {
                     //Create new client outside of pool when max pool size exceeded
-                    var nextIndex = poolIndex % Hosts.Count;
-                    var nextHost = Hosts[nextIndex];
+                    var desiredIndex = poolIndex % clients.Length;
+                    var nextHostIndex = desiredIndex % Hosts.Count;
+                    var nextHost = Hosts[nextHostIndex];
                     var newClient = InitNewClient(nextHost);
                     //Don't handle callbacks for new client outside pool
                     newClient.ClientManager = null; 
