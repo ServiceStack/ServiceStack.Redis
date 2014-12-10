@@ -38,11 +38,17 @@ namespace ServiceStack.Redis.Tests.Integration
 			RunSimultaneously(CreateAndStartManager, UseClient);
 		}
 
-		[Test]
-		public void Basic_can_support_64_threads_using_the_client_simultaneously()
-		{
-			RunSimultaneously(CreateAndStartBasicManager, UseClient);
-		}
+        [Test]
+        public void Basic_can_support_64_threads_using_the_client_simultaneously()
+        {
+            RunSimultaneously(CreateAndStartBasicManager, UseClient);
+        }
+
+        [Test]
+        public void ManagerPool_can_support_64_threads_using_the_client_simultaneously()
+        {
+            RunSimultaneously(CreateAndStartManagerPool, UseClient);
+        }
 
 		private static void UseClient(IRedisClientsManager manager, int clientNo)
 		{

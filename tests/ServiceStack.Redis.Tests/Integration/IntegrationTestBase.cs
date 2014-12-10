@@ -10,13 +10,21 @@ namespace ServiceStack.Redis.Tests.Integration
     [Category("Integration")]
 	public class IntegrationTestBase
 	{
-		protected IRedisClientsManager CreateAndStartPoolManager(
-			string[] readWriteHosts, string[] readOnlyHosts)
-		{
-			return new PooledRedisClientManager(readWriteHosts, readOnlyHosts);
-		}
+        protected IRedisClientsManager CreateAndStartPoolManager(
+            string[] readWriteHosts, string[] readOnlyHosts)
+        {
+            return new PooledRedisClientManager(readWriteHosts, readOnlyHosts);
+        }
 
-		protected IRedisClientsManager CreateAndStartBasicCacheManager(
+        protected IRedisClientsManager CreateAndStartManagerPool(
+            string[] readWriteHosts, string[] readOnlyHosts)
+        {
+            return new RedisManagerPool(readWriteHosts, new RedisPoolConfig {
+                MaxPoolSize = 10
+            });
+        }
+
+        protected IRedisClientsManager CreateAndStartBasicCacheManager(
 			string[] readWriteHosts, string[] readOnlyHosts)
 		{
 			return new BasicRedisClientManager(readWriteHosts, readOnlyHosts);
