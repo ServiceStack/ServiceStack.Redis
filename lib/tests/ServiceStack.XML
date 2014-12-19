@@ -504,43 +504,6 @@
             Don't redirect if the request was a forwarded request, e.g. from a Load Balancer
             </summary>
         </member>
-        <member name="T:ServiceStack.Messaging.IMessageHandler">
-            <summary>
-            Single threaded message handler that can process all messages
-            of a particular message type.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Messaging.IMessageHandler.Process(ServiceStack.Messaging.IMessageQueueClient)">
-            <summary>
-            Process all messages pending
-            </summary>
-            <param name="mqClient"></param>
-        </member>
-        <member name="M:ServiceStack.Messaging.IMessageHandler.ProcessQueue(ServiceStack.Messaging.IMessageQueueClient,System.String,System.Func{System.Boolean})">
-            <summary>
-            Process messages from a single queue.
-            </summary>
-            <param name="mqClient"></param>
-            <param name="queueName">The queue to process</param>
-            <param name="doNext">A predicate on whether to continue processing the next message if any</param>
-            <returns></returns>
-        </member>
-        <member name="M:ServiceStack.Messaging.IMessageHandler.ProcessMessage(ServiceStack.Messaging.IMessageQueueClient,System.Object)">
-            <summary>
-            Process a single message
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Messaging.IMessageHandler.GetStats">
-            <summary>
-            Get Current Stats for this Message Handler
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="P:ServiceStack.Messaging.IMessageHandler.MessageType">
-            <summary>
-            The type of the message this handler processes
-            </summary>
-        </member>
         <member name="T:ServiceStack.Messaging.IMessageHandlerFactory">
             <summary>
             Encapsulates creating a new message handler
