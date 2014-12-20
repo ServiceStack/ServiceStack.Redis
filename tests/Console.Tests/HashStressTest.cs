@@ -63,7 +63,7 @@ namespace TestRedisConnection
             {
                 threads.Add(new Thread(WorkerLoop));
             }
-            threads.Each(t => t.Start());
+            threads.ForEach(t => t.Start());
 
             "Press Enter to Stop...".Print();
             Console.ReadLine();
