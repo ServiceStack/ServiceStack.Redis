@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using ServiceStack.Redis;
 using ServiceStack.Redis.Generic;
@@ -57,7 +58,11 @@ namespace TestRedisConnection
             Interlocked.Increment(ref running);
 
             "Starting HashStressTest with {0} threads".Print(noOfThreads);
-            var threads = noOfThreads.Times(i => new Thread(WorkerLoop));
+            var threads = new List<Thread>();
+            for (int i = 0; i < noOfThreads; i++)
+            {
+                threads.Add(new Thread(WorkerLoop));
+            }
             threads.Each(t => t.Start());
 
             "Press Enter to Stop...".Print();
