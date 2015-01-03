@@ -75,22 +75,24 @@ Any additional configuration can be specified as QueryString parameters. The ful
 
 ## Redis Client Managers
 
-The recommended way to access the RedisClient is to use one of the available Client Managers:
+The recommended way to access `RedisClient` instances is to use one of the available Thread-Safe Client Managers below. Client Managers are connection factories which is ideally registered as a Singleton either in your IOC or static classes. 
 
-#### `RedisManagerPool`
+#### RedisManagerPool
 
-With the enhanced Redis URI Connection Strings we've been able to simplify and streamline the existing `PooledRedisClientManager` 
-implementation that's been extracted out into a new clients manager called `RedisManagerPool`. 
+With the enhanced Redis URI Connection Strings we've been able to simplify and streamline the existing `PooledRedisClientManager` implementation and have extracted it out into a new clients manager called `RedisManagerPool`. 
 
-In addition to removing all above options on the Client Manager itself, we've also removed readonly connection strings so the configuration 
-ends up much simpler and more aligned with the common use-case:
+In addition to removing all above options on the Client Manager itself, readonly connection strings have also been removed so the configuration ends up much simpler and more aligned with the common use-case:
 
 ```csharp
 container.Register<IRedisClientsManager>(c => 
     new RedisManagerPool(redisConnectionString));
 ```
 
-#### `PooledRedisClientManager`
+**Pooling Behavior**
+
+Any connections required after the maximum Pool size has been reached will be created and disposed outside of the Pool. By not being restricted to a maximum pool size, the pooling behavior in `RedisManagerPool` can maintain a smaller connection pool size at the cost of potentially having a higher opened/closed connection count.
+
+#### PooledRedisClientManager
 
 If you prefer to define options on the Client Manager itself or you want to provide separate Read/Write and ReadOnly 
 (i.e. Master and Slave) redis-servers, use the `PooledRedisClientManager` instead:
@@ -98,15 +100,18 @@ If you prefer to define options on the Client Manager itself or you want to prov
 ```csharp
 container.Register<IRedisClientsManager>(c => 
     new PooledRedisClientManager(redisReadWriteHosts, redisReadOnlyHosts) { 
-		ConnectTimeout = 100,
-		//...
-	});
+        ConnectTimeout = 100,
+        //...
+    });
 ```
 
-#### `BasicRedisClientManager`
+**Pooling Behavior**
 
-If don't want to use connection pooling (i.e. your accessing a local redis-server instance) 
-you can use a basic (non-pooled) Clients Manager:
+The `PooledRedisClientManager` imposes a maximum connection limit and when its maximum pool size has been reached will instead block on any new connection requests until the next `RedisClient` is released back into the pool. If no client became available within `PoolTimeout`, a Pool `TimeoutException` will be thrown.
+
+#### BasicRedisClientManager
+
+If don't want to use connection pooling (i.e. your accessing a local redis-server instance) you can use a basic (non-pooled) Clients Manager which creates a new `RedisClient` instance each time:
 
 ```csharp
 container.Register<IRedisClientsManager>(c => 
@@ -119,27 +124,26 @@ Once registered, accessing the RedisClient is the same in all Client Managers, e
 
 ```csharp
 var clientsManager = container.Resolve<IRedisClientsManager>();
-
 using (IRedisClient redis = clientsManager.GetClient())
 {
-	redis.IncrementValue("counter");
-	List<string> days = redis.GetAllItemsFromList("days");
+    redis.IncrementValue("counter");
+    List<string> days = redis.GetAllItemsFromList("days");
 
-	//Access Typed API
-	var redisTodos = redis.As<Todo>();
+    //Access Typed API
+    var redisTodos = redis.As<Todo>();
 
     redisTodos.Store(new Todo {
         Id = redisTodos.GetNextSequence(),
         Content = "Learn Redis",
     });
 
-	var todo = redisTodos.GetById(1);
+    var todo = redisTodos.GetById(1);
 
-	//Access Native Client
-	var redisNative = (IRedisNativeClient)redis;
+    //Access Native Client
+    var redisNative = (IRedisNativeClient)redis;
 
-	redisNative.Incr("counter");
-	List<string> days = redisNative.LRange("days", 0, -1);
+    redisNative.Incr("counter");
+    List<string> days = redisNative.LRange("days", 0, -1);
 }
 ```
 
