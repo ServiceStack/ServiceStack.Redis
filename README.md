@@ -77,7 +77,7 @@ Any additional configuration can be specified as QueryString parameters. The ful
 
 The recommended way to access `RedisClient` instances is to use one of the available Thread-Safe Client Managers below. Client Managers are connection factories which is ideally registered as a Singleton either in your IOC or static classes. 
 
-#### RedisManagerPool
+### RedisManagerPool
 
 With the enhanced Redis URI Connection Strings we've been able to simplify and streamline the existing `PooledRedisClientManager` implementation and have extracted it out into a new clients manager called `RedisManagerPool`. 
 
@@ -92,7 +92,7 @@ container.Register<IRedisClientsManager>(c =>
 
 Any connections required after the maximum Pool size has been reached will be created and disposed outside of the Pool. By not being restricted to a maximum pool size, the pooling behavior in `RedisManagerPool` can maintain a smaller connection pool size at the cost of potentially having a higher opened/closed connection count.
 
-#### PooledRedisClientManager
+### PooledRedisClientManager
 
 If you prefer to define options on the Client Manager itself or you want to provide separate Read/Write and ReadOnly 
 (i.e. Master and Slave) redis-servers, use the `PooledRedisClientManager` instead:
@@ -109,7 +109,7 @@ container.Register<IRedisClientsManager>(c =>
 
 The `PooledRedisClientManager` imposes a maximum connection limit and when its maximum pool size has been reached will instead block on any new connection requests until the next `RedisClient` is released back into the pool. If no client became available within `PoolTimeout`, a Pool `TimeoutException` will be thrown.
 
-#### BasicRedisClientManager
+### BasicRedisClientManager
 
 If don't want to use connection pooling (i.e. your accessing a local redis-server instance) you can use a basic (non-pooled) Clients Manager which creates a new `RedisClient` instance each time:
 
