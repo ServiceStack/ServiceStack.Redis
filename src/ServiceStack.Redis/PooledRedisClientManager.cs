@@ -60,14 +60,14 @@ namespace ServiceStack.Redis
 
         public IRedisClientFactory RedisClientFactory { get; set; }
 
-        public long Db { get; private set; }
+        public long? Db { get; private set; }
 
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
 
         public PooledRedisClientManager() : this(RedisNativeClient.DefaultHost) { }
 
         public PooledRedisClientManager(int poolSize, int poolTimeOutSeconds, params string[] readWriteHosts)
-            : this(readWriteHosts, readWriteHosts, null, RedisNativeClient.DefaultDb, poolSize, poolTimeOutSeconds)
+            : this(readWriteHosts, readWriteHosts, null, null, poolSize, poolTimeOutSeconds)
         {
         }
 
@@ -96,7 +96,7 @@ namespace ServiceStack.Redis
             IEnumerable<string> readWriteHosts,
             IEnumerable<string> readOnlyHosts,
             RedisClientManagerConfig config)
-            : this(readWriteHosts, readOnlyHosts, config, RedisNativeClient.DefaultDb, null, null)
+            : this(readWriteHosts, readOnlyHosts, config, null, null, null)
         {
         }
 
@@ -112,12 +112,12 @@ namespace ServiceStack.Redis
             IEnumerable<string> readWriteHosts,
             IEnumerable<string> readOnlyHosts,
             RedisClientManagerConfig config,
-            long initalDb,
+            long? initalDb,
             int? poolSizeMultiplier,
             int? poolTimeOutSeconds)
         {
             this.Db = config != null
-                ? config.DefaultDb.GetValueOrDefault(initalDb)
+                ? config.DefaultDb ?? initalDb
                 : initalDb;
 
             ReadWriteHosts = readWriteHosts.ToRedisEndPoints();
@@ -281,8 +281,8 @@ namespace ServiceStack.Redis
                 client.IdleTimeOutSecs = this.IdleTimeOutSecs.Value;
             if (this.NamespacePrefix != null)
                 client.NamespacePrefix = NamespacePrefix;
-            if (client.Db != Db) //Reset database to default if changed
-                client.ChangeDb(Db);
+            if (Db != null && client.Db != Db) //Reset database to default if changed
+                client.ChangeDb(Db.Value);
         }
 
         /// <summary>

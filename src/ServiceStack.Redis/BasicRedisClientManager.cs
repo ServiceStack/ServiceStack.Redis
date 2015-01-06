@@ -41,7 +41,7 @@ namespace ServiceStack.Redis
 
         public IRedisClientFactory RedisClientFactory { get; set; }
 
-        public long Db { get; private set; }
+        public long? Db { get; private set; }
 
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
 
@@ -65,14 +65,14 @@ namespace ServiceStack.Redis
         public BasicRedisClientManager(
             IEnumerable<string> readWriteHosts,
             IEnumerable<string> readOnlyHosts)
-            : this(readWriteHosts, readOnlyHosts, RedisNativeClient.DefaultDb)
+            : this(readWriteHosts, readOnlyHosts, null)
         {
         }
 
         public BasicRedisClientManager(
             IEnumerable<string> readWriteHosts,
             IEnumerable<string> readOnlyHosts,
-            long initalDb)
+            long? initalDb)
         {
             this.Db = initalDb;
 
@@ -127,8 +127,8 @@ namespace ServiceStack.Redis
                 client.IdleTimeOutSecs = this.IdleTimeOutSecs.Value;
             if (this.NamespacePrefix != null)
                 client.NamespacePrefix = NamespacePrefix;
-            if (client.Db != Db) //Reset database to default if changed
-                client.ChangeDb(Db);
+            if (Db != null && client.Db != Db) //Reset database to default if changed
+                client.ChangeDb(Db.Value);
 
             return client;
         }
