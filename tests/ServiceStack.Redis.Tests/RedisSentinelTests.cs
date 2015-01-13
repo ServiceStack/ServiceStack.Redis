@@ -97,5 +97,24 @@ namespace ServiceStack.Redis.Tests
                 Assert.That(((RedisNativeClient)client).IdleTimeOutSecs, Is.EqualTo(20));
             }
         }
+
+        [Test]
+        public void Can_specify_db_on_RedisSentinel()
+        {
+            var host = new[] {"{0}:{1}".Fmt(TestConfig.SentinelHost, TestConfig.RedisSentinelPort)};
+            var sentinel = new RedisSentinel(host, TestConfig.MasterName) {
+                RedisManagerFactory =
+                {
+                    FactoryFn = (writeHosts, readHosts) =>
+                        new PooledRedisClientManager(writeHosts, readHosts, initalDb:1)
+                }
+            };
+
+            using (var clientsManager = sentinel.Setup())
+            using (var client = clientsManager.GetClient())
+            {
+                Assert.That(client.Db, Is.EqualTo(1));
+            }
+        }
 	}
 }

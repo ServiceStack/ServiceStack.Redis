@@ -26,8 +26,10 @@ namespace ServiceStack.Redis
             this.redisSentinel = redisSentinel;
             this.redisManager = redisSentinel.redisManager;
             this.sentinelName = sentinelName;
-            this.sentinelClient = new RedisClient(host);
-            this.sentinelPubSubClient = new RedisClient(host);
+
+            //Sentinel Servers doesn't support DB, reset to 0
+            this.sentinelClient = new RedisClient(host) { Db = 0 };
+            this.sentinelPubSubClient = new RedisClient(host) { Db = 0 };
             this.sentinelSubscription = this.sentinelPubSubClient.CreateSubscription();
             this.sentinelSubscription.OnMessage = SentinelMessageReceived;
 
