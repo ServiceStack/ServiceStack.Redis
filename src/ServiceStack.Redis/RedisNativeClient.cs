@@ -18,6 +18,7 @@ using System.Linq;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using ServiceStack.Logging;
 using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
@@ -58,10 +59,24 @@ namespace ServiceStack.Redis
         private IRedisPipelineShared pipeline;
 
         private Dictionary<string, string> info;
+
+        const int YES = 1;
+        const int NO = 0;
+
         /// <summary>
         /// Used to manage connection pooling
         /// </summary>
-        internal bool Active { get; set; }
+        private int active;
+        internal bool Active
+        {
+            get { return Interlocked.CompareExchange(ref active, 0, 0) == YES; }
+            set
+            {
+                var intValue = value ? YES : NO;
+                Interlocked.CompareExchange(ref active, intValue, active);
+            }
+        }
+
         internal IHandleClientDispose ClientManager { get; set; }
 
         internal long LastConnectedAtTimestamp;
