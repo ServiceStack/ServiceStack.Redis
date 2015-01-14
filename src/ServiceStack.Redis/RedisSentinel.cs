@@ -49,6 +49,18 @@ namespace ServiceStack.Redis
             return this.redisManager;
         }
 
+        public Func<string, string> HostFilter { get; set; }
+
+        internal string[] ConfigureHosts(IEnumerable<string> hosts)
+        {
+            if (hosts == null)
+                return new string[0];
+
+            return HostFilter == null
+                ? hosts.ToArray()
+                : hosts.Map(HostFilter).ToArray();
+        }
+
         private void GetValidSentinel()
         {
             while (this.redisManager == null && ShouldRetry())

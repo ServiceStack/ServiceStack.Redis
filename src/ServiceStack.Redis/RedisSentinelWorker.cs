@@ -82,11 +82,15 @@ namespace ServiceStack.Redis
 
             if (redisManager == null)
             {
-                redisManager = redisSentinel.RedisManagerFactory.Create(masters, slaves);
+                redisManager = redisSentinel.RedisManagerFactory.Create(
+                    redisSentinel.ConfigureHosts(masters), 
+                    redisSentinel.ConfigureHosts(slaves));
             }
             else
             {
-                ((IRedisFailover)redisManager).FailoverTo(masters, slaves);
+                ((IRedisFailover)redisManager).FailoverTo(
+                    redisSentinel.ConfigureHosts(masters),
+                    redisSentinel.ConfigureHosts(slaves));
             }
         }
 

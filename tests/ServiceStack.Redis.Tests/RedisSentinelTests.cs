@@ -101,13 +101,9 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_specify_db_on_RedisSentinel()
         {
-            var host = new[] {"{0}:{1}".Fmt(TestConfig.SentinelHost, TestConfig.RedisSentinelPort)};
-            var sentinel = new RedisSentinel(host, TestConfig.MasterName) {
-                RedisManagerFactory =
-                {
-                    FactoryFn = (writeHosts, readHosts) =>
-                        new PooledRedisClientManager(writeHosts, readHosts, initalDb:1)
-                }
+            var sentinelHosts = new[] {"{0}:{1}".Fmt(TestConfig.SentinelHost, TestConfig.RedisSentinelPort)};
+            var sentinel = new RedisSentinel(sentinelHosts, TestConfig.MasterName) {
+                HostFilter = host => "{0}?db=1".Fmt(host)
             };
 
             using (var clientsManager = sentinel.Setup())
