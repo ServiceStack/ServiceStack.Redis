@@ -45,11 +45,11 @@ namespace TestRedisConnection
 
         public void WorkerLoop()
         {
+            var redisCollection = new RedisCachedCollection<string, string>(
+                clientsManager, "Thread: " + Thread.CurrentThread.ManagedThreadId);
+
             while (Interlocked.CompareExchange(ref running, 0, 0) > 0)
             {
-                var redisCollection = new RedisCachedCollection<string, string>(
-                    clientsManager, "Thread: " + Thread.CurrentThread.ManagedThreadId);
-
                 redisCollection.ContainsKey("key");
                 Interlocked.Increment(ref readCount);
 
@@ -241,28 +241,18 @@ namespace TestRedisConnection
 
         private void RetryAction(Action<IRedisClient> action)
         {
-            int i = 0;
-            while (true)
+            try
             {
-                try
+                using (var redis = RedisConnection)
                 {
-                    using (var redis = RedisConnection)
-                    {
-                        action(redis);
-                        return;
-                    }
+                    action(redis);
+                    return;
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                    throw;
-
-                    //if (i++ < 3)
-                    //{
-                    //    continue;
-                    //}
-                    //throw;
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
             }
         }
 
