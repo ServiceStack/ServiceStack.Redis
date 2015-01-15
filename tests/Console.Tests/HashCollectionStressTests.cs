@@ -11,6 +11,8 @@ namespace TestRedisConnection
     public class HashCollectionStressTests
     {
         private IRedisClientsManager clientsManager;
+        private RedisCachedCollection<string, string> redisCollection;
+        
         private int running = 0;
         private long writeCount = 0;
         private long readCount = 0;
@@ -18,6 +20,9 @@ namespace TestRedisConnection
         public void Execute(string ipAddress, int noOfThreads = 64)
         {
             clientsManager = new PooledRedisClientManager(ipAddress);
+    
+            redisCollection = new RedisCachedCollection<string, string>(
+                clientsManager, "Threads: " + 64);
 
             var StartedAt = DateTime.UtcNow;
             Interlocked.Increment(ref running);
@@ -45,9 +50,6 @@ namespace TestRedisConnection
 
         public void WorkerLoop()
         {
-            var redisCollection = new RedisCachedCollection<string, string>(
-                clientsManager, "Thread: " + Thread.CurrentThread.ManagedThreadId);
-
             while (Interlocked.CompareExchange(ref running, 0, 0) > 0)
             {
                 redisCollection.ContainsKey("key");
