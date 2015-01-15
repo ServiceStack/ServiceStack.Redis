@@ -56,6 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HashCollectionStressTests.cs" />
     <Compile Include="HashStressTest.cs" />
     <Compile Include="LongRunningRedisPubSubServer.cs" />
     <Compile Include="Program.cs" />

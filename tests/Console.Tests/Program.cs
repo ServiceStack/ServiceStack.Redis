@@ -18,6 +18,7 @@
             //new HashStressTest().Execute("127.0.0.1");
             //new HashStressTest().Execute("10.0.0.9");
 
+            new HashCollectionStressTests().Execute("10.0.0.9", noOfThreads: 64);
         }
     }
 }
