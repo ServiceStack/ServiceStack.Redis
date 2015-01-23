@@ -83,6 +83,12 @@ namespace ServiceStack.Redis
             {
                 for (var i = 0; i < clients.Length; i++)
                 {
+                    var redis = clients[i];
+                    if (redis != null)
+                    {
+                        redis.DisposeConnection();
+                    }
+
                     clients[i] = null;
                 }
                 Hosts = readWriteHosts.ToRedisEndPoints();

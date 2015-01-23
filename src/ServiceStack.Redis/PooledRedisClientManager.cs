@@ -158,6 +158,12 @@ namespace ServiceStack.Redis
             {
                 for (var i = 0; i < readClients.Length; i++)
                 {
+                    var redis = readClients[i];
+                    if (redis != null)
+                    {
+                        redis.DisposeConnection();
+                    }
+
                     readClients[i] = null;
                 }
                 ReadOnlyHosts = readOnlyHosts.ToRedisEndPoints();
@@ -167,6 +173,12 @@ namespace ServiceStack.Redis
             {
                 for (var i = 0; i < writeClients.Length; i++)
                 {
+                    var redis = writeClients[i];
+                    if (redis != null)
+                    {
+                        redis.DisposeConnection();
+                    }
+
                     writeClients[i] = null;
                 }
                 ReadWriteHosts = readWriteHosts.ToRedisEndPoints();
