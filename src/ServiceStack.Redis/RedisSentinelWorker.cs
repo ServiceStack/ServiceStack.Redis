@@ -68,6 +68,11 @@ namespace ServiceStack.Redis
 
                 ConfigureRedisFromSentinel();
             }
+
+            if (redisSentinel.OnSentinelMessageReceived != null)
+            {
+                redisSentinel.OnSentinelMessageReceived(channel, message);
+            }
         }
 
         /// <summary>

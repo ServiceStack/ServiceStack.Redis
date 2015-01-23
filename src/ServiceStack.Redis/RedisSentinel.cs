@@ -9,11 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ServiceStack;
+using ServiceStack.Logging;
 
 namespace ServiceStack.Redis
 {
     public class RedisSentinel : IRedisSentinel
     {
+        protected static readonly ILog Log = LogManager.GetLogger(typeof(RedisSentinel));
+
         public RedisManagerFactory RedisManagerFactory { get; set; }
 
         private readonly string sentinelName;
@@ -24,6 +27,8 @@ namespace ServiceStack.Redis
         internal IRedisClientsManager redisManager;
         private static int MaxFailures = 5;
         public Action<IRedisClientsManager> OnFailover { get; set; }
+        public Action OnWorkerError { get; set; }
+        public Action<string,string> OnSentinelMessageReceived { get; set; }
 
         public RedisSentinel(IEnumerable<string> sentinelHosts, string sentinelName)
         {
@@ -131,6 +136,12 @@ namespace ServiceStack.Redis
 
             if (worker != null)
             {
+                Log.Info("Error on existing SentinelWorker, reconnecting...");
+                if (OnWorkerError != null)
+                {
+                    OnWorkerError();
+                }
+
                 // dispose the worker
                 worker.SentinelError -= Worker_SentinelError;
                 worker.Dispose();
