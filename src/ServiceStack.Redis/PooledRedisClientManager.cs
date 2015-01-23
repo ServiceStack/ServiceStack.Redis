@@ -369,7 +369,15 @@ namespace ServiceStack.Redis
                 {
                     var readClient = readClients[i];
                     if (client != readClient) continue;
-                    client.Active = false;
+                    if (client.IsDisposed)
+                    {
+                        readClients[i] = null;
+                    }
+                    else
+                    {
+                        client.Active = false;
+                    }
+
                     Monitor.PulseAll(readClients);
                     return;
                 }
@@ -381,7 +389,15 @@ namespace ServiceStack.Redis
                 {
                     var writeClient = writeClients[i];
                     if (client != writeClient) continue;
-                    client.Active = false;
+                    if (client.IsDisposed)
+                    {
+                        writeClients[i] = null;
+                    }
+                    else
+                    {
+                        client.Active = false;
+                    }
+
                     Monitor.PulseAll(writeClients);
                     return;
                 }

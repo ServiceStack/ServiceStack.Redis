@@ -206,7 +206,16 @@ namespace ServiceStack.Redis
                 {
                     var writeClient = clients[i];
                     if (client != writeClient) continue;
-                    client.Active = false;
+                    if (client.IsDisposed)
+                    {
+                        clients[i] = null;
+                    }
+                    else
+                    {
+                        client.Active = false;
+                    }
+
+                    Monitor.PulseAll(clients);
                     return;
                 }
             }
