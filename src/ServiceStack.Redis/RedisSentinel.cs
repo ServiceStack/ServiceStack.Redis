@@ -23,6 +23,7 @@ namespace ServiceStack.Redis
         private RedisSentinelWorker worker;
         internal IRedisClientsManager redisManager;
         private static int MaxFailures = 5;
+        public Action<IRedisClientsManager> OnFailover { get; set; }
 
         public RedisSentinel(IEnumerable<string> sentinelHosts, string sentinelName)
         {

@@ -86,6 +86,12 @@ namespace ServiceStack.Redis
                 redisManager = redisSentinel.RedisManagerFactory.Create(
                     redisSentinel.ConfigureHosts(sentinelInfo.RedisMasters),
                     redisSentinel.ConfigureHosts(sentinelInfo.RedisSlaves));
+
+                var canFailover = redisManager as IRedisFailover;
+                if (canFailover != null && this.redisSentinel.OnFailover != null)
+                {
+                    canFailover.OnFailover.Add(this.redisSentinel.OnFailover);
+                }
             }
             else
             {
