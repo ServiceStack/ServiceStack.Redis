@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ServiceStack;
 
 namespace ServiceStack.Redis
 {
@@ -61,8 +62,13 @@ namespace ServiceStack.Redis
                 : hosts.Map(HostFilter).ToArray();
         }
 
-        private void GetValidSentinel()
+        private RedisSentinelWorker GetValidSentinel()
         {
+            if (this.worker != null)
+                return this.worker;
+
+            RedisException lastEx = null;
+
             while (this.redisManager == null && ShouldRetry())
             {
                 try
@@ -70,9 +76,11 @@ namespace ServiceStack.Redis
                     this.worker = GetNextSentinel();
                     this.redisManager = worker.GetClientManager();
                     this.worker.BeginListeningForConfigurationChanges();
+                    return this.worker;
                 }
-                catch (RedisException)
+                catch (RedisException ex)
                 {
+                    lastEx = ex;
                     if (this.worker != null)
                     {
                         this.worker.SentinelError -= Worker_SentinelError;
@@ -82,6 +90,8 @@ namespace ServiceStack.Redis
                     this.failures++;
                 }
             }
+
+            throw new RedisException("RedisSentinel is not accessible", lastEx);
         }
 
         /// <summary>
@@ -130,6 +140,12 @@ namespace ServiceStack.Redis
             }
         }
 
+        public SentinelInfo FailoverToSentinelHosts()
+        {
+            var worker = GetValidSentinel();
+            return worker.ConfigureRedisFromSentinel();            
+        }
+
         public void Dispose()
         {
             if (worker != null)
@@ -139,5 +155,22 @@ namespace ServiceStack.Redis
                 worker = null;
             }
         }
+    }
+}
+
+public class SentinelInfo
+{
+    public string[] RedisMasters { get; set; }
+    public string[] RedisSlaves { get; set; }
+
+    public SentinelInfo(List<string> redisMasters, List<string> redisSlaves)
+    {
+        RedisMasters = redisMasters != null ? redisMasters.ToArray() : new string[0];
+        RedisSlaves = redisSlaves != null ? RedisSlaves.ToArray() : new string[0];
+    }
+
+    public override string ToString()
+    {
+        return "masters: {0}, slaves: {1}".Fmt(RedisMasters, RedisSlaves);
     }
 }

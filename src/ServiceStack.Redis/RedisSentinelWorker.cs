@@ -73,25 +73,30 @@ namespace ServiceStack.Redis
         /// <summary>
         /// Does a sentinel check for masters and slaves and either sets up or fails over to the new config
         /// </summary>
-        private void ConfigureRedisFromSentinel()
+        internal SentinelInfo ConfigureRedisFromSentinel()
         {
-            Log.Info("Configuring Redis Clients");
-
-            var masters = ConvertMasterArrayToList(this.sentinelClient.Sentinel("master", this.sentinelName));
-            var slaves = ConvertSlaveArrayToList(this.sentinelClient.Sentinel("slaves", this.sentinelName));
+            var sentinelInfo = new SentinelInfo(
+                ConvertMasterArrayToList(this.sentinelClient.Sentinel("master", this.sentinelName)),
+                ConvertSlaveArrayToList(this.sentinelClient.Sentinel("slaves", this.sentinelName)));
 
             if (redisManager == null)
             {
+                Log.Info("Configuring initial Redis Clients: {0}".Fmt(sentinelInfo));
+
                 redisManager = redisSentinel.RedisManagerFactory.Create(
-                    redisSentinel.ConfigureHosts(masters), 
-                    redisSentinel.ConfigureHosts(slaves));
+                    redisSentinel.ConfigureHosts(sentinelInfo.RedisMasters),
+                    redisSentinel.ConfigureHosts(sentinelInfo.RedisSlaves));
             }
             else
             {
+                Log.Info("Failing over to Redis Clients: {0}".Fmt(sentinelInfo));
+
                 ((IRedisFailover)redisManager).FailoverTo(
-                    redisSentinel.ConfigureHosts(masters),
-                    redisSentinel.ConfigureHosts(slaves));
+                    redisSentinel.ConfigureHosts(sentinelInfo.RedisMasters),
+                    redisSentinel.ConfigureHosts(sentinelInfo.RedisSlaves));
             }
+
+            return sentinelInfo;
         }
 
         private Dictionary<string, string> ParseDataArray(object[] items)
