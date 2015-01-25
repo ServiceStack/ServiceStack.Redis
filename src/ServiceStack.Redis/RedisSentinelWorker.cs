@@ -19,12 +19,13 @@ namespace ServiceStack.Redis
         private string host;
         private IRedisClientsManager redisManager;
 
-        public event EventHandler SentinelError;
+        public Action<Exception> OnSentinelError;
 
         public RedisSentinelWorker(RedisSentinel redisSentinel, string host, string sentinelName)
         {
+
             this.redisSentinel = redisSentinel;
-            this.redisManager = redisSentinel.redisManager;
+            this.redisManager = redisSentinel.RedisManager;
             this.sentinelName = sentinelName;
 
             //Sentinel Servers doesn't support DB, reset to 0
@@ -33,7 +34,8 @@ namespace ServiceStack.Redis
             this.sentinelSubscription = this.sentinelPubSubClient.CreateSubscription();
             this.sentinelSubscription.OnMessage = SentinelMessageReceived;
 
-            Log.Info("Set up Redis Sentinel on {0}".Fmt(host));
+            if (Log.IsDebugEnabled)
+                Log.Debug("Set up Redis Sentinel on {0}".Fmt(host));
         }
 
         private void SubscribeForChanges(object arg)
@@ -43,14 +45,13 @@ namespace ServiceStack.Redis
                 // subscribe to all messages
                 this.sentinelSubscription.SubscribeToChannelsMatching("*");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Log.Error("Problem Subscribing to Redis Channel on {0}:{1}".Fmt(this.sentinelClient.Host, this.sentinelClient.Port));
-                // problem communicating to sentinel
-                if (SentinelError != null)
-                {
-                    SentinelError(this, EventArgs.Empty);
-                }
+                Log.Error("Error Subscribing to Redis Channel on {0}:{1}"
+                    .Fmt(this.sentinelClient.Host, this.sentinelClient.Port), ex);
+
+                if (OnSentinelError != null)
+                    OnSentinelError(ex);
             }
         }
 
@@ -61,6 +62,9 @@ namespace ServiceStack.Redis
         /// <param name="message"></param>
         private void SentinelMessageReceived(string channel, string message)
         {
+            if (Log.IsDebugEnabled)
+                Log.Debug("Received '{0}' on channel '{1}' from Sentinel".Fmt(channel, message));
+
             // {+|-}sdown is the event for server coming up or down
             if (channel.ToLower().Contains("sdown"))
             {
@@ -70,9 +74,7 @@ namespace ServiceStack.Redis
             }
 
             if (redisSentinel.OnSentinelMessageReceived != null)
-            {
                 redisSentinel.OnSentinelMessageReceived(channel, message);
-            }
         }
 
         /// <summary>
