@@ -785,7 +785,7 @@ namespace ServiceStack.Redis
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        internal string UrnKey<T>(T value)
+        public string UrnKey<T>(T value)
         {
             return String.Concat(NamespacePrefix, value.CreateUrn());
         }
@@ -795,7 +795,7 @@ namespace ServiceStack.Redis
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        internal string UrnKey<T>(object id)
+        public string UrnKey<T>(object id)
         {
             return String.Concat(NamespacePrefix, IdUtils.CreateUrn<T>(id));
         }
@@ -806,7 +806,7 @@ namespace ServiceStack.Redis
         /// <param name="type"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        internal string UrnKey(Type type, object id)
+        public string UrnKey(Type type, object id)
         {
             return String.Concat(NamespacePrefix, IdUtils.CreateUrn(type, id));
         }
