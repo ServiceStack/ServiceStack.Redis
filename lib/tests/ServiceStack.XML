@@ -333,6 +333,177 @@
             </summary>
             <returns></returns>
         </member>
+        <!-- Badly formed XML comment ignored for member "T:ServiceStack.Html.HtmlCompressor" -->
+        <member name="F:ServiceStack.Html.HtmlCompressor.PHP_TAG_PATTERN">
+            Predefined pattern that matches <code>&lt;?php ... ?></code> tags. 
+            Could be passed inside a list to {@link #setPreservePatterns(List) setPreservePatterns} method.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.SERVER_SCRIPT_TAG_PATTERN">
+            Predefined pattern that matches <code>&lt;% ... %></code> tags. 
+            Could be passed inside a list to {@link #setPreservePatterns(List) setPreservePatterns} method.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.SERVER_SIDE_INCLUDE_PATTERN">
+            Predefined pattern that matches <code>&lt;--# ... --></code> tags. 
+            Could be passed inside a list to {@link #setPreservePatterns(List) setPreservePatterns} method.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.BLOCK_TAGS_MIN">
+            Predefined list of tags that are very likely to be block-level. 
+            Could be passed to {@link #setRemoveSurroundingSpaces(string) setRemoveSurroundingSpaces} method.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.BLOCK_TAGS_MAX">
+            Predefined list of tags that are block-level by default, excluding <code>&lt;div></code> and <code>&lt;li></code> tags. 
+            Table tags are also included.
+            Could be passed to {@link #setRemoveSurroundingSpaces(string) setRemoveSurroundingSpaces} method.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.ALL_TAGS">
+            Could be passed to {@link #setRemoveSurroundingSpaces(string) setRemoveSurroundingSpaces} method 
+            to remove all surrounding spaces (not recommended).
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.Enabled">
+            If set to <code>false</code> all compression will be bypassed. Might be useful for testing purposes. 
+            Default is <code>true</code>.
+            
+            @param enabled set <code>false</code> to bypass all compression
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.JavaScriptCompressor">
+            Gets or Sets JavaScript compressor implementation that will be used 
+            to compress inline JavaScript in HTML. 
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.CssCompressor">
+            Returns CSS compressor implementation that will be used 
+            to compress inline CSS in HTML.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveComments">
+            If set to <code>true</code> all HTML comments will be removed.   
+            Default is <code>true</code>.
+            
+            @param removeComments set <code>true</code> to remove all HTML comments
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveMultiSpaces">
+            If set to <code>true</code> all multiple whitespace characters will be replaced with single spaces.
+            Default is <code>true</code>.
+            
+            @param removeMultiSpaces set <code>true</code> to replace all multiple whitespace characters 
+            will single spaces.
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveIntertagSpaces" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveQuotes" -->
+        <member name="F:ServiceStack.Html.HtmlCompressor.CompressJavaScript">
+            Enables JavaScript compression within &lt;script> tags 
+            if set to <code>true</code>. Default is <code>false</code> for performance reasons.
+             
+            <p><b>Note:</b> Compressing JavaScript is not recommended if pages are 
+            compressed dynamically on-the-fly because of performance impact. 
+            You should consider putting JavaScript into a separate file and
+            compressing it using standalone YUICompressor for example.</p>
+            
+            @param compressJavaScript set <code>true</code> to enable JavaScript compression. 
+            Default is <code>false</code>
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.CompressCss">
+            Enables CSS compression within &lt;style> tags using 
+            <a href="http://developer.yahoo.com/yui/compressor/">Yahoo YUI ICompressor</a> 
+            if set to <code>true</code>. Default is <code>false</code> for performance reasons.
+             
+            <p><b>Note:</b> Compressing CSS is not recommended if pages are 
+            compressed dynamically on-the-fly because of performance impact. 
+            You should consider putting CSS into a separate file and
+            compressing it using standalone YUICompressor for example.</p>
+            
+            @param compressCss set <code>true</code> to enable CSS compression. 
+            Default is <code>false</code>
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.SimpleDoctype">
+            If set to <code>true</code>, existing DOCTYPE declaration will be replaced with simple <code>&lt;!DOCTYPE html></code> declaration.
+            Default is <code>false</code>.
+            
+            @param simpleDoctype set <code>true</code> to replace existing DOCTYPE declaration with <code>&lt;!DOCTYPE html></code>
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveScriptAttributes" -->
+        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveStyleAttributes">
+            If set to <code>true</code>, <code>type="text/style"</code> attributes will be removed from <code>&lt;style></code> tags. Default is <code>false</code>.
+            
+            @param removeStyleAttributes set <code>true</code> to remove <code>type="text/style"</code> attributes from <code>&lt;style></code> tags
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveLinkAttributes" -->
+        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveFormAttributes">
+            If set to <code>true</code>, <code>method="get"</code> attributes will be removed from <code>&lt;form></code> tags. Default is <code>false</code>.
+            
+            @param removeFormAttributes set <code>true</code> to remove <code>method="get"</code> attributes from <code>&lt;form></code> tags
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveInputAttributes">
+            If set to <code>true</code>, <code>type="text"</code> attributes will be removed from <code>&lt;input></code> tags. Default is <code>false</code>.
+            
+            @param removeInputAttributes set <code>true</code> to remove <code>type="text"</code> attributes from <code>&lt;input></code> tags
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.SimpleBooleanAttributes" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveJavaScriptProtocol" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveHttpProtocol" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveHttpsProtocol" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveSurroundingSpaces" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.PreservePatterns" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.GenerateStatistics" -->
+        <member name="F:ServiceStack.Html.HtmlCompressor.Statistics">
+            Returns {@link HtmlCompressorStatistics} object containing statistics of the last HTML compression, if enabled. 
+            Should be called after {@link #compress(string)}
+            
+            @return {@link HtmlCompressorStatistics} object containing last HTML compression statistics
+            
+            @see HtmlCompressorStatistics
+            @see #setGenerateStatistics(bool)
+        </member>
+        <member name="M:ServiceStack.Html.HtmlCompressor.Compress(System.String)">
+            The main method that compresses given HTML source and returns compressed
+            result.
+            
+            @param html HTML content to compress
+            @return compressed content.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressorStatistics.OriginalMetrics">
+            Returns metrics of an uncompressed document
+            
+            @return metrics of an uncompressed document
+            @see HtmlMetrics
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressorStatistics.CompressedMetrics">
+            Returns metrics of a compressed document
+            
+            @return metrics of a compressed document
+            @see HtmlMetrics
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressorStatistics.Time" -->
+        <member name="F:ServiceStack.Html.HtmlCompressorStatistics.PreservedSize">
+            Returns total size of blocks that were skipped by the compressor 
+            (for example content inside <code>&lt;pre></code> tags or inside   
+            <code>&lt;script></code> tags with disabled javascript compression)
+            
+            @return the total size of blocks that were skipped by the compressor, in bytes
+        </member>
+        <member name="F:ServiceStack.Html.HtmlMetrics.Filesize">
+            Returns total filesize of a document
+            
+            @return total filesize of a document, in bytes
+        </member>
+        <member name="F:ServiceStack.Html.HtmlMetrics.EmptyChars">
+            Returns number of empty characters (spaces, tabs, end of lines) in a document
+            
+            @return number of empty characters in a document
+        </member>
+        <member name="F:ServiceStack.Html.HtmlMetrics.InlineScriptSize">
+            Returns total size of inline <code>&lt;script></code> tags
+            
+            @return total size of inline <code>&lt;script></code> tags, in bytes
+        </member>
+        <member name="F:ServiceStack.Html.HtmlMetrics.InlineStyleSize">
+            Returns total size of inline <code>&lt;style></code> tags
+            
+            @return total size of inline <code>&lt;style></code> tags, in bytes
+        </member>
+        <member name="F:ServiceStack.Html.HtmlMetrics.InlineEventSize">
+            Returns total size of inline event handlers (<code>onclick</code>, etc)
+            
+            @return total size of inline event handlers, in bytes
+        </member>
         <member name="M:ServiceStack.ServiceStackProvider.SessionAs``1">
             <summary>
             Typed UserSession
