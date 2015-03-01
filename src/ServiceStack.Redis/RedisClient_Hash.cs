@@ -126,15 +126,7 @@ namespace ServiceStack.Redis
 		public Dictionary<string, string> GetAllEntriesFromHash(string hashId)
 		{
 			var multiDataList = base.HGetAll(hashId);
-			var map = new Dictionary<string, string>();
-
-			for (var i = 0; i < multiDataList.Length; i += 2)
-			{
-				var key = multiDataList[i].FromUtf8Bytes();
-				map[key] = multiDataList[i + 1].FromUtf8Bytes();
-			}
-
-			return map;
+            return multiDataList.ToStringDictionary();
 		}
 
 		public List<string> GetValuesFromHash(string hashId, params string[] keys)

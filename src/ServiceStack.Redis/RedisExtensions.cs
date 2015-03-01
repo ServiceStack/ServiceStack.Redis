@@ -143,6 +143,22 @@ namespace ServiceStack.Redis
             return results;
         }
 
+        public static Dictionary<string, string> ToStringDictionary(this byte[][] multiDataList)
+        {
+            if (multiDataList == null)
+                return new Dictionary<string, string>();
+
+            var map = new Dictionary<string, string>();
+
+            for (var i = 0; i < multiDataList.Length; i += 2)
+            {
+                var key = multiDataList[i].FromUtf8Bytes();
+                map[key] = multiDataList[i + 1].FromUtf8Bytes();
+            }
+
+            return map;
+        }
+
         private static readonly NumberFormatInfo DoubleFormatProvider = new NumberFormatInfo
         {
             PositiveInfinitySymbol = "+inf",
