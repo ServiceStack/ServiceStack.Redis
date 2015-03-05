@@ -716,6 +716,12 @@
             </summary>
             <param name="instance"></param>
         </member>
+        <member name="M:ServiceStack.RequestContext.ReleaseDisposables">
+            <summary>
+            Release currently registered dependencies for this request
+            </summary>
+            <returns>true if any dependencies were released</returns>
+        </member>
         <member name="P:ServiceStack.RequestContext.Items">
             <summary>
             Gets a list of items for this request. 
