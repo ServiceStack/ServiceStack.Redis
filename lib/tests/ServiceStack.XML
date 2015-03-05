@@ -66,7 +66,7 @@
             Calls directly after services and filters are executed.
             </summary>
         </member>
-        <member name="M:ServiceStack.IAppHost.OnEndRequest">
+        <member name="M:ServiceStack.IAppHost.OnEndRequest(ServiceStack.Web.IRequest)">
             <summary>
             Called at the end of each request. Enables Request Scope.
             </summary>
@@ -8420,7 +8420,7 @@
             </summary>
             <param name="defaultFilePath"></param>
         </member>
-        <member name="M:ServiceStack.HostContext.CompleteRequest">
+        <member name="M:ServiceStack.HostContext.CompleteRequest(ServiceStack.Web.IRequest)">
             <summary>
             Call to signal the completion of a ServiceStack-handled Request
             </summary>
