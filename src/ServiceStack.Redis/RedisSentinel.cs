@@ -50,17 +50,35 @@ namespace ServiceStack.Redis
             return Start();
         }
 
+        [Obsolete("Use Start()")]
+        public IRedisClientsManager Setup(int initialDb, int? poolSizeMultiplier, int? poolTimeOutSeconds)
+        {
+            return Start(initialDb, poolSizeMultiplier, poolTimeOutSeconds);
+        }
+
         /// <summary>
         /// Initialize Sentinel Subscription and Configure Redis ClientsManager
         /// </summary>
         public IRedisClientsManager Start()
         {
-            GetValidSentinel();
+            GetValidSentinel(null, null, null);
 
             if (this.RedisManager == null)
                 throw new ApplicationException("Unable to resolve sentinels!");
 
             return this.RedisManager;
+        }
+
+        public IRedisClientsManager Start(int initialDb, int? poolSizeMultiplier, int? poolTimeOutSeconds)
+        {
+            GetValidSentinel(initialDb, poolSizeMultiplier, poolTimeOutSeconds);
+
+            if (this.redisManager == null)
+            {
+                throw new ApplicationException("Unable to resolve sentinels!");
+            }
+
+            return this.redisManager;
         }
 
         public Func<string, string> HostFilter { get; set; }
@@ -75,7 +93,7 @@ namespace ServiceStack.Redis
                 : hosts.Map(HostFilter).ToArray();
         }
 
-        private RedisSentinelWorker GetValidSentinel()
+	private RedisSentinelWorker GetValidSentinel(int? initialDb, int? poolSizeMultiplier, int? poolTimeOutSeconds)
         {
             if (this.worker != null)
                 return this.worker;
@@ -87,7 +105,12 @@ namespace ServiceStack.Redis
                 try
                 {
                     this.worker = GetNextSentinel();
-                    this.RedisManager = worker.GetClientManager();
+
+		    if (initialDb == null)
+                    	this.RedisManager = worker.GetClientManager();
+		    else
+			this.redisManager = worker.GetClientManager(initialDb.Value, poolSizeMultiplier, poolTimeOutSeconds);
+
                     this.worker.BeginListeningForConfigurationChanges();
                     return this.worker;
                 }

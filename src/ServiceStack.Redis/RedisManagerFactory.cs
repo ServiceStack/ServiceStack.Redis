@@ -48,5 +48,15 @@ namespace ServiceStack.Redis
 
             return redisManager;
         }
+
+        public IRedisClientsManager CreatePooledRedisClientManager(
+            IEnumerable<string> readWriteHosts,
+            IEnumerable<string> readOnlyHosts,
+            int initialDb,
+            int? poolSizeMultiplier,
+            int? poolTimeOutSeconds)
+        {
+                return new PooledRedisClientManager(readWriteHosts, readOnlyHosts, null, initialDb, poolSizeMultiplier, poolTimeOutSeconds);
+        }
     }
 }
