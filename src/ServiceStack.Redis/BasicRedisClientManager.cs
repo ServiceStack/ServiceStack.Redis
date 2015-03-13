@@ -107,6 +107,9 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         public virtual IRedisClient GetReadOnlyClient()
         {
+            if (ReadOnlyHosts.Count == 0)
+                return this.GetClient();
+
             var nextHost = ReadOnlyHosts[readOnlyHostsIndex++ % ReadOnlyHosts.Count];
             var client = InitNewClient(nextHost);
             return client;
