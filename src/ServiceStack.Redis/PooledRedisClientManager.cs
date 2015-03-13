@@ -303,6 +303,9 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         public virtual IRedisClient GetReadOnlyClient()
         {
+            if (ReadOnlyHosts.Count == 0)
+                return this.GetClient();
+
             lock (readClients)
             {
                 AssertValidReadOnlyPool();

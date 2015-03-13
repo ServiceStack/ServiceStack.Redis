@@ -187,9 +187,19 @@ namespace ServiceStack.Redis.Generic
             return client.StoreIntersectFromSortedSets(this, setIds);
         }
 
+        public long PopulateWithIntersectOf(IRedisSortedSet<T>[] setIds, string[] args)
+        {
+            return client.StoreIntersectFromSortedSets(this, setIds, args);
+        }
+
         public long PopulateWithUnionOf(params IRedisSortedSet<T>[] setIds)
         {
             return client.StoreUnionFromSortedSets(this, setIds);
+        }
+
+        public long PopulateWithUnionOf(IRedisSortedSet<T>[] setIds, string[] args)
+        {
+            return client.StoreUnionFromSortedSets(this, setIds, args);
         }
     }
 }
