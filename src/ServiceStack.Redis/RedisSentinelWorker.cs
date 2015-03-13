@@ -19,10 +19,6 @@ namespace ServiceStack.Redis
         private string host;
         private IRedisClientsManager redisManager;
 
-        private int? initialDb;
-        private int? poolSizeMultiplier;
-        private int? poolTimeOutSeconds;
-
         public Action<Exception> OnSentinelError;
 
         public RedisSentinelWorker(RedisSentinel redisSentinel, string host, string sentinelName)
@@ -69,10 +65,8 @@ namespace ServiceStack.Redis
             if (Log.IsDebugEnabled)
                 Log.Debug("Received '{0}' on channel '{1}' from Sentinel".Fmt(channel, message));
 
-	    // +failover-end is the event for a failover completing (it's necessary to also catch 
-	    //      this one to handle command line fail-over requests where neither server is ever "down"
             // {+|-}sdown is the event for server coming up or down
-	    if ((channel == "+failover-end") || (channel.ToLower().Contains("sdown")))
+            if (channel.ToLower().Contains("sdown"))
             {
                 Log.Info("Sentinel detected server down/up with message:{0}".Fmt(message));
 
@@ -96,23 +90,9 @@ namespace ServiceStack.Redis
             {
                 Log.Info("Configuring initial Redis Clients: {0}".Fmt(sentinelInfo));
 
-		if (this.initialDb == null)
-		{
-	                redisManager = redisSentinel.RedisManagerFactory.Create(
-				redisSentinel.ConfigureHosts(sentinelInfo.RedisMasters),
-				redisSentinel.ConfigureHosts(sentinelInfo.RedisSlaves)
-			);
-		}
-		else
-		{
-			redisManager = redisSentinel.RedisManagerFactory.CreatePooledRedisClientManager(
-				redisSentinel.ConfigureHosts(sentinelInfo.RedisMasters), 
-				redisSentinel.ConfigureHosts(sentinelInfo.RedisSlaves), 
-				this.initialDb.Value, 
-				this.poolSizeMultiplier, 
-				this.poolTimeOutSeconds
-			);
-		}
+                redisManager = redisSentinel.RedisManagerFactory.Create(
+                    redisSentinel.ConfigureHosts(sentinelInfo.RedisMasters),
+                    redisSentinel.ConfigureHosts(sentinelInfo.RedisSlaves));
 
                 var canFailover = redisManager as IRedisFailover;
                 if (canFailover != null && this.redisSentinel.OnFailover != null)
@@ -224,17 +204,6 @@ namespace ServiceStack.Redis
 
         public IRedisClientsManager GetClientManager()
         {
-            ConfigureRedisFromSentinel();
-
-            return this.redisManager;
-        }
-
-        public IRedisClientsManager GetClientManager(int initialDb, int? poolSizeMultiplier, int? poolTimeOutSeconds)
-        {
-            this.initialDb = initialDb;
-            this.poolSizeMultiplier = poolSizeMultiplier;
-            this.poolTimeOutSeconds = poolTimeOutSeconds;
-
             ConfigureRedisFromSentinel();
 
             return this.redisManager;
