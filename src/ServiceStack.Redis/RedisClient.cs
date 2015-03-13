@@ -95,7 +95,7 @@ namespace ServiceStack.Redis
             set { SetEntry(key, value); }
         }
 
-        public override void OnConnected() {}
+        public override void OnConnected() { }
 
         public RedisText Custom(params object[] cmdWithArgs)
         {
@@ -167,7 +167,7 @@ namespace ServiceStack.Redis
         {
             var bytesValue = value != null ? value.ToUtf8Bytes() : null;
 
-            return base.Set(key, bytesValue, exists:true);
+            return base.Set(key, bytesValue, exists: true);
         }
 
         public bool SetEntryIfExists(string key, string value, TimeSpan expireIn)
@@ -175,9 +175,9 @@ namespace ServiceStack.Redis
             var bytesValue = value != null ? value.ToUtf8Bytes() : null;
 
             if (expireIn.Milliseconds > 0)
-                return base.Set(key, bytesValue, exists:true, expiryMs:(long)expireIn.TotalMilliseconds);
+                return base.Set(key, bytesValue, exists: true, expiryMs: (long)expireIn.TotalMilliseconds);
             else
-                return base.Set(key, bytesValue, exists:true, expirySeconds:(int)expireIn.TotalSeconds);
+                return base.Set(key, bytesValue, exists: true, expirySeconds: (int)expireIn.TotalSeconds);
         }
 
         public bool SetEntryIfNotExists(string key, string value)
@@ -302,7 +302,7 @@ namespace ServiceStack.Redis
         {
             return IncrBy(key, count);
         }
-        
+
         public double IncrementValueBy(string key, double count)
         {
             return IncrByFloat(key, count);
@@ -342,7 +342,7 @@ namespace ServiceStack.Redis
                     return PExpire(key, (long)expireIn.TotalMilliseconds);
                 }
             }
- 
+
             return Expire(key, (int)expireIn.TotalSeconds);
         }
 
@@ -923,7 +923,7 @@ namespace ServiceStack.Redis
             RemoveByPattern(pattern.Replace(".*", "*").Replace(".+", "?"));
         }
 
-        public IEnumerable<string> ScanAllKeys(string pattern = null, int pageSize=1000)
+        public IEnumerable<string> ScanAllKeys(string pattern = null, int pageSize = 1000)
         {
             var ret = new ScanResult();
             while (true)
@@ -999,12 +999,12 @@ namespace ServiceStack.Redis
         {
             return base.PfAdd(key, elements.Map(x => x.ToUtf8Bytes()).ToArray());
         }
-        
+
         public long CountHyperLog(string key)
         {
             return base.PfCount(key);
         }
-        
+
         public void MergeHyperLogs(string toKey, params string[] fromKeys)
         {
             base.PfMerge(toKey, fromKeys);

@@ -18,70 +18,70 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
-	public partial class RedisClient
-		: IRedisClient
-	{
-		public IHasNamed<IRedisHash> Hashes { get; set; }
+    public partial class RedisClient
+        : IRedisClient
+    {
+        public IHasNamed<IRedisHash> Hashes { get; set; }
 
-		internal class RedisClientHashes
-			: IHasNamed<IRedisHash>
-		{
-			private readonly RedisClient client;
+        internal class RedisClientHashes
+            : IHasNamed<IRedisHash>
+        {
+            private readonly RedisClient client;
 
-			public RedisClientHashes(RedisClient client)
-			{
-				this.client = client;
-			}
+            public RedisClientHashes(RedisClient client)
+            {
+                this.client = client;
+            }
 
-			public IRedisHash this[string hashId]
-			{
-				get
-				{
-					return new RedisClientHash(client, hashId);
-				}
-				set
-				{
-					var hash = this[hashId];
-					hash.Clear();
-					hash.CopyTo(value.ToArray(), 0);
-				}
-			}
-		}
+            public IRedisHash this[string hashId]
+            {
+                get
+                {
+                    return new RedisClientHash(client, hashId);
+                }
+                set
+                {
+                    var hash = this[hashId];
+                    hash.Clear();
+                    hash.CopyTo(value.ToArray(), 0);
+                }
+            }
+        }
 
-		public bool SetEntryInHash(string hashId, string key, string value)
-		{
-			return base.HSet(hashId, key.ToUtf8Bytes(), value.ToUtf8Bytes()) == Success;
-		}
+        public bool SetEntryInHash(string hashId, string key, string value)
+        {
+            return base.HSet(hashId, key.ToUtf8Bytes(), value.ToUtf8Bytes()) == Success;
+        }
 
-		public bool SetEntryInHashIfNotExists(string hashId, string key, string value)
-		{
-			return base.HSetNX(hashId, key.ToUtf8Bytes(), value.ToUtf8Bytes()) == Success;
-		}
+        public bool SetEntryInHashIfNotExists(string hashId, string key, string value)
+        {
+            return base.HSetNX(hashId, key.ToUtf8Bytes(), value.ToUtf8Bytes()) == Success;
+        }
 
-		public void SetRangeInHash(string hashId, IEnumerable<KeyValuePair<string, string>> keyValuePairs)
-		{
-			var keyValuePairsList = keyValuePairs.ToList();
-			if (keyValuePairsList.Count == 0) return;
+        public void SetRangeInHash(string hashId, IEnumerable<KeyValuePair<string, string>> keyValuePairs)
+        {
+            var keyValuePairsList = keyValuePairs.ToList();
+            if (keyValuePairsList.Count == 0) return;
 
-			var keys = new byte[keyValuePairsList.Count][];
-			var values = new byte[keyValuePairsList.Count][];
+            var keys = new byte[keyValuePairsList.Count][];
+            var values = new byte[keyValuePairsList.Count][];
 
-			for (var i = 0; i < keyValuePairsList.Count; i++)
-			{
-				var kvp = keyValuePairsList[i];
-				keys[i] = kvp.Key.ToUtf8Bytes();
-				values[i] = kvp.Value.ToUtf8Bytes();
-			}
+            for (var i = 0; i < keyValuePairsList.Count; i++)
+            {
+                var kvp = keyValuePairsList[i];
+                keys[i] = kvp.Key.ToUtf8Bytes();
+                values[i] = kvp.Value.ToUtf8Bytes();
+            }
 
-			base.HMSet(hashId, keys, values);
-		}
+            base.HMSet(hashId, keys, values);
+        }
 
-		public long IncrementValueInHash(string hashId, string key, int incrementBy)
+        public long IncrementValueInHash(string hashId, string key, int incrementBy)
         {
             return base.HIncrby(hashId, key.ToUtf8Bytes(), incrementBy);
         }
 
-		public long IncrementValueInHash(string hashId, string key, long incrementBy)
+        public long IncrementValueInHash(string hashId, string key, long incrementBy)
         {
             return base.HIncrby(hashId, key.ToUtf8Bytes(), incrementBy);
         }
@@ -92,49 +92,49 @@ namespace ServiceStack.Redis
         }
 
         public string GetValueFromHash(string hashId, string key)
-		{
-			return base.HGet(hashId, key.ToUtf8Bytes()).FromUtf8Bytes();
-		}
+        {
+            return base.HGet(hashId, key.ToUtf8Bytes()).FromUtf8Bytes();
+        }
 
-		public bool HashContainsEntry(string hashId, string key)
-		{
-			return base.HExists(hashId, key.ToUtf8Bytes()) == Success;
-		}
+        public bool HashContainsEntry(string hashId, string key)
+        {
+            return base.HExists(hashId, key.ToUtf8Bytes()) == Success;
+        }
 
-		public bool RemoveEntryFromHash(string hashId, string key)
-		{
-			return base.HDel(hashId, key.ToUtf8Bytes()) == Success;
-		}
+        public bool RemoveEntryFromHash(string hashId, string key)
+        {
+            return base.HDel(hashId, key.ToUtf8Bytes()) == Success;
+        }
 
-		public long GetHashCount(string hashId)
-		{
-			return base.HLen(hashId);
-		}
+        public long GetHashCount(string hashId)
+        {
+            return base.HLen(hashId);
+        }
 
-		public List<string> GetHashKeys(string hashId)
-		{
-			var multiDataList = base.HKeys(hashId);
-			return multiDataList.ToStringList();
-		}
+        public List<string> GetHashKeys(string hashId)
+        {
+            var multiDataList = base.HKeys(hashId);
+            return multiDataList.ToStringList();
+        }
 
-		public List<string> GetHashValues(string hashId)
-		{
-			var multiDataList = base.HVals(hashId);
-			return multiDataList.ToStringList();
-		}
+        public List<string> GetHashValues(string hashId)
+        {
+            var multiDataList = base.HVals(hashId);
+            return multiDataList.ToStringList();
+        }
 
-		public Dictionary<string, string> GetAllEntriesFromHash(string hashId)
-		{
-			var multiDataList = base.HGetAll(hashId);
+        public Dictionary<string, string> GetAllEntriesFromHash(string hashId)
+        {
+            var multiDataList = base.HGetAll(hashId);
             return multiDataList.ToStringDictionary();
-		}
+        }
 
-		public List<string> GetValuesFromHash(string hashId, params string[] keys)
-		{
-			if (keys.Length == 0) return new List<string>();
-			var keyBytes = ConvertToBytes(keys);
-			var multiDataList = base.HMGet(hashId, keyBytes);
-			return multiDataList.ToStringList();
-		}
-	}
+        public List<string> GetValuesFromHash(string hashId, params string[] keys)
+        {
+            if (keys.Length == 0) return new List<string>();
+            var keyBytes = ConvertToBytes(keys);
+            var multiDataList = base.HMGet(hashId, keyBytes);
+            return multiDataList.ToStringList();
+        }
+    }
 }
