@@ -1759,6 +1759,17 @@ namespace ServiceStack.Redis
             return SendExpectLong(cmdWithArgs);
         }
 
+        public long ZUnionStore(string intoSetId, string[] setIds, string[] args)
+        {
+            var totalArgs = new List<string>(setIds);
+            totalArgs.Insert(0, setIds.Length.ToString());
+            totalArgs.Insert(0, intoSetId);
+            totalArgs.AddRange(args);
+
+            var cmdWithArgs = MergeCommandWithArgs(Commands.ZUnionStore, totalArgs.ToArray());
+            return SendExpectLong(cmdWithArgs);
+        }
+
         public long ZInterStore(string intoSetId, params string[] setIds)
         {
             var setIdsList = new List<string>(setIds);
@@ -1766,6 +1777,17 @@ namespace ServiceStack.Redis
             setIdsList.Insert(0, intoSetId);
 
             var cmdWithArgs = MergeCommandWithArgs(Commands.ZInterStore, setIdsList.ToArray());
+            return SendExpectLong(cmdWithArgs);
+        }
+
+        public long ZInterStore(string intoSetId, string[] setIds, string[] args)
+        {
+            var totalArgs = new List<string>(setIds);
+            totalArgs.Insert(0, setIds.Length.ToString());
+            totalArgs.Insert(0, intoSetId);
+            totalArgs.AddRange(args);
+
+            var cmdWithArgs = MergeCommandWithArgs(Commands.ZInterStore, totalArgs.ToArray());
             return SendExpectLong(cmdWithArgs);
         }
 

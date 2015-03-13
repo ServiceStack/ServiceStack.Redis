@@ -413,10 +413,20 @@ namespace ServiceStack.Redis
 			return base.ZInterStore(intoSetId, setIds);
 		}
 
+        public long StoreIntersectFromSortedSets(string intoSetId, string[] setIds, string[] args)
+        {
+	        return base.ZInterStore(intoSetId, setIds, args);
+        }
+
 		public long StoreUnionFromSortedSets(string intoSetId, params string[] setIds)
 		{
 			return base.ZUnionStore(intoSetId, setIds);
 		}
+
+        public long StoreUnionFromSortedSets(string intoSetId, string[] setIds, string[] args)
+        {
+	        return base.ZUnionStore(intoSetId, setIds, args);
+        }
 
         private static string GetSearchStart(string start)
         {

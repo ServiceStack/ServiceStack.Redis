@@ -66,7 +66,7 @@ namespace ServiceStack.Redis
                 Log.Debug("Received '{0}' on channel '{1}' from Sentinel".Fmt(channel, message));
 
             // {+|-}sdown is the event for server coming up or down
-            if (channel.ToLower().Contains("sdown"))
+            if ((channel == "+failover-end") || channel.ToLower().Contains("sdown"))
             {
                 Log.Info("Sentinel detected server down/up with message:{0}".Fmt(message));
 
