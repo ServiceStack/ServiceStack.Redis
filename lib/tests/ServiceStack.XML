@@ -2913,46 +2913,46 @@
             smart clients (e.g. ajax) with hints to transparently invoke client-side functionality
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResultExtensions.GetDto(System.Object)">
+        <member name="M:ServiceStack.HttpResultUtils.GetDto(System.Object)">
             <summary>
             Shortcut to get the ResponseDTO whether it's bare or inside a IHttpResult
             </summary>
             <param name="response"></param>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.HttpResultExtensions.GetResponseDto(System.Object)">
+        <member name="M:ServiceStack.HttpResultUtils.GetResponseDto(System.Object)">
             <summary>
             Alias of AsDto
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResultExtensions.GetDto``1(System.Object)">
+        <member name="M:ServiceStack.HttpResultUtils.GetDto``1(System.Object)">
             <summary>
             Shortcut to get the ResponseDTO whether it's bare or inside a IHttpResult
             </summary>
             <param name="response"></param>
             <returns>TResponse if found; otherwise null</returns>
         </member>
-        <member name="M:ServiceStack.HttpResultExtensions.GetResponseDto``1(System.Object)">
+        <member name="M:ServiceStack.HttpResultUtils.GetResponseDto``1(System.Object)">
             <summary>
             Alias of AsDto
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResultExtensions.IsErrorResponse(System.Object)">
+        <member name="M:ServiceStack.HttpResultUtils.IsErrorResponse(System.Object)">
             <summary>
             Whether the response is an IHttpError or Exception
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResultExtensions.ExtractHttpRanges(System.String,System.Int64,System.Int64@,System.Int64@)">
+        <member name="M:ServiceStack.HttpResultUtils.ExtractHttpRanges(System.String,System.Int64,System.Int64@,System.Int64@)">
             <summary>
             rangeHeader should be of the format "bytes=0-" or "bytes=0-12345" or "bytes=123-456"
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResultExtensions.AddHttpRangeResponseHeaders(ServiceStack.Web.IResponse,System.Int64,System.Int64,System.Int64)">
+        <member name="M:ServiceStack.HttpResultUtils.AddHttpRangeResponseHeaders(ServiceStack.Web.IResponse,System.Int64,System.Int64,System.Int64)">
             <summary>
             Adds 206 PartialContent Status, Content-Range and Content-Length headers
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResultExtensions.WritePartialTo(System.IO.Stream,System.IO.Stream,System.Int64,System.Int64)">
+        <member name="M:ServiceStack.HttpResultUtils.WritePartialTo(System.IO.Stream,System.IO.Stream,System.Int64,System.Int64)">
             <summary>
             Writes partial range as specified by start-end, from fromStream to toStream.
             </summary>
@@ -7660,6 +7660,11 @@
             </summary>
             <param name="container">The IoC container</param>
             <param name="assemblies">The assemblies to scan for a validator</param>
+        </member>
+        <member name="M:ServiceStack.VirtualFileExtensions.Refresh(ServiceStack.IO.IVirtualFile)">
+            <summary>
+            Refresh file stats for this node if supported
+            </summary>
         </member>
         <member name="T:ServiceStack.VirtualPath.InMemoryVirtualPathProvider">
             <summary>
