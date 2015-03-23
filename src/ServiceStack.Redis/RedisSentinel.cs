@@ -160,6 +160,11 @@ namespace ServiceStack.Redis
             return GetValidSentinel().ConfigureRedisFromSentinel();
         }
 
+        public SentinelInfo GetSentinelInfo()
+        {
+            return GetValidSentinel().GetSentinelInfo();
+        }
+
         public void Dispose()
         {
             if (worker != null)
