@@ -180,6 +180,7 @@
     <Compile Include="ConfigTests.cs" />
     <Compile Include="CustomCommandTests.cs" />
     <Compile Include="Issues\RedisCharacterizationTests.cs" />
+    <Compile Include="RedisBatchTests.cs" />
     <Compile Include="RedisManagerPoolTests.cs" />
     <Compile Include="DiagnosticTests.cs" />
     <Compile Include="Examples\ServiceStack_Redis_UseCase.cs" />
