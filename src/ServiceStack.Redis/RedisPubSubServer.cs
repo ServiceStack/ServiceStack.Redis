@@ -166,14 +166,15 @@ namespace ServiceStack.Redis
 
         void SendHeartbeat(object state)
         {
-            if (OnHeartbeatSent != null)
-                OnHeartbeatSent();
-
             var currentStatus = Interlocked.CompareExchange(ref status, 0, 0);
             if (currentStatus != Status.Started)
-            {
                 return;
-            }
+
+            if (DateTime.UtcNow - new DateTime(lastHeartbeatTicks) < HeartbeatInterval.Value)
+                return;
+
+            if (OnHeartbeatSent != null)
+                OnHeartbeatSent();
 
             NotifyAllSubscribers(ControlCommand.Pulse);
 
