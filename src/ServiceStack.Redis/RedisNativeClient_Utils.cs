@@ -132,7 +132,7 @@ namespace ServiceStack.Redis
 
                 Bstream = new BufferedStream(networkStream, 16 * 1024);
 
-                if (Password != null)
+                if (!string.IsNullOrEmpty(Password))
                     SendExpectSuccess(Commands.Auth, Password.ToUtf8Bytes());
 
                 if (db != 0)
