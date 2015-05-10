@@ -387,6 +387,41 @@ namespace ServiceStack.Redis.Tests
 
             Assert.That(score, Is.EqualTo(12345678901234567890d));
         }
+
+        public class Article
+        {
+            public int Id { get; set; }
+            public string Title { get; set; }
+            public DateTime ModifiedDate { get; set; }
+        }
+
+        [Test]
+        public void Can_use_SortedIndex_to_store_articles_by_Date()
+        {
+            var redisArticles = Redis.As<Article>();
+
+            var articles = new[]
+	        {
+	            new Article { Id = 1, Title = "Article 1", ModifiedDate = new DateTime(2015, 01, 02) },
+	            new Article { Id = 2, Title = "Article 2", ModifiedDate = new DateTime(2015, 01, 01) },
+	            new Article { Id = 3, Title = "Article 3", ModifiedDate = new DateTime(2015, 01, 03) },
+	        };
+
+            redisArticles.StoreAll(articles);
+
+            const string LatestArticlesSet = "urn:Article:modified";
+
+            foreach (var article in articles)
+            {
+                Redis.AddItemToSortedSet(LatestArticlesSet, article.Id.ToString(), article.ModifiedDate.Ticks);
+            }
+
+            var articleIds = Redis.GetAllItemsFromSortedSetDesc(LatestArticlesSet);
+            articleIds.PrintDump();
+
+            var latestArticles = redisArticles.GetByIds(articleIds);
+            latestArticles.PrintDump();
+        }
     }
 
 }
