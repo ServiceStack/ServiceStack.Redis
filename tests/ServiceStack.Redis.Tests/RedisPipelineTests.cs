@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 
 namespace ServiceStack.Redis.Tests
@@ -275,5 +276,18 @@ namespace ServiceStack.Redis.Tests
             }
         }
 
+	    [Test]
+        public void Can_call_AddRangeToSet_in_pipeline()
+	    {
+	        using (var pipeline = Redis.CreatePipeline())
+	        {
+	            var key = "pipeline-test";
+
+                pipeline.QueueCommand(r => r.Remove(key));
+                pipeline.QueueCommand(r => r.AddRangeToSet(key, new[]{ "A", "B", "C" }.ToList()));
+
+                pipeline.Flush();
+	        }
+	    }
 	}
 }

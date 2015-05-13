@@ -88,10 +88,12 @@ namespace ServiceStack.Redis
             if (items.Count == 0)
                 return;
 
-            if (this.Transaction != null)
+            if (this.Transaction != null || this.Pipeline != null)
             {
-                var trans = this.Transaction as IRedisQueueableOperation;
-                if (trans == null)
+                var queueable = this.Transaction as IRedisQueueableOperation
+                    ?? this.Pipeline as IRedisQueueableOperation;
+
+                if (queueable == null)
                     throw new NotSupportedException("Cannot AddRangeToSet() when Transaction is: " + this.Transaction.GetType().Name);
 
                 //Complete the first QueuedCommand()
@@ -101,10 +103,10 @@ namespace ServiceStack.Redis
                 for (var i = 1; i < items.Count; i++)
                 {
                     var item = items[i];
-                    trans.QueueCommand(c => c.AddItemToSet(setId, item));
+                    queueable.QueueCommand(c => c.AddItemToSet(setId, item));
                 }
             }
-            else
+            else 
             {
                 var uSetId = setId.ToUtf8Bytes();
                 var pipeline = CreatePipelineCommand();
