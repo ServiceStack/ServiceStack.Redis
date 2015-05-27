@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using NUnit.Framework;
+using ServiceStack.Logging;
 using ServiceStack.Redis;
 using ServiceStack.Text;
 
@@ -39,14 +40,12 @@ namespace ServiceStack.Redis.Tests
             using (var pipeline = Redis.CreatePipeline())
             {
                 for (int i = 0; i < total; ++i)
-                         pipeline.QueueCommand(r => ((RedisNativeClient)Redis).Set(key + i.ToString(),temp));
+                    pipeline.QueueCommand(r => ((RedisNativeClient)Redis).Set(key + i.ToString(), temp));
                 pipeline.Flush();
 
             }
             sw.Stop();
             Debug.WriteLine(String.Format("Time for pipelining {0} Set(key,value) operations: {1} ms", total, sw.ElapsedMilliseconds));
-
-
         }
 
         private string[] stringsFromBytes(byte[][] input)
@@ -56,13 +55,14 @@ namespace ServiceStack.Redis.Tests
                 return new string[1];
 
             }
-            var rc  = new string[input.Length];
-            for (int i = 0; i < input.Length; ++i )
+            var rc = new string[input.Length];
+            for (int i = 0; i < input.Length; ++i)
             {
                 rc[i] = input[i].FromUtf8Bytes();
             }
             return rc;
         }
+
         [Test]
         public void Compare_sort_nosort_to_smembers_mget()
         {
@@ -72,7 +72,6 @@ namespace ServiceStack.Redis.Tests
             var temp = new byte[1];
             byte fixedValue = 124;
             temp[0] = fixedValue;
-
 
             //initialize set and individual keys
             Redis.Del(setKey);
@@ -90,7 +89,7 @@ namespace ServiceStack.Redis.Tests
             {
                 var keys = Redis.SMembers(setKey);
                 results = Redis.MGet(keys);
-  
+
             }
 
             sw.Stop();
@@ -101,13 +100,12 @@ namespace ServiceStack.Redis.Tests
                 Assert.AreEqual(result[0], fixedValue);
             }
 
-
             Debug.WriteLine(String.Format("Time to call {0} SMembers and MGet operations: {1} ms", count, sw.ElapsedMilliseconds));
-            var opt = new SortOptions() {SortPattern = "nosort", GetPattern = "*"};
+            var opt = new SortOptions() { SortPattern = "nosort", GetPattern = "*" };
 
             sw = Stopwatch.StartNew();
             for (int i = 0; i < count; ++i)
-               results = Redis.Sort(setKey, opt);
+                results = Redis.Sort(setKey, opt);
             sw.Stop();
 
             //make sure that results are valid
@@ -116,10 +114,7 @@ namespace ServiceStack.Redis.Tests
                 Assert.AreEqual(result[0], fixedValue);
             }
 
-
             Debug.WriteLine(String.Format("Time to call {0} sort operations: {1} ms", count, sw.ElapsedMilliseconds));
-
-
         }
     }
 
