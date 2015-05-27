@@ -20,8 +20,15 @@ namespace ServiceStack.Redis
 
         private BufferPool() { }
         const int PoolSize = 1000; //1.45MB
-        internal const int BufferLength = 1450; //MTU size - some headers
+        //internal const int BufferLength = 1450; //MTU size - some headers
         private static readonly object[] pool = new object[PoolSize];
+
+        internal static byte[] GetBuffer(int bufferSize)
+        {
+            return bufferSize > RedisConfig.BufferPoolMaxSize 
+                ? new byte[bufferSize] 
+                : GetBuffer();
+        }
 
         internal static byte[] GetBuffer()
         {
@@ -31,7 +38,7 @@ namespace ServiceStack.Redis
                 if ((tmp = Interlocked.Exchange(ref pool[i], null)) != null) 
                     return (byte[])tmp;
             }
-            return new byte[BufferLength];
+            return new byte[RedisConfig.BufferLength];
         }
 
         internal static void ResizeAndFlushLeft(ref byte[] buffer, int toFitAtLeastBytes, int copyFromIndex, int copyBytes)
@@ -50,7 +57,7 @@ namespace ServiceStack.Redis
             {
                 Buffer.BlockCopy(buffer, copyFromIndex, newBuffer, 0, copyBytes);
             }
-            if (buffer.Length == BufferLength)
+            if (buffer.Length == RedisConfig.BufferLength)
             {
                 ReleaseBufferToPool(ref buffer);
             }
@@ -60,7 +67,7 @@ namespace ServiceStack.Redis
         internal static void ReleaseBufferToPool(ref byte[] buffer)
         {
             if (buffer == null) return;
-            if (buffer.Length == BufferLength)
+            if (buffer.Length == RedisConfig.BufferLength)
             {
                 for (int i = 0; i < pool.Length; i++)
                 {
