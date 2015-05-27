@@ -166,7 +166,7 @@ namespace ServiceStack.Redis.Tests
             // Create Redis Wrapper
             var redis = new Sider.RedisClient();
 
-            Run("ServiceStack.Redis 8MB", 8000000,
+            Run("Sider 8MB", 8000000,
                 (i, bytes) => redis.SetRaw("eitan" + i.ToString(), bytes));
         }
 
@@ -185,7 +185,7 @@ namespace ServiceStack.Redis.Tests
             // Create Redis Wrapper
             var redis = new Sider.RedisClient();
 
-            Run("ServiceStack.Redis 1MB", 1000000,
+            Run("Sider 1MB", 1000000,
                 (i, bytes) => redis.SetRaw("eitan" + i.ToString(), bytes));
         }
 
@@ -194,7 +194,7 @@ namespace ServiceStack.Redis.Tests
         {
             var redis = new RedisNativeClient();
 
-            Run("ServiceStack.Redis 1MB", 100000,
+            Run("ServiceStack.Redis 100K", 100000,
                 (i, bytes) => redis.Set("eitan" + i.ToString(), bytes));
         }
 
@@ -204,7 +204,7 @@ namespace ServiceStack.Redis.Tests
             // Create Redis Wrapper
             var redis = new Sider.RedisClient();
 
-            Run("ServiceStack.Redis 1MB", 100000,
+            Run("Sider 100K", 100000,
                 (i, bytes) => redis.SetRaw("eitan" + i.ToString(), bytes));
         }
 
@@ -213,7 +213,7 @@ namespace ServiceStack.Redis.Tests
         {
             var redis = new RedisNativeClient();
 
-            Run("ServiceStack.Redis 1MB", 10000,
+            Run("ServiceStack.Redis 10K", 10000,
                 (i, bytes) => redis.Set("eitan" + i.ToString(), bytes));
         }
 
@@ -223,7 +223,7 @@ namespace ServiceStack.Redis.Tests
             // Create Redis Wrapper
             var redis = new Sider.RedisClient();
 
-            Run("ServiceStack.Redis 1MB", 10000,
+            Run("Sider 10K", 10000,
                 (i, bytes) => redis.SetRaw("eitan" + i.ToString(), bytes));
         }
 
@@ -232,7 +232,7 @@ namespace ServiceStack.Redis.Tests
         {
             var redis = new RedisNativeClient();
 
-            Run("ServiceStack.Redis 1MB", 1000,
+            Run("ServiceStack.Redis 1K", 1000,
                 (i, bytes) => redis.Set("eitan" + i.ToString(), bytes));
         }
 
@@ -242,7 +242,7 @@ namespace ServiceStack.Redis.Tests
             // Create Redis Wrapper
             var redis = new Sider.RedisClient();
 
-            Run("ServiceStack.Redis 1MB", 1000,
+            Run("Sider 1K", 1000,
                 (i, bytes) => redis.SetRaw("eitan" + i.ToString(), bytes));
         }
     }
