@@ -8,7 +8,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [TestFixture]
+    [TestFixture, Explicit]
     public class RedisBenchmarkTests
         : RedisClientTestsBase
     {
@@ -118,7 +118,7 @@ namespace ServiceStack.Redis.Tests
         }
     }
 
-    [TestFixture]
+    [TestFixture, Explicit]
     public class RawBytesSetBenchmark
     {
         public void Run(string name, int nBlockSizeBytes, Action<int,byte[]> fn)
