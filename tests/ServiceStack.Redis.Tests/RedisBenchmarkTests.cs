@@ -118,4 +118,72 @@ namespace ServiceStack.Redis.Tests
         }
     }
 
+    [TestFixture]
+    public class RawBytesSetBenchmark
+    {
+        [Test]
+        public void Benchmark_setting_raw_bytes_8MB()
+        {
+            Stopwatch sw;
+            long ms1, ms2, interval;
+            int nBytesHandled = 0;
+            int nBlockSizeBytes = 8000000;
+            int nMaxIterations = 5;
+            byte[] pBuffer = new byte[(int)(nBlockSizeBytes)];
+
+            // Create Redis Wrapper
+            var redis = new RedisNativeClient();
+
+            // Clear DB
+            redis.FlushAll();
+
+            sw = Stopwatch.StartNew();
+            ms1 = sw.ElapsedMilliseconds;
+            for (int i = 0; i < nMaxIterations; i++)
+            {
+                redis.Set("eitan" + i.ToString(), pBuffer);
+                nBytesHandled += nBlockSizeBytes;
+            }
+
+            ms2 = sw.ElapsedMilliseconds;
+            interval = ms2 - ms1;
+
+            // Calculate rate
+            double dMBPerSEc = nBytesHandled / 1024.0 / 1024.0 / ((double)interval / 1000.0);
+            Console.WriteLine("ServiceStack.Redis: Rate {0:N4}, Total: {1}ms", dMBPerSEc, ms2);
+        }
+
+        [Test]
+        public void Benchmark_setting_raw_bytes_8MB_Sider()
+        {
+            Stopwatch sw;
+            long ms1, ms2, interval;
+            int nBytesHandled = 0;
+            int nBlockSizeBytes = 8000000;
+            int nMaxIterations = 5;
+            byte[] pBuffer = new byte[(int)(nBlockSizeBytes)];
+
+            // Create Redis Wrapper
+            var redis = new Sider.RedisClient();
+
+            // Clear DB
+            redis.FlushAll();
+
+            sw = Stopwatch.StartNew();
+            ms1 = sw.ElapsedMilliseconds;
+            for (int i = 0; i < nMaxIterations; i++)
+            {
+                redis.SetRaw("eitan" + i.ToString(), pBuffer);
+                nBytesHandled += nBlockSizeBytes;
+            }
+
+            ms2 = sw.ElapsedMilliseconds;
+            interval = ms2 - ms1;
+
+            // Calculate rate
+            double dMBPerSEc = nBytesHandled / 1024.0 / 1024.0 / ((double)interval / 1000.0);
+            Console.WriteLine("Sider: Rate {0:N4}, Total: {1}ms", dMBPerSEc, ms2);
+        }
+    }
+
 }

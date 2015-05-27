@@ -160,6 +160,10 @@
     <Reference Include="ServiceStack.Text">
       <HintPath>..\..\lib\ServiceStack.Text.dll</HintPath>
     </Reference>
+    <Reference Include="Sider, Version=0.9.3.42023, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\src\packages\Sider.0.9.3\lib\net40-Client\Sider.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>

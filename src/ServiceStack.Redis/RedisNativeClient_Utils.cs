@@ -359,7 +359,7 @@ namespace ServiceStack.Redis
             var bytesCopied = 0;
             while (bytesCopied < cmdBytes.Length)
             {
-                var copyOfBytes = BufferPool.GetBuffer();
+                var copyOfBytes = BufferPool.GetBuffer(cmdBytes.Length);
                 var bytesToCopy = Math.Min(cmdBytes.Length - bytesCopied, copyOfBytes.Length);
                 Buffer.BlockCopy(cmdBytes, bytesCopied, copyOfBytes, 0, bytesToCopy);
                 cmdBuffer.Add(new ArraySegment<byte>(copyOfBytes, 0, bytesToCopy));
@@ -369,7 +369,7 @@ namespace ServiceStack.Redis
 
         private bool CouldAddToCurrentBuffer(byte[] cmdBytes)
         {
-            if (cmdBytes.Length + currentBufferIndex < BufferPool.BufferLength)
+            if (cmdBytes.Length + currentBufferIndex < RedisConfig.BufferLength)
             {
                 Buffer.BlockCopy(cmdBytes, 0, currentBuffer, currentBufferIndex, cmdBytes.Length);
                 currentBufferIndex += cmdBytes.Length;
