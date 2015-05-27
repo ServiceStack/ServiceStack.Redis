@@ -121,15 +121,13 @@ namespace ServiceStack.Redis.Tests
     [TestFixture]
     public class RawBytesSetBenchmark
     {
-        [Test]
-        public void Benchmark_setting_raw_bytes_8MB()
+        public void Run(string name, int nBlockSizeBytes, Action<int,byte[]> fn)
         {
             Stopwatch sw;
             long ms1, ms2, interval;
             int nBytesHandled = 0;
-            int nBlockSizeBytes = 8000000;
             int nMaxIterations = 5;
-            byte[] pBuffer = new byte[(int)(nBlockSizeBytes)];
+            byte[] pBuffer = new byte[nBlockSizeBytes];
 
             // Create Redis Wrapper
             var redis = new RedisNativeClient();
@@ -141,7 +139,7 @@ namespace ServiceStack.Redis.Tests
             ms1 = sw.ElapsedMilliseconds;
             for (int i = 0; i < nMaxIterations; i++)
             {
-                redis.Set("eitan" + i.ToString(), pBuffer);
+                fn(i, pBuffer);
                 nBytesHandled += nBlockSizeBytes;
             }
 
@@ -149,40 +147,103 @@ namespace ServiceStack.Redis.Tests
             interval = ms2 - ms1;
 
             // Calculate rate
-            double dMBPerSEc = nBytesHandled / 1024.0 / 1024.0 / ((double)interval / 1000.0);
-            Console.WriteLine("ServiceStack.Redis: Rate {0:N4}, Total: {1}ms", dMBPerSEc, ms2);
+            double dMBPerSEc = nBytesHandled / 1024.0 / 1024.0 / (interval / 1000.0);
+            Console.WriteLine(name + ": Rate {0:N4}, Total: {1}ms", dMBPerSEc, ms2);
         }
 
         [Test]
-        public void Benchmark_setting_raw_bytes_8MB_Sider()
+        public void Benchmark_SET_raw_bytes_8MB_ServiceStack()
         {
-            Stopwatch sw;
-            long ms1, ms2, interval;
-            int nBytesHandled = 0;
-            int nBlockSizeBytes = 8000000;
-            int nMaxIterations = 5;
-            byte[] pBuffer = new byte[(int)(nBlockSizeBytes)];
+            var redis = new RedisNativeClient();
 
+            Run("ServiceStack.Redis 8MB", 8000000,
+                (i, bytes) => redis.Set("eitan" + i.ToString(), bytes));
+        }
+
+        [Test]
+        public void Benchmark_SET_raw_bytes_8MB_Sider()
+        {
             // Create Redis Wrapper
             var redis = new Sider.RedisClient();
 
-            // Clear DB
-            redis.FlushAll();
+            Run("ServiceStack.Redis 8MB", 8000000,
+                (i, bytes) => redis.SetRaw("eitan" + i.ToString(), bytes));
+        }
 
-            sw = Stopwatch.StartNew();
-            ms1 = sw.ElapsedMilliseconds;
-            for (int i = 0; i < nMaxIterations; i++)
-            {
-                redis.SetRaw("eitan" + i.ToString(), pBuffer);
-                nBytesHandled += nBlockSizeBytes;
-            }
+        [Test]
+        public void Benchmark_SET_raw_bytes_1MB_ServiceStack()
+        {
+            var redis = new RedisNativeClient();
 
-            ms2 = sw.ElapsedMilliseconds;
-            interval = ms2 - ms1;
+            Run("ServiceStack.Redis 1MB", 1000000,
+                (i, bytes) => redis.Set("eitan" + i.ToString(), bytes));
+        }
 
-            // Calculate rate
-            double dMBPerSEc = nBytesHandled / 1024.0 / 1024.0 / ((double)interval / 1000.0);
-            Console.WriteLine("Sider: Rate {0:N4}, Total: {1}ms", dMBPerSEc, ms2);
+        [Test]
+        public void Benchmark_SET_raw_bytes_1MB_Sider()
+        {
+            // Create Redis Wrapper
+            var redis = new Sider.RedisClient();
+
+            Run("ServiceStack.Redis 1MB", 1000000,
+                (i, bytes) => redis.SetRaw("eitan" + i.ToString(), bytes));
+        }
+
+        [Test]
+        public void Benchmark_SET_raw_bytes_100k_ServiceStack()
+        {
+            var redis = new RedisNativeClient();
+
+            Run("ServiceStack.Redis 1MB", 100000,
+                (i, bytes) => redis.Set("eitan" + i.ToString(), bytes));
+        }
+
+        [Test]
+        public void Benchmark_SET_raw_bytes_100k_Sider()
+        {
+            // Create Redis Wrapper
+            var redis = new Sider.RedisClient();
+
+            Run("ServiceStack.Redis 1MB", 100000,
+                (i, bytes) => redis.SetRaw("eitan" + i.ToString(), bytes));
+        }
+
+        [Test]
+        public void Benchmark_SET_raw_bytes_10k_ServiceStack()
+        {
+            var redis = new RedisNativeClient();
+
+            Run("ServiceStack.Redis 1MB", 10000,
+                (i, bytes) => redis.Set("eitan" + i.ToString(), bytes));
+        }
+
+        [Test]
+        public void Benchmark_SET_raw_bytes_10k_Sider()
+        {
+            // Create Redis Wrapper
+            var redis = new Sider.RedisClient();
+
+            Run("ServiceStack.Redis 1MB", 10000,
+                (i, bytes) => redis.SetRaw("eitan" + i.ToString(), bytes));
+        }
+
+        [Test]
+        public void Benchmark_SET_raw_bytes_1k_ServiceStack()
+        {
+            var redis = new RedisNativeClient();
+
+            Run("ServiceStack.Redis 1MB", 1000,
+                (i, bytes) => redis.Set("eitan" + i.ToString(), bytes));
+        }
+
+        [Test]
+        public void Benchmark_SET_raw_bytes_1k_Sider()
+        {
+            // Create Redis Wrapper
+            var redis = new Sider.RedisClient();
+
+            Run("ServiceStack.Redis 1MB", 1000,
+                (i, bytes) => redis.SetRaw("eitan" + i.ToString(), bytes));
         }
     }
 
