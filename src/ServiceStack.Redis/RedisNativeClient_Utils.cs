@@ -447,7 +447,15 @@ namespace ServiceStack.Redis
 
         private int SafeReadByte()
         {
-            return Bstream.ReadByte();
+	        try
+	        {
+		        return Bstream.ReadByte();
+	        }
+	        catch (Exception)
+	        {
+		        HadExceptions = true;
+		        throw;
+	        }
         }
 
         protected void SendExpectSuccess(params byte[][] cmdWithBinaryArgs)
