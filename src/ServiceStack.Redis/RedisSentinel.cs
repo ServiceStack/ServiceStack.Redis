@@ -189,6 +189,8 @@ public class SentinelInfo
 
     public override string ToString()
     {
-        return "masters: {0}, slaves: {1}".Fmt(RedisMasters, RedisSlaves);
+        return "masters: {0}, slaves: {1}".Fmt(
+            string.Join(", ", RedisMasters),
+            string.Join(", ", RedisSlaves));
     }
 }
