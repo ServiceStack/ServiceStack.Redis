@@ -132,7 +132,7 @@ namespace ServiceStack.Redis
 
                 Bstream = new BufferedStream(networkStream, 16 * 1024);
 
-                if (Password != null)
+                if (!string.IsNullOrEmpty(Password))
                     SendExpectSuccess(Commands.Auth, Password.ToUtf8Bytes());
 
                 if (db != 0)
@@ -270,7 +270,7 @@ namespace ServiceStack.Redis
         private RedisResponseException CreateResponseError(string error)
         {
             HadExceptions = true;
-            string safeLastCommand = (Password == null) ? lastCommand : (lastCommand ?? "").Replace(Password, "");
+            string safeLastCommand = string.IsNullOrEmpty(Password) ? lastCommand : (lastCommand ?? "").Replace(Password, "");
 
             var throwEx = new RedisResponseException(
                 string.Format("{0}, sPort: {1}, LastCommand: {2}",
