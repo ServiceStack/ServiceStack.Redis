@@ -173,5 +173,12 @@ namespace ServiceStack.Redis.Tests
 
             Thread.Sleep(TimeSpan.FromMinutes(10));
         }
+
+        [Test]
+        public void Defaults_to_default_sentinel_port()
+        {
+            var sentinelEndpoint = "127.0.0.1".ToRedisEndpoint(defaultPort: RedisNativeClient.DefaultPortSentinel);
+            Assert.That(sentinelEndpoint.Port, Is.EqualTo(RedisNativeClient.DefaultPortSentinel));
+        }
     }
 }

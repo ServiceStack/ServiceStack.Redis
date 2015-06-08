@@ -25,10 +25,10 @@ namespace ServiceStack.Redis
         {
             return hosts == null 
                 ? new List<RedisEndpoint>() : 
-                hosts.Select(ToRedisEndpoint).ToList();
+                hosts.Select(x => ToRedisEndpoint(x)).ToList();
         }
 
-        public static RedisEndpoint ToRedisEndpoint(this string connectionString)
+        public static RedisEndpoint ToRedisEndpoint(this string connectionString, int? defaultPort = null)
         {
             if (connectionString == null)
                 throw new ArgumentNullException("connectionString");
@@ -39,7 +39,7 @@ namespace ServiceStack.Redis
             var qsParts = domainParts.Last().SplitOnFirst('?');
             var hostParts = qsParts[0].SplitOnLast(':');
             var useDefaultPort = true;
-            var port = RedisNativeClient.DefaultPort;
+            var port = defaultPort.GetValueOrDefault(RedisNativeClient.DefaultPort);
             if (hostParts.Length > 1)
             {
                 port = int.Parse(hostParts[1]);
