@@ -3,6 +3,6 @@ namespace ServiceStack.Redis
 {
     public interface IRedisSentinel : IDisposable
     {
-        IRedisClientsManager Setup();
+        IRedisClientsManager Start();
     }
 }

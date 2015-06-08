@@ -73,7 +73,7 @@ namespace ServiceStack.Redis.Tests
         {
             var sentinel = new RedisSentinel(new[] { "{0}:{1}".Fmt(TestConfig.SentinelHost, TestConfig.RedisSentinelPort) }, TestConfig.MasterName);
 
-            var clientsManager = sentinel.Setup();
+            var clientsManager = sentinel.Start();
             var client = clientsManager.GetClient();
 
             Assert.That(client.Host, Is.EqualTo("127.0.0.1").Or.EqualTo(TestConfig.SentinelHost));
@@ -97,7 +97,7 @@ namespace ServiceStack.Redis.Tests
                 }
             };
 
-            using (var clientsManager = (PooledRedisClientManager)sentinel.Setup())
+            using (var clientsManager = (PooledRedisClientManager)sentinel.Start())
             using (var client = clientsManager.GetClient())
             {
                 Assert.That(clientsManager.IdleTimeOutSecs, Is.EqualTo(20));
@@ -114,7 +114,7 @@ namespace ServiceStack.Redis.Tests
                 HostFilter = host => "{0}?db=1".Fmt(host)
             };
 
-            using (var clientsManager = sentinel.Setup())
+            using (var clientsManager = sentinel.Start())
             using (var client = clientsManager.GetClient())
             {
                 Assert.That(client.Db, Is.EqualTo(1));
