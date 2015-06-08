@@ -822,7 +822,8 @@ namespace ServiceStack.Redis
 
         private object[] ReadDeeplyNestedMultiData()
         {
-            return (object[])ReadDeeplyNestedMultiDataItem();
+            var result = ReadDeeplyNestedMultiDataItem();
+            return (object[])result;
         }
 
         private object ReadDeeplyNestedMultiDataItem()

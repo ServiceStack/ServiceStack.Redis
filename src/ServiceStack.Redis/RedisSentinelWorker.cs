@@ -15,22 +15,23 @@ namespace ServiceStack.Redis
         private readonly RedisClient sentinelClient;
         private readonly RedisClient sentinelPubSubClient;
         private readonly IRedisSubscription sentinelSubscription;
-        private readonly string sentinelName;
+        private readonly string masterName;
         private string host;
         private IRedisClientsManager redisManager;
 
         public Action<Exception> OnSentinelError;
 
-        public RedisSentinelWorker(RedisSentinel redisSentinel, string host, string sentinelName)
+        public RedisSentinelWorker(RedisSentinel redisSentinel, string host, string masterName)
         {
-
             this.redisSentinel = redisSentinel;
             this.redisManager = redisSentinel.RedisManager;
-            this.sentinelName = sentinelName;
+            this.masterName = masterName;
 
             //Sentinel Servers doesn't support DB, reset to 0
-            this.sentinelClient = new RedisClient(host) { Db = 0 };
-            this.sentinelPubSubClient = new RedisClient(host) { Db = 0 };
+            var sentinelEndpoint = host.ToRedisEndpoint(defaultPort:RedisNativeClient.DefaultPortSentinel);
+
+            this.sentinelClient = new RedisClient(sentinelEndpoint) { Db = 0 };
+            this.sentinelPubSubClient = new RedisClient(sentinelEndpoint) { Db = 0 };
             this.sentinelSubscription = this.sentinelPubSubClient.CreateSubscription();
             this.sentinelSubscription.OnMessage = SentinelMessageReceived;
 
@@ -113,8 +114,9 @@ namespace ServiceStack.Redis
         internal SentinelInfo GetSentinelInfo()
         {
             var sentinelInfo = new SentinelInfo(
-                ConvertMasterArrayToList(this.sentinelClient.Sentinel("master", this.sentinelName)),
-                ConvertSlaveArrayToList(this.sentinelClient.Sentinel("slaves", this.sentinelName)));
+                redisSentinel.MasterName,
+                ConvertMasterArrayToList(this.sentinelClient.Sentinel("master", this.masterName)),
+                ConvertSlaveArrayToList(this.sentinelClient.Sentinel("slaves", this.masterName)));
             return sentinelInfo;
         }
 
