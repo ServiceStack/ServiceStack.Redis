@@ -135,7 +135,13 @@ namespace ServiceStack.Redis
             return SearchKeys("*");
         }
 
+        [Obsolete("Use SetValue()")]
         public void SetEntry(string key, string value)
+        {
+            SetValue(key, value);
+        }
+
+        public void SetValue(string key, string value)
         {
             var bytesValue = value != null
                 ? value.ToUtf8Bytes()
@@ -144,7 +150,13 @@ namespace ServiceStack.Redis
             base.Set(key, bytesValue);
         }
 
+        [Obsolete("Use SetValue()")]
         public void SetEntry(string key, string value, TimeSpan expireIn)
+        {
+            SetValue(key, value, expireIn);
+        }
+
+        public void SetValue(string key, string value, TimeSpan expireIn)
         {
             var bytesValue = value != null
                 ? value.ToUtf8Bytes()
@@ -163,14 +175,39 @@ namespace ServiceStack.Redis
             }
         }
 
+        [Obsolete("Use SetValueIfExists()")]
         public bool SetEntryIfExists(string key, string value)
+        {
+            return SetValueIfExists(key, value);
+        }
+
+        public bool SetValueIfExists(string key, string value)
         {
             var bytesValue = value != null ? value.ToUtf8Bytes() : null;
 
             return base.Set(key, bytesValue, exists: true);
         }
 
+        [Obsolete("Use SetValueIfNotExists()")]
+        public bool SetEntryIfNotExists(string key, string value)
+        {
+            return SetValueIfNotExists(key, value);
+        }
+
+        public bool SetValueIfNotExists(string key, string value)
+        {
+            var bytesValue = value != null ? value.ToUtf8Bytes() : null;
+
+            return base.Set(key, bytesValue, exists: false);
+        }
+
+        [Obsolete("Use SetValueIfExists()")]
         public bool SetEntryIfExists(string key, string value, TimeSpan expireIn)
+        {
+            return SetValueIfExists(key, value, expireIn);
+        }
+
+        public bool SetValueIfExists(string key, string value, TimeSpan expireIn)
         {
             var bytesValue = value != null ? value.ToUtf8Bytes() : null;
 
@@ -180,14 +217,13 @@ namespace ServiceStack.Redis
                 return base.Set(key, bytesValue, exists: true, expirySeconds: (int)expireIn.TotalSeconds);
         }
 
-        public bool SetEntryIfNotExists(string key, string value)
+        [Obsolete("Use SetValueIfNotExists()")]
+        public bool SetEntryIfNotExists(string key, string value, TimeSpan expireIn)
         {
-            var bytesValue = value != null ? value.ToUtf8Bytes() : null;
-
-            return base.Set(key, bytesValue, exists: false);
+            return SetValueIfNotExists(key, value, expireIn);
         }
 
-        public bool SetEntryIfNotExists(string key, string value, TimeSpan expireIn)
+        public bool SetValueIfNotExists(string key, string value, TimeSpan expireIn)
         {
             var bytesValue = value != null ? value.ToUtf8Bytes() : null;
 
@@ -250,9 +286,7 @@ namespace ServiceStack.Redis
             base.MSet(keyBytes, valBytes);
         }
 
-        /// <summary>
-        /// Alias for GetValue
-        /// </summary>
+        [Obsolete("Use GetValue()")]
         public string GetEntry(string key)
         {
             return GetValue(key);
@@ -266,7 +300,13 @@ namespace ServiceStack.Redis
                 : bytes.FromUtf8Bytes();
         }
 
+        [Obsolete("Use GetAndSetValue()")]
         public string GetAndSetEntry(string key, string value)
+        {
+            return GetAndSetValue(key, value);
+        }
+
+        public string GetAndSetValue(string key, string value)
         {
             return GetSet(key, value.ToUtf8Bytes()).FromUtf8Bytes();
         }
