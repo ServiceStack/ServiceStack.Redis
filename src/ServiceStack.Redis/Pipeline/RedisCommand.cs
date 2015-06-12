@@ -19,6 +19,7 @@ namespace ServiceStack.Redis
         public Func<IRedisClient, byte[][]> MultiBytesReturnCommand { get; set; }
         public Func<IRedisClient, string> StringReturnCommand { get; set; }
         public Func<IRedisClient, List<string>> MultiStringReturnCommand { get; set; }
+        public Func<IRedisClient, Dictionary<string, string>> DictionaryStringReturnCommand { get; set; }
         public Func<IRedisClient, double> DoubleReturnCommand { get; set; }
 
         public override void Execute(IRedisClient client)
@@ -63,7 +64,10 @@ namespace ServiceStack.Redis
                 else if (MultiStringReturnCommand != null)
                 {
                     MultiStringReturnCommand(client);
-
+                }
+                else if (DictionaryStringReturnCommand != null)
+                {
+                    DictionaryStringReturnCommand(client);
                 }
             }
             catch (Exception ex)

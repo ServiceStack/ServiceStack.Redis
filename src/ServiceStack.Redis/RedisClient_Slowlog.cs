@@ -18,26 +18,26 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
-	public partial class RedisClient
-		: IRedisClient
-	{
+    public partial class RedisClient
+        : IRedisClient
+    {
         public IEnumerable<SlowlogItem> GetSlowlog(int? numberOfRecords = null)
         {
             var data = Slowlog(numberOfRecords);
             var list = new SlowlogItem[data.Length];
-            for(int i = 0; i < data.Length; i++)
+            for (int i = 0; i < data.Length; i++)
             {
                 var log = (object[])data[i];
 
-                var arguments = ((object[]) log[3]).OfType<byte[]>()
+                var arguments = ((object[])log[3]).OfType<byte[]>()
                     .Select(t => t.FromUtf8Bytes())
                     .ToArray();
 
 
                 list[i] = new SlowlogItem(
-                    Int32.Parse((string) log[0], CultureInfo.InvariantCulture),
-                    DateTimeExtensions.FromUnixTime(Int32.Parse((string) log[1], CultureInfo.InvariantCulture)),
-                    Int32.Parse((string) log[2], CultureInfo.InvariantCulture),
+                    Int32.Parse((string)log[0], CultureInfo.InvariantCulture),
+                    DateTimeExtensions.FromUnixTime(Int32.Parse((string)log[1], CultureInfo.InvariantCulture)),
+                    Int32.Parse((string)log[2], CultureInfo.InvariantCulture),
                     arguments
                     );
             }
@@ -45,12 +45,12 @@ namespace ServiceStack.Redis
             return list;
         }
 
-        
-	}
+
+    }
 
     public class SlowlogItem
     {
-        public SlowlogItem(int id, DateTime timeStamp, int duration, string [] arguments)
+        public SlowlogItem(int id, DateTime timeStamp, int duration, string[] arguments)
         {
             Id = id;
             Timestamp = timeStamp;

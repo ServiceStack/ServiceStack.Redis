@@ -132,7 +132,7 @@ namespace ServiceStack.Redis
 
                 Bstream = new BufferedStream(networkStream, 16 * 1024);
 
-                if (Password != null)
+                if (!string.IsNullOrEmpty(Password))
                     SendExpectSuccess(Commands.Auth, Password.ToUtf8Bytes());
 
                 if (db != 0)
@@ -270,7 +270,7 @@ namespace ServiceStack.Redis
         private RedisResponseException CreateResponseError(string error)
         {
             HadExceptions = true;
-            string safeLastCommand = (Password == null) ? lastCommand : lastCommand.Replace(Password, "");
+            string safeLastCommand = string.IsNullOrEmpty(Password) ? lastCommand : (lastCommand ?? "").Replace(Password, "");
 
             var throwEx = new RedisResponseException(
                 string.Format("{0}, sPort: {1}, LastCommand: {2}",
@@ -359,7 +359,7 @@ namespace ServiceStack.Redis
             var bytesCopied = 0;
             while (bytesCopied < cmdBytes.Length)
             {
-                var copyOfBytes = BufferPool.GetBuffer();
+                var copyOfBytes = BufferPool.GetBuffer(cmdBytes.Length);
                 var bytesToCopy = Math.Min(cmdBytes.Length - bytesCopied, copyOfBytes.Length);
                 Buffer.BlockCopy(cmdBytes, bytesCopied, copyOfBytes, 0, bytesToCopy);
                 cmdBuffer.Add(new ArraySegment<byte>(copyOfBytes, 0, bytesToCopy));
@@ -369,7 +369,7 @@ namespace ServiceStack.Redis
 
         private bool CouldAddToCurrentBuffer(byte[] cmdBytes)
         {
-            if (cmdBytes.Length + currentBufferIndex < BufferPool.BufferLength)
+            if (cmdBytes.Length + currentBufferIndex < RedisConfig.BufferLength)
             {
                 Buffer.BlockCopy(cmdBytes, 0, currentBuffer, currentBufferIndex, cmdBytes.Length);
                 currentBufferIndex += cmdBytes.Length;
@@ -447,7 +447,15 @@ namespace ServiceStack.Redis
 
         private int SafeReadByte()
         {
-            return Bstream.ReadByte();
+	        try
+	        {
+		        return Bstream.ReadByte();
+	        }
+	        catch (Exception)
+	        {
+		        HadExceptions = true;
+		        throw;
+	        }
         }
 
         protected void SendExpectSuccess(params byte[][] cmdWithBinaryArgs)
@@ -814,7 +822,8 @@ namespace ServiceStack.Redis
 
         private object[] ReadDeeplyNestedMultiData()
         {
-            return (object[])ReadDeeplyNestedMultiDataItem();
+            var result = ReadDeeplyNestedMultiDataItem();
+            return (object[])result;
         }
 
         private object ReadDeeplyNestedMultiDataItem()

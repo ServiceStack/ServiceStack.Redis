@@ -72,7 +72,7 @@ namespace ServiceStack.Redis
 
         public bool Add<T>(string key, T value)
         {
-            return Exec(r => r.Set(key, ToBytes(value), exists:false));
+            return Exec(r => r.Set(key, ToBytes(value), exists: false));
         }
 
         public bool Set<T>(string key, T value)
@@ -103,7 +103,7 @@ namespace ServiceStack.Redis
 
         public bool Add<T>(string key, T value, TimeSpan expiresIn)
         {
-            return Exec(r => r.Set(key, ToBytes(value), exists:false, expiryMs:(long)expiresIn.TotalMilliseconds));
+            return Exec(r => r.Set(key, ToBytes(value), exists: false, expiryMs: (long)expiresIn.TotalMilliseconds));
         }
 
         public bool Set<T>(string key, T value, TimeSpan expiresIn)
@@ -148,7 +148,7 @@ namespace ServiceStack.Redis
 
         public bool Replace<T>(string key, T value, TimeSpan expiresIn)
         {
-            return Exec(r => r.Set(key, ToBytes(value), exists:true, expiryMs: (long)expiresIn.TotalMilliseconds));
+            return Exec(r => r.Set(key, ToBytes(value), exists: true, expiryMs: (long)expiresIn.TotalMilliseconds));
         }
 
         public IDictionary<string, T> GetAll<T>(IEnumerable<string> keys)

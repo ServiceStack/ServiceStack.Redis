@@ -37,6 +37,7 @@ App_Data/
 
 NuGet/
 NuGet.Signed/
+packages/
 *.pfx
 
 build/

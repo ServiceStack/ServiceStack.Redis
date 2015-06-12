@@ -15,22 +15,23 @@ namespace ServiceStack.Redis
         private readonly RedisClient sentinelClient;
         private readonly RedisClient sentinelPubSubClient;
         private readonly IRedisSubscription sentinelSubscription;
-        private readonly string sentinelName;
+        private readonly string masterName;
         private string host;
         private IRedisClientsManager redisManager;
 
         public Action<Exception> OnSentinelError;
 
-        public RedisSentinelWorker(RedisSentinel redisSentinel, string host, string sentinelName)
+        public RedisSentinelWorker(RedisSentinel redisSentinel, string host, string masterName)
         {
-
             this.redisSentinel = redisSentinel;
             this.redisManager = redisSentinel.RedisManager;
-            this.sentinelName = sentinelName;
+            this.masterName = masterName;
 
             //Sentinel Servers doesn't support DB, reset to 0
-            this.sentinelClient = new RedisClient(host) { Db = 0 };
-            this.sentinelPubSubClient = new RedisClient(host) { Db = 0 };
+            var sentinelEndpoint = host.ToRedisEndpoint(defaultPort:RedisNativeClient.DefaultPortSentinel);
+
+            this.sentinelClient = new RedisClient(sentinelEndpoint) { Db = 0 };
+            this.sentinelPubSubClient = new RedisClient(sentinelEndpoint) { Db = 0 };
             this.sentinelSubscription = this.sentinelPubSubClient.CreateSubscription();
             this.sentinelSubscription.OnMessage = SentinelMessageReceived;
 
@@ -66,7 +67,7 @@ namespace ServiceStack.Redis
                 Log.Debug("Received '{0}' on channel '{1}' from Sentinel".Fmt(channel, message));
 
             // {+|-}sdown is the event for server coming up or down
-            if (channel.ToLower().Contains("sdown"))
+            if ((channel == "+failover-end") || channel.ToLower().Contains("sdown"))
             {
                 Log.Info("Sentinel detected server down/up with message:{0}".Fmt(message));
 
@@ -82,9 +83,7 @@ namespace ServiceStack.Redis
         /// </summary>
         internal SentinelInfo ConfigureRedisFromSentinel()
         {
-            var sentinelInfo = new SentinelInfo(
-                ConvertMasterArrayToList(this.sentinelClient.Sentinel("master", this.sentinelName)),
-                ConvertSlaveArrayToList(this.sentinelClient.Sentinel("slaves", this.sentinelName)));
+            var sentinelInfo = GetSentinelInfo();
 
             if (redisManager == null)
             {
@@ -109,6 +108,15 @@ namespace ServiceStack.Redis
                     redisSentinel.ConfigureHosts(sentinelInfo.RedisSlaves));
             }
 
+            return sentinelInfo;
+        }
+
+        internal SentinelInfo GetSentinelInfo()
+        {
+            var sentinelInfo = new SentinelInfo(
+                redisSentinel.MasterName,
+                ConvertMasterArrayToList(this.sentinelClient.Sentinel("master", this.masterName)),
+                ConvertSlaveArrayToList(this.sentinelClient.Sentinel("slaves", this.masterName)));
             return sentinelInfo;
         }
 

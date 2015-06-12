@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -12,6 +13,7 @@ namespace ServiceStack.Redis.Tests
         private const string ListKey = "rdtmultitest-list";
         private const string SetKey = "rdtmultitest-set";
         private const string SortedSetKey = "rdtmultitest-sortedset";
+        private const string HashKey = "rdthashtest";
 
         public override void TearDown()
         {
@@ -310,6 +312,25 @@ namespace ServiceStack.Redis.Tests
 
             Assert.That(Redis.Get<string>(key), Is.EqualTo("Foo"));
             Assert.That(Redis.GetTimeToLive(key), Is.EqualTo(TimeSpan.MaxValue));
+        }
+
+	    [Test]
+        public void Can_call_GetAllEntriesFromHash_in_transaction()
+	    {
+            var stringMap = new Dictionary<string, string> {
+     			{"one","a"}, {"two","b"}, {"three","c"}, {"four","d"}
+     		};
+            stringMap.Each(x => Redis.SetEntryInHash(HashKey, x.Key, x.Value));
+
+            Dictionary<string, string> results = null;
+            using (var trans = Redis.CreateTransaction())
+	        {
+	            trans.QueueCommand(r => r.GetAllEntriesFromHash(HashKey), x => results = x);
+
+	            trans.Commit();
+	        }
+
+            Assert.That(results, Is.EquivalentTo(stringMap));
         }
     }
 }

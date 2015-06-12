@@ -224,5 +224,26 @@ namespace ServiceStack.Redis
             });
             command(RedisClient);
         }
+
+        public void QueueCommand(Func<IRedisClient, Dictionary<string, string>> command)
+        {
+            QueueCommand(command, null, null);
+        }
+
+        public void QueueCommand(Func<IRedisClient, Dictionary<string, string>> command, Action<Dictionary<string, string>> onSuccessCallback)
+        {
+            QueueCommand(command, onSuccessCallback, null);
+        }
+
+        public void QueueCommand(Func<IRedisClient, Dictionary<string, string>> command, Action<Dictionary<string, string>> onSuccessCallback, Action<Exception> onErrorCallback)
+        {
+            BeginQueuedCommand(new QueuedRedisCommand
+            {
+                DictionaryStringReturnCommand = command,
+                OnSuccessDictionaryStringCallback = onSuccessCallback,
+                OnErrorCallback = onErrorCallback
+            });
+            command(RedisClient);
+        }
     }
 }

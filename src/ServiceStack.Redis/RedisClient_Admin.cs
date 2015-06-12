@@ -17,20 +17,20 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
-	public partial class RedisClient
-		: IRedisClient
-	{
+    public partial class RedisClient
+        : IRedisClient
+    {
         public void SetConfig(string configItem, string value)
         {
             base.ConfigSet(configItem, value.ToUtf8Bytes());
         }
 
-	    public RedisText GetServerRoleInfo()
-	    {
-	        return base.Role();
-	    }
+        public RedisText GetServerRoleInfo()
+        {
+            return base.Role();
+        }
 
-	    public string GetConfig(string configItem)
+        public string GetConfig(string configItem)
         {
             var sb = new StringBuilder();
             var byteArray = base.ConfigGet(configItem);
@@ -66,12 +66,12 @@ namespace ServiceStack.Redis
             base.ClientSetName(name);
         }
 
-	    public void KillClient(string address)
-	    {
+        public void KillClient(string address)
+        {
             base.ClientKill(address);
-	    }
+        }
 
-	    public long KillClients(string fromAddress = null, string withId = null, RedisClientType? ofType = null, bool? skipMe = null)
+        public long KillClients(string fromAddress = null, string withId = null, RedisClientType? ofType = null, bool? skipMe = null)
         {
             var typeString = ofType != null ? ofType.ToString().ToLower() : null;
             var skipMeString = skipMe != null ? (skipMe.Value ? "yes" : "no") : null;

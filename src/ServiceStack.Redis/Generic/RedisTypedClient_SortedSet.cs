@@ -271,9 +271,19 @@ namespace ServiceStack.Redis.Generic
             return client.StoreIntersectFromSortedSets(intoSetId.Id, setIds.Map(x => x.Id).ToArray());
         }
 
+        public long StoreIntersectFromSortedSets(IRedisSortedSet<T> intoSetId, IRedisSortedSet<T>[] setIds, string[] args)
+        {
+            return client.StoreIntersectFromSortedSets(intoSetId.Id, setIds.Map(x => x.Id).ToArray(), args);
+        }
+
         public long StoreUnionFromSortedSets(IRedisSortedSet<T> intoSetId, params IRedisSortedSet<T>[] setIds)
         {
             return client.StoreUnionFromSortedSets(intoSetId.Id, setIds.Map(x => x.Id).ToArray());
+        }
+
+        public long StoreUnionFromSortedSets(IRedisSortedSet<T> intoSetId, IRedisSortedSet<T>[] setIds, string[] args)
+        {
+            return client.StoreUnionFromSortedSets(intoSetId.Id, setIds.Map(x => x.Id).ToArray(), args);
         }
     }
 }

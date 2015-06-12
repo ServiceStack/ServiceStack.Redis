@@ -4,6 +4,91 @@
         <name>ServiceStack.Server</name>
     </assembly>
     <members>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.ServiceBaseUrl">
+            <summary>
+            The BaseUrl of the ServiceStack instance (inferred)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.ServiceName">
+            <summary>
+            Name of the ServiceStack Instance (inferred)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.ServiceDescription">
+            <summary>
+            Textual description of the AutoQuery Services (shown in Home Services list)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.ServiceIconUrl">
+            <summary>
+            Icon for this ServiceStack Instance (shown in Home Services list)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.IsPublic">
+            <summary>
+            Whether to publish this Service to the public Services registry
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.OnlyShowAnnotatedServices">
+            <summary>
+            Only show AutoQuery Services attributed with [AutoQueryViewer]
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.ImplicitConventions">
+            <summary>
+            List of different Search Filters available
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.DefaultSearchField">
+            <summary>
+            The Column which should be selected by default
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.DefaultSearchType">
+            <summary>
+            The Query Type filter which should be selected by default
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.DefaultSearchText">
+            <summary>
+            The search text which should be populated by default
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.BrandUrl">
+            <summary>
+            Link to your website users can click to find out more about you
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.BrandImageUrl">
+            <summary>
+            A custom logo or image that users can click on to visit your site
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.TextColor">
+            <summary>
+            The default color of text
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.LinkColor">
+            <summary>
+            The default color of links
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.BackgroundColor">
+            <summary>
+            The default background color of each screen
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.BackgroundImageUrl">
+            <summary>
+            The default background image of each screen anchored to the bottom left
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.IconUrl">
+            <summary>
+            The default icon for each of your AutoQuery Services
+            </summary>
+        </member>
         <member name="T:ServiceStack.Messaging.Rcon.Client">
             <summary>
             Base rcon class.
