@@ -130,6 +130,11 @@ namespace ServiceStack.Redis
         {
             return SPop(setId).FromUtf8Bytes();
         }
+        
+        public List<string> PopItemsFromSet(string setId, int count)
+        {
+            return SPop(setId, count).ToStringList();
+        }
 
         public void MoveBetweenSets(string fromSetId, string toSetId, string item)
         {

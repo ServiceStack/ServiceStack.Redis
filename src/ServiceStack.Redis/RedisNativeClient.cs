@@ -1070,6 +1070,14 @@ namespace ServiceStack.Redis
 
             return SendExpectData(Commands.SPop, setId.ToUtf8Bytes());
         }
+        
+        public byte[][] SPop(string setId, int count)
+    	{
+    		if (setId == null)
+    			throw new ArgumentNullException("setId");
+           	
+           	return SendExpectMultiData(Commands.SPop, setId.ToUtf8Bytes(), count.ToUtf8Bytes());
+    	}
 
         public void SMove(string fromSetId, string toSetId, byte[] value)
         {
