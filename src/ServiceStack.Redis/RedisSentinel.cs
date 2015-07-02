@@ -42,16 +42,13 @@ namespace ServiceStack.Redis
         public RedisSentinel(string sentinelHost = null, string masterName = null)
             : this(new[] { sentinelHost ?? DefaultAddress }, masterName ?? DefaultMasterName) { }
 
-        public RedisSentinel(IEnumerable<string> sentinelHosts)
-            : this(sentinelHosts, DefaultMasterName) { }
-
-        public RedisSentinel(IEnumerable<string> sentinelHosts, string masterName)
+        public RedisSentinel(IEnumerable<string> sentinelHosts, string masterName = null)
         {
             this.sentinels = sentinelHosts != null ? sentinelHosts.ToList() : null;
             if (sentinelHosts == null || sentinels.Count == 0)
                 throw new ArgumentException("sentinels must have at least one entry");
 
-            this.masterName = masterName;
+            this.masterName = masterName ?? DefaultMasterName;
             this.RedisManagerFactory = new RedisManagerFactory();
         }
 
