@@ -317,10 +317,15 @@ namespace ServiceStack.Redis
 			return SendExpectMultiData(Commands.Time);
 		}
 
-    	public void DebugSegfault()
-    	{
-			SendExpectSuccess(Commands.Debug, Commands.Segfault);
-		}
+        public void DebugSegfault()
+        {
+            SendExpectSuccess(Commands.Debug, Commands.Segfault);
+        }
+
+        public void DebugSleep(double durationSecs)
+        {
+            SendExpectSuccess(Commands.Debug, Commands.Sleep, durationSecs.ToUtf8Bytes());
+        }
 
     	public byte[] Dump(string key)
 		{

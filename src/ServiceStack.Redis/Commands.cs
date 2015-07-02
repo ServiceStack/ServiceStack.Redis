@@ -40,6 +40,7 @@ namespace ServiceStack.Redis
         public readonly static byte[] Rewrite = "REWRITE".ToUtf8Bytes();
         public readonly static byte[] Time = "TIME".ToUtf8Bytes();
         public readonly static byte[] Segfault = "SEGFAULT".ToUtf8Bytes();
+        public readonly static byte[] Sleep = "SLEEP".ToUtf8Bytes();
         public readonly static byte[] Dump = "DUMP".ToUtf8Bytes();
         public readonly static byte[] Restore = "RESTORE".ToUtf8Bytes();
         public readonly static byte[] Migrate = "MIGRATE".ToUtf8Bytes();
