@@ -184,6 +184,7 @@
     <Compile Include="ConfigTests.cs" />
     <Compile Include="CustomCommandTests.cs" />
     <Compile Include="Issues\RedisCharacterizationTests.cs" />
+    <Compile Include="Redis3SentinelSetupTests.cs" />
     <Compile Include="RedisBatchTests.cs" />
     <Compile Include="RedisManagerPoolTests.cs" />
     <Compile Include="DiagnosticTests.cs" />
