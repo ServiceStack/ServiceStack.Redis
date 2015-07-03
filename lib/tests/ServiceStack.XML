@@ -117,6 +117,16 @@
             Add Request Filters, to be applied before the dto is deserialized
             </summary>
         </member>
+        <member name="P:ServiceStack.IAppHost.RequestConverters">
+            <summary>
+            Add Request Converter to convert Request DTO's
+            </summary>
+        </member>
+        <member name="P:ServiceStack.IAppHost.ResponseConverters">
+            <summary>
+            Add Response Converter to convert Response DTO's
+            </summary>
+        </member>
         <member name="P:ServiceStack.IAppHost.GlobalRequestFilters">
             <summary>
             Add Request Filters for HTTP Requests
@@ -314,6 +324,28 @@
         <member name="P:ServiceStack.AspNet.ServiceStackPage.ForbiddenRedirectUrl">
             <summary>
             Default redirct URL if Required Role or Permission attributes doesn't permit access.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Service">
+            <summary>
+            Generic + Useful IService base class
+            </summary>
+        </member>
+        <member name="M:ServiceStack.IServiceBase.ResolveService``1">
+            <summary>
+            Resolve an alternate Web Service from ServiceStack's IOC container.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="F:ServiceStack.Service.session">
+            <summary>
+            Dynamic Session Bag
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Service.SessionAs``1">
+            <summary>
+            Typed UserSession
             </summary>
         </member>
         <member name="M:ServiceStack.Configuration.ISettings.Get(System.String)">
@@ -636,28 +668,6 @@
         <member name="M:ServiceStack.Auth.UserAuthRepositoryExtensions.InitSchema(ServiceStack.Auth.IAuthRepository)">
             <summary>
             Creates the required missing tables or DB schema 
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Service">
-            <summary>
-            Generic + Useful IService base class
-            </summary>
-        </member>
-        <member name="M:ServiceStack.IServiceBase.ResolveService``1">
-            <summary>
-            Resolve an alternate Web Service from ServiceStack's IOC container.
-            </summary>
-            <typeparam name="T"></typeparam>
-            <returns></returns>
-        </member>
-        <member name="F:ServiceStack.Service.session">
-            <summary>
-            Dynamic Session Bag
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Service.SessionAs``1">
-            <summary>
-            Typed UserSession
             </summary>
         </member>
         <member name="T:ServiceStack.EnsureHttpsAttribute">
