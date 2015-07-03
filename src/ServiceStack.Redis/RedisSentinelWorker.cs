@@ -172,7 +172,12 @@ namespace ServiceStack.Redis
                 data.TryGetValue("ip", out ip);
                 data.TryGetValue("port", out port);
 
-                if (ip == "127.0.0.1")
+                string externalIp;
+                if (redisSentinel.IpAddressMap.TryGetValue(ip, out externalIp))
+                {
+                    ip = externalIp;
+                }
+                else if (ip == "127.0.0.1")
                 {
                     ip = this.sentinelClient.Host;
                 }
@@ -201,6 +206,12 @@ namespace ServiceStack.Redis
 
             data.TryGetValue("ip", out ip);
             data.TryGetValue("port", out port);
+
+            string externalIp;
+            if (redisSentinel.IpAddressMap.TryGetValue(ip, out externalIp))
+            {
+                ip = externalIp;
+            }
 
             if (ip != null && port != null)
             {

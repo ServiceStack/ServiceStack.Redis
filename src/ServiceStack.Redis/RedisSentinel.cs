@@ -39,6 +39,8 @@ namespace ServiceStack.Redis
         public Action<Exception> OnWorkerError { get; set; }
         public Action<string, string> OnSentinelMessageReceived { get; set; }
 
+        public Dictionary<string, string> IpAddressMap { get; set; } 
+
         public RedisSentinel(string sentinelHost = null, string masterName = null)
             : this(new[] { sentinelHost ?? DefaultAddress }, masterName ?? DefaultMasterName) { }
 
@@ -50,6 +52,7 @@ namespace ServiceStack.Redis
 
             this.masterName = masterName ?? DefaultMasterName;
             this.RedisManagerFactory = new RedisManagerFactory();
+            IpAddressMap = new Dictionary<string, string>();
         }
 
         /// <summary>
