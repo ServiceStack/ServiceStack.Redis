@@ -82,7 +82,14 @@ namespace ServiceStack.Redis.Tests
                 client.SetEntry("Sentinel3Setup", "GoogleCloud");
 
                 var result = client.GetEntry("Sentinel3Setup");
+                Assert.That(result, Is.EqualTo("GoogleCloud"));
+            }
 
+            using (var readOnly = redisManager.GetReadOnlyClient())
+            {
+                "{0}:{1}".Print(readOnly.Host, readOnly.Port);
+
+                var result = readOnly.GetEntry("Sentinel3Setup");
                 Assert.That(result, Is.EqualTo("GoogleCloud"));
             }
         }
