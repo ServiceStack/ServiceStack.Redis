@@ -39,7 +39,7 @@ namespace ServiceStack.Redis
         public const long DefaultDb = 0;
         public const int DefaultPort = 6379;
         public const int DefaultPortSsl = 6380;
-        public const int DefaultPortSentinel = 6379;
+        public const int DefaultPortSentinel = 26379;
         public const string DefaultHost = "localhost";
         public const int DefaultIdleTimeOutSecs = 240; //default on redis is 300
 
