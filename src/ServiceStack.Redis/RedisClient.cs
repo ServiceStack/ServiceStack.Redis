@@ -1050,6 +1050,37 @@ namespace ServiceStack.Redis
             base.PfMerge(toKey, fromKeys);
         }
 
+        public RedisServerRole GetServerRole()
+        {
+            if (AssertServerVersionNumber() >= 2812)
+            {
+                var text = base.Role();
+                var roleName = text.Children[0].Text;
+                return ToServerRole(roleName); 
+            }
+            
+            string role;
+            this.Info.TryGetValue("role", out role);
+            return ToServerRole(role);
+        }
+
+        private static RedisServerRole ToServerRole(string roleName)
+        {
+            if (string.IsNullOrEmpty(roleName))
+                return RedisServerRole.Unknown;
+    
+            switch (roleName)
+            {
+                case "master":
+                    return RedisServerRole.Master;
+                case "slave":
+                    return RedisServerRole.Slave;
+                case "sentinel":
+                    return RedisServerRole.Sentinel;
+                default:
+                    return RedisServerRole.Unknown;
+            }
+        }
     }
 
 }

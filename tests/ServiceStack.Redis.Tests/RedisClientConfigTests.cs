@@ -83,6 +83,8 @@ namespace ServiceStack.Redis.Tests
         {
             var result = Redis.Role();
             result.PrintDump();
+            Assert.That(result.Children[0].Text, Is.EqualTo("master"));
+            Assert.That(Redis.GetServerRole(), Is.EqualTo(RedisServerRole.Master));
 
             //needs redis-server v3.0
             //var slave = new RedisClient("10.0.0.9:6380");
