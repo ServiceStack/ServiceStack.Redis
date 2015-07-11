@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using Moq;
 using NUnit.Framework;
 using ServiceStack.Text;
 
@@ -22,27 +21,14 @@ namespace ServiceStack.Redis.Tests
 		private string firstReadWriteHost;
 		private string firstReadOnlyHost;
 
-		private Mock<IRedisClientFactory> mockFactory;
-
 		[SetUp]
 		public void OnBeforeEachTest()
 		{
 			firstReadWriteHost = testReadWriteHosts[0];
 			firstReadOnlyHost = testReadOnlyHosts[0];
-
-			SetupRedisFactoryMock();
 		}
 
-		private void SetupRedisFactoryMock()
-		{
-			mockFactory = new Mock<IRedisClientFactory>();
-			mockFactory.Expect(x => x.CreateRedisClient(
-                It.IsAny<RedisEndpoint>()))
-                .Returns((Func<RedisEndpoint, RedisClient>)((config) => new RedisClient(config)));
-		}
-
-		public PooledRedisClientManager CreateManager(
-			IRedisClientFactory usingFactory, string[] readWriteHosts, string[] readOnlyHosts, int ? defaultDb = null)
+		public PooledRedisClientManager CreateManager(string[] readWriteHosts, string[] readOnlyHosts, int ? defaultDb = null)
 		{
 			return new PooledRedisClientManager(readWriteHosts, readOnlyHosts,
 				new RedisClientManagerConfig {
@@ -50,28 +36,16 @@ namespace ServiceStack.Redis.Tests
 					MaxReadPoolSize = readOnlyHosts.Length,
 					AutoStart = false,
                     DefaultDb = defaultDb
-				}) 
-				{
-					RedisClientFactory = usingFactory,
-				};
+				});
 		}
-
-		public PooledRedisClientManager CreateManager(
-			IRedisClientFactory usingFactory, params string[] readWriteHosts)
-		{
-			return new PooledRedisClientManager(readWriteHosts) {
-				RedisClientFactory = usingFactory,
-			};
-		}
-
 		public PooledRedisClientManager CreateManager(params string[] readWriteHosts)
 		{
-			return CreateManager(mockFactory.Object, readWriteHosts, readWriteHosts);
+			return CreateManager(readWriteHosts, readWriteHosts);
 		}
 
 		public PooledRedisClientManager CreateManager()
 		{
-			return CreateManager(mockFactory.Object, testReadWriteHosts, testReadOnlyHosts);
+			return CreateManager(testReadWriteHosts, testReadOnlyHosts);
 		}
 
 		public PooledRedisClientManager CreateAndStartManager()
@@ -99,10 +73,56 @@ namespace ServiceStack.Redis.Tests
 		}
 
         [Test]
-        public void Can_change_db_for_client()
+        public void Can_change_db_for_client_PooledRedisClientManager()
         {
             using (var db1 = new PooledRedisClientManager(1, new string[] { TestConfig.SingleHost }))
             using (var db2 = new PooledRedisClientManager(2, new string[] { TestConfig.SingleHost }))
+            {
+                var val = Environment.TickCount;
+                var key = "test" + val;
+                var db1c = db1.GetClient();
+                var db2c = db2.GetClient();
+                try
+                {
+                    db1c.Set(key, val);
+                    Assert.That(db2c.Get<int>(key), Is.EqualTo(0));
+                    Assert.That(db1c.Get<int>(key), Is.EqualTo(val));
+                }
+                finally
+                {
+                    db1c.Remove(key);
+                }
+            }
+        }
+
+        [Test]
+        public void Can_change_db_for_client_RedisManagerPool()
+        {
+            using (var db1 = new RedisManagerPool(TestConfig.SingleHost + "?db=1"))
+            using (var db2 = new RedisManagerPool(TestConfig.SingleHost + "?db=2"))
+            {
+                var val = Environment.TickCount;
+                var key = "test" + val;
+                var db1c = db1.GetClient();
+                var db2c = db2.GetClient();
+                try
+                {
+                    db1c.Set(key, val);
+                    Assert.That(db2c.Get<int>(key), Is.EqualTo(0));
+                    Assert.That(db1c.Get<int>(key), Is.EqualTo(val));
+                }
+                finally
+                {
+                    db1c.Remove(key);
+                }
+            }
+        }
+
+        [Test]
+        public void Can_change_db_for_client_BasicRedisClientManager()
+        {
+            using (var db1 = new BasicRedisClientManager(1, new string[] { TestConfig.SingleHost }))
+            using (var db2 = new BasicRedisClientManager(2, new string[] { TestConfig.SingleHost }))
             {
                 var val = Environment.TickCount;
                 var key = "test" + val;
@@ -139,8 +159,6 @@ namespace ServiceStack.Redis.Tests
 				var client = manager.GetClient();
 
 				AssertClientHasHost(client, firstReadWriteHost);
-
-				mockFactory.VerifyAll();
 			}
 		}
 
@@ -161,8 +179,6 @@ namespace ServiceStack.Redis.Tests
 				var client = manager.GetReadOnlyClient();
 
 				AssertClientHasHost(client, firstReadOnlyHost);
-
-				mockFactory.VerifyAll();
 			}
 		}
 
@@ -183,8 +199,6 @@ namespace ServiceStack.Redis.Tests
 				AssertClientHasHost(client3, testReadWriteHosts[2]);
 				AssertClientHasHost(client4, testReadWriteHosts[3]);
 				AssertClientHasHost(client5, testReadWriteHosts[0]);
-
-				mockFactory.VerifyAll();
 			}
 		}
 
@@ -206,8 +220,6 @@ namespace ServiceStack.Redis.Tests
 				AssertClientHasHost(client3, testReadOnlyHosts[2]);
 				AssertClientHasHost(client4, testReadOnlyHosts[0]);
 				AssertClientHasHost(client5, testReadOnlyHosts[1]);
-
-				mockFactory.VerifyAll();
 			}
 		}
 
@@ -225,9 +237,7 @@ namespace ServiceStack.Redis.Tests
 						MaxReadPoolSize = readHosts.Length * poolSizeMultiplier,
 						AutoStart = true,
 					}
-				) {
-					RedisClientFactory = mockFactory.Object,
-				}
+				)
 			)
 			{
 				//A poolsize of 4 will not block getting 4 clients
@@ -261,8 +271,6 @@ namespace ServiceStack.Redis.Tests
 					AssertClientHasHost(client7, readHosts[0]);
 					AssertClientHasHost(client8, readHosts[1]);
 				}
-
-				mockFactory.VerifyAll();
 			}
 		}
 
@@ -295,8 +303,6 @@ namespace ServiceStack.Redis.Tests
 				AssertClientHasHost(client3, testReadWriteHosts[2]);
 				AssertClientHasHost(client4, testReadWriteHosts[3]);
 				AssertClientHasHost(client5, testReadWriteHosts[3]);
-
-				mockFactory.VerifyAll();
 			}
 		}
 
@@ -328,8 +334,6 @@ namespace ServiceStack.Redis.Tests
 				AssertClientHasHost(client2, testReadOnlyHosts[1]);
 				AssertClientHasHost(client3, testReadOnlyHosts[2]);
 				AssertClientHasHost(client4, testReadOnlyHosts[2]);
-
-				mockFactory.VerifyAll();
 			}
 		}
 

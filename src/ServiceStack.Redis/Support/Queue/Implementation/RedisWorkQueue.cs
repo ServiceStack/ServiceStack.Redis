@@ -13,11 +13,8 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
         protected string workQueue;
         protected readonly PooledRedisClientManager clientManager;
 
-        public RedisWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port) : 
-                                               this(maxReadPoolSize, maxWritePoolSize, host, port, null)
-        {
-           
-        }
+        public RedisWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port) 
+            : this(maxReadPoolSize, maxWritePoolSize, host, port, null) {}
 
         public RedisWorkQueue(int maxReadPoolSize, int maxWritePoolSize, string host, int port, string queueName )
         {
@@ -27,15 +24,15 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             workQueue = queueNamespace.GlobalCacheKey( "WorkQueue");
 
             var poolConfig = new RedisClientManagerConfig
-                                 {
-                                     MaxReadPoolSize = maxReadPoolSize,
-                                     MaxWritePoolSize = maxWritePoolSize
-                                 };
+            {
+                MaxReadPoolSize = maxReadPoolSize,
+                MaxWritePoolSize = maxWritePoolSize
+            };
             
-            clientManager = new PooledRedisClientManager(new List<string>() { host + ":" + port.ToString() },new List<string>(), poolConfig)
-                                {
-                                    RedisClientFactory = new SerializingRedisClientFactory()
-                                };
+            clientManager = new PooledRedisClientManager(new List<string> { host + ":" + port.ToString() },new List<string>(), poolConfig)
+            {
+                ClientFactory = config => new SerializingRedisClient(config)
+            };
         }
 
         public void Dispose()

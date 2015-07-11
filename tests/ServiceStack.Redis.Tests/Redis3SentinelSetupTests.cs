@@ -40,6 +40,20 @@ namespace ServiceStack.Redis.Tests
             "107.178.218.53",
         };
 
+        private static RedisSentinel CreateGCloudSentinel()
+        {
+            var sentinel = new RedisSentinel(GoogleCloudSentinelHosts, masterName: "master")
+            {
+                IpAddressMap =
+                {
+                    {"10.240.34.152", "146.148.77.31"},
+                    {"10.240.203.193", "130.211.139.141"},
+                    {"10.240.209.52", "107.178.218.53"},
+                }
+            };
+            return sentinel;
+        }
+
         [Test]
         public void Can_connect_directly_to_Redis_Instances()
         {
@@ -62,14 +76,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_connect_to_GoogleCloud_3SentinelSetup()
         {
-            var sentinel = new RedisSentinel(GoogleCloudSentinelHosts, masterName: "master")
-            {
-                IpAddressMap = {
-                    {"10.240.34.152", "146.148.77.31"},
-                    {"10.240.203.193","130.211.139.141"},
-                    {"10.240.209.52", "107.178.218.53"},
-                }
-            };
+            var sentinel = CreateGCloudSentinel();
 
             var redisManager = sentinel.Start();
 

@@ -26,7 +26,7 @@ namespace ServiceStack.Redis
     /// Provides thread-safe pooling of redis client connections.
     /// </summary>
     public partial class RedisManagerPool
-        : IRedisClientsManager, IRedisFailover, IHandleClientDispose
+        : IRedisClientsManager, IRedisFailover, IHandleClientDispose, IHasRedisResolver
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RedisManagerPool));
 
@@ -35,8 +35,6 @@ namespace ServiceStack.Redis
 
         public int RecheckPoolAfterMs = 100;
 
-        private List<RedisEndpoint> Hosts { get; set; }
-
         public List<Action<IRedisClientsManager>> OnFailover { get; private set; }
 
         private RedisClient[] clients = new RedisClient[0];
@@ -44,9 +42,11 @@ namespace ServiceStack.Redis
 
         protected int RedisClientCounter = 0;
 
-        public IRedisClientFactory RedisClientFactory { get; set; }
+        public Func<RedisEndpoint,RedisClient> ClientFactory { get; set; }
 
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
+
+        public IRedisResolver RedisResolver { get; set; }
 
         public int MaxPoolSize { get; set; }
 
@@ -59,12 +59,8 @@ namespace ServiceStack.Redis
             if (hosts == null)
                 throw new ArgumentNullException("hosts");
 
-            Hosts = hosts.ToRedisEndPoints();
-
-            if (Hosts.Count == 0)
-                throw new Exception("Must provide at least ");
-
-            this.RedisClientFactory = Redis.RedisClientFactory.Instance;
+            RedisResolver = new BasicRedisResolver();
+            RedisResolver.ResetMasters(hosts);
 
             if (config == null)
                 config = new RedisPoolConfig();
@@ -91,7 +87,7 @@ namespace ServiceStack.Redis
 
                     clients[i] = null;
                 }
-                Hosts = readWriteHosts.ToRedisEndPoints();
+                RedisResolver.ResetMasters(readWriteHosts);
             }
 
             if (this.OnFailover != null)
@@ -130,9 +126,8 @@ namespace ServiceStack.Redis
                 {
                     //Create new client outside of pool when max pool size exceeded
                     var desiredIndex = poolIndex % clients.Length;
-                    var nextHostIndex = desiredIndex % Hosts.Count;
-                    var nextHost = Hosts[nextHostIndex];
-                    var newClient = InitNewClient(nextHost);
+                    var nextHost = RedisResolver.GetReadWriteHost(desiredIndex);
+                    var newClient = InitNewClient(nextHost, readWrite:true);
                     //Don't handle callbacks for new client outside pool
                     newClient.ClientManager = null; 
                     return newClient;
@@ -140,8 +135,6 @@ namespace ServiceStack.Redis
 
                 poolIndex++;
                 inActiveClient.Active = true;
-
-                InitClient(inActiveClient);
 
                 return inActiveClient;
             }
@@ -161,20 +154,22 @@ namespace ServiceStack.Redis
             var desiredIndex = poolIndex % clients.Length;
             //this will loop through all hosts in readClients once even though there are 2 for loops
             //both loops are used to try to get the prefered host according to the round robin algorithm
-            for (int x = 0; x < Hosts.Count; x++)
+            var readWriteTotal = RedisResolver.ReadWriteHostsCount;
+            for (int x = 0; x < readWriteTotal; x++)
             {
-                var nextHostIndex = (desiredIndex + x) % Hosts.Count;
-                var nextHost = Hosts[nextHostIndex];
-                for (var i = nextHostIndex; i < clients.Length; i += Hosts.Count)
+                var nextHostIndex = (desiredIndex + x) % readWriteTotal;
+                RedisEndpoint nextHost = RedisResolver.GetReadWriteHost(nextHostIndex);
+                for (var i = nextHostIndex; i < clients.Length; i += readWriteTotal)
                 {
                     if (clients[i] != null && !clients[i].Active && !clients[i].HadExceptions)
                         return clients[i];
-                    else if (clients[i] == null || clients[i].HadExceptions)
+                    
+                    if (clients[i] == null || clients[i].HadExceptions)
                     {
                         if (clients[i] != null)
                             clients[i].DisposeConnection();
 
-                        var client = InitNewClient(nextHost);
+                        var client = InitNewClient(nextHost, readWrite:true);
                         clients[i] = client;
 
                         return client;
@@ -184,18 +179,17 @@ namespace ServiceStack.Redis
             return null;
         }
 
-        private RedisClient InitNewClient(RedisEndpoint nextHost)
+        private RedisClient InitNewClient(RedisEndpoint nextHost, bool readWrite)
         {
-            var client = RedisClientFactory.CreateRedisClient(nextHost);
+            var client = ClientFactory != null
+                ? ClientFactory(nextHost)
+                : RedisResolver.CreateRedisClient(nextHost, readWrite:true);
+
             client.Id = Interlocked.Increment(ref RedisClientCounter);
             client.ClientManager = this;
             client.ConnectionFilter = ConnectionFilter;
 
             return client;
-        }
-
-        private void InitClient(RedisClient client)
-        {
         }
 
         public void DisposeClient(RedisNativeClient client)

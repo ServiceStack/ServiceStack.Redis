@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using ServiceStack.Redis.Support.Locking;
 
 namespace ServiceStack.Redis.Support.Queue.Implementation
 {

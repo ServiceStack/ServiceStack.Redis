@@ -22,42 +22,21 @@ namespace ServiceStack.Redis.Tests
 		private string firstReadWriteHost;
 		private string firstReadOnlyHost;
 
-		private Mock<IRedisClientFactory> mockFactory;
-
 		[SetUp]
 		public void OnBeforeEachTest()
 		{
 			firstReadWriteHost = hosts[0];
 			firstReadOnlyHost = testReadOnlyHosts[0];
-
-			SetupRedisFactoryMock();
-		}
-
-		private void SetupRedisFactoryMock()
-		{
-			mockFactory = new Mock<IRedisClientFactory>();
-			mockFactory.Expect(x => x.CreateRedisClient(
-                It.IsAny<RedisEndpoint>()))
-                .Returns((Func<RedisEndpoint, RedisClient>)((config) => new RedisClient(config)));
-		}
-
-        public RedisManagerPool CreateManager(
-			IRedisClientFactory usingFactory, params string[] hosts)
-		{
-            return new RedisManagerPool(hosts)
-            {
-				RedisClientFactory = usingFactory,
-			};
 		}
 
         public RedisManagerPool CreateManager(params string[] hosts)
 		{
-			return CreateManager(mockFactory.Object, hosts);
+			return CreateManager(hosts);
 		}
 
         public RedisManagerPool CreateManager()
 		{
-			return CreateManager(mockFactory.Object, hosts);
+			return CreateManager(hosts);
 		}
 
         [Test]
@@ -91,8 +70,6 @@ namespace ServiceStack.Redis.Tests
 				var client = manager.GetClient();
 
 				AssertClientHasHost(client, firstReadWriteHost);
-
-				mockFactory.VerifyAll();
 			}
 		}
 
@@ -123,8 +100,6 @@ namespace ServiceStack.Redis.Tests
 				AssertClientHasHost(client3, hosts[2]);
 				AssertClientHasHost(client4, hosts[3]);
 				AssertClientHasHost(client5, hosts[0]);
-
-				mockFactory.VerifyAll();
 			}
 		}
 
@@ -135,11 +110,7 @@ namespace ServiceStack.Redis.Tests
 
             using (var manager = new RedisManagerPool(
                     writeHosts, 
-                    new RedisPoolConfig { MaxPoolSize = 4 }) 
-                {
-					RedisClientFactory = mockFactory.Object,
-				}
-			)
+                    new RedisPoolConfig { MaxPoolSize = 4 }))
 			{
 				//A poolsize of 4 will not block getting 4 clients
 				using (var client1 = manager.GetClient())
@@ -152,8 +123,6 @@ namespace ServiceStack.Redis.Tests
 					AssertClientHasHost(client3, writeHosts[0]);
 					AssertClientHasHost(client4, writeHosts[0]);
 				}
-
-				mockFactory.VerifyAll();
 			}
 		}
 
@@ -162,11 +131,7 @@ namespace ServiceStack.Redis.Tests
 		{
             using (var manager = new RedisManagerPool(
                     hosts,
-                    new RedisPoolConfig { MaxPoolSize = 4 })
-                {
-                    RedisClientFactory = mockFactory.Object,
-                }
-            )
+                    new RedisPoolConfig { MaxPoolSize = 4 }))
             {
 				var delay = TimeSpan.FromSeconds(1);
 				var client1 = manager.GetClient();
@@ -199,8 +164,6 @@ namespace ServiceStack.Redis.Tests
 				AssertClientHasHost(client3, hosts[2]);
 				AssertClientHasHost(client4, hosts[3]);
 				AssertClientHasHost(client5, hosts[0]);
-
-				mockFactory.VerifyAll();
 			}
 		}
 

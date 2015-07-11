@@ -21,10 +21,8 @@ namespace ServiceStack.Redis
     /// Allows the configuration of different ReadWrite and ReadOnly hosts
     /// </summary>
     public partial class BasicRedisClientManager
-        : IRedisClientsManager, IRedisFailover
+        : IRedisClientsManager, IRedisFailover, IHasRedisResolver
     {
-        private List<RedisEndpoint> ReadWriteHosts { get; set; }
-        private List<RedisEndpoint> ReadOnlyHosts { get; set; }
         public int? ConnectTimeout { get; set; }
         public int? SocketSendTimeout { get; set; }
         public int? SocketReceiveTimeout { get; set; }
@@ -39,13 +37,15 @@ namespace ServiceStack.Redis
 
         protected int RedisClientCounter = 0;
 
-        public IRedisClientFactory RedisClientFactory { get; set; }
+        public Func<RedisEndpoint, RedisClient> ClientFactory { get; set; } 
 
         public long? Db { get; private set; }
 
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
 
         public List<Action<IRedisClientsManager>> OnFailover { get; private set; }
+
+        public IRedisResolver RedisResolver { get; set; }
 
         public BasicRedisClientManager() : this(RedisNativeClient.DefaultHost) { }
 
@@ -65,9 +65,7 @@ namespace ServiceStack.Redis
         public BasicRedisClientManager(
             IEnumerable<string> readWriteHosts,
             IEnumerable<string> readOnlyHosts)
-            : this(readWriteHosts, readOnlyHosts, null)
-        {
-        }
+            : this(readWriteHosts, readOnlyHosts, null) {}
 
         public BasicRedisClientManager(
             IEnumerable<string> readWriteHosts,
@@ -76,11 +74,11 @@ namespace ServiceStack.Redis
         {
             this.Db = initalDb;
 
-            ReadWriteHosts = readWriteHosts.ToRedisEndPoints();
-            ReadOnlyHosts = readOnlyHosts.ToRedisEndPoints();
+            RedisResolver = new BasicRedisResolver();
+            RedisResolver.ResetMasters(readWriteHosts);
+            RedisResolver.ResetSlaves(readOnlyHosts);
 
             this.OnFailover = new List<Action<IRedisClientsManager>>();
-            this.RedisClientFactory = Redis.RedisClientFactory.Instance;
 
             this.OnStart();
         }
@@ -96,8 +94,8 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         public IRedisClient GetClient()
         {
-            var nextHost = ReadWriteHosts[readWriteHostsIndex++ % ReadWriteHosts.Count];
-            var client = InitNewClient(nextHost);
+            var nextHost = RedisResolver.GetReadWriteHost(readWriteHostsIndex++);
+            var client = InitNewClient(nextHost, readWrite:true);
             return client;
         }
 
@@ -107,17 +105,17 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         public virtual IRedisClient GetReadOnlyClient()
         {
-            if (ReadOnlyHosts.Count == 0)
-                return this.GetClient();
-
-            var nextHost = ReadOnlyHosts[readOnlyHostsIndex++ % ReadOnlyHosts.Count];
-            var client = InitNewClient(nextHost);
+            var nextHost = RedisResolver.GetReadOnlyHost(readOnlyHostsIndex++);
+            var client = InitNewClient(nextHost, readWrite:false);
             return client;
         }
 
-        private RedisClient InitNewClient(RedisEndpoint nextHost)
+        private RedisClient InitNewClient(RedisEndpoint nextHost, bool readWrite)
         {
-            var client = RedisClientFactory.CreateRedisClient(nextHost);
+            var client = ClientFactory != null
+                ? ClientFactory(nextHost)
+                : RedisResolver.CreateRedisClient(nextHost, readWrite: readWrite);
+
             client.Id = Interlocked.Increment(ref RedisClientCounter);
             client.ConnectionFilter = ConnectionFilter;
             if (this.ConnectTimeout != null)
@@ -157,8 +155,11 @@ namespace ServiceStack.Redis
 
         public void FailoverTo(IEnumerable<string> readWriteHosts, IEnumerable<string> readOnlyHosts)
         {
-            ReadWriteHosts = readWriteHosts.ToRedisEndPoints();
-            ReadOnlyHosts = readOnlyHosts.ToRedisEndPoints();
+            lock (this)
+            {
+                RedisResolver.ResetMasters(readWriteHosts);
+                RedisResolver.ResetSlaves(readOnlyHosts);
+            }
 
             Start();
         }

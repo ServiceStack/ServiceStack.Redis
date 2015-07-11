@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using ServiceStack.Caching;
 using ServiceStack.Logging;
@@ -24,7 +25,7 @@ namespace ServiceStack.Redis
     /// 1 master and multiple replicated read slaves.
     /// </summary>
     public partial class PooledRedisClientManager
-        : IRedisClientsManager, IRedisFailover, IHandleClientDispose
+        : IRedisClientsManager, IRedisFailover, IHandleClientDispose, IHasRedisResolver
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PooledRedisClientManager));
 
@@ -44,8 +45,7 @@ namespace ServiceStack.Redis
         /// </summary>
         public string NamespacePrefix { get; set; }
 
-        private List<RedisEndpoint> ReadWriteHosts { get; set; }
-        private List<RedisEndpoint> ReadOnlyHosts { get; set; }
+        public IRedisResolver RedisResolver { get; set; }
         public List<Action<IRedisClientsManager>> OnFailover { get; private set; }
 
         private RedisClient[] writeClients = new RedisClient[0];
@@ -58,7 +58,7 @@ namespace ServiceStack.Redis
 
         protected RedisClientManagerConfig Config { get; set; }
 
-        public IRedisClientFactory RedisClientFactory { get; set; }
+        public Func<RedisEndpoint,RedisClient> ClientFactory { get; set; }
 
         public long? Db { get; private set; }
 
@@ -120,17 +120,20 @@ namespace ServiceStack.Redis
                 ? config.DefaultDb ?? initalDb
                 : initalDb;
 
-            ReadWriteHosts = readWriteHosts.ToRedisEndPoints();
-            ReadOnlyHosts = readOnlyHosts.ToRedisEndPoints();
+            RedisResolver = new BasicRedisResolver();
 
-            this.RedisClientFactory = Redis.RedisClientFactory.Instance;
+            var masters = readWriteHosts.ToArray();
+            var slaves = readOnlyHosts.ToArray();
+
+            RedisResolver.ResetMasters(masters);
+            RedisResolver.ResetSlaves(slaves);
 
             this.PoolSizeMultiplier = poolSizeMultiplier ?? 10;
 
             this.Config = config ?? new RedisClientManagerConfig
             {
-                MaxWritePoolSize = ReadWriteHosts.Count * PoolSizeMultiplier,
-                MaxReadPoolSize = ReadOnlyHosts.Count * PoolSizeMultiplier,
+                MaxWritePoolSize = masters.Length * PoolSizeMultiplier,
+                MaxReadPoolSize = slaves.Length * PoolSizeMultiplier,
             };
 
             this.OnFailover = new List<Action<IRedisClientsManager>>();
@@ -166,7 +169,7 @@ namespace ServiceStack.Redis
 
                     readClients[i] = null;
                 }
-                ReadOnlyHosts = readOnlyHosts.ToRedisEndPoints();
+                RedisResolver.ResetSlaves(readOnlyHosts);
             }
 
             lock (writeClients)
@@ -181,7 +184,7 @@ namespace ServiceStack.Redis
 
                     writeClients[i] = null;
                 }
-                ReadWriteHosts = readWriteHosts.ToRedisEndPoints();
+                RedisResolver.ResetMasters(readWriteHosts);
             }
 
             if (this.OnFailover != null)
@@ -246,20 +249,22 @@ namespace ServiceStack.Redis
             var desiredIndex = WritePoolIndex % writeClients.Length;
             //this will loop through all hosts in readClients once even though there are 2 for loops
             //both loops are used to try to get the prefered host according to the round robin algorithm
-            for (int x = 0; x < ReadWriteHosts.Count; x++)
+            var readWriteTotal = RedisResolver.ReadWriteHostsCount;
+            for (int x = 0; x < readWriteTotal; x++)
             {
-                var nextHostIndex = (desiredIndex + x) % ReadWriteHosts.Count;
-                RedisEndpoint nextHost = ReadWriteHosts[nextHostIndex];
-                for (var i = nextHostIndex; i < writeClients.Length; i += ReadWriteHosts.Count)
+                var nextHostIndex = (desiredIndex + x) % readWriteTotal;
+                RedisEndpoint nextHost = RedisResolver.GetReadWriteHost(nextHostIndex);
+                for (var i = nextHostIndex; i < writeClients.Length; i += readWriteTotal)
                 {
                     if (writeClients[i] != null && !writeClients[i].Active && !writeClients[i].HadExceptions)
-                        return writeClients[i];
-                    else if (writeClients[i] == null || writeClients[i].HadExceptions)
+                        return writeClients[i];                        
+                    
+                    if (writeClients[i] == null || writeClients[i].HadExceptions)
                     {
                         if (writeClients[i] != null)
                             writeClients[i].DisposeConnection();
 
-                        var client = InitNewClient(nextHost);
+                        var client = InitNewClient(nextHost, readWrite:true);
                         writeClients[i] = client;
 
                         return client;
@@ -269,9 +274,12 @@ namespace ServiceStack.Redis
             return null;
         }
 
-        private RedisClient InitNewClient(RedisEndpoint nextHost)
+        private RedisClient InitNewClient(RedisEndpoint nextHost, bool readWrite)
         {
-            var client = RedisClientFactory.CreateRedisClient(nextHost);
+            var client = ClientFactory != null 
+                ? ClientFactory(nextHost)
+                : RedisResolver.CreateRedisClient(nextHost, readWrite:readWrite);
+
             client.Id = Interlocked.Increment(ref RedisClientCounter);
             client.ClientManager = this;
             client.ConnectionFilter = ConnectionFilter;
@@ -303,9 +311,6 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         public virtual IRedisClient GetReadOnlyClient()
         {
-            if (ReadOnlyHosts.Count == 0)
-                return this.GetClient();
-
             lock (readClients)
             {
                 AssertValidReadOnlyPool();
@@ -341,20 +346,22 @@ namespace ServiceStack.Redis
             var desiredIndex = ReadPoolIndex % readClients.Length;
             //this will loop through all hosts in readClients once even though there are 2 for loops
             //both loops are used to try to get the prefered host according to the round robin algorithm
-            for (int x = 0; x < ReadOnlyHosts.Count; x++)
+            var readOnlyTotal = RedisResolver.ReadOnlyHostsCount;
+            for (int x = 0; x < readOnlyTotal; x++)
             {
-                var nextHostIndex = (desiredIndex + x) % ReadOnlyHosts.Count;
-                var nextHost = ReadOnlyHosts[nextHostIndex];
-                for (var i = nextHostIndex; i < readClients.Length; i += ReadOnlyHosts.Count)
+                var nextHostIndex = (desiredIndex + x) % readOnlyTotal;
+                var nextHost = RedisResolver.GetReadOnlyHost(nextHostIndex);
+                for (var i = nextHostIndex; i < readClients.Length; i += readOnlyTotal)
                 {
                     if (readClients[i] != null && !readClients[i].Active && !readClients[i].HadExceptions)
                         return readClients[i];
-                    else if (readClients[i] == null || readClients[i].HadExceptions)
+                    
+                    if (readClients[i] == null || readClients[i].HadExceptions)
                     {
                         if (readClients[i] != null)
                             readClients[i].DisposeConnection();
 
-                        var client = InitNewClient(nextHost);
+                        var client = InitNewClient(nextHost, readWrite:false);
                         readClients[i] = client;
 
                         return client;
