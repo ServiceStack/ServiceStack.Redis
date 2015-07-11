@@ -42,3 +42,4 @@ packages/
 
 build/
 tests/ServiceStack.Redis.Tests/azureconfig.txt
+*.rdb
