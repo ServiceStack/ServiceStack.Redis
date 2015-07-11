@@ -120,7 +120,7 @@ namespace ServiceStack.Redis
                 ? config.DefaultDb ?? initalDb
                 : initalDb;
 
-            RedisResolver = new BasicRedisResolver();
+            RedisResolver = new RedisResolver();
 
             var masters = readWriteHosts.ToArray();
             var slaves = readOnlyHosts.ToArray();

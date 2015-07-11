@@ -74,7 +74,7 @@ namespace ServiceStack.Redis
         {
             this.Db = initalDb;
 
-            RedisResolver = new BasicRedisResolver();
+            RedisResolver = new RedisResolver();
             RedisResolver.ResetMasters(readWriteHosts);
             RedisResolver.ResetSlaves(readOnlyHosts);
 

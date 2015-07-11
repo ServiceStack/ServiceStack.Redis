@@ -15,5 +15,9 @@ namespace ServiceStack.Redis
         public static int BufferLength = 1450;
 
         public static int BufferPoolMaxSize = 500000;
+
+        public static bool VerifyMasterConnections = true;
+
+        public static int SentinelConnectTimeout = 200;
     }
 }

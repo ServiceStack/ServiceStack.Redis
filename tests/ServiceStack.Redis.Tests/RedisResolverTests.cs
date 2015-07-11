@@ -9,7 +9,7 @@ using ServiceStack.Text;
 namespace ServiceStack.Redis.Tests
 {
     [TestFixture]
-    public class RedisHostResolverTests
+    public class RedisResolverTests
         : RedisClientTestsBase
     {
         public static int[] RedisServerPorts = new[] { 6380, 6381, 6382 };
@@ -67,7 +67,35 @@ namespace ServiceStack.Redis.Tests
                 CreateNoWindow = true,
             };
 
-            ThreadPool.QueueUserWorkItem(state => Process.Start(pInfo)); 
+            ThreadPool.QueueUserWorkItem(state => Process.Start(pInfo));
+        }
+
+        [Test]
+        public void RedisResolver_does_reset_when_detects_invalid_master()
+        {
+            var invalidMaster = new[] { RedisSlaves[0] };
+            var invalidSlaves = new[] { RedisMaster[0], RedisSlaves[1] };
+
+            using (var redisManager = new PooledRedisClientManager(invalidMaster, invalidSlaves))
+            {
+                var resolver = (RedisResolver)redisManager.RedisResolver;
+
+                using (var master = redisManager.GetClient())
+                {
+                    master.SetValue("KEY", "1");
+                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                }
+                using (var master = redisManager.GetClient())
+                {
+                    master.Increment("KEY", 1);
+                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                }
+
+                "Masters:".Print();
+                resolver.Masters.PrintDump();
+                "Slaves:".Print();
+                resolver.Slaves.PrintDump();
+            }
         }
 
         [Test]
@@ -181,8 +209,8 @@ namespace ServiceStack.Redis.Tests
             public int ReadWriteHostsCount { get { return 1; } }
             public int ReadOnlyHostsCount { get { return 1; } }
 
-            public void ResetMasters(IEnumerable<string> hosts) {}
-            public void ResetSlaves(IEnumerable<string> hosts) {}
+            public void ResetMasters(IEnumerable<string> hosts) { }
+            public void ResetSlaves(IEnumerable<string> hosts) { }
 
             public RedisClient CreateRedisClient(RedisEndpoint config, bool readWrite)
             {
@@ -205,7 +233,8 @@ namespace ServiceStack.Redis.Tests
         public void PooledRedisClientManager_can_execute_CustomResolver()
         {
             var resolver = new FixedResolver(RedisMaster[0].ToRedisEndpoint(), RedisSlaves[0].ToRedisEndpoint());
-            using (var redisManager = new PooledRedisClientManager("127.0.0.1:8888") {
+            using (var redisManager = new PooledRedisClientManager("127.0.0.1:8888")
+            {
                 RedisResolver = resolver
             })
             {
