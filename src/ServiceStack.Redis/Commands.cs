@@ -30,6 +30,7 @@ namespace ServiceStack.Redis
         public readonly static byte[] BgSave = "BGSAVE".ToUtf8Bytes();
         public readonly static byte[] LastSave = "LASTSAVE".ToUtf8Bytes();
         public readonly static byte[] Shutdown = "SHUTDOWN".ToUtf8Bytes();
+        public readonly static byte[] NoSave = "NOSAVE".ToUtf8Bytes();
         public readonly static byte[] BgRewriteAof = "BGREWRITEAOF".ToUtf8Bytes();
 
         public readonly static byte[] Info = "INFO".ToUtf8Bytes();

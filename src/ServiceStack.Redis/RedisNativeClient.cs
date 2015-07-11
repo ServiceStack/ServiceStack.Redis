@@ -763,6 +763,11 @@ namespace ServiceStack.Redis
             SendCommand(Commands.Shutdown);
         }
 
+        public void ShutdownNoSave()
+        {
+            SendCommand(Commands.Shutdown, Commands.NoSave);
+        }
+
         public void BgRewriteAof()
         {
             SendExpectSuccess(Commands.BgRewriteAof);
