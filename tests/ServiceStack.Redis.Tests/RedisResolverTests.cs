@@ -8,6 +8,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
+    [Ignore("Integration Test")]
     [TestFixture]
     public class RedisResolverTests
         : RedisClientTestsBase

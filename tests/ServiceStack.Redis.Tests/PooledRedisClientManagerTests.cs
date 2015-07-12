@@ -10,7 +10,19 @@ namespace ServiceStack.Redis.Tests
 	[TestFixture, Category("Integration")]
 	public class PooledRedisClientManagerTests
 	{
-		readonly string[] testReadWriteHosts = new[] {
+        [TestFixtureSetUp]
+        public void TestFixtureSetUp()
+        {
+            RedisConfig.VerifyMasterConnections = false;
+        }
+
+        [TestFixtureTearDown]
+        public void TestFixtureTearDown()
+        {
+            RedisConfig.VerifyMasterConnections = true;
+        }
+
+        readonly string[] testReadWriteHosts = new[] {
 			"readwrite1", "readwrite2:6000", "192.168.0.1", "localhost"
 		};
 

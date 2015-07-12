@@ -5,6 +5,18 @@ namespace ServiceStack.Redis.Tests
     [TestFixture]
     public class ConfigTests
     {
+        [TestFixtureSetUp]
+        public void TestFixtureSetUp()
+        {
+            RedisConfig.VerifyMasterConnections = false;
+        }
+
+        [TestFixtureTearDown]
+        public void TestFixtureTearDown()
+        {
+            RedisConfig.VerifyMasterConnections = true;
+        }
+
         [Test]
         [TestCase("host", "{Host:host,Port:6379}")]
         [TestCase("redis://host", "{Host:host,Port:6379}")]
