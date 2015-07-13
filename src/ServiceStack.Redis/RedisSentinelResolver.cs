@@ -7,9 +7,11 @@ using ServiceStack.Logging;
 
 namespace ServiceStack.Redis
 {
-    public class RedisSentinelResolver : IRedisResolver
+    public class RedisSentinelResolver : IRedisResolver, IRedisResolverExtended
     {
         static ILog log = LogManager.GetLogger(typeof(RedisResolver));
+
+        public Func<RedisEndpoint, RedisClient> ClientFactory { get; set; }
 
         public int ReadWriteHostsCount { get; private set; }
         public int ReadOnlyHostsCount { get; private set; }
@@ -41,6 +43,7 @@ namespace ServiceStack.Redis
             this.sentinel = sentinel;
             ResetMasters(masters.ToList());
             ResetSlaves(slaves.ToList());
+            ClientFactory = RedisConfig.ClientFactory;
         }
 
         public virtual void ResetMasters(IEnumerable<string> hosts)
@@ -92,25 +95,36 @@ namespace ServiceStack.Redis
                 : GetReadWriteHost(desiredIndex);
         }
 
-        public virtual RedisClient CreateRedisClient(RedisEndpoint config, bool readWrite)
+        public RedisClient CreateMasterClient(int desiredIndex)
         {
-            var client = RedisConfig.ClientFactory(config);
+            return CreateRedisClient(GetReadWriteHost(desiredIndex), master: true);
+        }
 
-            if (readWrite)
+        public RedisClient CreateSlaveClient(int desiredIndex)
+        {
+            return CreateRedisClient(GetReadOnlyHost(desiredIndex), master: false);
+        }
+
+        public virtual RedisClient CreateRedisClient(RedisEndpoint config, bool master)
+        {
+            var client = ClientFactory(config);
+            if (master)
             {
                 var role = client.GetServerRole();
                 if (role != RedisServerRole.Master)
                 {
+                    Interlocked.Increment(ref RedisState.TotalInvalidMasters);
                     try
                     {
                         var stopwatch = Stopwatch.StartNew();
                         while (true)
                         {
                             var masterConfig = sentinel.GetMaster();
-                            var master = RedisConfig.ClientFactory(masterConfig);
-                            var masterRole = master.GetServerRole();
+                            var masterClient = ClientFactory(masterConfig);
+                            masterClient.ConnectTimeout = sentinel.SentinelWorkerTimeoutMs;
+                            var masterRole = masterClient.GetServerRole();
                             if (masterRole == RedisServerRole.Master)
-                                return master;
+                                return masterClient;
 
                             if (stopwatch.Elapsed > sentinel.MaxWaitBetweenSentinelLookups)
                                 throw new TimeoutException("Max Wait Between Sentinel Lookups Elapsed: {0}"
@@ -129,10 +143,8 @@ namespace ServiceStack.Redis
                         {
                             try
                             {
-                                var testClient = new RedisClient(hostConfig)
-                                {
-                                    ConnectTimeout = RedisConfig.HostLookupTimeout
-                                };
+                                var testClient = ClientFactory(hostConfig);
+                                testClient.ConnectTimeout = RedisConfig.HostLookupTimeoutMs;
                                 var testRole = testClient.GetServerRole();
                                 switch (testRole)
                                 {
@@ -152,6 +164,7 @@ namespace ServiceStack.Redis
 
                         if (masterClient == null)
                         {
+                            Interlocked.Increment(ref RedisState.TotalNoMastersFound);
                             var errorMsg = "No master found in: " + string.Join(", ", allHosts.Map(x => x.GetHostString()));
                             log.Error(errorMsg);
                             throw new Exception(errorMsg);

@@ -5,9 +5,11 @@ using ServiceStack.Logging;
 
 namespace ServiceStack.Redis
 {
-    public class BasicRedisResolver : IRedisResolver
+    public class BasicRedisResolver : IRedisResolver, IRedisResolverExtended
     {
         static ILog log = LogManager.GetLogger(typeof(BasicRedisResolver));
+
+        public Func<RedisEndpoint, RedisClient> ClientFactory { get; set; }
 
         public int ReadWriteHostsCount { get; private set; }
         public int ReadOnlyHostsCount { get; private set; }
@@ -28,6 +30,7 @@ namespace ServiceStack.Redis
         {
             ResetMasters(masters.ToList());
             ResetSlaves(slaves.ToList());
+            ClientFactory = RedisConfig.ClientFactory;
         }
 
         public virtual void ResetMasters(IEnumerable<string> hosts)
@@ -52,9 +55,18 @@ namespace ServiceStack.Redis
             ResetSlaves(hosts.ToRedisEndPoints());
         }
 
-        public RedisClient CreateRedisClient(RedisEndpoint config, bool readWrite)
+        public virtual void ResetSlaves(List<RedisEndpoint> newSlaves)
         {
-            return RedisConfig.ClientFactory(config);
+            slaves = (newSlaves ?? new List<RedisEndpoint>()).ToArray();
+            ReadOnlyHostsCount = slaves.Length;
+
+            if (log.IsDebugEnabled)
+                log.Debug("New Redis Slaves: " + string.Join(", ", slaves.Map(x => x.GetHostString())));
+        }
+
+        public RedisClient CreateRedisClient(RedisEndpoint config, bool master)
+        {
+            return ClientFactory(config);
         }
 
         public RedisEndpoint GetReadWriteHost(int desiredIndex)
@@ -69,13 +81,14 @@ namespace ServiceStack.Redis
                 : GetReadWriteHost(desiredIndex);
         }
 
-        public virtual void ResetSlaves(List<RedisEndpoint> newSlaves)
+        public RedisClient CreateMasterClient(int desiredIndex)
         {
-            slaves = (newSlaves ?? new List<RedisEndpoint>()).ToArray();
-            ReadOnlyHostsCount = slaves.Length;
+            return CreateRedisClient(GetReadWriteHost(desiredIndex), master: true);
+        }
 
-            if (log.IsDebugEnabled)
-                log.Debug("New Redis Slaves: " + string.Join(", ", slaves.Map(x => x.GetHostString())));
+        public RedisClient CreateSlaveClient(int desiredIndex)
+        {
+            return CreateRedisClient(GetReadOnlyHost(desiredIndex), master: false);
         }
     }
 }

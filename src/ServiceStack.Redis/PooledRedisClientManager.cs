@@ -58,8 +58,6 @@ namespace ServiceStack.Redis
 
         protected RedisClientManagerConfig Config { get; set; }
 
-        public Func<RedisEndpoint,RedisClient> ClientFactory { get; set; }
-
         public long? Db { get; private set; }
 
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
@@ -154,6 +152,8 @@ namespace ServiceStack.Redis
 
         public void FailoverTo(IEnumerable<string> readWriteHosts, IEnumerable<string> readOnlyHosts)
         {
+            Interlocked.Increment(ref RedisState.TotalFailovers);
+
             lock (readClients)
             {
                 for (var i = 0; i < readClients.Length; i++)
@@ -258,8 +258,7 @@ namespace ServiceStack.Redis
                         if (writeClients[i] != null)
                             RedisState.DeactivateClient(writeClients[i]);
 
-                        var nextHost = RedisResolver.GetReadWriteHost(nextHostIndex);
-                        var client = InitNewClient(nextHost, readWrite: true);
+                        var client = InitNewClient(RedisResolver.CreateMasterClient(nextHostIndex));
                         writeClients[i] = client;
 
                         return client;
@@ -269,18 +268,13 @@ namespace ServiceStack.Redis
             return null;
         }
 
-        private RedisClient InitNewClient(RedisEndpoint nextHost, bool readWrite)
+        private RedisClient InitNewClient(RedisClient client)
         {
-            var client = ClientFactory != null 
-                ? ClientFactory(nextHost)
-                : RedisResolver.CreateRedisClient(nextHost, readWrite:readWrite);
-
             client.Id = Interlocked.Increment(ref RedisClientCounter);
             client.ClientManager = this;
             client.ConnectionFilter = ConnectionFilter;
             if (NamespacePrefix != null)
                 client.NamespacePrefix = NamespacePrefix;
-
             return client;
         }
 
@@ -357,8 +351,7 @@ namespace ServiceStack.Redis
                         if (readClients[i] != null)
                             RedisState.DeactivateClient(readClients[i]);
 
-                        var nextHost = RedisResolver.GetReadOnlyHost(nextHostIndex);
-                        var client = InitNewClient(nextHost, readWrite: false);
+                        var client = InitNewClient(RedisResolver.CreateSlaveClient(nextHostIndex));
                         readClients[i] = client;
 
                         return client;

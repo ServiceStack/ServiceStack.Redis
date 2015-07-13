@@ -94,8 +94,7 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         public IRedisClient GetClient()
         {
-            var nextHost = RedisResolver.GetReadWriteHost(readWriteHostsIndex++);
-            var client = InitNewClient(nextHost, readWrite:true);
+            var client = InitNewClient(RedisResolver.CreateMasterClient(readWriteHostsIndex++));
             return client;
         }
 
@@ -105,17 +104,12 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         public virtual IRedisClient GetReadOnlyClient()
         {
-            var nextHost = RedisResolver.GetReadOnlyHost(readOnlyHostsIndex++);
-            var client = InitNewClient(nextHost, readWrite:false);
+            var client = InitNewClient(RedisResolver.CreateSlaveClient(readOnlyHostsIndex++));
             return client;
         }
 
-        private RedisClient InitNewClient(RedisEndpoint nextHost, bool readWrite)
+        private RedisClient InitNewClient(RedisClient client)
         {
-            var client = ClientFactory != null
-                ? ClientFactory(nextHost)
-                : RedisResolver.CreateRedisClient(nextHost, readWrite: readWrite);
-
             client.Id = Interlocked.Increment(ref RedisClientCounter);
             client.ConnectionFilter = ConnectionFilter;
             if (this.ConnectTimeout != null)
@@ -155,6 +149,8 @@ namespace ServiceStack.Redis
 
         public void FailoverTo(IEnumerable<string> readWriteHosts, IEnumerable<string> readOnlyHosts)
         {
+            Interlocked.Increment(ref RedisState.TotalFailovers);
+
             lock (this)
             {
                 RedisResolver.ResetMasters(readWriteHosts);

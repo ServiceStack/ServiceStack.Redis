@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Net.Security;
+using System.Threading;
 
 namespace ServiceStack.Redis
 {
     public class RedisConfig
     {
-        public static Func<RedisEndpoint, RedisClient> ClientFactory = c => new RedisClient(c);
+        public static Func<RedisEndpoint, RedisClient> ClientFactory = c =>
+        {
+            Interlocked.Increment(ref RedisState.TotalClientsCreated);
+            return new RedisClient(c);
+        };
 
         public static LocalCertificateSelectionCallback CertificateSelectionCallback { get; set; }
 
@@ -18,11 +23,13 @@ namespace ServiceStack.Redis
 
         public static bool VerifyMasterConnections = true;
 
-        public static int HostLookupTimeout = 200;
+        public static int HostLookupTimeoutMs = 200;
 
         //Skip ServerVersion Checks by specifying Min Version number, e.g: 2.8.12 => 2812, 2.9.1 => 2910
         public static int? AssumeServerVersion;
 
         public static TimeSpan DeactivatedClientsExpiry = TimeSpan.FromMinutes(1);
+
+        public static bool DisableVerboseLogging = false;
     }
 }

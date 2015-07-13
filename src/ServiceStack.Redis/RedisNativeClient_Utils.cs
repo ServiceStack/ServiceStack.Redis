@@ -319,7 +319,7 @@ namespace ServiceStack.Redis
             if (__requestsPerHour % 20 == 0)
                 LicenseUtils.AssertValidUsage(LicenseFeature.Redis, QuotaType.RequestsPerHour, __requestsPerHour);
 
-            if (log.IsDebugEnabled)
+            if (log.IsDebugEnabled && !RedisConfig.DisableVerboseLogging)
                 CmdLog(cmdWithBinaryArgs);
 
             //Total command lines count

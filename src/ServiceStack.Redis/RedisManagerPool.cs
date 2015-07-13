@@ -74,6 +74,8 @@ namespace ServiceStack.Redis
 
         public void FailoverTo(params string[] readWriteHosts)
         {
+            Interlocked.Increment(ref RedisState.TotalFailovers);
+
             lock (clients)
             {
                 for (var i = 0; i < clients.Length; i++)
@@ -123,8 +125,7 @@ namespace ServiceStack.Redis
                 {
                     //Create new client outside of pool when max pool size exceeded
                     var desiredIndex = poolIndex % clients.Length;
-                    var nextHost = RedisResolver.GetReadWriteHost(desiredIndex);
-                    var newClient = InitNewClient(nextHost, readWrite:true);
+                    var newClient = InitNewClient(RedisResolver.CreateMasterClient(desiredIndex));
                     //Don't handle callbacks for new client outside pool
                     newClient.ClientManager = null; 
                     return newClient;
@@ -167,8 +168,7 @@ namespace ServiceStack.Redis
                         if (clients[i] != null)
                             RedisState.DeactivateClient(clients[i]);
 
-                        var nextHost = RedisResolver.GetReadWriteHost(nextHostIndex);
-                        var client = InitNewClient(nextHost, readWrite: true);
+                        var client = InitNewClient(RedisResolver.CreateMasterClient(nextHostIndex));
                         clients[i] = client;
 
                         return client;
@@ -178,12 +178,8 @@ namespace ServiceStack.Redis
             return null;
         }
 
-        private RedisClient InitNewClient(RedisEndpoint nextHost, bool readWrite)
+        private RedisClient InitNewClient(RedisClient client)
         {
-            var client = ClientFactory != null
-                ? ClientFactory(nextHost)
-                : RedisResolver.CreateRedisClient(nextHost, readWrite:true);
-
             client.Id = Interlocked.Increment(ref RedisClientCounter);
             client.ClientManager = this;
             client.ConnectionFilter = ConnectionFilter;

@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using ServiceStack.Logging;
 
 namespace ServiceStack.Redis
 {
-    public class RedisResolver : IRedisResolver
+    public class RedisResolver : IRedisResolver, IRedisResolverExtended
     {
         static ILog log = LogManager.GetLogger(typeof(RedisResolver));
+
+        public Func<RedisEndpoint, RedisClient> ClientFactory { get; set; }
 
         public int ReadWriteHostsCount { get; private set; }
         public int ReadOnlyHostsCount { get; private set; }
@@ -36,6 +39,7 @@ namespace ServiceStack.Redis
         {
             ResetMasters(masters.ToList());
             ResetSlaves(slaves.ToList());
+            ClientFactory = RedisConfig.ClientFactory;
         }
 
         public virtual void ResetMasters(IEnumerable<string> hosts)
@@ -71,15 +75,16 @@ namespace ServiceStack.Redis
                 log.Debug("New Redis Slaves: " + string.Join(", ", slaves.Map(x => x.GetHostString())));
         }
 
-        public virtual RedisClient CreateRedisClient(RedisEndpoint config, bool readWrite)
+        public virtual RedisClient CreateRedisClient(RedisEndpoint config, bool master)
         {
-            var client = RedisConfig.ClientFactory(config);
+            var client = ClientFactory(config);
 
-            if (readWrite && RedisConfig.VerifyMasterConnections)
+            if (master && RedisConfig.VerifyMasterConnections)
             {
                 var role = client.GetServerRole();
                 if (role != RedisServerRole.Master)
                 {
+                    Interlocked.Increment(ref RedisState.TotalInvalidMasters);
                     log.Error("Redis Master Host '{0}' is {1}. Resetting allHosts...".Fmt(config.GetHostString(), role));
                     var newMasters = new List<RedisEndpoint>();
                     var newSlaves = new List<RedisEndpoint>();
@@ -88,9 +93,8 @@ namespace ServiceStack.Redis
                     {
                         try
                         {
-                            var testClient = new RedisClient(hostConfig) {
-                                ConnectTimeout = RedisConfig.HostLookupTimeout
-                            };
+                            var testClient = ClientFactory(hostConfig);
+                            testClient.ConnectTimeout = RedisConfig.HostLookupTimeoutMs;
                             var testRole = testClient.GetServerRole();
                             switch (testRole)
                             {
@@ -110,6 +114,7 @@ namespace ServiceStack.Redis
 
                     if (masterClient == null)
                     {
+                        Interlocked.Increment(ref RedisState.TotalNoMastersFound);
                         var errorMsg = "No master found in: " + string.Join(", ", allHosts.Map(x => x.GetHostString()));
                         log.Error(errorMsg);
                         throw new Exception(errorMsg);
@@ -134,6 +139,16 @@ namespace ServiceStack.Redis
             return ReadOnlyHostsCount > 0
                        ? slaves[desiredIndex % slaves.Length]
                        : GetReadWriteHost(desiredIndex);
+        }
+
+        public RedisClient CreateMasterClient(int desiredIndex)
+        {
+            return CreateRedisClient(GetReadWriteHost(desiredIndex), master: true);
+        }
+
+        public RedisClient CreateSlaveClient(int desiredIndex)
+        {
+            return CreateRedisClient(GetReadOnlyHost(desiredIndex), master: false);
         }
     }
 }
