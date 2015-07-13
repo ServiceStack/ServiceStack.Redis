@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using ServiceStack.Logging;
 
 namespace ServiceStack.Redis
@@ -74,68 +76,95 @@ namespace ServiceStack.Redis
                 log.Debug("New Redis Slaves: " + string.Join(", ", slaves.Map(x => x.GetHostString())));
         }
 
+        public RedisEndpoint GetReadWriteHost(int desiredIndex)
+        {
+            return sentinel.GetMaster() ?? masters[desiredIndex % masters.Length];
+        }
+
+        public RedisEndpoint GetReadOnlyHost(int desiredIndex)
+        {
+            var slavesEndpoints = sentinel.GetSlaves();
+            if (slavesEndpoints.Count > 0)
+                return slavesEndpoints[desiredIndex % slavesEndpoints.Count];
+
+            return ReadOnlyHostsCount > 0
+                ? slaves[desiredIndex % slaves.Length]
+                : GetReadWriteHost(desiredIndex);
+        }
+
         public virtual RedisClient CreateRedisClient(RedisEndpoint config, bool readWrite)
         {
             var client = RedisConfig.ClientFactory(config);
 
-            if (readWrite && RedisConfig.VerifyMasterConnections)
+            if (readWrite)
             {
                 var role = client.GetServerRole();
                 if (role != RedisServerRole.Master)
                 {
-                    log.Error("Redis Master Host '{0}' is {1}. Resetting allHosts...".Fmt(config.GetHostString(), role));
-                    var newMasters = new List<RedisEndpoint>();
-                    var newSlaves = new List<RedisEndpoint>();
-                    RedisClient masterClient = null;
-                    foreach (var hostConfig in allHosts)
+                    try
                     {
-                        try
+                        var stopwatch = Stopwatch.StartNew();
+                        while (true)
                         {
-                            var testClient = new RedisClient(hostConfig) {
-                                ConnectTimeout = RedisConfig.SentinelConnectTimeout
-                            };
-                            var testRole = testClient.GetServerRole();
-                            switch (testRole)
-                            {
-                                case RedisServerRole.Master:
-                                    newMasters.Add(hostConfig);
-                                    if (masterClient == null)
-                                        masterClient = testClient;
-                                    break;
-                                case RedisServerRole.Slave:
-                                    newSlaves.Add(hostConfig);
-                                    break;
-                            }
+                            var masterConfig = sentinel.GetMaster();
+                            var master = RedisConfig.ClientFactory(masterConfig);
+                            var masterRole = master.GetServerRole();
+                            if (masterRole == RedisServerRole.Master)
+                                return master;
 
+                            if (stopwatch.Elapsed > sentinel.MaxWaitBetweenSentinelLookups)
+                                throw new TimeoutException("Max Wait Between Sentinel Lookups Elapsed: {0}"
+                                    .Fmt(sentinel.MaxWaitBetweenSentinelLookups.ToString()));
+
+                            Thread.Sleep(sentinel.WaitBetweenSentinelLookups);
                         }
-                        catch { /* skip */ }
                     }
-
-                    if (masterClient == null)
+                    catch (Exception ex)
                     {
-                        var errorMsg = "No master found in: " + string.Join(", ", allHosts.Map(x => x.GetHostString()));
-                        log.Error(errorMsg);
-                        throw new Exception(errorMsg);
-                    }
+                        log.Error("Redis Master Host '{0}' is {1}. Resetting allHosts...".Fmt(config.GetHostString(), role), ex);
+                        var newMasters = new List<RedisEndpoint>();
+                        var newSlaves = new List<RedisEndpoint>();
+                        RedisClient masterClient = null;
+                        foreach (var hostConfig in allHosts)
+                        {
+                            try
+                            {
+                                var testClient = new RedisClient(hostConfig)
+                                {
+                                    ConnectTimeout = RedisConfig.HostLookupTimeout
+                                };
+                                var testRole = testClient.GetServerRole();
+                                switch (testRole)
+                                {
+                                    case RedisServerRole.Master:
+                                        newMasters.Add(hostConfig);
+                                        if (masterClient == null)
+                                            masterClient = testClient;
+                                        break;
+                                    case RedisServerRole.Slave:
+                                        newSlaves.Add(hostConfig);
+                                        break;
+                                }
 
-                    ResetMasters(newMasters);
-                    ResetSlaves(newSlaves);
-                    return masterClient;
+                            }
+                            catch { /* skip */ }
+                        }
+
+                        if (masterClient == null)
+                        {
+                            var errorMsg = "No master found in: " + string.Join(", ", allHosts.Map(x => x.GetHostString()));
+                            log.Error(errorMsg);
+                            throw new Exception(errorMsg);
+                        }
+
+                        ResetMasters(newMasters);
+                        ResetSlaves(newSlaves);
+                        return masterClient;
+                    }
                 }
             }
 
             return client;
         }
-
-        public RedisEndpoint GetReadWriteHost(int desiredIndex)
-        {
-            return masters[desiredIndex % masters.Length];
-        }
-
-        public RedisEndpoint GetReadOnlyHost(int desiredIndex)
-        {
-            return ReadOnlyHostsCount > 0
-                       ? slaves[desiredIndex % slaves.Length]
-                       : GetReadWriteHost(desiredIndex);
-        }    }
+    }
 }

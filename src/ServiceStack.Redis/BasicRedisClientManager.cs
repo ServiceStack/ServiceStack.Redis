@@ -62,15 +62,17 @@ namespace ServiceStack.Redis
         /// </summary>
         /// <param name="readWriteHosts">The write hosts.</param>
         /// <param name="readOnlyHosts">The read hosts.</param>
-        public BasicRedisClientManager(
-            IEnumerable<string> readWriteHosts,
-            IEnumerable<string> readOnlyHosts)
-            : this(readWriteHosts, readOnlyHosts, null) {}
-
+        /// <param name="initalDb"></param>
         public BasicRedisClientManager(
             IEnumerable<string> readWriteHosts,
             IEnumerable<string> readOnlyHosts,
-            long? initalDb)
+            long? initalDb = null)
+            : this(readWriteHosts.ToRedisEndPoints(), readOnlyHosts.ToRedisEndPoints(), initalDb) {}
+
+        public BasicRedisClientManager(
+            IEnumerable<RedisEndpoint> readWriteHosts,
+            IEnumerable<RedisEndpoint> readOnlyHosts,
+            long? initalDb = null)
         {
             this.Db = initalDb;
 
