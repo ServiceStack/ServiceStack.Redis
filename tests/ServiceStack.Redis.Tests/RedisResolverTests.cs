@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    //[Ignore("Integration Test")]
+    [Ignore("Ignore Sentinel Integration Tests")]
     [TestFixture]
     public class RedisResolverTests
         : RedisSentinelTestBase

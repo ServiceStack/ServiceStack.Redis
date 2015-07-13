@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Logging;
@@ -9,7 +7,7 @@ using Timer = System.Timers.Timer;
 
 namespace ServiceStack.Redis.Tests
 {
-    //[Ignore("Reenable when CI has Sentinel")]
+    [Ignore("Ignore Sentinel Integration Tests")]
     [TestFixture, Category("Integration")]
     public class RedisSentinelTests
         : RedisSentinelTestBase

@@ -3,7 +3,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [Ignore("Reenable when CI has Sentinel")]
+    [Ignore("Ignore Sentinel Integration Tests")]
     [TestFixture, Category("Integration")]
     public class Redis3SentinelSetupTests
         : RedisSentinelTestBase
