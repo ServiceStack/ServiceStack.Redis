@@ -1,8 +1,6 @@
 ﻿using ServiceStack.Logging;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ServiceStack.Redis
 {
@@ -10,44 +8,22 @@ namespace ServiceStack.Redis
     {
         protected static readonly ILog Log = LogManager.GetLogger(typeof(RedisSentinelWorker));
 
-        private readonly RedisSentinel redisSentinel;
+        private readonly RedisSentinel sentinel;
         private readonly RedisClient sentinelClient;
-        private readonly RedisClient sentinelPubSubClient;
-        private readonly IRedisSubscription sentinelSubscription;
+        private RedisPubSubServer sentinePubSub;
 
         public Action<Exception> OnSentinelError;
 
-        public RedisSentinelWorker(RedisSentinel redisSentinel, string host)
+        public RedisSentinelWorker(RedisSentinel sentinel, RedisEndpoint sentinelEndpoint)
         {
-            this.redisSentinel = redisSentinel;
+            this.sentinel = sentinel;
 
             //Sentinel Servers doesn't support DB, reset to 0
-            var sentinelEndpoint = host.ToRedisEndpoint(defaultPort:RedisNativeClient.DefaultPortSentinel);
-
-            this.sentinelClient = new RedisClient(sentinelEndpoint) { Db = 0 };
-            this.sentinelPubSubClient = new RedisClient(sentinelEndpoint) { Db = 0 };
-            this.sentinelSubscription = this.sentinelPubSubClient.CreateSubscription();
-            this.sentinelSubscription.OnMessage = SentinelMessageReceived;
+            var timeoutMs = (int) sentinel.SentinelWorkerTimeout.TotalMilliseconds;
+            this.sentinelClient = new RedisClient(sentinelEndpoint) { Db = 0, ConnectTimeout = timeoutMs };
 
             if (Log.IsDebugEnabled)
-                Log.Debug("Set up Redis Sentinel on {0}".Fmt(host));
-        }
-
-        private void SubscribeForChanges(object arg)
-        {
-            try
-            {
-                // subscribe to all messages
-                this.sentinelSubscription.SubscribeToChannelsMatching("*");
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Error Subscribing to Redis Channel on {0}:{1}"
-                    .Fmt(this.sentinelClient.Host, this.sentinelClient.Port), ex);
-
-                if (OnSentinelError != null)
-                    OnSentinelError(ex);
-            }
+                Log.Debug("Set up Redis Sentinel on {0}".Fmt(sentinelEndpoint));
         }
 
         /// <summary>
@@ -62,30 +38,48 @@ namespace ServiceStack.Redis
 
             // {+|-}sdown is the event for server coming up or down
             var c = channel.ToLower();
-            if (c == "+failover-end" || c.Contains("sdown") || c.Contains("odown"))
+            if (c == "+failover-end"
+                || (sentinel.ResetWhenSubjectivelyDown && c.Contains("sdown"))
+                || (sentinel.ResetWhenObjectivelyDown && c.Contains("odown")))
             {
                 Log.Info("Sentinel detected server down/up '{0}' with message: {1}".Fmt(channel, message));
-
-                redisSentinel.ResetClients();
+                sentinel.ResetClients();
             }
 
-            if (redisSentinel.OnSentinelMessageReceived != null)
-                redisSentinel.OnSentinelMessageReceived(channel, message);
+            if (sentinel.OnSentinelMessageReceived != null)
+                sentinel.OnSentinelMessageReceived(channel, message);
         }
 
         internal SentinelInfo GetSentinelInfo()
         {
             var sentinelInfo = new SentinelInfo(
-                redisSentinel.MasterName,
-                SanitizeMasterConfig(this.sentinelClient.SentinelMaster(redisSentinel.MasterName)),
-                SanitizeSlavesConfig(this.sentinelClient.SentinelSlaves(redisSentinel.MasterName)));
+                sentinel.MasterName,
+                new[] { GetMasterHost(sentinel.MasterName) },
+                GetSlaveHosts(sentinel.MasterName));
 
             return sentinelInfo;
         }
 
-        internal List<string> GetMasterHost(string masterName)
+        internal string GetMasterHost(string masterName)
         {
-            return sentinelClient.SentinelGetMasterAddrByName(masterName);
+            var masterInfo = sentinelClient.SentinelGetMasterAddrByName(masterName);
+            if (masterInfo.Count > 0)
+            {
+                var ip = masterInfo[0];
+                var port = masterInfo[1];
+
+                string aliasIp;
+                if (sentinel.IpAddressMap.TryGetValue(ip, out aliasIp))
+                    ip = aliasIp;
+
+                return "{0}:{1}".Fmt(ip, port);
+            }
+            return null;
+        }
+
+        internal List<string> GetSlaveHosts(string masterName)
+        {
+            return SanitizeSlavesConfig(this.sentinelClient.SentinelSlaves(sentinel.MasterName));
         }
 
         private List<string> SanitizeSlavesConfig(IEnumerable<Dictionary<string, string>> slaves)
@@ -101,9 +95,9 @@ namespace ServiceStack.Redis
                 slave.TryGetValue("ip", out ip);
                 slave.TryGetValue("port", out port);
 
-                string externalIp;
-                if (redisSentinel.IpAddressMap.TryGetValue(ip, out externalIp))
-                    ip = externalIp;
+                string aliasIp;
+                if (sentinel.IpAddressMap.TryGetValue(ip, out aliasIp))
+                    ip = aliasIp;
                 else if (ip == "127.0.0.1")
                     ip = this.sentinelClient.Host;
 
@@ -113,42 +107,40 @@ namespace ServiceStack.Redis
             return servers;
         }
 
-        private List<string> SanitizeMasterConfig(IDictionary<string, string> masterConfig)
-        {
-            string ip;
-            string port;
-
-            masterConfig.TryGetValue("ip", out ip);
-            masterConfig.TryGetValue("port", out port);
-
-            string ipAlias;
-            if (redisSentinel.IpAddressMap.TryGetValue(ip, out ipAlias))
-                ip = ipAlias;
-
-            return ip != null && port != null
-                ? new List<string>{ "{0}:{1}".Fmt(ip, port) } 
-                : new List<string>();
-        }
-
         public void BeginListeningForConfigurationChanges()
         {
-            // subscribing blocks, so put it on a different thread
-            Task.Factory.StartNew(SubscribeForChanges, TaskCreationOptions.LongRunning);
+            try
+            {
+                if (this.sentinePubSub == null)
+                {
+                    var sentinelManager = new BasicRedisClientManager(sentinel.SentinelHosts, sentinel.SentinelHosts) 
+                    {
+                        //Use BasicRedisResolver which doesn't validate non-Master Sentinel instances
+                        RedisResolver = new BasicRedisResolver(sentinel.SentinelHosts, sentinel.SentinelHosts)
+                    };
+                    this.sentinePubSub = new RedisPubSubServer(sentinelManager)
+                    {
+                        HeartbeatInterval = null,
+                        IsSentinelSubscription = true,
+                        ChannelsMatching = new[] { RedisPubSubServer.AllChannelsWildCard },
+                        OnMessage = SentinelMessageReceived
+                    };
+                }
+                this.sentinePubSub.Start();
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error Subscribing to Redis Channel on {0}:{1}"
+                    .Fmt(this.sentinelClient.Host, this.sentinelClient.Port), ex);
+
+                if (OnSentinelError != null)
+                    OnSentinelError(ex);
+            }
         }
 
         public void Dispose()
         {
-            this.sentinelClient.Dispose();
-            this.sentinelPubSubClient.Dispose();
-
-            try
-            {
-                this.sentinelSubscription.Dispose();
-            }
-            catch (RedisException)
-            {
-                // if this is getting disposed after the sentinel shuts down, this will fail
-            }
+            new IDisposable[] { this.sentinelClient, sentinePubSub }.Dispose(Log);
         }
     }
 }
