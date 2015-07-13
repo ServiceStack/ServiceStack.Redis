@@ -101,7 +101,7 @@ namespace ServiceStack.Redis.Tests
             ThreadPool.QueueUserWorkItem(state => Process.Start(pInfo));
         }
 
-        public static void StartAllRedisServers(int waitMs = 1000)
+        public static void StartAllRedisServers(int waitMs = 1500)
         {
             foreach (var port in RedisPorts)
             {
@@ -111,7 +111,7 @@ namespace ServiceStack.Redis.Tests
                 Thread.Sleep(waitMs);
         }
 
-        public static void StartAllRedisSentinels(int waitMs = 1000)
+        public static void StartAllRedisSentinels(int waitMs = 1500)
         {
             foreach (var port in RedisPorts)
             {

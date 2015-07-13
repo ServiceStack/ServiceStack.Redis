@@ -17,6 +17,7 @@ namespace ServiceStack.Redis.Tests
         {
             StartAllRedisServers();
             StartAllRedisSentinels();
+            LogManager.LogFactory = new ConsoleLogFactory(debugEnabled:true);
         }
 
         [TestFixtureTearDown]
@@ -133,10 +134,10 @@ namespace ServiceStack.Redis.Tests
             }
         }
 
-        [Ignore,Test]
+        [Ignore, Test]
         public void Run_sentinel_for_10_minutes()
         {
-            LogManager.LogFactory = new ConsoleLogFactory(debugEnabled: true);
+            ILog log = LogManager.GetLogger(GetType());
 
             using (var sentinel = CreateSentinel())
             {
@@ -160,15 +161,15 @@ namespace ServiceStack.Redis.Tests
                         {
                             var counter = redis.Increment("key", 1);
                             key = "key" + counter;
-                            "Set key {0} in read/write client".Print(key);
-                            redis.SetEntry(key, "value" + 1);
+                            log.InfoFormat("Set key {0} in read/write client", key);
+                            redis.SetValue(key, "value" + 1);
                         }
 
                         using (var redis = redisManager.GetClient())
                         {
-                            "Get key {0} in read-only client...".Print(key);
-                            var value = redis.GetEntry(key);
-                            "{0} = {1}".Print(key, value);
+                            log.InfoFormat("Get key {0} in read-only client...", key);
+                            var value = redis.GetValue(key);
+                            log.InfoFormat("{0} = {1}", key, value);
                         }
                     };
                 }
