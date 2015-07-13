@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using ServiceStack.Text;
 
@@ -155,7 +156,10 @@ namespace ServiceStack.Redis.Tests
             {
                 this.master = master;
                 this.slave = slave;
+                this.ClientFactory = RedisConfig.ClientFactory;
             }
+
+            public Func<RedisEndpoint, RedisClient> ClientFactory { get; set; }
 
             public int ReadWriteHostsCount { get { return 1; } }
             public int ReadOnlyHostsCount { get { return 1; } }
@@ -163,20 +167,20 @@ namespace ServiceStack.Redis.Tests
             public void ResetMasters(IEnumerable<string> hosts) { }
             public void ResetSlaves(IEnumerable<string> hosts) { }
 
-            public RedisClient CreateRedisClient(RedisEndpoint config, bool readWrite)
+            public RedisClient CreateRedisClient(RedisEndpoint config, bool master)
             {
                 NewClientsInitialized++;
-                return RedisConfig.ClientFactory(config);
+                return ClientFactory(config);
             }
 
-            public RedisEndpoint GetReadWriteHost(int desiredIndex)
+            public RedisClient CreateMasterClient(int desiredIndex)
             {
-                return master;
+                return CreateRedisClient(master, master: true);
             }
 
-            public RedisEndpoint GetReadOnlyHost(int desiredIndex)
+            public RedisClient CreateSlaveClient(int desiredIndex)
             {
-                return slave;
+                return CreateRedisClient(slave, master: false);
             }
         }
 
