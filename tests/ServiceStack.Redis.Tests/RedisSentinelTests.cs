@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Logging;
@@ -9,29 +9,39 @@ using Timer = System.Timers.Timer;
 
 namespace ServiceStack.Redis.Tests
 {
-    [Ignore("Reenable when CI has Sentinel")]
+    //[Ignore("Reenable when CI has Sentinel")]
     [TestFixture, Category("Integration")]
     public class RedisSentinelTests
-        : RedisClientTestsBase
+        : RedisSentinelTestBase
     {
+        [TestFixtureSetUp]
+        public void OnBeforeTestFixture()
+        {
+            StartAllRedisServers();
+            StartAllRedisSentinels();
+        }
+
+        [TestFixtureTearDown]
+        public void OnAfterTestFixture()
+        {
+            ShutdownAllRedisSentinels();
+            ShutdownAllRedisServers();
+        }
+
         protected RedisClient RedisSentinel;
 
-
-        public override void OnBeforeEachTest()
+        [SetUp]
+        public void OnBeforeEachTest()
         {
-            base.OnBeforeEachTest();
-
-            RedisSentinel = new RedisClient(TestConfig.SentinelHost, TestConfig.RedisSentinelPort);
+            var parts = SentinelHosts[0].SplitOnFirst(':');
+            RedisSentinel = new RedisClient(parts[0], int.Parse(parts[1]));
         }
 
-
-        public override void TearDown()
+        [TearDown]
+        public void OnAfterEachTest()
         {
-            base.TearDown();
-
             RedisSentinel.Dispose();
         }
-
 
         [Test]
         public void Can_Ping_Sentinel()
@@ -42,134 +52,129 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_Get_Sentinel_Masters()
         {
-            object[] masters = RedisSentinel.Sentinel("masters");
+            var masters = RedisSentinel.SentinelMasters();
+            masters.PrintDump();
 
-            Assert.AreEqual(masters.Count(), TestConfig.MasterHosts.Count());
+            Assert.That(masters.Count, Is.GreaterThan(0));
+        }
+
+        [Test]
+        public void Can_Get_Sentinel_Master()
+        {
+            var master = RedisSentinel.SentinelMaster(MasterName);
+            master.PrintDump();
+
+            var host = "{0}:{1}".Fmt(master["ip"], master["port"]);
+            Assert.That(master["name"], Is.EqualTo(MasterName));
+            Assert.That(host, Is.EqualTo(MasterHosts[0]));
         }
 
         [Test]
         public void Can_Get_Sentinel_Slaves()
         {
-            object[] slaves = RedisSentinel.Sentinel("slaves", TestConfig.MasterName);
+            var slaves = RedisSentinel.SentinelSlaves(MasterName);
+            slaves.PrintDump();
 
-            Assert.That(slaves.Count(), Is.GreaterThan(0));
+            Assert.That(slaves.Count, Is.GreaterThan(0));
         }
 
         [Test]
         public void Can_Get_Master_Addr()
         {
-            object[] addr = RedisSentinel.Sentinel("get-master-addr-by-name", TestConfig.MasterName);
+            var addr = RedisSentinel.SentinelGetMasterAddrByName(MasterName);
 
-            string host = Encoding.UTF8.GetString((byte[])addr[0]);
-            string port = Encoding.UTF8.GetString((byte[])addr[1]);
+            string host = addr[0];
+            string port = addr[1];
+            var hostString = "{0}:{1}".Fmt(host, port);
 
             // IP of localhost
-            Assert.That(host, Is.EqualTo("127.0.0.1").Or.EqualTo(TestConfig.SentinelHost));
-            Assert.AreEqual(port, TestConfig.RedisPort.ToString());
+            Assert.That(hostString, Is.EqualTo(MasterHosts[0]));
         }
 
         [Test]
         public void Can_Get_Redis_ClientsManager()
         {
-            var sentinel = new RedisSentinel(new[] { "{0}:{1}".Fmt(TestConfig.SentinelHost, TestConfig.RedisSentinelPort) }, TestConfig.MasterName);
-
-            var clientsManager = sentinel.Start();
-            var client = clientsManager.GetClient();
-
-            Assert.That(client.Host, Is.EqualTo("127.0.0.1").Or.EqualTo(TestConfig.SentinelHost));
-            Assert.AreEqual(client.Port, TestConfig.RedisPort);
-
-            client.Dispose();
-            sentinel.Dispose();
+            using (var sentinel = CreateSentinel())
+            {
+                var clientsManager = sentinel.Start();
+                using (var client = clientsManager.GetClient())
+                {
+                    Assert.That(client.GetHostString(), Is.EqualTo(MasterHosts[0]));
+                }
+            }
         }
 
         [Test]
         public void Can_specify_Timeout_on_RedisManager()
         {
-            var sentinel = new RedisSentinel(new[] { "{0}:{1}".Fmt(TestConfig.SentinelHost, TestConfig.RedisSentinelPort) }, TestConfig.MasterName)
+            using (var sentinel = CreateSentinel())
             {
-                RedisManagerFactory =
-                {
-                    OnInit = r =>
-                    {
-                        ((PooledRedisClientManager)r).IdleTimeOutSecs = 20;
-                    }
-                }
-            };
+                sentinel.RedisManagerFactory = (masters, slaves) => new PooledRedisClientManager(masters, slaves) { IdleTimeOutSecs = 20 };
 
-            using (var clientsManager = (PooledRedisClientManager)sentinel.Start())
-            using (var client = clientsManager.GetClient())
-            {
-                Assert.That(clientsManager.IdleTimeOutSecs, Is.EqualTo(20));
-                Assert.That(((RedisNativeClient)client).IdleTimeOutSecs, Is.EqualTo(20));
+                using (var clientsManager = (PooledRedisClientManager)sentinel.Start())
+                using (var client = clientsManager.GetClient())
+                {
+                    Assert.That(clientsManager.IdleTimeOutSecs, Is.EqualTo(20));
+                    Assert.That(((RedisNativeClient)client).IdleTimeOutSecs, Is.EqualTo(20));
+                }
             }
         }
 
         [Test]
         public void Can_specify_db_on_RedisSentinel()
         {
-            var sentinelHosts = new[] { "{0}:{1}".Fmt(TestConfig.SentinelHost, TestConfig.RedisSentinelPort) };
-            var sentinel = new RedisSentinel(sentinelHosts, TestConfig.MasterName)
+            using (var sentinel = CreateSentinel())
             {
-                HostFilter = host => "{0}?db=1".Fmt(host)
-            };
-
-            using (var clientsManager = sentinel.Start())
-            using (var client = clientsManager.GetClient())
-            {
-                Assert.That(client.Db, Is.EqualTo(1));
+                sentinel.HostFilter = host => "{0}?db=1".Fmt(host);
+ 
+                using (var clientsManager = sentinel.Start())
+                using (var client = clientsManager.GetClient())
+                {
+                    Assert.That(client.Db, Is.EqualTo(1));
+                }
             }
         }
 
-        [Test]
+        [Ignore,Test]
         public void Run_sentinel_for_10_minutes()
         {
             LogManager.LogFactory = new ConsoleLogFactory(debugEnabled: true);
 
-            var sentinelHost = "{0}:{1}".Fmt(TestConfig.SentinelHost, TestConfig.RedisSentinelPort);
-            var sentinel = new RedisSentinel(sentinelHost, TestConfig.MasterName)
+            using (var sentinel = CreateSentinel())
             {
-                OnFailover = manager =>
-                {
-                    "Redis Managers Failed Over to new hosts".Print();
-                },
-                OnWorkerError = ex =>
-                {
-                    "Worker error: {0}".Print(ex);
-                },
-                OnSentinelMessageReceived = (channel, msg) =>
-                {
-                    "Received '{0}' on channel '{1}' from Sentinel".Print(channel, msg);
-                },
-            };
+                sentinel.OnFailover = manager => "Redis Managers Failed Over to new hosts".Print();
+                sentinel.OnWorkerError = ex => "Worker error: {0}".Print(ex);
+                sentinel.OnSentinelMessageReceived = (channel, msg) => "Received '{0}' on channel '{1}' from Sentinel".Print(channel, msg);
 
-            var redisManager = sentinel.Start();
-
-            var aTimer = new Timer
-            {
-                Interval = 1000,
-                Enabled = true
-            };
-            aTimer.Elapsed += (sender, args) =>
-            {
-                "Incrementing key".Print();
-
-                string key = null;
-                using (var redis = redisManager.GetClient())
+                using (var redisManager = sentinel.Start())
                 {
-                    var counter = redis.Increment("key", 1);
-                    key = "key" + counter;
-                    "Set key {0} in read/write client".Print(key);
-                    redis.SetEntry(key, "value" + 1);
+                    var aTimer = new Timer
+                    {
+                        Interval = 1000,
+                        Enabled = true
+                    };
+                    aTimer.Elapsed += (sender, args) =>
+                    {
+                        "Incrementing key".Print();
+
+                        string key = null;
+                        using (var redis = redisManager.GetClient())
+                        {
+                            var counter = redis.Increment("key", 1);
+                            key = "key" + counter;
+                            "Set key {0} in read/write client".Print(key);
+                            redis.SetEntry(key, "value" + 1);
+                        }
+
+                        using (var redis = redisManager.GetClient())
+                        {
+                            "Get key {0} in read-only client...".Print(key);
+                            var value = redis.GetEntry(key);
+                            "{0} = {1}".Print(key, value);
+                        }
+                    };
                 }
-
-                using (var redis = redisManager.GetClient())
-                {
-                    "Get key {0} in read-only client...".Print(key);
-                    var value = redis.GetEntry(key);
-                    "{0} = {1}".Print(key, value);
-                }
-            };
+            }
 
             Thread.Sleep(TimeSpan.FromMinutes(10));
         }

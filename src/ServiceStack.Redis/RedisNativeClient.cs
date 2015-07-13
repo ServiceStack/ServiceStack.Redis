@@ -1447,6 +1447,78 @@ namespace ServiceStack.Redis
 
         #endregion
 
+        #region Sentinel
+
+        private static Dictionary<string, string> ToDictionary(object[] result)
+        {
+            var masterInfo = new Dictionary<string, string>();
+
+            string key = null;
+            for (var i = 0; i < result.Length; i++)
+            {
+                var bytes = (byte[])result[i];
+                if (i % 2 == 0)
+                {
+                    key = bytes.FromUtf8Bytes();
+                }
+                else
+                {
+                    var val = bytes.FromUtf8Bytes();
+                    masterInfo[key] = val;
+                }
+            }
+            return masterInfo;
+        }
+
+        public List<Dictionary<string, string>> SentinelMasters()
+        {
+            var args = new List<byte[]>
+            {
+                Commands.Sentinel,
+                Commands.Masters,
+            };
+            var results = SendExpectDeeplyNestedMultiData(args.ToArray());
+            return (from object[] result in results select ToDictionary(result)).ToList();
+        }
+
+        public Dictionary<string, string> SentinelMaster(string masterName)
+        {
+            var args = new List<byte[]>
+            {
+                Commands.Sentinel,
+                Commands.Master,
+                masterName.ToUtf8Bytes(),
+            };
+            var results = SendExpectDeeplyNestedMultiData(args.ToArray());
+            return ToDictionary(results);
+        }
+
+        public List<Dictionary<string, string>> SentinelSlaves(string masterName)
+        {
+            var args = new List<byte[]>
+            {
+                Commands.Sentinel,
+                Commands.Slaves,
+                masterName.ToUtf8Bytes(),
+            };
+            var results = SendExpectDeeplyNestedMultiData(args.ToArray());
+            return (from object[] result in results select ToDictionary(result)).ToList();
+        }
+
+        public List<string> SentinelGetMasterAddrByName(string masterName)
+        {
+            var args = new List<byte[]>
+            {
+                Commands.Sentinel,
+                Commands.GetMasterAddrByName,
+                masterName.ToUtf8Bytes(),
+            };
+
+            return SendExpectMultiData(args.ToArray()).ToStringList();
+        }
+
+        #endregion
+
         #region Sorted Set Operations
 
         private static void AssertSetIdAndValue(string setId, byte[] value)
