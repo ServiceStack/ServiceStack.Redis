@@ -1,4 +1,5 @@
-﻿using ServiceStack.Logging;
+﻿using System.Threading;
+using ServiceStack.Logging;
 using System;
 using System.Collections.Generic;
 
@@ -17,10 +18,10 @@ namespace ServiceStack.Redis
         public RedisSentinelWorker(RedisSentinel sentinel, RedisEndpoint sentinelEndpoint)
         {
             this.sentinel = sentinel;
-
-            //Sentinel Servers doesn't support DB, reset to 0
-            var timeoutMs = (int) sentinel.SentinelWorkerTimeout.TotalMilliseconds;
-            this.sentinelClient = new RedisClient(sentinelEndpoint) { Db = 0, ConnectTimeout = timeoutMs };
+            this.sentinelClient = new RedisClient(sentinelEndpoint) {
+                Db = 0, //Sentinel Servers doesn't support DB, reset to 0
+                ConnectTimeout = sentinel.SentinelWorkerTimeoutMs,
+            };
 
             if (Log.IsDebugEnabled)
                 Log.Debug("Set up Redis Sentinel on {0}".Fmt(sentinelEndpoint));
@@ -38,9 +39,17 @@ namespace ServiceStack.Redis
 
             // {+|-}sdown is the event for server coming up or down
             var c = channel.ToLower();
+            var isSubjectivelyDown = c.Contains("sdown");
+            if (isSubjectivelyDown)
+                Interlocked.Increment(ref RedisState.TotalSubjectiveServersDown);
+
+            var isObjectivelyDown = c.Contains("odown");
+            if (isObjectivelyDown)
+                Interlocked.Increment(ref RedisState.TotalObjectiveServersDown);
+
             if (c == "+failover-end"
-                || (sentinel.ResetWhenSubjectivelyDown && c.Contains("sdown"))
-                || (sentinel.ResetWhenObjectivelyDown && c.Contains("odown")))
+                || (sentinel.ResetWhenSubjectivelyDown && isSubjectivelyDown)
+                || (sentinel.ResetWhenObjectivelyDown && isObjectivelyDown))
             {
                 Log.Info("Sentinel detected server down/up '{0}' with message: {1}".Fmt(channel, message));
                 sentinel.ResetClients();

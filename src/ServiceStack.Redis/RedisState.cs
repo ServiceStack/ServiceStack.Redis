@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using ServiceStack.Logging;
 
 namespace ServiceStack.Redis
@@ -13,10 +14,21 @@ namespace ServiceStack.Redis
     {
         private static ILog log = LogManager.GetLogger(typeof(RedisState));
 
+        internal static long TotalFailovers = 0;
+        internal static long TotalDeactivatedClients = 0;
+        internal static long TotalFailedSentinelWorkers = 0;
+        internal static long TotalInvalidMasters = 0;
+        internal static long TotalNoMastersFound = 0;
+        internal static long TotalClientsCreated = 0;
+        internal static long TotalSubjectiveServersDown = 0;
+        internal static long TotalObjectiveServersDown = 0;
+
         static readonly ConcurrentDictionary<RedisClient, DateTime> DeactivatedClients = new ConcurrentDictionary<RedisClient, DateTime>();
 
         internal static void DeactivateClient(RedisClient client)
         {
+            Interlocked.Increment(ref TotalDeactivatedClients);
+
             if (RedisConfig.DeactivatedClientsExpiry == TimeSpan.Zero)
             {
                 client.DisposeConnection();

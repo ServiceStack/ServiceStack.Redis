@@ -32,7 +32,6 @@ namespace ServiceStack.Redis
         }
 
         private int failures = 0;
-        private int totalFailures = 0;
         private int sentinelIndex = -1;
         internal RedisEndpoint[] SentinelHosts { get; private set; }
         private RedisSentinelWorker worker;
@@ -47,7 +46,7 @@ namespace ServiceStack.Redis
 
         public TimeSpan WaitBetweenSentinelLookups { get; set; }
         public TimeSpan MaxWaitBetweenSentinelLookups { get; set; }
-        public TimeSpan SentinelWorkerTimeout { get; set; }
+        public int SentinelWorkerTimeoutMs { get; set; }
 
         public bool ResetWhenSubjectivelyDown { get; set; }
         public bool ResetWhenObjectivelyDown { get; set; }
@@ -69,7 +68,7 @@ namespace ServiceStack.Redis
             RedisManagerFactory = (masters,slaves) => new PooledRedisClientManager(masters, slaves);
             ResetWhenObjectivelyDown = true;
             ResetWhenSubjectivelyDown = true;
-            SentinelWorkerTimeout = TimeSpan.FromMilliseconds(100);
+            SentinelWorkerTimeoutMs = 100;
             WaitBetweenSentinelLookups = TimeSpan.FromMilliseconds(250);
             MaxWaitBetweenSentinelLookups = TimeSpan.FromSeconds(60);
         }
@@ -167,7 +166,7 @@ namespace ServiceStack.Redis
 
                     lastEx = ex;
                     this.failures++;
-                    this.totalFailures++;
+                    Interlocked.Increment(ref RedisState.TotalFailedSentinelWorkers);
                 }
             }
 
