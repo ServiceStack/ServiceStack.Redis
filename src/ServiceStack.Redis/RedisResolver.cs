@@ -89,7 +89,7 @@ namespace ServiceStack.Redis
                         try
                         {
                             var testClient = new RedisClient(hostConfig) {
-                                ConnectTimeout = RedisConfig.SentinelConnectTimeout
+                                ConnectTimeout = RedisConfig.HostLookupTimeout
                             };
                             var testRole = testClient.GetServerRole();
                             switch (testRole)

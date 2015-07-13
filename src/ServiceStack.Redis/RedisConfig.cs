@@ -18,7 +18,7 @@ namespace ServiceStack.Redis
 
         public static bool VerifyMasterConnections = true;
 
-        public static int SentinelConnectTimeout = 200;
+        public static int HostLookupTimeout = 200;
 
         //Skip ServerVersion Checks by specifying Min Version number, e.g: 2.8.12 => 2812, 2.9.1 => 2910
         public static int? AssumeServerVersion;
