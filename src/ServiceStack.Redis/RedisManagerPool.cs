@@ -59,8 +59,7 @@ namespace ServiceStack.Redis
             if (hosts == null)
                 throw new ArgumentNullException("hosts");
 
-            RedisResolver = new RedisResolver();
-            RedisResolver.ResetMasters(hosts);
+            RedisResolver = new RedisResolver(hosts, null);
 
             if (config == null)
                 config = new RedisPoolConfig();

@@ -6,15 +6,8 @@ namespace ServiceStack.Redis.Tests
     [Ignore("Reenable when CI has Sentinel")]
     [TestFixture, Category("Integration")]
     public class Redis3SentinelSetupTests
-        : RedisClientTestsBase
+        : RedisSentinelTestBase
     {
-        static string[] SentinelHosts = new[]
-        {
-            "127.0.0.1:26380",
-            "127.0.0.1:26381",
-            "127.0.0.1:26382",
-        };
-
         [Test]
         public void Can_connect_to_3SentinelSetup()
         {
@@ -31,27 +24,6 @@ namespace ServiceStack.Redis.Tests
                 var result = client.GetEntry("Sentinel3Setup");
                 Assert.That(result, Is.EqualTo("IntranetSentinel"));
             }
-        }
-
-        static string[] GoogleCloudSentinelHosts = new[]
-        {
-            "146.148.77.31",
-            "130.211.139.141",
-            "107.178.218.53",
-        };
-
-        private static RedisSentinel CreateGCloudSentinel()
-        {
-            var sentinel = new RedisSentinel(GoogleCloudSentinelHosts, masterName: "master")
-            {
-                IpAddressMap =
-                {
-                    {"10.240.34.152", "146.148.77.31"},
-                    {"10.240.203.193", "130.211.139.141"},
-                    {"10.240.209.52", "107.178.218.53"},
-                }
-            };
-            return sentinel;
         }
 
         [Test]

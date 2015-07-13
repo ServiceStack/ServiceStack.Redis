@@ -5,7 +5,7 @@ using ServiceStack.Logging;
 
 namespace ServiceStack.Redis
 {
-    public class RedisResolver : IRedisResolver
+    public class RedisSentinelResolver : IRedisResolver
     {
         static ILog log = LogManager.GetLogger(typeof(RedisResolver));
 
@@ -13,6 +13,8 @@ namespace ServiceStack.Redis
         public int ReadOnlyHostsCount { get; private set; }
 
         HashSet<RedisEndpoint> allHosts = new HashSet<RedisEndpoint>();
+
+        private RedisSentinel sentinel;
 
         private RedisEndpoint[] masters;
         private RedisEndpoint[] slaves;
@@ -26,14 +28,15 @@ namespace ServiceStack.Redis
             get { return slaves; }
         }
 
-        public RedisResolver()
-            : this(new RedisEndpoint[0], new RedisEndpoint[0]) { }
+        public RedisSentinelResolver(RedisSentinel sentinel)
+            : this(sentinel, new RedisEndpoint[0], new RedisEndpoint[0]) { }
 
-        public RedisResolver(IEnumerable<string> masters, IEnumerable<string> slaves)
-            : this(masters.ToRedisEndPoints(), slaves.ToRedisEndPoints()){}
+        public RedisSentinelResolver(RedisSentinel sentinel, IEnumerable<string> masters, IEnumerable<string> slaves)
+            : this(sentinel, masters.ToRedisEndPoints(), slaves.ToRedisEndPoints()) { }
 
-        public RedisResolver(IEnumerable<RedisEndpoint> masters, IEnumerable<RedisEndpoint> slaves)
+        public RedisSentinelResolver(RedisSentinel sentinel, IEnumerable<RedisEndpoint> masters, IEnumerable<RedisEndpoint> slaves)
         {
+            this.sentinel = sentinel;
             ResetMasters(masters.ToList());
             ResetSlaves(slaves.ToList());
         }
@@ -134,6 +137,5 @@ namespace ServiceStack.Redis
             return ReadOnlyHostsCount > 0
                        ? slaves[desiredIndex % slaves.Length]
                        : GetReadWriteHost(desiredIndex);
-        }
-    }
+        }    }
 }

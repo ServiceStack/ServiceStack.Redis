@@ -251,6 +251,7 @@
     <Compile Include="RedisPubSubServerTests.cs" />
     <Compile Include="RedisPubSubTests.cs" />
     <Compile Include="RedisScanTests.cs" />
+    <Compile Include="RedisSentinelTestBase.cs" />
     <Compile Include="RedisSentinelTests.cs" />
     <Compile Include="RedisTransactionCommonTests.cs" />
     <Compile Include="RedisTransactionTests.cs" />

@@ -16,8 +16,8 @@ namespace ServiceStack.Redis
     public class RedisSentinel : IRedisSentinel
     {
         protected static readonly ILog Log = LogManager.GetLogger(typeof(RedisSentinel));
-
-        public RedisManagerFactory RedisManagerFactory { get; set; }
+        
+        public Func<string[],string[],IRedisClientsManager> RedisManagerFactory { get; set; }
 
         public static string DefaultMasterName = "mymaster";
         public static string DefaultAddress = "127.0.0.1:26379";
@@ -51,8 +51,8 @@ namespace ServiceStack.Redis
                 throw new ArgumentException("sentinels must have at least one entry");
 
             this.masterName = masterName ?? DefaultMasterName;
-            this.RedisManagerFactory = new RedisManagerFactory();
             IpAddressMap = new Dictionary<string, string>();
+            RedisManagerFactory = (masters,slaves) => new PooledRedisClientManager(masters, slaves);
         }
 
         /// <summary>
@@ -80,6 +80,48 @@ namespace ServiceStack.Redis
                 : hosts.Map(HostFilter).ToArray();
         }
 
+        public SentinelInfo ResetClients()
+        {
+            var sentinelInfo = GetSentinelInfo();
+
+            if (RedisManager == null)
+            {
+                Log.Info("Configuring initial Redis Clients: {0}".Fmt(sentinelInfo));
+                RedisManager = CreateRedisManager(sentinelInfo);
+            }
+            else
+            {
+                Log.Info("Failing over to Redis Clients: {0}".Fmt(sentinelInfo));
+                ((IRedisFailover)RedisManager).FailoverTo(
+                    ConfigureHosts(sentinelInfo.RedisMasters),
+                    ConfigureHosts(sentinelInfo.RedisSlaves));
+            }
+
+            return sentinelInfo;
+        }
+
+        private IRedisClientsManager CreateRedisManager(SentinelInfo sentinelInfo)
+        {
+            var redisManager = RedisManagerFactory(
+                ConfigureHosts(sentinelInfo.RedisMasters),
+                ConfigureHosts(sentinelInfo.RedisSlaves));
+
+            //var hasRedisResolver = (IHasRedisResolver)redisManager;
+            //hasRedisResolver.RedisResolver = new RedisSentinelResolver(redisSentinel);
+
+            var canFailover = redisManager as IRedisFailover;
+            if (canFailover != null && this.OnFailover != null)
+            {
+                canFailover.OnFailover.Add(this.OnFailover);
+            }
+            return redisManager;
+        }
+
+        public IRedisClientsManager GetRedisManager()
+        {
+            return RedisManager ?? (RedisManager = CreateRedisManager(GetSentinelInfo()));
+        }
+
         private RedisSentinelWorker GetValidSentinel()
         {
             if (this.worker != null)
@@ -92,7 +134,7 @@ namespace ServiceStack.Redis
                 try
                 {
                     this.worker = GetNextSentinel();
-                    this.RedisManager = worker.GetClientManager();
+                    this.RedisManager = GetRedisManager();
                     this.worker.BeginListeningForConfigurationChanges();
                     return this.worker;
                 }
@@ -112,6 +154,18 @@ namespace ServiceStack.Redis
             throw new RedisException("RedisSentinel is not accessible", lastEx);
         }
 
+        public string GetMasterHost()
+        {
+            var sentinelWorker = GetValidSentinel();
+
+            lock (sentinelWorker)
+            {
+                var parts = sentinelWorker.GetMasterHost(masterName);
+                var host = "{0}:{1}".Fmt(parts[0], parts[1]);
+                return host;
+            }
+        }
+
         /// <summary>
         /// Check if GetValidSentinel should try the next sentinel server
         /// </summary>
@@ -129,7 +183,7 @@ namespace ServiceStack.Redis
             if (sentinelIndex >= sentinels.Count)
                 sentinelIndex = 0;
 
-            var sentinelWorker = new RedisSentinelWorker(this, sentinels[sentinelIndex], this.masterName)
+            var sentinelWorker = new RedisSentinelWorker(this, sentinels[sentinelIndex])
             {
                 OnSentinelError = OnSentinelError
             };
@@ -158,11 +212,6 @@ namespace ServiceStack.Redis
                 this.worker = GetNextSentinel();
                 this.worker.BeginListeningForConfigurationChanges();
             }
-        }
-
-        public SentinelInfo FailoverToSentinelHosts()
-        {
-            return GetValidSentinel().ConfigureRedisFromSentinel();
         }
 
         public SentinelInfo GetSentinelInfo()

@@ -1,23 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [Ignore("Integration Test")]
+    //[Ignore("Integration Test")]
     [TestFixture]
     public class RedisResolverTests
-        : RedisClientTestsBase
+        : RedisSentinelTestBase
     {
-        public static int[] RedisServerPorts = new[] { 6380, 6381, 6382 };
-
-        public static string[] RedisMaster = new[] { "127.0.0.1:6380" };
-        public static string[] RedisSlaves = new[] { "127.0.0.1:6381", "127.0.0.1:6382" };
-
         [TestFixtureSetUp]
         public void TestFixtureSetUp()
         {
@@ -30,52 +23,11 @@ namespace ServiceStack.Redis.Tests
             ShutdownAllRedisServers();
         }
 
-        public static void StartAllRedisServers()
-        {
-            foreach (var port in RedisServerPorts)
-            {
-                StartRedisServer(port);
-            }
-            Thread.Sleep(1000);
-        }
-
-        public static void ShutdownAllRedisServers()
-        {
-            foreach (var port in RedisServerPorts)
-            {
-                try
-                {
-                    var client = new RedisClient("127.0.0.1", port);
-                    client.ShutdownNoSave();
-                }
-                catch (Exception ex)
-                {
-                    "Error trying to shutdown {0}".Print(port);
-                    ex.Message.Print();
-                }
-            }
-        }
-
-        private static void StartRedisServer(int port)
-        {
-            var pInfo = new ProcessStartInfo
-            {
-                FileName = new FileInfo(@"..\..\..\..\src\sentinel\redis\redis-server.exe").FullName,
-                Arguments = new FileInfo(@"..\..\..\..\src\sentinel\redis-{0}\redis.windows.conf".Fmt(port)).FullName,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            };
-
-            ThreadPool.QueueUserWorkItem(state => Process.Start(pInfo));
-        }
-
         [Test]
         public void RedisResolver_does_reset_when_detects_invalid_master()
         {
-            var invalidMaster = new[] { RedisSlaves[0] };
-            var invalidSlaves = new[] { RedisMaster[0], RedisSlaves[1] };
+            var invalidMaster = new[] { SlaveHosts[0] };
+            var invalidSlaves = new[] { MasterHosts[0], SlaveHosts[1] };
 
             using (var redisManager = new PooledRedisClientManager(invalidMaster, invalidSlaves))
             {
@@ -84,12 +36,12 @@ namespace ServiceStack.Redis.Tests
                 using (var master = redisManager.GetClient())
                 {
                     master.SetValue("KEY", "1");
-                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                    Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
                 }
                 using (var master = redisManager.GetClient())
                 {
                     master.Increment("KEY", 1);
-                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                    Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
                 }
 
                 "Masters:".Print();
@@ -102,16 +54,16 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void PooledRedisClientManager_alternates_hosts()
         {
-            using (var redisManager = new PooledRedisClientManager(RedisMaster, RedisSlaves))
+            using (var redisManager = new PooledRedisClientManager(MasterHosts, SlaveHosts))
             {
                 using (var master = redisManager.GetClient())
                 {
-                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                    Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
                     master.SetValue("KEY", "1");
                 }
                 using (var master = redisManager.GetClient())
                 {
-                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                    Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
                     master.Increment("KEY", 1);
                 }
 
@@ -119,7 +71,7 @@ namespace ServiceStack.Redis.Tests
                 {
                     using (var readOnly = redisManager.GetReadOnlyClient())
                     {
-                        Assert.That(readOnly.GetHostString(), Is.EqualTo(RedisSlaves[i % RedisSlaves.Length]));
+                        Assert.That(readOnly.GetHostString(), Is.EqualTo(SlaveHosts[i % SlaveHosts.Length]));
                         Assert.That(readOnly.GetValue("KEY"), Is.EqualTo("2"));
                     }
                 });
@@ -134,16 +86,16 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void RedisManagerPool_alternates_hosts()
         {
-            using (var redisManager = new RedisManagerPool(RedisMaster))
+            using (var redisManager = new RedisManagerPool(MasterHosts))
             {
                 using (var master = redisManager.GetClient())
                 {
-                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                    Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
                     master.SetValue("KEY", "1");
                 }
                 using (var master = redisManager.GetClient())
                 {
-                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                    Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
                     master.Increment("KEY", 1);
                 }
 
@@ -151,7 +103,7 @@ namespace ServiceStack.Redis.Tests
                 {
                     using (var readOnly = redisManager.GetReadOnlyClient())
                     {
-                        Assert.That(readOnly.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                        Assert.That(readOnly.GetHostString(), Is.EqualTo(MasterHosts[0]));
                         Assert.That(readOnly.GetValue("KEY"), Is.EqualTo("2"));
                     }
                 });
@@ -166,16 +118,16 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void BasicRedisClientManager_alternates_hosts()
         {
-            using (var redisManager = new BasicRedisClientManager(RedisMaster, RedisSlaves))
+            using (var redisManager = new BasicRedisClientManager(MasterHosts, SlaveHosts))
             {
                 using (var master = redisManager.GetClient())
                 {
-                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                    Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
                     master.SetValue("KEY", "1");
                 }
                 using (var master = redisManager.GetClient())
                 {
-                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                    Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
                     master.Increment("KEY", 1);
                 }
 
@@ -183,7 +135,7 @@ namespace ServiceStack.Redis.Tests
                 {
                     using (var readOnly = redisManager.GetReadOnlyClient())
                     {
-                        Assert.That(readOnly.GetHostString(), Is.EqualTo(RedisSlaves[i % RedisSlaves.Length]));
+                        Assert.That(readOnly.GetHostString(), Is.EqualTo(SlaveHosts[i % SlaveHosts.Length]));
                         Assert.That(readOnly.GetValue("KEY"), Is.EqualTo("2"));
                     }
                 });
@@ -233,7 +185,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void PooledRedisClientManager_can_execute_CustomResolver()
         {
-            var resolver = new FixedResolver(RedisMaster[0].ToRedisEndpoint(), RedisSlaves[0].ToRedisEndpoint());
+            var resolver = new FixedResolver(MasterHosts[0].ToRedisEndpoint(), SlaveHosts[0].ToRedisEndpoint());
             using (var redisManager = new PooledRedisClientManager("127.0.0.1:8888")
             {
                 RedisResolver = resolver
@@ -241,12 +193,12 @@ namespace ServiceStack.Redis.Tests
             {
                 using (var master = redisManager.GetClient())
                 {
-                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                    Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
                     master.SetValue("KEY", "1");
                 }
                 using (var master = redisManager.GetClient())
                 {
-                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                    Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
                     master.Increment("KEY", 1);
                 }
                 Assert.That(resolver.NewClientsInitialized, Is.EqualTo(1));
@@ -255,8 +207,8 @@ namespace ServiceStack.Redis.Tests
                 {
                     using (var slave = redisManager.GetReadOnlyClient())
                     {
-                        Assert.That(slave.GetHostString(), Is.EqualTo(RedisSlaves[0]));
-                        slave.GetValue("KEY").Print();
+                        Assert.That(slave.GetHostString(), Is.EqualTo(SlaveHosts[0]));
+                        Assert.That(slave.GetValue("KEY"), Is.EqualTo("2"));
                     }
                 });
                 Assert.That(resolver.NewClientsInitialized, Is.EqualTo(2));
@@ -267,13 +219,13 @@ namespace ServiceStack.Redis.Tests
                 {
                     using (var master = redisManager.GetClient())
                     {
-                        Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
-                        master.GetValue("KEY").Print();
+                        Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
+                        Assert.That(master.GetValue("KEY"), Is.EqualTo("2"));
                     }
                     using (var slave = redisManager.GetReadOnlyClient())
                     {
-                        Assert.That(slave.GetHostString(), Is.EqualTo(RedisSlaves[0]));
-                        slave.GetValue("KEY").Print();
+                        Assert.That(slave.GetHostString(), Is.EqualTo(SlaveHosts[0]));
+                        Assert.That(slave.GetValue("KEY"), Is.EqualTo("2"));
                     }
                 });
                 Assert.That(resolver.NewClientsInitialized, Is.EqualTo(4));
@@ -283,7 +235,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void RedisManagerPool_can_execute_CustomResolver()
         {
-            var resolver = new FixedResolver(RedisMaster[0].ToRedisEndpoint(), RedisSlaves[0].ToRedisEndpoint());
+            var resolver = new FixedResolver(MasterHosts[0].ToRedisEndpoint(), SlaveHosts[0].ToRedisEndpoint());
             using (var redisManager = new RedisManagerPool("127.0.0.1:8888")
             {
                 RedisResolver = resolver
@@ -291,12 +243,12 @@ namespace ServiceStack.Redis.Tests
             {
                 using (var master = redisManager.GetClient())
                 {
-                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                    Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
                     master.SetValue("KEY", "1");
                 }
                 using (var master = redisManager.GetClient())
                 {
-                    Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
+                    Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
                     master.Increment("KEY", 1);
                 }
                 Assert.That(resolver.NewClientsInitialized, Is.EqualTo(1));
@@ -305,8 +257,8 @@ namespace ServiceStack.Redis.Tests
                 {
                     using (var slave = redisManager.GetReadOnlyClient())
                     {
-                        Assert.That(slave.GetHostString(), Is.EqualTo(RedisMaster[0]));
-                        slave.GetValue("KEY").Print();
+                        Assert.That(slave.GetHostString(), Is.EqualTo(MasterHosts[0]));
+                        Assert.That(slave.GetValue("KEY"), Is.EqualTo("2"));
                     }
                 });
                 Assert.That(resolver.NewClientsInitialized, Is.EqualTo(1));
@@ -317,18 +269,43 @@ namespace ServiceStack.Redis.Tests
                 {
                     using (var master = redisManager.GetClient())
                     {
-                        Assert.That(master.GetHostString(), Is.EqualTo(RedisMaster[0]));
-                        master.GetValue("KEY").Print();
+                        Assert.That(master.GetHostString(), Is.EqualTo(MasterHosts[0]));
+                        Assert.That(master.GetValue("KEY"), Is.EqualTo("2"));
                     }
                     using (var slave = redisManager.GetReadOnlyClient())
                     {
-                        Assert.That(slave.GetHostString(), Is.EqualTo(RedisMaster[0]));
-                        slave.GetValue("KEY").Print();
+                        Assert.That(slave.GetHostString(), Is.EqualTo(MasterHosts[0]));
+                        Assert.That(slave.GetValue("KEY"), Is.EqualTo("2"));
                     }
                 });
                 Assert.That(resolver.NewClientsInitialized, Is.EqualTo(2));
             }
         }
 
+        private static void InitializeEmptyRedisManagers(IRedisClientsManager redisManager, string[] masters, string[] slaves)
+        {
+            var hasResolver = (IHasRedisResolver)redisManager;
+            hasResolver.RedisResolver.ResetMasters(masters);
+            hasResolver.RedisResolver.ResetSlaves(slaves);
+
+            using (var master = redisManager.GetClient())
+            {
+                Assert.That(master.GetHostString(), Is.EqualTo(masters[0]));
+                master.SetValue("KEY", "1");
+            }
+            using (var slave = redisManager.GetReadOnlyClient())
+            {
+                Assert.That(slave.GetHostString(), Is.EqualTo(slaves[0]));
+                Assert.That(slave.GetValue("KEY"), Is.EqualTo("1"));
+            }
+        }
+
+        [Test]
+        public void Can_initalize_ClientManagers_with_no_hosts()
+        {
+            InitializeEmptyRedisManagers(new PooledRedisClientManager(), MasterHosts, SlaveHosts);
+            InitializeEmptyRedisManagers(new RedisManagerPool(), MasterHosts, MasterHosts);
+            InitializeEmptyRedisManagers(new BasicRedisClientManager(), MasterHosts, SlaveHosts);
+        }
     }
 }

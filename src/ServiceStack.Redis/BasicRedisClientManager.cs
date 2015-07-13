@@ -74,9 +74,7 @@ namespace ServiceStack.Redis
         {
             this.Db = initalDb;
 
-            RedisResolver = new RedisResolver();
-            RedisResolver.ResetMasters(readWriteHosts);
-            RedisResolver.ResetSlaves(readOnlyHosts);
+            RedisResolver = new RedisResolver(readWriteHosts, readOnlyHosts);
 
             this.OnFailover = new List<Action<IRedisClientsManager>>();
 

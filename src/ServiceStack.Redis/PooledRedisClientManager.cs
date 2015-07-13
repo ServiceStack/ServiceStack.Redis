@@ -120,13 +120,10 @@ namespace ServiceStack.Redis
                 ? config.DefaultDb ?? initalDb
                 : initalDb;
 
-            RedisResolver = new RedisResolver();
+            var masters = (readWriteHosts ?? new string[0]).ToArray();
+            var slaves = (readOnlyHosts ?? new string[0]).ToArray();
 
-            var masters = readWriteHosts.ToArray();
-            var slaves = readOnlyHosts.ToArray();
-
-            RedisResolver.ResetMasters(masters);
-            RedisResolver.ResetSlaves(slaves);
+            RedisResolver = new RedisResolver(masters, slaves);
 
             this.PoolSizeMultiplier = poolSizeMultiplier ?? 10;
 

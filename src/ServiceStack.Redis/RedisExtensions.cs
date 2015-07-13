@@ -24,8 +24,8 @@ namespace ServiceStack.Redis
         public static List<RedisEndpoint> ToRedisEndPoints(this IEnumerable<string> hosts)
         {
             return hosts == null 
-                ? new List<RedisEndpoint>() : 
-                hosts.Select(x => ToRedisEndpoint(x)).ToList();
+                ? new List<RedisEndpoint>() 
+                : hosts.Select(x => ToRedisEndpoint(x)).ToList();
         }
 
         public static RedisEndpoint ToRedisEndpoint(this string connectionString, int? defaultPort = null)
