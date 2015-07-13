@@ -286,7 +286,7 @@ namespace ServiceStack.Redis
                             };
 
                             //blocks thread
-                            if (ChannelsMatching != null)
+                            if (ChannelsMatching != null && ChannelsMatching.Length > 0)
                                 subscription.SubscribeToChannelsMatching(ChannelsMatching);
                             else
                                 subscription.SubscribeToChannels(Channels);             
