@@ -15,10 +15,10 @@ namespace ServiceStack.Redis.Tests
         private const string SortedSetKey = "rdtmultitest-sortedset";
         private const string HashKey = "rdthashtest";
 
-        public override void TearDown()
+        public override void OnAfterEachTest()
         {
             CleanMask = Key + "*";
-            base.TearDown();
+            base.OnAfterEachTest();
         }
 
 		[Test]

@@ -14,10 +14,10 @@ namespace ServiceStack.Redis.Tests
         private const string SetKey = "pipemultitest-set";
         private const string SortedSetKey = "pipemultitest-sortedset";
 
-        public override void TearDown()
+        public override void OnAfterEachTest()
         {
             CleanMask = Key + "*";
-            base.TearDown();
+            base.OnAfterEachTest();
         }
 
         [Test]

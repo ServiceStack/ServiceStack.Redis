@@ -25,10 +25,10 @@ namespace ServiceStack.Redis.Tests
      		};
 		}
 
-        public override void TearDown()
+        public override void OnAfterEachTest()
         {
             CleanMask = HashId + "*";
-            base.TearDown();
+            base.OnAfterEachTest();
         }
 
 		[Test]

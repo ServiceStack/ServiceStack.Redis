@@ -11,10 +11,10 @@ namespace ServiceStack.Redis.Tests
 	{
         private const string Prefix = "tran";
 
-        public override void TearDown()
+        public override void OnAfterEachTest()
         {
             CleanMask = Prefix + "*";
-            base.TearDown();
+            base.OnAfterEachTest();
         }
 
 		[Test]

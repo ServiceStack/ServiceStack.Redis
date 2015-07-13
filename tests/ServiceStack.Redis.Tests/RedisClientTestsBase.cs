@@ -16,7 +16,7 @@ namespace ServiceStack.Redis.Tests
 		}
 
 		[TestFixtureSetUp]
-		public void TestFixtureSetUp()
+		public virtual void OnBeforeTestFixture()
 		{
 			RedisClient.NewFactoryFn = () => new RedisClient(TestConfig.SingleHost);
             using (var redis = RedisClient.New())
@@ -25,6 +25,11 @@ namespace ServiceStack.Redis.Tests
             }
 		}
 
+        [TestFixtureTearDown]
+        public virtual void OnAfterTestFixture()
+        {
+        }
+
 		[SetUp]
 		public virtual void OnBeforeEachTest()
 		{
@@ -32,7 +37,7 @@ namespace ServiceStack.Redis.Tests
 		}
 
         [TearDown]
-        public virtual void TearDown()
+        public virtual void OnAfterEachTest()
         {
             if (Redis.NamespacePrefix != null && CleanMask == null) CleanMask = Redis.NamespacePrefix + "*";
             if (CleanMask != null) Redis.SearchKeys(CleanMask).ForEach(t => Redis.Del(t));
