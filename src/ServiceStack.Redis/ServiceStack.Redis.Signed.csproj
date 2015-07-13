@@ -160,7 +160,6 @@
     <Compile Include="IHandleClientDispose.cs" />
     <Compile Include="IRedisResolver.cs" />
     <Compile Include="RedisClientExtensions.cs" />
-    <Compile Include="RedisManagerFactory.cs" />
     <Compile Include="RedisManagerPool.cs" />
     <Compile Include="RedisClient_Admin.cs" />
     <Compile Include="Generic\ManagedListGeneric.cs" />
@@ -181,6 +180,7 @@
     <Compile Include="RedisEndpoint.cs" />
     <Compile Include="RedisPubSubServer.cs" />
     <Compile Include="RedisSentinel.cs" />
+    <Compile Include="RedisSentinelResolver.cs" />
     <Compile Include="RedisSentinelWorker.cs" />
     <Compile Include="ScanResult.cs" />
     <Compile Include="ShardedConnectionPool.cs" />
