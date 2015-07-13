@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using ServiceStack.Logging;
-using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
@@ -29,6 +28,7 @@ namespace ServiceStack.Redis
         public Action<string> OnUnSubscribe { get; set; }
         public Action<Exception> OnError { get; set; }
         public Action<IRedisPubSubServer> OnFailover { get; set; }
+        public bool IsSentinelSubscription { get; set; }
 
         readonly Random rand = new Random(Environment.TickCount);
 
@@ -62,8 +62,10 @@ namespace ServiceStack.Redis
             get { return Interlocked.CompareExchange(ref bgThreadCount, 0, 0); }
         }
 
+        public const string AllChannelsWildCard = "*";
         public IRedisClientsManager ClientsManager { get; set; }
         public string[] Channels { get; set; }
+        public string[] ChannelsMatching { get; set; }
         public TimeSpan? WaitBeforeNextRestart { get; set; }
 
         public RedisPubSubServer(IRedisClientsManager clientsManager, params string[] channels)
@@ -141,7 +143,9 @@ namespace ServiceStack.Redis
                 using (var redis = ClientsManager.GetReadOnlyClient())
                 {
                     startedAt = Stopwatch.StartNew();
-                    serverTimeAtStart = redis.GetServerTime();
+                    serverTimeAtStart = IsSentinelSubscription
+                        ? DateTime.UtcNow
+                        : redis.GetServerTime();
                 }
             }
             catch (Exception ex)
@@ -281,7 +285,12 @@ namespace ServiceStack.Redis
                                 }
                             };
 
-                            subscription.SubscribeToChannels(Channels); //blocks thread
+                            //blocks thread
+                            if (ChannelsMatching != null)
+                                subscription.SubscribeToChannelsMatching(ChannelsMatching);
+                            else
+                                subscription.SubscribeToChannels(Channels);             
+
                             masterClient = null;
                         }
                     }
