@@ -22,5 +22,7 @@ namespace ServiceStack.Redis
 
         //Skip ServerVersion Checks by specifying Min Version number, e.g: 2.8.12 => 2812, 2.9.1 => 2910
         public static int? AssumeServerVersion;
+
+        public static TimeSpan DeactivatedClientsExpiry = TimeSpan.FromMinutes(1);
     }
 }

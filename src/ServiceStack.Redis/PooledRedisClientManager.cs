@@ -160,9 +160,7 @@ namespace ServiceStack.Redis
                 {
                     var redis = readClients[i];
                     if (redis != null)
-                    {
-                        redis.DisposeConnection();
-                    }
+                        RedisState.DeactivateClient(redis);
 
                     readClients[i] = null;
                 }
@@ -175,9 +173,7 @@ namespace ServiceStack.Redis
                 {
                     var redis = writeClients[i];
                     if (redis != null)
-                    {
-                        redis.DisposeConnection();
-                    }
+                        RedisState.DeactivateClient(redis);
 
                     writeClients[i] = null;
                 }
@@ -233,6 +229,8 @@ namespace ServiceStack.Redis
 
                 InitClient(inActiveClient);
 
+                RedisState.DisposeExpiredClients();
+
                 return inActiveClient;
             }
         }
@@ -250,7 +248,6 @@ namespace ServiceStack.Redis
             for (int x = 0; x < readWriteTotal; x++)
             {
                 var nextHostIndex = (desiredIndex + x) % readWriteTotal;
-                RedisEndpoint nextHost = RedisResolver.GetReadWriteHost(nextHostIndex);
                 for (var i = nextHostIndex; i < writeClients.Length; i += readWriteTotal)
                 {
                     if (writeClients[i] != null && !writeClients[i].Active && !writeClients[i].HadExceptions)
@@ -259,9 +256,10 @@ namespace ServiceStack.Redis
                     if (writeClients[i] == null || writeClients[i].HadExceptions)
                     {
                         if (writeClients[i] != null)
-                            writeClients[i].DisposeConnection();
+                            RedisState.DeactivateClient(writeClients[i]);
 
-                        var client = InitNewClient(nextHost, readWrite:true);
+                        var nextHost = RedisResolver.GetReadWriteHost(nextHostIndex);
+                        var client = InitNewClient(nextHost, readWrite: true);
                         writeClients[i] = client;
 
                         return client;
@@ -330,6 +328,8 @@ namespace ServiceStack.Redis
 
                 InitClient(inActiveClient);
 
+                RedisState.DisposeExpiredClients();
+
                 return inActiveClient;
             }
         }
@@ -347,7 +347,6 @@ namespace ServiceStack.Redis
             for (int x = 0; x < readOnlyTotal; x++)
             {
                 var nextHostIndex = (desiredIndex + x) % readOnlyTotal;
-                var nextHost = RedisResolver.GetReadOnlyHost(nextHostIndex);
                 for (var i = nextHostIndex; i < readClients.Length; i += readOnlyTotal)
                 {
                     if (readClients[i] != null && !readClients[i].Active && !readClients[i].HadExceptions)
@@ -356,9 +355,10 @@ namespace ServiceStack.Redis
                     if (readClients[i] == null || readClients[i].HadExceptions)
                     {
                         if (readClients[i] != null)
-                            readClients[i].DisposeConnection();
+                            RedisState.DeactivateClient(readClients[i]);
 
-                        var client = InitNewClient(nextHost, readWrite:false);
+                        var nextHost = RedisResolver.GetReadOnlyHost(nextHostIndex);
+                        var client = InitNewClient(nextHost, readWrite: false);
                         readClients[i] = client;
 
                         return client;
@@ -597,6 +597,8 @@ namespace ServiceStack.Redis
             {
                 Log.Error("Error when trying to dispose of PooledRedisClientManager", ex);
             }
+
+            RedisState.DisposeAllDeactivatedClients();
         }
 
         private int disposeAttempts = 0;

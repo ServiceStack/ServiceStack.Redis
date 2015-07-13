@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using Moq;
 using NUnit.Framework;
 using ServiceStack.Text;
 
@@ -22,6 +21,18 @@ namespace ServiceStack.Redis.Tests
 		private string firstReadWriteHost;
 		private string firstReadOnlyHost;
 
+        [TestFixtureSetUp]
+        public void TestFixtureSetUp()
+        {
+            RedisConfig.VerifyMasterConnections = false;
+        }
+
+        [TestFixtureTearDown]
+        public void TestFixtureTearDown()
+        {
+            RedisConfig.VerifyMasterConnections = true;
+        }
+
 		[SetUp]
 		public void OnBeforeEachTest()
 		{
@@ -29,14 +40,9 @@ namespace ServiceStack.Redis.Tests
 			firstReadOnlyHost = testReadOnlyHosts[0];
 		}
 
-        public RedisManagerPool CreateManager(params string[] hosts)
-		{
-			return CreateManager(hosts);
-		}
-
         public RedisManagerPool CreateManager()
 		{
-			return CreateManager(hosts);
+            return new RedisManagerPool(hosts);
 		}
 
         [Test]

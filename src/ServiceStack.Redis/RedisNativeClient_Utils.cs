@@ -89,7 +89,7 @@ namespace ServiceStack.Redis
                 {
                     socket.Close();
                     socket = null;
-                    HadExceptions = true;
+                    DeactivatedAt = DateTime.UtcNow;
                     return;
                 }
 
@@ -183,7 +183,7 @@ namespace ServiceStack.Redis
                     socket.Close();
                 socket = null;
 
-                HadExceptions = true;
+                DeactivatedAt = DateTime.UtcNow;
                 var throwEx = new RedisException("could not connect to redis Instance at " + Host + ":" + Port, ex);
                 log.Error(throwEx.Message, ex);
                 throw throwEx;
@@ -255,7 +255,7 @@ namespace ServiceStack.Redis
 
         private bool HandleSocketException(SocketException ex)
         {
-            HadExceptions = true;
+            DeactivatedAt = DateTime.UtcNow;
             log.Error("SocketException: ", ex);
 
             lastSocketException = ex;
@@ -269,7 +269,7 @@ namespace ServiceStack.Redis
 
         private RedisResponseException CreateResponseError(string error)
         {
-            HadExceptions = true;
+            DeactivatedAt = DateTime.UtcNow;
             string safeLastCommand = string.IsNullOrEmpty(Password) ? lastCommand : (lastCommand ?? "").Replace(Password, "");
 
             var throwEx = new RedisResponseException(
@@ -281,7 +281,7 @@ namespace ServiceStack.Redis
 
         private RedisException CreateConnectionError()
         {
-            HadExceptions = true;
+            DeactivatedAt = DateTime.UtcNow;
             var throwEx = new RedisException(
                 string.Format("Unable to Connect: sPort: {0}",
                     clientPort), lastSocketException);
@@ -456,7 +456,7 @@ namespace ServiceStack.Redis
 	        }
 	        catch (Exception)
 	        {
-		        HadExceptions = true;
+		        DeactivatedAt = DateTime.UtcNow;
 		        throw;
 	        }
         }

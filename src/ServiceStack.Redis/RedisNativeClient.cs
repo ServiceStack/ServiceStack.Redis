@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using ServiceStack.Logging;
 using ServiceStack.Redis.Pipeline;
@@ -50,7 +49,9 @@ namespace ServiceStack.Redis
         private int clientPort;
         private string lastCommand;
         private SocketException lastSocketException;
-        public bool HadExceptions { get; protected set; }
+
+        internal DateTime? DeactivatedAt;
+        public bool HadExceptions { get { return DeactivatedAt != null; } }
 
         protected Socket socket;
         protected BufferedStream Bstream;
@@ -116,7 +117,6 @@ namespace ServiceStack.Redis
                 transaction = value;
             }
         }
-
 
         internal IRedisPipelineShared Pipeline
         {
