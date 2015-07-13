@@ -392,23 +392,26 @@ namespace ServiceStack.Redis
                 if (currentBufferIndex > 0)
                     PushCurrentBuffer();
 
-                if (!Env.IsMono && sslStream == null)
+                if (cmdBuffer.Count > 0)
                 {
-                    socket.Send(cmdBuffer); //Optimized for Windows
-                }
-                else
-                {
-                    //Sendling IList<ArraySegment> Throws 'Message to Large' SocketException in Mono
-                    foreach (var segment in cmdBuffer)
+                    if (!Env.IsMono && sslStream == null)
                     {
-                        var buffer = segment.Array;
-                        if (sslStream == null)
+                        socket.Send(cmdBuffer); //Optimized for Windows
+                    }
+                    else
+                    {
+                        //Sendling IList<ArraySegment> Throws 'Message to Large' SocketException in Mono
+                        foreach (var segment in cmdBuffer)
                         {
-                            socket.Send(buffer, segment.Offset, segment.Count, SocketFlags.None);
-                        }
-                        else
-                        {
-                            sslStream.Write(buffer, segment.Offset, segment.Count);
+                            var buffer = segment.Array;
+                            if (sslStream == null)
+                            {
+                                socket.Send(buffer, segment.Offset, segment.Count, SocketFlags.None);
+                            }
+                            else
+                            {
+                                sslStream.Write(buffer, segment.Offset, segment.Count);
+                            }
                         }
                     }
                 }
