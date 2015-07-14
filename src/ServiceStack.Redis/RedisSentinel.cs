@@ -17,8 +17,8 @@ namespace ServiceStack.Redis
     public class RedisSentinel : IRedisSentinel
     {
         protected static readonly ILog Log = LogManager.GetLogger(typeof(RedisSentinel));
-        
-        public Func<string[],string[],IRedisClientsManager> RedisManagerFactory { get; set; }
+
+        public Func<string[], string[], IRedisClientsManager> RedisManagerFactory { get; set; }
 
         public static string DefaultMasterName = "mymaster";
         public static string DefaultAddress = "127.0.0.1:26379";
@@ -46,6 +46,10 @@ namespace ServiceStack.Redis
         public Dictionary<string, string> IpAddressMap { get; set; }
 
         public bool ScanForOtherSentinels { get; set; }
+
+        private DateTime lastSentinelsRefresh;
+        public TimeSpan RefreshSentinelHostsAfter { get; set; }
+
         public TimeSpan WaitBetweenSentinelLookups { get; set; }
         public TimeSpan MaxWaitBetweenSentinelLookups { get; set; }
         public int SentinelWorkerTimeoutMs { get; set; }
@@ -62,14 +66,15 @@ namespace ServiceStack.Redis
             this.SentinelHosts = sentinelHosts != null
                 ? sentinelHosts.ToList()
                 : null;
-            
+
             if (SentinelHosts == null || SentinelHosts.Count == 0)
                 throw new ArgumentException("sentinels must have at least one entry");
 
             this.masterName = masterName ?? DefaultMasterName;
             IpAddressMap = new Dictionary<string, string>();
-            RedisManagerFactory = (masters,slaves) => new PooledRedisClientManager(masters, slaves);
+            RedisManagerFactory = (masters, slaves) => new PooledRedisClientManager(masters, slaves);
             ScanForOtherSentinels = true;
+            RefreshSentinelHostsAfter = TimeSpan.FromMinutes(10);
             ResetWhenObjectivelyDown = true;
             ResetWhenSubjectivelyDown = true;
             ResetSentinelsWhenObjectivelyDown = true;
@@ -86,17 +91,10 @@ namespace ServiceStack.Redis
             lock (oLock)
             {
                 if (ScanForOtherSentinels)
-                {
-                    var activeHosts = GetActiveSentinelHosts(SentinelHosts);
-                    if (activeHosts.Count == 0)
-                        throw new ArgumentException("Could not find any active sentinels from: ", 
-                            string.Join(", ", SentinelHosts.ToArray()));
-
-                    SentinelHosts = activeHosts;
-                }
+                    RefreshActiveSentinels();
 
                 SentinelEndpoints = SentinelHosts
-                    .Map(x => x.ToRedisEndpoint(defaultPort:RedisConfig.DefaultPortSentinel))
+                    .Map(x => x.ToRedisEndpoint(defaultPort: RedisConfig.DefaultPortSentinel))
                     .ToArray();
 
                 var sentinelWorker = GetValidSentinelWorker();
@@ -137,15 +135,25 @@ namespace ServiceStack.Redis
             return activeSentinelHosts;
         }
 
-        public void ResetSentinels()
+        public void RefreshActiveSentinels()
         {
             var activeHosts = GetActiveSentinelHosts(SentinelHosts);
             if (activeHosts.Count == 0) return;
-            
-            SentinelHosts = activeHosts;
-            SentinelEndpoints = SentinelHosts
-                .Map(x => x.ToRedisEndpoint(defaultPort: RedisConfig.DefaultPortSentinel))
-                .ToArray();
+
+            lock (SentinelHosts)
+            {
+                lastSentinelsRefresh = DateTime.UtcNow;
+
+                activeHosts.Each(x =>
+                {
+                    if (!SentinelHosts.Contains(x))
+                        SentinelHosts.Add(x);
+                });
+
+                SentinelEndpoints = SentinelHosts
+                    .Map(x => x.ToRedisEndpoint(defaultPort: RedisConfig.DefaultPortSentinel))
+                    .ToArray();
+            }
         }
 
         public Func<string, string> HostFilter { get; set; }
@@ -241,8 +249,14 @@ namespace ServiceStack.Redis
             lock (sentinelWorker)
             {
                 var host = sentinelWorker.GetMasterHost(masterName);
-                return host != null 
-                    ? (HostFilter != null ? HostFilter(host) : host).ToRedisEndpoint() 
+
+                if (ScanForOtherSentinels && DateTime.UtcNow - lastSentinelsRefresh > RefreshSentinelHostsAfter)
+                {
+                    RefreshActiveSentinels();
+                }
+
+                return host != null
+                    ? (HostFilter != null ? HostFilter(host) : host).ToRedisEndpoint()
                     : null;
             }
         }
@@ -317,7 +331,7 @@ namespace ServiceStack.Redis
         public void Dispose()
         {
             if (worker == null) return;
-            
+
             worker.Dispose();
             worker = null;
         }

@@ -47,11 +47,6 @@ namespace ServiceStack.Redis
             if (isObjectivelyDown)
                 Interlocked.Increment(ref RedisState.TotalObjectiveServersDown);
 
-            if (isObjectivelyDown && sentinel.ResetSentinelsWhenObjectivelyDown)
-            {
-                sentinel.ResetSentinels();
-            }
-
             if (c == "+failover-end"
                 || (sentinel.ResetWhenSubjectivelyDown && isSubjectivelyDown)
                 || (sentinel.ResetWhenObjectivelyDown && isObjectivelyDown))
