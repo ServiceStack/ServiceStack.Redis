@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 
 namespace ServiceStack.Redis
 {
@@ -42,6 +43,21 @@ namespace ServiceStack.Redis
         public static long TotalObjectiveServersDown
         {
             get { return Interlocked.CompareExchange(ref RedisState.TotalObjectiveServersDown, 0, 0); }
+        }
+
+        public static Dictionary<string, long> ToDictionary()
+        {
+            return new Dictionary<string, long> 
+            {
+                {"TotalFailovers", TotalFailovers},
+                {"TotalDeactivatedClients", TotalDeactivatedClients},
+                {"TotalFailedSentinelWorkers", TotalFailedSentinelWorkers},
+                {"TotalInvalidMasters", TotalInvalidMasters},
+                {"TotalNoMastersFound", TotalNoMastersFound},
+                {"TotalClientsCreated", TotalClientsCreated},
+                {"TotalSubjectiveServersDown", TotalSubjectiveServersDown},
+                {"TotalObjectiveServersDown", TotalObjectiveServersDown},
+            };
         }
     }
 }
