@@ -248,7 +248,7 @@ namespace ServiceStack.Redis
             SafeConnectionClose();
             Connect(); //sets db to 0
 
-            if (previousDb != DefaultDb) this.Db = previousDb;
+            if (previousDb != RedisConfig.DefaultDb) this.Db = previousDb;
 
             return socket != null;
         }
@@ -591,6 +591,9 @@ namespace ServiceStack.Redis
 
         protected void Log(string fmt, params object[] args)
         {
+            if (RedisConfig.DisableVerboseLogging)
+                return;
+
             log.DebugFormat("{0}", string.Format(fmt, args).Trim());
         }
 

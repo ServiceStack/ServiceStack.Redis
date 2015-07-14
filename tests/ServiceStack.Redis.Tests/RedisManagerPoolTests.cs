@@ -82,7 +82,7 @@ namespace ServiceStack.Redis.Tests
         private static void AssertClientHasHost(IRedisClient client, string hostWithOptionalPort)
         {
             var parts = hostWithOptionalPort.Split(':');
-            var port = parts.Length > 1 ? int.Parse(parts[1]) : RedisNativeClient.DefaultPort;
+            var port = parts.Length > 1 ? int.Parse(parts[1]) : RedisConfig.DefaultPort;
 
             Assert.That(client.Host, Is.EqualTo(parts[0]));
             Assert.That(client.Port, Is.EqualTo(port));

@@ -6,16 +6,21 @@ namespace ServiceStack.Redis
 {
     public class RedisConfig
     {
+        //redis-server defaults:
+        public const long DefaultDb = 0;
+        public const int DefaultPort = 6379;
+        public const int DefaultPortSsl = 6380;
+        public const int DefaultPortSentinel = 26379;
+        public const string DefaultHost = "localhost";
+        public static int DefaultIdleTimeOutSecs = 300;
+
         public static Func<RedisEndpoint, RedisClient> ClientFactory = c =>
         {
             Interlocked.Increment(ref RedisState.TotalClientsCreated);
             return new RedisClient(c);
         };
 
-        public static LocalCertificateSelectionCallback CertificateSelectionCallback { get; set; }
-
-        //Example at: http://msdn.microsoft.com/en-us/library/office/dd633677(v=exchg.80).aspx 
-        public static RemoteCertificateValidationCallback CertificateValidationCallback { get; set; }
+        public static int IdleTimeOutSecs = 240;
 
         public static int BufferLength = 1450;
 
@@ -31,5 +36,9 @@ namespace ServiceStack.Redis
         public static TimeSpan DeactivatedClientsExpiry = TimeSpan.FromMinutes(1);
 
         public static bool DisableVerboseLogging = false;
+
+        //Example at: http://msdn.microsoft.com/en-us/library/office/dd633677(v=exchg.80).aspx 
+        public static LocalCertificateSelectionCallback CertificateSelectionCallback { get; set; }
+        public static RemoteCertificateValidationCallback CertificateValidationCallback { get; set; }
     }
 }

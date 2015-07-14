@@ -66,7 +66,7 @@ namespace ServiceStack.Redis
             Init();
         }
 
-        public RedisClient(string host, int port, string password = null, long db = DefaultDb)
+        public RedisClient(string host, int port, string password = null, long db = RedisConfig.DefaultDb)
             : base(host, port, password, db)
         {
             Init();

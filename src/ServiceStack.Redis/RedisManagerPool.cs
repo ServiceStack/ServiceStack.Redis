@@ -50,7 +50,7 @@ namespace ServiceStack.Redis
 
         public int MaxPoolSize { get; set; }
 
-        public RedisManagerPool() : this(RedisNativeClient.DefaultHost) {}
+        public RedisManagerPool() : this(RedisConfig.DefaultHost) {}
         public RedisManagerPool(string host) : this(new[]{ host }) {}
         public RedisManagerPool(IEnumerable<string> hosts) : this(hosts, null) {}
 

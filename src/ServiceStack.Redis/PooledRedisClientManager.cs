@@ -62,7 +62,7 @@ namespace ServiceStack.Redis
 
         public Action<IRedisNativeClient> ConnectionFilter { get; set; }
 
-        public PooledRedisClientManager() : this(RedisNativeClient.DefaultHost) { }
+        public PooledRedisClientManager() : this(RedisConfig.DefaultHost) { }
 
         public PooledRedisClientManager(int poolSize, int poolTimeOutSeconds, params string[] readWriteHosts)
             : this(readWriteHosts, readWriteHosts, null, null, poolSize, poolTimeOutSeconds)

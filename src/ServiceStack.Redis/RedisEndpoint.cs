@@ -7,17 +7,17 @@ namespace ServiceStack.Redis
     {
         public RedisEndpoint()
         {
-            Host = RedisNativeClient.DefaultHost;
-            Port = RedisNativeClient.DefaultPort;
-            Db = RedisNativeClient.DefaultDb;
+            Host = RedisConfig.DefaultHost;
+            Port = RedisConfig.DefaultPort;
+            Db = RedisConfig.DefaultDb;
 
             ConnectTimeout = 0;
             SendTimeout = -1;
             ReceiveTimeout = -1;
-            IdleTimeOutSecs = RedisNativeClient.DefaultIdleTimeOutSecs;
+            IdleTimeOutSecs = RedisConfig.IdleTimeOutSecs;
         }
 
-        public RedisEndpoint(string host, int port, string password = null, long db = RedisNativeClient.DefaultDb)
+        public RedisEndpoint(string host, int port, string password = null, long db = RedisConfig.DefaultDb)
             : this()
         {
             this.Host = host;

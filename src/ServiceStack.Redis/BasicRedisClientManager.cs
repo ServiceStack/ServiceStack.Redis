@@ -47,7 +47,7 @@ namespace ServiceStack.Redis
 
         public IRedisResolver RedisResolver { get; set; }
 
-        public BasicRedisClientManager() : this(RedisNativeClient.DefaultHost) { }
+        public BasicRedisClientManager() : this(RedisConfig.DefaultHost) { }
 
         public BasicRedisClientManager(params string[] readWriteHosts)
             : this(readWriteHosts, readWriteHosts) { }

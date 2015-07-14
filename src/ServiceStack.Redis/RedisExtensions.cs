@@ -39,7 +39,7 @@ namespace ServiceStack.Redis
             var qsParts = domainParts.Last().SplitOnFirst('?');
             var hostParts = qsParts[0].SplitOnLast(':');
             var useDefaultPort = true;
-            var port = defaultPort.GetValueOrDefault(RedisNativeClient.DefaultPort);
+            var port = defaultPort.GetValueOrDefault(RedisConfig.DefaultPort);
             if (hostParts.Length > 1)
             {
                 port = int.Parse(hostParts[1]);
@@ -73,7 +73,7 @@ namespace ServiceStack.Redis
                         case "ssl":
                             endpoint.Ssl = bool.Parse(value);
                             if (useDefaultPort)
-                                endpoint.Port = RedisNativeClient.DefaultPortSsl;
+                                endpoint.Port = RedisConfig.DefaultPortSsl;
                             break;
                         case "client":
                             endpoint.Client = value;
