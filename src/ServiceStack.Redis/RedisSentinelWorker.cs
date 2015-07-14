@@ -47,6 +47,11 @@ namespace ServiceStack.Redis
             if (isObjectivelyDown)
                 Interlocked.Increment(ref RedisState.TotalObjectiveServersDown);
 
+            if (isObjectivelyDown && sentinel.ResetSentinelsWhenObjectivelyDown)
+            {
+                sentinel.ResetSentinels();
+            }
+
             if (c == "+failover-end"
                 || (sentinel.ResetWhenSubjectivelyDown && isSubjectivelyDown)
                 || (sentinel.ResetWhenObjectivelyDown && isObjectivelyDown))
@@ -86,12 +91,17 @@ namespace ServiceStack.Redis
             return null;
         }
 
-        internal List<string> GetSlaveHosts(string masterName)
+        internal List<string> GetSentinelHosts(string masterName)
         {
-            return SanitizeSlavesConfig(this.sentinelClient.SentinelSlaves(sentinel.MasterName));
+            return SanitizeHostsConfig(this.sentinelClient.SentinelSentinels(sentinel.MasterName));
         }
 
-        private List<string> SanitizeSlavesConfig(IEnumerable<Dictionary<string, string>> slaves)
+        internal List<string> GetSlaveHosts(string masterName)
+        {
+            return SanitizeHostsConfig(this.sentinelClient.SentinelSlaves(sentinel.MasterName));
+        }
+
+        private List<string> SanitizeHostsConfig(IEnumerable<Dictionary<string, string>> slaves)
         {
             string ip;
             string port;
@@ -125,7 +135,7 @@ namespace ServiceStack.Redis
                     var sentinelManager = new BasicRedisClientManager(sentinel.SentinelHosts, sentinel.SentinelHosts) 
                     {
                         //Use BasicRedisResolver which doesn't validate non-Master Sentinel instances
-                        RedisResolver = new BasicRedisResolver(sentinel.SentinelHosts, sentinel.SentinelHosts)
+                        RedisResolver = new BasicRedisResolver(sentinel.SentinelEndpoints, sentinel.SentinelEndpoints)
                     };
                     this.sentinePubSub = new RedisPubSubServer(sentinelManager)
                     {

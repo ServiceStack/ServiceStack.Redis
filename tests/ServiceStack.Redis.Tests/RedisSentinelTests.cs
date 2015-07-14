@@ -78,6 +78,15 @@ namespace ServiceStack.Redis.Tests
         }
 
         [Test]
+        public void Can_Get_Sentinel_Sentinels()
+        {
+            var sentinels = RedisSentinel.SentinelSentinels(MasterName);
+            sentinels.PrintDump();
+
+            Assert.That(sentinels.Count, Is.GreaterThan(0));
+        }
+
+        [Test]
         public void Can_Get_Master_Addr()
         {
             var addr = RedisSentinel.SentinelGetMasterAddrByName(MasterName);
@@ -88,6 +97,24 @@ namespace ServiceStack.Redis.Tests
 
             // IP of localhost
             Assert.That(hostString, Is.EqualTo(MasterHosts[0]));
+        }
+
+        [Test]
+        public void Does_scan_for_other_active_sentinels()
+        {
+            using (var sentinel = new RedisSentinel(SentinelHosts[0]) {
+                ScanForOtherSentinels = true
+            })
+            {
+                var clientsManager = sentinel.Start();
+
+                Assert.That(sentinel.SentinelHosts, Is.EquivalentTo(SentinelHosts));
+
+                using (var client = clientsManager.GetClient())
+                {
+                    Assert.That(client.GetHostString(), Is.EqualTo(MasterHosts[0]));
+                }
+            }
         }
 
         [Test]
@@ -181,8 +208,8 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Defaults_to_default_sentinel_port()
         {
-            var sentinelEndpoint = "127.0.0.1".ToRedisEndpoint(defaultPort: RedisNativeClient.DefaultPortSentinel);
-            Assert.That(sentinelEndpoint.Port, Is.EqualTo(RedisNativeClient.DefaultPortSentinel));
+            var sentinelEndpoint = "127.0.0.1".ToRedisEndpoint(defaultPort: RedisConfig.DefaultPortSentinel);
+            Assert.That(sentinelEndpoint.Port, Is.EqualTo(RedisConfig.DefaultPortSentinel));
         }
     }
 }

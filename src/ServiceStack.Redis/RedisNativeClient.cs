@@ -35,13 +35,6 @@ namespace ServiceStack.Redis
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(RedisNativeClient));
 
-        public const long DefaultDb = 0;
-        public const int DefaultPort = 6379;
-        public const int DefaultPortSsl = 6380;
-        public const int DefaultPortSentinel = 26379;
-        public const string DefaultHost = "localhost";
-        public const int DefaultIdleTimeOutSecs = 240; //default on redis is 300
-
         internal const int Success = 1;
         internal const int OneGb = 1073741824;
         private readonly byte[] endData = new[] { (byte)'\r', (byte)'\n' };
@@ -143,7 +136,7 @@ namespace ServiceStack.Redis
         public RedisNativeClient(string host, int port)
             : this(host, port, null) { }
 
-        public RedisNativeClient(string host, int port, string password = null, long db = DefaultDb)
+        public RedisNativeClient(string host, int port, string password = null, long db = RedisConfig.DefaultDb)
         {
             if (host == null)
                 throw new ArgumentNullException("host");
@@ -168,7 +161,7 @@ namespace ServiceStack.Redis
         }
 
         public RedisNativeClient()
-            : this(DefaultHost, DefaultPort) { }
+            : this(RedisConfig.DefaultHost, RedisConfig.DefaultPort) { }
 
         #region Common Operations
 
@@ -1451,7 +1444,7 @@ namespace ServiceStack.Redis
 
         private static Dictionary<string, string> ToDictionary(object[] result)
         {
-            var masterInfo = new Dictionary<string, string>();
+            var map = new Dictionary<string, string>();
 
             string key = null;
             for (var i = 0; i < result.Length; i++)
@@ -1464,10 +1457,10 @@ namespace ServiceStack.Redis
                 else
                 {
                     var val = bytes.FromUtf8Bytes();
-                    masterInfo[key] = val;
+                    map[key] = val;
                 }
             }
-            return masterInfo;
+            return map;
         }
 
         public List<Dictionary<string, string>> SentinelMasters()
@@ -1491,6 +1484,18 @@ namespace ServiceStack.Redis
             };
             var results = SendExpectDeeplyNestedMultiData(args.ToArray());
             return ToDictionary(results);
+        }
+
+        public List<Dictionary<string, string>> SentinelSentinels(string masterName)
+        {
+            var args = new List<byte[]>
+            {
+                Commands.Sentinel,
+                Commands.Sentinels,
+                masterName.ToUtf8Bytes(),
+            };
+            var results = SendExpectDeeplyNestedMultiData(args.ToArray());
+            return (from object[] result in results select ToDictionary(result)).ToList();
         }
 
         public List<Dictionary<string, string>> SentinelSlaves(string masterName)
