@@ -105,26 +105,86 @@ namespace ServiceStack.Redis
             return CreateRedisClient(GetReadOnlyHost(desiredIndex), master: false);
         }
 
+        object oLock = new object();
+        private string lastInvalidMasterHost = null;
+        private long lastValidMasterTicks = DateTime.UtcNow.Ticks;
+ 
+        private DateTime lastValidMasterFromSentinelAt
+        {
+            get { return new DateTime(Interlocked.Read(ref lastValidMasterTicks), DateTimeKind.Utc); }
+            set { Interlocked.Exchange(ref lastValidMasterTicks, value.Ticks); }
+        }
+
         public virtual RedisClient CreateRedisClient(RedisEndpoint config, bool master)
         {
             var client = ClientFactory(config);
             if (master)
             {
-                var role = client.GetServerRole();
-                if (role != RedisServerRole.Master)
+                var role = RedisServerRole.Unknown;
+                try
+                {
+                    role = client.GetServerRole();
+                    if (role == RedisServerRole.Master)
+                    {
+                        lastValidMasterFromSentinelAt = DateTime.UtcNow;
+                        return client;
+                    }
+                }
+                catch (Exception ex)
                 {
                     Interlocked.Increment(ref RedisState.TotalInvalidMasters);
+
+                    if (client.GetHostString() == lastInvalidMasterHost)
+                    {
+                        lock (oLock)
+                        {
+                            if (DateTime.UtcNow - lastValidMasterFromSentinelAt > sentinel.WaitBeforeForcingMasterFailover)
+                            {
+                                lastInvalidMasterHost = null;
+                                lastValidMasterFromSentinelAt = DateTime.UtcNow;
+
+                                log.Error("Valid master was not found at '{0}' within '{1}'. Sending SENTINEL failover...".Fmt(
+                                    client.GetHostString(), sentinel.WaitBeforeForcingMasterFailover), ex);
+
+                                Interlocked.Increment(ref RedisState.TotalForcedMasterFailovers);
+
+                                sentinel.ForceMasterFailover();
+                                Thread.Sleep(sentinel.WaitBetweenSentinelLookups);
+                                role = client.GetServerRole();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        lastInvalidMasterHost = client.GetHostString();
+                    }
+                }
+
+                if (role != RedisServerRole.Master)
+                {
                     try
                     {
                         var stopwatch = Stopwatch.StartNew();
                         while (true)
                         {
-                            var masterConfig = sentinel.GetMaster();
-                            var masterClient = ClientFactory(masterConfig);
-                            masterClient.ConnectTimeout = sentinel.SentinelWorkerTimeoutMs;
-                            var masterRole = masterClient.GetServerRole();
-                            if (masterRole == RedisServerRole.Master)
-                                return masterClient;
+                            try
+                            {
+                                var masterConfig = sentinel.GetMaster();
+                                var masterClient = ClientFactory(masterConfig);
+                                masterClient.ConnectTimeout = sentinel.SentinelWorkerConnectTimeoutMs;
+
+                                var masterRole = masterClient.GetServerRole();
+                                if (masterRole == RedisServerRole.Master)
+                                {
+                                    lastValidMasterFromSentinelAt = DateTime.UtcNow;
+                                    return masterClient;
+                                }
+                                else
+                                {
+                                    Interlocked.Increment(ref RedisState.TotalInvalidMasters);
+                                }
+                            }
+                            catch { /* Ignore errors until MaxWait */ }
 
                             if (stopwatch.Elapsed > sentinel.MaxWaitBetweenSentinelLookups)
                                 throw new TimeoutException("Max Wait Between Sentinel Lookups Elapsed: {0}"
@@ -136,6 +196,7 @@ namespace ServiceStack.Redis
                     catch (Exception ex)
                     {
                         log.Error("Redis Master Host '{0}' is {1}. Resetting allHosts...".Fmt(config.GetHostString(), role), ex);
+
                         var newMasters = new List<RedisEndpoint>();
                         var newSlaves = new List<RedisEndpoint>();
                         RedisClient masterClient = null;
@@ -159,7 +220,7 @@ namespace ServiceStack.Redis
                                 }
 
                             }
-                            catch { /* skip */ }
+                            catch { /* skip past invalid master connections */ }
                         }
 
                         if (masterClient == null)
