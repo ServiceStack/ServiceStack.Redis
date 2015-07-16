@@ -12,7 +12,6 @@ namespace ServiceStack.Redis
         public const int DefaultPortSsl = 6380;
         public const int DefaultPortSentinel = 26379;
         public const string DefaultHost = "localhost";
-        public static int DefaultIdleTimeOutSecs = 300;
 
         public static Func<RedisEndpoint, RedisClient> ClientFactory = c =>
         {
@@ -20,7 +19,10 @@ namespace ServiceStack.Redis
             return new RedisClient(c);
         };
 
-        public static int IdleTimeOutSecs = 240;
+        public static int DefaultConnectTimeout = 0;
+        public static int DefaultSendTimeout = -1;
+        public static int DefaultReceiveTimeout = -1;
+        public static int DefaultIdleTimeOutSecs = 240;
 
         public static int BufferLength = 1450;
 

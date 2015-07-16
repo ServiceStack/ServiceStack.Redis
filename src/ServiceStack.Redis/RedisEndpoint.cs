@@ -11,10 +11,10 @@ namespace ServiceStack.Redis
             Port = RedisConfig.DefaultPort;
             Db = RedisConfig.DefaultDb;
 
-            ConnectTimeout = 0;
-            SendTimeout = -1;
-            ReceiveTimeout = -1;
-            IdleTimeOutSecs = RedisConfig.IdleTimeOutSecs;
+            ConnectTimeout = RedisConfig.DefaultConnectTimeout;
+            SendTimeout = RedisConfig.DefaultSendTimeout;
+            ReceiveTimeout = RedisConfig.DefaultReceiveTimeout;
+            IdleTimeOutSecs = RedisConfig.DefaultIdleTimeOutSecs;
         }
 
         public RedisEndpoint(string host, int port, string password = null, long db = RedisConfig.DefaultDb)
