@@ -24,6 +24,7 @@ namespace ServiceStack.Redis
         public static string DefaultAddress = "127.0.0.1:26379";
 
         private object oLock = new object();
+        private bool isDisposed = false;
 
         private readonly string masterName;
         public string MasterName
@@ -52,7 +53,10 @@ namespace ServiceStack.Redis
 
         public TimeSpan WaitBetweenSentinelLookups { get; set; }
         public TimeSpan MaxWaitBetweenSentinelLookups { get; set; }
-        public int SentinelWorkerTimeoutMs { get; set; }
+        public TimeSpan WaitBeforeForcingMasterFailover { get; set; }
+        public int SentinelWorkerConnectTimeoutMs { get; set; }
+        public int SentinelWorkerReceiveTimeoutMs { get; set; }
+        public int SentinelWorkerSendTimeoutMs { get; set; }
 
         public bool ResetWhenSubjectivelyDown { get; set; }
         public bool ResetWhenObjectivelyDown { get; set; }
@@ -78,9 +82,12 @@ namespace ServiceStack.Redis
             ResetWhenObjectivelyDown = true;
             ResetWhenSubjectivelyDown = true;
             ResetSentinelsWhenObjectivelyDown = true;
-            SentinelWorkerTimeoutMs = 100;
+            SentinelWorkerConnectTimeoutMs = 100;
+            SentinelWorkerReceiveTimeoutMs = 100;
+            SentinelWorkerSendTimeoutMs = 100;
             WaitBetweenSentinelLookups = TimeSpan.FromMilliseconds(250);
             MaxWaitBetweenSentinelLookups = TimeSpan.FromSeconds(60);
+            WaitBeforeForcingMasterFailover = TimeSpan.FromSeconds(60);
         }
 
         /// <summary>
@@ -90,6 +97,15 @@ namespace ServiceStack.Redis
         {
             lock (oLock)
             {
+                for (int i = 0; i < SentinelHosts.Count; i++)
+                {
+                    var parts = SentinelHosts[i].SplitOnLast(':');
+                    if (parts.Length == 1)
+                    {
+                        SentinelHosts[i] = parts[0] + ":{0}".Fmt(RedisConfig.DefaultPortSentinel);
+                    }
+                }
+
                 if (ScanForOtherSentinels)
                     RefreshActiveSentinels();
 
@@ -212,6 +228,9 @@ namespace ServiceStack.Redis
 
         private RedisSentinelWorker GetValidSentinelWorker()
         {
+            if (isDisposed)
+                throw new ObjectDisposedException(GetType().Name);
+
             if (this.worker != null)
                 return this.worker;
 
@@ -285,15 +304,13 @@ namespace ServiceStack.Redis
         {
             lock (oLock)
             {
-                sentinelIndex++;
-
                 if (this.worker != null)
                 {
                     this.worker.Dispose();
                     this.worker = null;
                 }
 
-                if (sentinelIndex >= SentinelEndpoints.Length)
+                if (++sentinelIndex >= SentinelEndpoints.Length)
                     sentinelIndex = 0;
 
                 var sentinelWorker = new RedisSentinelWorker(this, SentinelEndpoints[sentinelIndex])
@@ -319,6 +336,15 @@ namespace ServiceStack.Redis
             }
         }
 
+        public string ForceMasterFailover()
+        {
+            var sentinelWorker = GetValidSentinelWorker();
+            lock (sentinelWorker)
+            {
+                return sentinelWorker.ForceMasterFailover(masterName);
+            }
+        }
+
         public SentinelInfo GetSentinelInfo()
         {
             var sentinelWorker = GetValidSentinelWorker();
@@ -330,10 +356,9 @@ namespace ServiceStack.Redis
 
         public void Dispose()
         {
-            if (worker == null) return;
+            this.isDisposed = true;
 
-            worker.Dispose();
-            worker = null;
+            new IDisposable[] { RedisManager, worker }.Dispose();
         }
     }
 }
