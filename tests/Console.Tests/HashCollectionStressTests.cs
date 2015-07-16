@@ -6,7 +6,7 @@ using ServiceStack.Redis;
 using ServiceStack.Redis.Generic;
 using ServiceStack.Text;
 
-namespace TestRedisConnection
+namespace ConsoleTests
 {
     public class HashCollectionStressTests
     {

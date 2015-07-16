@@ -6,7 +6,7 @@ using ServiceStack.Redis;
 using ServiceStack.Text;
 using Timer = System.Timers.Timer;
 
-namespace TestRedisConnection
+namespace ConsoleTests
 {
     public class LongRunningRedisPubSubServer
     {

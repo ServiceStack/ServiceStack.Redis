@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using ServiceStack.Redis;
 using ServiceStack.Redis.Generic;
-using ServiceStack;
 using ServiceStack.Text;
 
-namespace TestRedisConnection
+namespace ConsoleTests
 {
     class DeviceInfo
     {
