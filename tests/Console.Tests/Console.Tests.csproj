@@ -7,7 +7,7 @@
     <ProjectGuid>{8368C965-B4F6-4263-9ABB-731A175B2E77}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Console.Tests</RootNamespace>
+    <RootNamespace>ConsoleTests</RootNamespace>
     <AssemblyName>Console.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -38,6 +38,10 @@
     <Reference Include="ServiceStack.Client">
       <HintPath>..\..\lib\tests\ServiceStack.Client.dll</HintPath>
     </Reference>
+    <Reference Include="ServiceStack.Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\ServiceStack.Common.dll</HintPath>
+    </Reference>
     <Reference Include="ServiceStack.Interfaces">
       <HintPath>..\..\lib\ServiceStack.Interfaces.dll</HintPath>
     </Reference>
@@ -56,11 +60,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GoogleRedisSentinelFailoverTests.cs" />
     <Compile Include="HashCollectionStressTests.cs" />
     <Compile Include="HashStressTest.cs" />
     <Compile Include="LongRunningRedisPubSubServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="LocalRedisSentinelFailoverTests.cs" />
+    <Compile Include="RedisSentinelFailoverTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\ServiceStack.Redis\ServiceStack.Redis.csproj">
