@@ -20,7 +20,9 @@ namespace ServiceStack.Redis
             this.sentinel = sentinel;
             this.sentinelClient = new RedisClient(sentinelEndpoint) {
                 Db = 0, //Sentinel Servers doesn't support DB, reset to 0
-                ConnectTimeout = sentinel.SentinelWorkerTimeoutMs,
+                ConnectTimeout = sentinel.SentinelWorkerConnectTimeoutMs,
+                ReceiveTimeout = sentinel.SentinelWorkerReceiveTimeoutMs,
+                SendTimeout = sentinel.SentinelWorkerSendTimeoutMs,
             };
 
             if (Log.IsDebugEnabled)
@@ -72,18 +74,21 @@ namespace ServiceStack.Redis
         internal string GetMasterHost(string masterName)
         {
             var masterInfo = sentinelClient.SentinelGetMasterAddrByName(masterName);
-            if (masterInfo.Count > 0)
-            {
-                var ip = masterInfo[0];
-                var port = masterInfo[1];
+            return masterInfo.Count > 0 
+                ? SanitizeMasterConfig(masterInfo) 
+                : null;
+        }
 
-                string aliasIp;
-                if (sentinel.IpAddressMap.TryGetValue(ip, out aliasIp))
-                    ip = aliasIp;
+        private string SanitizeMasterConfig(List<string> masterInfo)
+        {
+            var ip = masterInfo[0];
+            var port = masterInfo[1];
 
-                return "{0}:{1}".Fmt(ip, port);
-            }
-            return null;
+            string aliasIp;
+            if (sentinel.IpAddressMap.TryGetValue(ip, out aliasIp))
+                ip = aliasIp;
+
+            return "{0}:{1}".Fmt(ip, port);
         }
 
         internal List<string> GetSentinelHosts(string masterName)
@@ -150,6 +155,14 @@ namespace ServiceStack.Redis
                 if (OnSentinelError != null)
                     OnSentinelError(ex);
             }
+        }
+
+        public string ForceMasterFailover(string masterName)
+        {
+            var masterInfo = this.sentinelClient.SentinelFailover(masterName);
+            return masterInfo.Count > 0
+                ? SanitizeMasterConfig(masterInfo)
+                : null;
         }
 
         public void Dispose()
