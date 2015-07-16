@@ -17,13 +17,15 @@ namespace ServiceStack.Redis
         internal static long TotalFailovers = 0;
         internal static long TotalDeactivatedClients = 0;
         internal static long TotalFailedSentinelWorkers = 0;
+        internal static long TotalForcedMasterFailovers = 0;
         internal static long TotalInvalidMasters = 0;
         internal static long TotalNoMastersFound = 0;
         internal static long TotalClientsCreated = 0;
+        internal static long TotalClientsCreatedOutsidePool = 0;
         internal static long TotalSubjectiveServersDown = 0;
         internal static long TotalObjectiveServersDown = 0;
 
-        static readonly ConcurrentDictionary<RedisClient, DateTime> DeactivatedClients = new ConcurrentDictionary<RedisClient, DateTime>();
+        internal static readonly ConcurrentDictionary<RedisClient, DateTime> DeactivatedClients = new ConcurrentDictionary<RedisClient, DateTime>();
 
         internal static void DeactivateClient(RedisClient client)
         {

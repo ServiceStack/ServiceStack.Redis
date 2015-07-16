@@ -20,6 +20,11 @@ namespace ServiceStack.Redis
             get { return Interlocked.CompareExchange(ref RedisState.TotalFailedSentinelWorkers, 0, 0); }
         }
 
+        public static long TotalForcedMasterFailovers
+        {
+            get { return Interlocked.CompareExchange(ref RedisState.TotalForcedMasterFailovers, 0, 0); }
+        }
+
         public static long TotalInvalidMasters
         {
             get { return Interlocked.CompareExchange(ref RedisState.TotalInvalidMasters, 0, 0); }
@@ -33,6 +38,11 @@ namespace ServiceStack.Redis
         public static long TotalClientsCreated
         {
             get { return Interlocked.CompareExchange(ref RedisState.TotalClientsCreated, 0, 0); }
+        }
+
+        public static long TotalClientsCreatedOutsidePool
+        {
+            get { return Interlocked.CompareExchange(ref RedisState.TotalClientsCreatedOutsidePool, 0, 0); }
         }
 
         public static long TotalSubjectiveServersDown
@@ -52,11 +62,14 @@ namespace ServiceStack.Redis
                 {"TotalFailovers", TotalFailovers},
                 {"TotalDeactivatedClients", TotalDeactivatedClients},
                 {"TotalFailedSentinelWorkers", TotalFailedSentinelWorkers},
+                {"TotalForcedMasterFailovers", TotalForcedMasterFailovers},
                 {"TotalInvalidMasters", TotalInvalidMasters},
                 {"TotalNoMastersFound", TotalNoMastersFound},
                 {"TotalClientsCreated", TotalClientsCreated},
+                {"TotalClientsCreatedOutsidePool", TotalClientsCreatedOutsidePool},
                 {"TotalSubjectiveServersDown", TotalSubjectiveServersDown},
                 {"TotalObjectiveServersDown", TotalObjectiveServersDown},
+                {"TotalPendingDeactivatedClients", RedisState.DeactivatedClients.Count },
             };
         }
     }
