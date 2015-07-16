@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using ServiceStack.Text;
 
-namespace ServiceStack.Redis.Tests
+namespace ServiceStack.Redis.Tests.Sentinel
 {
-    [Ignore("Ignore Sentinel Integration Tests")]
     [TestFixture]
     public class RedisResolverTests
         : RedisSentinelTestBase

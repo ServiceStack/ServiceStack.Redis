@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Text;
@@ -348,6 +349,47 @@ namespace ServiceStack.Redis.Tests
 				AssertClientHasHost(client4, testReadOnlyHosts[2]);
 			}
 		}
+
+	    [Test]
+	    public void Does_throw_TimeoutException_when_PoolTimeout_exceeded()
+	    {
+            using (var manager = new PooledRedisClientManager(testReadWriteHosts, testReadOnlyHosts,
+                new RedisClientManagerConfig
+                    {
+                        MaxWritePoolSize = 4,
+                        MaxReadPoolSize = 4,
+                        AutoStart = false,
+                    }))
+			{
+			    manager.PoolTimeout = 100;
+
+			    manager.Start();
+
+			    var masters = 4.Times(i => manager.GetClient());
+
+                try
+                {
+                    manager.GetClient();
+                    Assert.Fail("Should throw TimeoutException");
+                }
+                catch (TimeoutException ex)
+                {
+                    Assert.That(ex.Message, Is.StringStarting("Redis Timeout expired."));
+                }
+
+			    var slaves = 4.Times(i => manager.GetReadOnlyClient());
+
+                try
+                {
+                    manager.GetReadOnlyClient();
+                    Assert.Fail("Should throw TimeoutException");
+                }
+                catch (TimeoutException ex)
+                {
+                    Assert.That(ex.Message, Is.StringStarting("Redis Timeout expired."));
+                }
+			}
+	    }
 
 		[Test]
 		public void Can_support_64_threads_using_the_client_simultaneously()

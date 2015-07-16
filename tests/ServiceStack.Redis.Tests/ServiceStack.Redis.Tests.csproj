@@ -184,9 +184,7 @@
     <Compile Include="ConfigTests.cs" />
     <Compile Include="CustomCommandTests.cs" />
     <Compile Include="Issues\RedisCharacterizationTests.cs" />
-    <Compile Include="Redis3SentinelSetupTests.cs" />
     <Compile Include="RedisBatchTests.cs" />
-    <Compile Include="RedisResolverTests.cs" />
     <Compile Include="RedisManagerPoolTests.cs" />
     <Compile Include="DiagnosticTests.cs" />
     <Compile Include="Examples\ServiceStack_Redis_UseCase.cs" />
@@ -251,8 +249,6 @@
     <Compile Include="RedisPubSubServerTests.cs" />
     <Compile Include="RedisPubSubTests.cs" />
     <Compile Include="RedisScanTests.cs" />
-    <Compile Include="RedisSentinelTestBase.cs" />
-    <Compile Include="RedisSentinelTests.cs" />
     <Compile Include="RedisTransactionCommonTests.cs" />
     <Compile Include="RedisTransactionTests.cs" />
     <Compile Include="RedisUtilTests.cs" />

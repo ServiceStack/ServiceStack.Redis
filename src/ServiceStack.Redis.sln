@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Redis.Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console.Tests", "..\tests\Console.Tests\Console.Tests.csproj", "{8368C965-B4F6-4263-9ABB-731A175B2E77}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Redis.Tests.Sentinel", "..\tests\ServiceStack.Redis.Tests.Sentinel\ServiceStack.Redis.Tests.Sentinel.csproj", "{91C55091-A946-49B5-9517-8794EBCC5784}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,15 @@ Global
 		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Signed|Any CPU.ActiveCfg = Release|Any CPU
 		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Signed|Any CPU.Build.0 = Release|Any CPU
 		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Signed|x86.ActiveCfg = Release|Any CPU
+		{91C55091-A946-49B5-9517-8794EBCC5784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91C55091-A946-49B5-9517-8794EBCC5784}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91C55091-A946-49B5-9517-8794EBCC5784}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{91C55091-A946-49B5-9517-8794EBCC5784}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91C55091-A946-49B5-9517-8794EBCC5784}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91C55091-A946-49B5-9517-8794EBCC5784}.Release|x86.ActiveCfg = Release|Any CPU
+		{91C55091-A946-49B5-9517-8794EBCC5784}.Signed|Any CPU.ActiveCfg = Release|Any CPU
+		{91C55091-A946-49B5-9517-8794EBCC5784}.Signed|Any CPU.Build.0 = Release|Any CPU
+		{91C55091-A946-49B5-9517-8794EBCC5784}.Signed|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

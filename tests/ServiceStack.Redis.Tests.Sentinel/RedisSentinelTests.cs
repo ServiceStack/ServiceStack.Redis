@@ -5,9 +5,8 @@ using ServiceStack.Logging;
 using ServiceStack.Text;
 using Timer = System.Timers.Timer;
 
-namespace ServiceStack.Redis.Tests
+namespace ServiceStack.Redis.Tests.Sentinel
 {
-    [Ignore("Ignore Sentinel Integration Tests")]
     [TestFixture, Category("Integration")]
     public class RedisSentinelTests
         : RedisSentinelTestBase

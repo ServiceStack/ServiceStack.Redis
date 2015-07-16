@@ -4,10 +4,12 @@ using System.IO;
 using System.Threading;
 using ServiceStack.Text;
 
-namespace ServiceStack.Redis.Tests
+namespace ServiceStack.Redis.Tests.Sentinel
 {
     public abstract class RedisSentinelTestBase
     {
+        public const bool DisableLocalServers = true;
+
         public const string MasterName = "mymaster";
         public const string GCloudMasterName = "master";
 
@@ -70,7 +72,6 @@ namespace ServiceStack.Redis.Tests
             return sentinel;
         }
 
-
         public static void StartRedisServer(int port)
         {
             var pInfo = new ProcessStartInfo
@@ -103,6 +104,9 @@ namespace ServiceStack.Redis.Tests
 
         public static void StartAllRedisServers(int waitMs = 1500)
         {
+            if (DisableLocalServers)
+                return;
+
             foreach (var port in RedisPorts)
             {
                 StartRedisServer(port);
@@ -113,6 +117,9 @@ namespace ServiceStack.Redis.Tests
 
         public static void StartAllRedisSentinels(int waitMs = 1500)
         {
+            if (DisableLocalServers)
+                return;
+
             foreach (var port in RedisPorts)
             {
                 StartRedisSentinel(port);
@@ -123,6 +130,9 @@ namespace ServiceStack.Redis.Tests
 
         public static void ShutdownAllRedisServers()
         {
+            if (DisableLocalServers)
+                return;
+
             foreach (var port in RedisPorts)
             {
                 try
@@ -140,6 +150,9 @@ namespace ServiceStack.Redis.Tests
 
         public static void ShutdownAllRedisSentinels()
         {
+            if (DisableLocalServers)
+                return;
+
             foreach (var port in SentinelPorts)
             {
                 try

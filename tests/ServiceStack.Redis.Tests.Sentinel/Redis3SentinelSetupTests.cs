@@ -1,9 +1,8 @@
 ﻿using NUnit.Framework;
 using ServiceStack.Text;
 
-namespace ServiceStack.Redis.Tests
+namespace ServiceStack.Redis.Tests.Sentinel
 {
-    [Ignore("Ignore Sentinel Integration Tests")]
     [TestFixture, Category("Integration")]
     public class Redis3SentinelSetupTests
         : RedisSentinelTestBase
