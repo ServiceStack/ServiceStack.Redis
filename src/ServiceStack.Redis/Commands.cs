@@ -209,6 +209,7 @@ namespace ServiceStack.Redis
         public readonly static byte[] Sentinels = "sentinels".ToUtf8Bytes();
         public readonly static byte[] Master = "master".ToUtf8Bytes();
         public readonly static byte[] Slaves = "slaves".ToUtf8Bytes();
+        public readonly static byte[] Failover = "failover".ToUtf8Bytes();
         public readonly static byte[] GetMasterAddrByName = "get-master-addr-by-name".ToUtf8Bytes();
     }
 }

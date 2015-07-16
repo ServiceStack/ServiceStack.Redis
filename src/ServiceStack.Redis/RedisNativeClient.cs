@@ -43,8 +43,23 @@ namespace ServiceStack.Redis
         private string lastCommand;
         private SocketException lastSocketException;
 
-        internal DateTime? DeactivatedAt;
-        public bool HadExceptions { get { return DeactivatedAt != null; } }
+        internal long deactivatedAtTicks;
+        public DateTime? DeactivatedAt
+        {
+            get
+            {
+                return deactivatedAtTicks != 0
+                    ? new DateTime(Interlocked.Read(ref deactivatedAtTicks), DateTimeKind.Utc)
+                    : (DateTime?)null;
+            }
+            set
+            {
+                var ticksValue = value == null ? 0 : value.Value.Ticks;
+                Interlocked.Exchange(ref deactivatedAtTicks, ticksValue);
+            }
+        }
+
+        public bool HadExceptions { get { return deactivatedAtTicks > 0; } }
 
         protected Socket socket;
         protected BufferedStream Bstream;
@@ -64,11 +79,13 @@ namespace ServiceStack.Redis
         private int active;
         internal bool Active
         {
-            get { return Interlocked.CompareExchange(ref active, 0, 0) == YES; }
+            get
+            {
+                return Interlocked.CompareExchange(ref active, 0, 0) == YES;
+            }
             set
             {
-                var intValue = value ? YES : NO;
-                Interlocked.CompareExchange(ref active, intValue, active);
+                Interlocked.Exchange(ref active, value ? YES : NO);
             }
         }
 
@@ -1522,6 +1539,18 @@ namespace ServiceStack.Redis
             return SendExpectMultiData(args.ToArray()).ToStringList();
         }
 
+        public List<string> SentinelFailover(string masterName)
+        {
+            var args = new List<byte[]>
+            {
+                Commands.Sentinel,
+                Commands.GetMasterAddrByName,
+                masterName.ToUtf8Bytes(),
+            };
+
+            return SendExpectMultiData(args.ToArray()).ToStringList();
+        }
+
         #endregion
 
         #region Sorted Set Operations
@@ -2103,7 +2132,7 @@ namespace ServiceStack.Redis
             get { return ClientManager != null; }
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
