@@ -149,7 +149,7 @@ namespace ServiceStack.Redis
 
                     var newClient = InitNewClient(RedisResolver.CreateMasterClient(Math.Max(inactivePoolIndex, 0)));
 
-                    //Put all blocking I/O or potential Exceptions are before lock
+                    //Put all blocking I/O or potential Exceptions before lock
                     lock (clients)
                     {
                         //Create new client outside of pool when max pool size exceeded

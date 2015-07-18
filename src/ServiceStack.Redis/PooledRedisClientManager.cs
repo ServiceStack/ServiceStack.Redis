@@ -261,7 +261,7 @@ namespace ServiceStack.Redis
 
                     var newClient = InitNewClient(RedisResolver.CreateMasterClient(inactivePoolIndex));
 
-                    //Put all blocking I/O or potential Exceptions are before lock
+                    //Put all blocking I/O or potential Exceptions before lock
                     lock (writeClients)
                     {
                         //If existingClient at inactivePoolIndex changed (failover) return new client outside of pool
@@ -404,7 +404,7 @@ namespace ServiceStack.Redis
 
                     var newClient = InitNewClient(RedisResolver.CreateSlaveClient(inactivePoolIndex));
 
-                    //Put all blocking I/O or potential Exceptions are before lock
+                    //Put all blocking I/O or potential Exceptions before lock
                     lock (readClients)
                     {
                         //If existingClient at inactivePoolIndex changed (failover) return new client outside of pool
