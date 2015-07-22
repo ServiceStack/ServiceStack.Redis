@@ -41,6 +41,26 @@ namespace ServiceStack.Redis.Tests
         }
 
         [Test]
+        [TestCase("host", "host:6379")]
+        [TestCase("redis://host", "host:6379")]
+        [TestCase("host:1", "host:1")]
+        [TestCase("pass@host:1", "host:1?Password=pass")]
+        [TestCase("nunit:pass@host:1", "host:1?Client=nunit&Password=pass")]
+        [TestCase("host:1?password=pass&client=nunit", "host:1?Client=nunit&Password=pass")]
+        [TestCase("host:1?db=2", "host:1?Db=2")]
+        [TestCase("host?ssl=true", "host:6380?Ssl=true")]
+        [TestCase("host:1?ssl=true", "host:1?Ssl=true")]
+        [TestCase("host:1?connectTimeout=1&sendtimeout=2&receiveTimeout=3&idletimeoutsecs=4",
+            "host:1?ConnectTimeout=1&SendTimeout=2&ReceiveTimeout=3&IdleTimeOutSecs=4")]
+        [TestCase("redis://nunit:pass@host:1?ssl=true&db=1&connectTimeout=2&sendtimeout=3&receiveTimeout=4&idletimeoutsecs=5&NamespacePrefix=prefix.",
+            "host:1?Client=nunit&Password=pass&Db=1&Ssl=true&ConnectTimeout=2&SendTimeout=3&ReceiveTimeout=4&IdleTimeOutSecs=5&NamespacePrefix=prefix.")]
+        public void Does_Serialize_RedisEndpoint(string connString, string expectedString)
+        {
+            var actual = connString.ToRedisEndpoint();
+            Assert.That(actual.ToString(), Is.EqualTo(expectedString));
+        }
+
+        [Test]
         public void Does_set_all_properties_on_Client_using_ClientsManagers()
         {
             var connStr = "redis://nunit:pass@host:1?ssl=true&db=0&connectTimeout=2&sendtimeout=3&receiveTimeout=4&idletimeoutsecs=5&NamespacePrefix=prefix.";

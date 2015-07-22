@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using ServiceStack.IO;
 
 namespace ServiceStack.Redis
@@ -38,6 +40,37 @@ namespace ServiceStack.Redis
         public string Password { get; set; }
         public bool RequiresAuth { get { return !string.IsNullOrEmpty(Password); } }
         public string NamespacePrefix { get; set; }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendFormat("{0}:{1}", Host, Port);
+
+            var args = new List<string>();
+            if (Client != null)
+                args.Add("Client=" + Client);
+            if (Password != null)
+                args.Add("Password=" + Password);
+            if (Db != RedisConfig.DefaultDb)
+                args.Add("Db=" + Db);
+            if (Ssl)
+                args.Add("Ssl=true");
+            if (ConnectTimeout != RedisConfig.DefaultConnectTimeout)
+                args.Add("ConnectTimeout=" + ConnectTimeout);
+            if (SendTimeout != RedisConfig.DefaultSendTimeout)
+                args.Add("SendTimeout=" + SendTimeout);
+            if (ReceiveTimeout != RedisConfig.DefaultReceiveTimeout)
+                args.Add("ReceiveTimeout=" + ReceiveTimeout);
+            if (IdleTimeOutSecs != RedisConfig.DefaultIdleTimeOutSecs)
+                args.Add("IdleTimeOutSecs=" + IdleTimeOutSecs);
+            if (NamespacePrefix != null)
+                args.Add("NamespacePrefix=" + NamespacePrefix.UrlEncode());
+
+            if (args.Count > 0)
+                sb.Append("?").Append(string.Join("&", args));
+            
+            return sb.ToString();
+        }
 
         protected bool Equals(RedisEndpoint other)
         {
