@@ -128,6 +128,9 @@ namespace ServiceStack.Redis
             {
                 try
                 {
+                    if (Log.IsDebugEnabled)
+                        Log.Debug("Connecting to all available Sentinels to discover Active Sentinel Hosts...");
+
                     var endpoint = sentinelHost.ToRedisEndpoint(defaultPort: RedisConfig.DefaultPortSentinel);
                     using (var sentinelWorker = new RedisSentinelWorker(this, endpoint))
                     {
@@ -142,6 +145,9 @@ namespace ServiceStack.Redis
                                 activeSentinelHosts.Add(activeHost);
                         }
                     }
+
+                    if (Log.IsDebugEnabled)
+                        Log.Debug("All active Sentinels Found: " + string.Join(", ", activeSentinelHosts));
                 }
                 catch (Exception ex)
                 {
@@ -190,12 +196,16 @@ namespace ServiceStack.Redis
 
             if (RedisManager == null)
             {
-                Log.Debug("Configuring initial Redis Clients: {0}".Fmt(sentinelInfo));
+                if (Log.IsDebugEnabled)
+                    Log.Debug("Configuring initial Redis Clients: {0}".Fmt(sentinelInfo));
+
                 RedisManager = CreateRedisManager(sentinelInfo);
             }
             else
             {
-                Log.Debug("Failing over to Redis Clients: {0}".Fmt(sentinelInfo));
+                if (Log.IsDebugEnabled)
+                    Log.Debug("Failing over to Redis Clients: {0}".Fmt(sentinelInfo));
+
                 ((IRedisFailover)RedisManager).FailoverTo(
                     ConfigureHosts(sentinelInfo.RedisMasters),
                     ConfigureHosts(sentinelInfo.RedisSlaves));

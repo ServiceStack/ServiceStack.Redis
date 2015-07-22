@@ -53,7 +53,9 @@ namespace ServiceStack.Redis
                 || (sentinel.ResetWhenSubjectivelyDown && isSubjectivelyDown)
                 || (sentinel.ResetWhenObjectivelyDown && isObjectivelyDown))
             {
-                Log.Debug("Sentinel detected server down/up '{0}' with message: {1}".Fmt(channel, message));
+                if (Log.IsDebugEnabled)
+                    Log.Debug("Sentinel detected server down/up '{0}' with message: {1}".Fmt(channel, message));
+
                 sentinel.ResetClients();
             }
 
