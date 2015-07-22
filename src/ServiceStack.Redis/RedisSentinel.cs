@@ -190,12 +190,12 @@ namespace ServiceStack.Redis
 
             if (RedisManager == null)
             {
-                Log.Info("Configuring initial Redis Clients: {0}".Fmt(sentinelInfo));
+                Log.Debug("Configuring initial Redis Clients: {0}".Fmt(sentinelInfo));
                 RedisManager = CreateRedisManager(sentinelInfo);
             }
             else
             {
-                Log.Info("Failing over to Redis Clients: {0}".Fmt(sentinelInfo));
+                Log.Debug("Failing over to Redis Clients: {0}".Fmt(sentinelInfo));
                 ((IRedisFailover)RedisManager).FailoverTo(
                     ConfigureHosts(sentinelInfo.RedisMasters),
                     ConfigureHosts(sentinelInfo.RedisSlaves));
