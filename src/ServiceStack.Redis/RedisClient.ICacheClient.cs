@@ -114,7 +114,7 @@ namespace ServiceStack.Redis
             }
             else
             {
-                Exec(r => r.Set(key, ToBytes(value), (int)expiresIn.TotalSeconds));
+                Exec(r => r.SetEx(key, (int)expiresIn.TotalSeconds, ToBytes(value)));
             }
             return true;
         }
