@@ -33,18 +33,35 @@ namespace ServiceStack.Redis
                         //If we've gotten here then a key for the lock is present. This could be because the lock is
                         //correctly acquired or it could be because a client that had acquired the lock crashed (or didn't release it properly).
                         //Therefore we need to get the value of the lock to see when it should expire
-				        string lockExpireString = redisClient.Get<string>(key);
+				        
+                        redisClient.Watch(key);
+                        string lockExpireString = redisClient.Get<string>(key);
                         long lockExpireTime;
-                        if (!long.TryParse(lockExpireString, out lockExpireTime))
+				        if (!long.TryParse(lockExpireString, out lockExpireTime))
+				        {
+                            redisClient.UnWatch();  // since the client is scoped externally
                             return false;
+				        }
+                            
                         //If the expire time is greater than the current time then we can't let the lock go yet
-                        if (lockExpireTime > DateTime.UtcNow.ToUnixTimeMs())
+				        if (lockExpireTime > DateTime.UtcNow.ToUnixTimeMs())
+				        {
+                            redisClient.UnWatch();  // since the client is scoped externally
                             return false;
+				        }   
 
                         //If the expire time is less than the current time then it wasn't released properly and we can attempt to 
-                        //acquire the lock. This is done by setting the lock to our timeout string AND checking to make sure
-                        //that what is returned is the old timeout string in order to account for a possible race condition.
-                        return redisClient.GetAndSetEntry(key, lockString) == lockExpireString;
+                        //acquire the lock. The above call to Watch(_lockKey) enrolled the key in monitoring, so if it changes
+                        //before we call Commit() below, the Commit will fail and return false, which means that another thread 
+                        //was able to acquire the lock before we finished processing.
+
+                        bool txSucceeded;
+                        using (var trans = redisClient.CreateTransaction()) // we started the "Watch" above; this tx will succeed if the value has not moved 
+                        {
+                            trans.QueueCommand(r => r.Set(key, lockString));
+                            txSucceeded = trans.Commit();
+                        }
+                        return txSucceeded;
 				    },
 				timeOut
 			);
