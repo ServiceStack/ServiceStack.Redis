@@ -26,7 +26,7 @@ namespace ServiceStack.Redis
                         string lockString = (expireTime.ToUnixTimeMs() + 1).ToString();
 
                         //Try to set the lock, if it does not exist this will succeed and the lock is obtained
-                        var nx = redisClient.SetValueIfExists(key, lockString);
+                        var nx = redisClient.SetValueIfNotExists(key, lockString);
                         if (nx)
                             return true;
 
