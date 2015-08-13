@@ -24,7 +24,7 @@ namespace ServiceStack.Redis.Pipeline
             var results = new List<long>();
             while (cmdCount-- > 0)
             {
-                results.Add(client.ReadInt());
+                results.Add(client.ReadLong());
             }
 
             return results;

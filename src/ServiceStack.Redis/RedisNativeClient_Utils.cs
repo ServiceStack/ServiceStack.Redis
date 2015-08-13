@@ -415,6 +415,7 @@ namespace ServiceStack.Redis
                         }
                     }
                 }
+
                 ResetSendBuffer();
             }
             catch (IOException ex)  // several stream commands wrap SocketException in IOException
@@ -481,12 +482,12 @@ namespace ServiceStack.Redis
 
             if (Pipeline != null)
             {
-                Pipeline.CompleteLongQueuedCommand(ReadInt);
+                Pipeline.CompleteLongQueuedCommand(ReadLong);
                 return default(long);
             }
             return ReadLong();
         }
-		        
+
         protected byte[] SendExpectData(params byte[][] cmdWithBinaryArgs)
         {
             if (!SendCommand(cmdWithBinaryArgs))
@@ -680,29 +681,6 @@ namespace ServiceStack.Redis
         internal void ExpectQueued()
         {
             ExpectWord(QUEUED);
-        }
-
-		public long ReadInt()
-        {
-            int c = SafeReadByte();
-            if (c == -1)
-                throw CreateResponseError("No more data");
-
-            var s = ReadLine();
-
-            if (log.IsDebugEnabled)
-                Log("R: {0}", s);
-
-            if (c == '-')
-                throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
-
-            if (c == ':' || c == '$')//really strange why ZRANK needs the '$' here
-            {
-                int i;
-                if (int.TryParse(s, out i))
-                    return i;
-            }
-            throw CreateResponseError("Unknown reply on integer response: " + c + s);
         }
 
         public long ReadLong()
