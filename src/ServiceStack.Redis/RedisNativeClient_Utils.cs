@@ -385,6 +385,8 @@ namespace ServiceStack.Redis
             currentBufferIndex = 0;
         }
 
+        public Action OnBeforeFlush { get; set; }
+
         public bool FlushSendBuffer()
         {
             try
@@ -394,6 +396,9 @@ namespace ServiceStack.Redis
 
                 if (cmdBuffer.Count > 0)
                 {
+                    if (OnBeforeFlush != null)
+                        OnBeforeFlush();
+
                     if (!Env.IsMono && sslStream == null)
                     {
                         socket.Send(cmdBuffer); //Optimized for Windows
@@ -462,132 +467,83 @@ namespace ServiceStack.Redis
 	        }
         }
 
-        protected void SendExpectSuccess(params byte[][] cmdWithBinaryArgs)
+        protected T SendReceive<T>(byte[][] cmdWithBinaryArgs, Func<T> fn, Action<Func<T>> completePipelineFn = null)
         {
             if (!SendCommand(cmdWithBinaryArgs))
                 throw CreateConnectionError();
 
             if (Pipeline != null)
             {
-                Pipeline.CompleteVoidQueuedCommand(ExpectSuccess);
+                if (completePipelineFn == null)
+                    throw new NotSupportedException("Pipeline is not supported.");
+
+                completePipelineFn(fn);
+                return default(T);
+            }
+            return fn();
+        }
+
+        protected void SendReceiveVoid(byte[][] cmdWithBinaryArgs, Action fn, Action<Action> completePipelineFn)
+        {
+            if (!SendCommand(cmdWithBinaryArgs))
+                throw CreateConnectionError();
+
+            if (Pipeline != null)
+            {
+                if (completePipelineFn == null)
+                    throw new NotSupportedException("Pipeline is not supported.");
+
+                completePipelineFn(fn);
                 return;
             }
-            ExpectSuccess();
+            fn();
+        }
+
+        protected void SendExpectSuccess(params byte[][] cmdWithBinaryArgs)
+        {
+            SendReceiveVoid(cmdWithBinaryArgs, ExpectSuccess, Pipeline != null ? Pipeline.CompleteVoidQueuedCommand : (Action<Action>) null);
         }
 
         protected long SendExpectLong(params byte[][] cmdWithBinaryArgs)
         {
-            if (!SendCommand(cmdWithBinaryArgs))
-                throw CreateConnectionError();
-
-            if (Pipeline != null)
-            {
-                Pipeline.CompleteLongQueuedCommand(ReadLong);
-                return default(long);
-            }
-            return ReadLong();
+            return SendReceive(cmdWithBinaryArgs, ReadLong, Pipeline != null ? Pipeline.CompleteLongQueuedCommand : (Action<Func<long>>) null);
         }
 
         protected byte[] SendExpectData(params byte[][] cmdWithBinaryArgs)
         {
-            if (!SendCommand(cmdWithBinaryArgs))
-                throw CreateConnectionError();
+            return SendReceive(cmdWithBinaryArgs, ReadData, Pipeline != null ? Pipeline.CompleteBytesQueuedCommand : (Action<Func<byte[]>>)null);
+        }
 
-            if (Pipeline != null)
-            {
-                Pipeline.CompleteBytesQueuedCommand(ReadData);
-                return null;
-            }
-            return ReadData();
+        protected double SendExpectDouble(params byte[][] cmdWithBinaryArgs)
+        {
+            return SendReceive(cmdWithBinaryArgs, ReadDouble, Pipeline != null ? Pipeline.CompleteDoubleQueuedCommand : (Action<Func<double>>)null);
+        }
+
+        protected string SendExpectCode(params byte[][] cmdWithBinaryArgs)
+        {
+            return SendReceive(cmdWithBinaryArgs, ExpectCode, Pipeline != null ? Pipeline.CompleteStringQueuedCommand : (Action<Func<string>>)null);
+        }
+
+        protected byte[][] SendExpectMultiData(params byte[][] cmdWithBinaryArgs)
+        {
+            return SendReceive(cmdWithBinaryArgs, ReadMultiData, Pipeline != null ? Pipeline.CompleteMultiBytesQueuedCommand : (Action<Func<byte[][]>>)null)
+                ?? new byte[0][];
+        }
+
+        protected object[] SendExpectDeeplyNestedMultiData(params byte[][] cmdWithBinaryArgs)
+        {
+            return SendReceive(cmdWithBinaryArgs, ReadDeeplyNestedMultiData);
+        }
+
+        protected RedisData SendExpectComplexResponse(params byte[][] cmdWithBinaryArgs)
+        {
+            return SendReceive(cmdWithBinaryArgs, ReadComplexResponse);
         }
 
         protected string SendExpectString(params byte[][] cmdWithBinaryArgs)
         {
             var bytes = SendExpectData(cmdWithBinaryArgs);
             return bytes.FromUtf8Bytes();
-        }
-
-        protected double SendExpectDouble(params byte[][] cmdWithBinaryArgs)
-        {
-            if (!SendCommand(cmdWithBinaryArgs))
-                throw CreateConnectionError();
-
-            if (Pipeline != null)
-            {
-                Pipeline.CompleteDoubleQueuedCommand(ReadDouble);
-                return Double.NaN;
-            }
-
-            return ReadDouble();
-        }
-
-        public double ReadDouble()
-        {
-            var bytes = ReadData();
-            return (bytes == null) ? double.NaN : ParseDouble(bytes);
-        }
-
-        public static double ParseDouble(byte[] doubleBytes)
-        {
-            var doubleString = Encoding.UTF8.GetString(doubleBytes);
-
-            double d;
-            double.TryParse(doubleString, NumberStyles.Any, CultureInfo.InvariantCulture.NumberFormat, out d);
-
-            return d;
-        }
-
-        protected string SendExpectCode(params byte[][] cmdWithBinaryArgs)
-        {
-            if (!SendCommand(cmdWithBinaryArgs))
-                throw CreateConnectionError();
-
-            if (Pipeline != null)
-            {
-                Pipeline.CompleteStringQueuedCommand(ExpectCode);
-                return null;
-            }
-
-            return ExpectCode();
-        }
-
-        protected byte[][] SendExpectMultiData(params byte[][] cmdWithBinaryArgs)
-        {
-            if (!SendCommand(cmdWithBinaryArgs))
-                throw CreateConnectionError();
-
-            if (Pipeline != null)
-            {
-                Pipeline.CompleteMultiBytesQueuedCommand(ReadMultiData);
-                return new byte[0][];
-            }
-            return ReadMultiData();
-        }
-
-        protected object[] SendExpectDeeplyNestedMultiData(params byte[][] cmdWithBinaryArgs)
-        {
-            if (!SendCommand(cmdWithBinaryArgs))
-                throw CreateConnectionError();
-
-            if (Pipeline != null)
-            {
-                throw new NotSupportedException("Pipeline is not supported.");
-            }
-
-            return ReadDeeplyNestedMultiData();
-        }
-
-        protected RedisData SendExpectComplexResponse(params byte[][] cmdWithBinaryArgs)
-        {
-            if (!SendCommand(cmdWithBinaryArgs))
-                throw CreateConnectionError();
-
-            if (Pipeline != null)
-            {
-                throw new NotSupportedException("Pipeline is not supported.");
-            }
-
-            return ReadComplexResponse();
         }
 
         protected void Log(string fmt, params object[] args)
@@ -704,6 +660,22 @@ namespace ServiceStack.Redis
                     return i;
             }
             throw CreateResponseError("Unknown reply on integer response: " + c + s);
+        }
+
+        public double ReadDouble()
+        {
+            var bytes = ReadData();
+            return (bytes == null) ? double.NaN : ParseDouble(bytes);
+        }
+
+        public static double ParseDouble(byte[] doubleBytes)
+        {
+            var doubleString = Encoding.UTF8.GetString(doubleBytes);
+
+            double d;
+            double.TryParse(doubleString, NumberStyles.Any, CultureInfo.InvariantCulture.NumberFormat, out d);
+
+            return d;
         }
 
         private byte[] ReadData()
