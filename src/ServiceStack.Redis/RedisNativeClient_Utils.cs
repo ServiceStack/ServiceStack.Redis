@@ -505,8 +505,7 @@ namespace ServiceStack.Redis
                 catch (Exception outerEx)
                 {
                     var retryableEx = outerEx as RedisRetryableException;
-
-                    if (outerEx is RedisException && retryableEx == null)
+                    if (retryableEx == null && outerEx is RedisException)
                         throw;
 
                     var ex = retryableEx ?? GetRetryableException(outerEx);

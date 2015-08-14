@@ -7,8 +7,9 @@
     <authors>Service Stack</authors>
     <owners>Service Stack</owners>
     <description>
-      C# Redis Client for the worlds fastest distributed NoSQL datastore. Byte[], String and POCO Typed clients.
-      Thread-Safe Basic and Pooled client managers included.
+        C# Redis Client for the worlds fastest distributed NoSQL datastore.
+        Byte[], String and POCO Typed clients.
+        Thread-Safe Basic and Pooled client managers included.
     </description>
     <projectUrl>https://github.com/ServiceStack/ServiceStack.Redis</projectUrl>
     <licenseUrl>https://servicestack.net/terms</licenseUrl>
