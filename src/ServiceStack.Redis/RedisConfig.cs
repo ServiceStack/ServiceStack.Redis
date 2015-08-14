@@ -44,5 +44,29 @@ namespace ServiceStack.Redis
         //Example at: http://msdn.microsoft.com/en-us/library/office/dd633677(v=exchg.80).aspx 
         public static LocalCertificateSelectionCallback CertificateSelectionCallback { get; set; }
         public static RemoteCertificateValidationCallback CertificateValidationCallback { get; set; }
+
+        /// <summary>
+        /// Resets Redis Config and Redis Stats back to default values
+        /// </summary>
+        public static void Reset()
+        {
+            RedisStats.Reset();
+
+            DefaultConnectTimeout = 0;
+            DefaultSendTimeout = -1;
+            DefaultReceiveTimeout = -1;
+            DefaultRetryTimeout = 3 * 1000;
+            DefaultIdleTimeOutSecs = 240;
+            BackOffMultiplier = 10;
+            BufferLength = 1450;
+            BufferPoolMaxSize = 500000;
+            VerifyMasterConnections = true;
+            HostLookupTimeoutMs = 200;
+            AssumeServerVersion = null;
+            DeactivatedClientsExpiry = TimeSpan.FromMinutes(1);
+            DisableVerboseLogging = false;
+            CertificateSelectionCallback = null;
+            CertificateValidationCallback = null;
+        }
     }
 }

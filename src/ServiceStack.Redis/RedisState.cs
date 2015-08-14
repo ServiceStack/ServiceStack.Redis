@@ -24,6 +24,9 @@ namespace ServiceStack.Redis
         internal static long TotalClientsCreatedOutsidePool = 0;
         internal static long TotalSubjectiveServersDown = 0;
         internal static long TotalObjectiveServersDown = 0;
+        internal static long TotalRetryCount = 0;
+        internal static long TotalRetrySuccess = 0;
+        internal static long TotalRetryTimedout = 0;
 
         internal static readonly ConcurrentDictionary<RedisClient, DateTime> DeactivatedClients = new ConcurrentDictionary<RedisClient, DateTime>();
 
