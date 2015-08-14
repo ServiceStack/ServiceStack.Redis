@@ -410,7 +410,9 @@ namespace ServiceStack.Redis.Tests
 
 			WaitHandle.WaitAll(clientAsyncResults.ConvertAll(x => x.AsyncWaitHandle).ToArray());
 
-			Debug.WriteLine(TypeSerializer.SerializeToString(clientUsageMap));
+            RedisStats.ToDictionary().PrintDump();
+
+            Debug.WriteLine(TypeSerializer.SerializeToString(clientUsageMap));
 
 			var hostCount = 0;
 			foreach (var entry in clientUsageMap)

@@ -22,7 +22,6 @@ namespace ServiceStack.Redis.Tests.Integration
             testData = TypeSerializer.SerializeToString(results);
         }
 
-        [Explicit]
 		[Test]
 		public void Can_support_64_threads_using_the_client_simultaneously()
 		{
@@ -45,7 +44,9 @@ namespace ServiceStack.Redis.Tests.Integration
 
 			WaitHandle.WaitAll(clientAsyncResults.ConvertAll(x => x.AsyncWaitHandle).ToArray());
 
-			Debug.WriteLine(String.Format("Completed in {0} ticks", (Stopwatch.GetTimestamp() - before)));
+			Debug.WriteLine(string.Format("Completed in {0} ticks", (Stopwatch.GetTimestamp() - before)));
+
+            RedisStats.ToDictionary().PrintDump();
 		}
 
 		[Test]
