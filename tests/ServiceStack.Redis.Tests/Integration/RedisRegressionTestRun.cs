@@ -73,7 +73,7 @@ namespace ServiceStack.Redis.Tests.Integration
 
 		private static void UseClientAsync(IRedisClientsManager manager, int clientNo)
 		{
-			using (var client = manager.GetReadOnlyClient())
+			using (var client = manager.GetClient())
 			{
 				UseClient(client, clientNo);
 			}
@@ -87,7 +87,7 @@ namespace ServiceStack.Redis.Tests.Integration
 			{
 				host = client.Host;
 
-				Debug.WriteLine(String.Format("Client '{0}' is using '{1}'", clientNo, client.Host));
+				Debug.WriteLine(string.Format("Client '{0}' is using '{1}'", clientNo, client.Host));
 				var differentDbs = new[] { 1, 0, 2 };
 
 				foreach (var db in differentDbs)
@@ -95,7 +95,7 @@ namespace ServiceStack.Redis.Tests.Integration
 					client.Db = db;
 
 					var testClientKey = "test:" + host + ":" + clientNo;
-					client.SetEntry(testClientKey, testData);
+					client.SetValue(testClientKey, testData);
 					var result = client.GetValue(testClientKey) ?? "";
 					LogResult(db, testClientKey, result);
 
@@ -108,7 +108,6 @@ namespace ServiceStack.Redis.Tests.Integration
 					client.AddItemToList(testClientListKey, testData);
 					var resultList = client.GetAllItemsFromList(testClientListKey);
 					LogResult(db, testClientKey, resultList.FirstOrDefault());
-
 				}
 			}
 			catch (NullReferenceException ex)
@@ -118,7 +117,7 @@ namespace ServiceStack.Redis.Tests.Integration
             }
 			catch (Exception ex)
 			{
-				Debug.WriteLine(String.Format("\t[ERROR@{0}]: {1} => {2}",
+				Debug.WriteLine(string.Format("\t[ERROR@{0}]: {1} => {2}",
 					host, ex.GetType().Name, ex));
                 Assert.Fail("Exception");
 			}

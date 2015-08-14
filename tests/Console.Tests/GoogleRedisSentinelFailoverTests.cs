@@ -4,11 +4,13 @@ namespace ConsoleTests
 {
     public class GoogleRedisSentinelFailoverTests : RedisSentinelFailoverTests
     {
+        //gcloud compute instances list
+        //url: https://cloud.google.com/sdk/gcloud/reference/compute/instances/list
         public static string[] SentinelHosts = new[]
         {
-            "146.148.77.31",
-            "130.211.139.141",
-            "107.178.218.53",
+            "130.211.149.172",
+            "130.211.191.163",
+            "146.148.61.165",
         };
 
         protected override RedisSentinel CreateSentinel()
@@ -17,9 +19,9 @@ namespace ConsoleTests
             {
                 IpAddressMap =
                 {
-                    {"10.240.34.152", "146.148.77.31"},
-                    {"10.240.203.193", "130.211.139.141"},
-                    {"10.240.209.52", "107.178.218.53"},
+                    {"10.240.109.243", "130.211.149.172"},
+                    {"10.240.201.29", "130.211.191.163"},
+                    {"10.240.200.252", "146.148.61.165"},
                 }
             };
             return sentinel;

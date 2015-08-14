@@ -18,9 +18,9 @@ namespace ServiceStack.Redis.Tests.Sentinel
             {
                 client.FlushAll();
 
-                client.SetEntry("Sentinel3Setup", "IntranetSentinel");
+                client.SetValue("Sentinel3Setup", "IntranetSentinel");
 
-                var result = client.GetEntry("Sentinel3Setup");
+                var result = client.GetValue("Sentinel3Setup");
                 Assert.That(result, Is.EqualTo("IntranetSentinel"));
             }
         }
