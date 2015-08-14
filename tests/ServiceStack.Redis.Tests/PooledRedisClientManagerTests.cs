@@ -417,7 +417,7 @@ namespace ServiceStack.Redis.Tests
 			var hostCount = 0;
 			foreach (var entry in clientUsageMap)
 			{
-				Assert.That(entry.Value, Is.GreaterThanOrEqualTo(5), "Host has unproportianate distrobution: " + entry.Value);
+				Assert.That(entry.Value, Is.GreaterThanOrEqualTo(2), "Host has unproportianate distrobution: " + entry.Value);
 				Assert.That(entry.Value, Is.LessThanOrEqualTo(30), "Host has unproportianate distrobution: " + entry.Value);
 				hostCount += entry.Value;
 			}
