@@ -400,13 +400,13 @@ namespace ServiceStack.Redis
 
         public Action OnBeforeFlush { get; set; }
 
-        public void FlushAndResetSendBuffer()
+        internal void FlushAndResetSendBuffer()
         {
             FlushSendBuffer();
             ResetSendBuffer();
         }
 
-        public void FlushSendBuffer()
+        internal void FlushSendBuffer()
         {
             if (currentBufferIndex > 0)
                 PushCurrentBuffer();
@@ -458,68 +458,10 @@ namespace ServiceStack.Redis
             return Bstream.ReadByte();
         }
 
-        protected T SendReceive<T>(byte[][] cmdWithBinaryArgs, Func<T> fn, Action<Func<T>> completePipelineFn = null)
-        {
-            var i = 0;
-            Exception originalEx = null;
-
-            var firstAttempt = DateTime.UtcNow;
-
-            while (true)
-            {
-                try
-                {
-                    TryConnectIfNeeded();
-
-                    if (i == 0) //only write to buffer once
-                        WriteCommandToSendBuffer(cmdWithBinaryArgs);
-
-                    if (Pipeline == null) //pipeline will handle flush if in pipeline
-                    {
-                        FlushSendBuffer();
-                    }
-                    else
-                    {
-                        if (completePipelineFn == null)
-                            throw new NotSupportedException("Pipeline is not supported.");
-
-                        completePipelineFn(fn);
-                        return default(T);
-                    }
-
-                    var result = fn();
-
-                    if (Pipeline == null)
-                    {
-                        ResetSendBuffer();
-                    }
-
-                    return result;
-                }
-                catch (Exception outerEx)
-                {
-                    var retryableEx = outerEx as RedisRetryableException;
-
-                    if (outerEx is RedisException && retryableEx == null)
-                        throw;
-
-                    var ex = retryableEx ?? GetRetryableException(outerEx);
-                    if (ex == null)
-                        throw CreateConnectionError();
-
-                    if (originalEx == null)
-                        originalEx = ex;
-
-                    var retry = DateTime.UtcNow - firstAttempt < retryTimeout;
-                    if (!retry)
-                        throw CreateRetryTimeoutException(retryTimeout, originalEx);
-
-                    Thread.Sleep(GetBackOffMultiplier(++i));
-                }
-            }
-        }
-
-        protected void SendReceiveVoid(byte[][] cmdWithBinaryArgs, Action fn, Action<Action> completePipelineFn, bool sendWithoutRead = false)
+        protected T SendReceive<T>(byte[][] cmdWithBinaryArgs, 
+            Func<T> fn, 
+            Action<Func<T>> completePipelineFn = null, 
+            bool sendWithoutRead = false)
         {
             var i = 0;
             Exception originalEx = null;
@@ -545,18 +487,20 @@ namespace ServiceStack.Redis
                             throw new NotSupportedException("Pipeline is not supported.");
 
                         completePipelineFn(fn);
-                        return;
+                        return default(T);
                     }
 
+                    var result = default(T);
                     if (fn != null)
-                        fn();
+                        result = fn();
 
                     if (Pipeline == null)
-                    {
                         ResetSendBuffer();
-                    }
 
-                    return;
+                    if (i > 0)
+                        Interlocked.Increment(ref RedisState.TotalRetrySuccess);
+
+                    return result;
                 }
                 catch (Exception outerEx)
                 {
@@ -574,8 +518,15 @@ namespace ServiceStack.Redis
 
                     var retry = DateTime.UtcNow - firstAttempt < retryTimeout;
                     if (!retry)
-                        throw CreateRetryTimeoutException(retryTimeout, originalEx);
+                    {
+                        if (Pipeline == null)
+                            ResetSendBuffer();
 
+                        Interlocked.Increment(ref RedisState.TotalRetryTimedout);
+                        throw CreateRetryTimeoutException(retryTimeout, originalEx);
+                    }
+
+                    Interlocked.Increment(ref RedisState.TotalRetryCount);
                     Thread.Sleep(GetBackOffMultiplier(++i));
                 }
             }
@@ -616,12 +567,17 @@ namespace ServiceStack.Redis
 
         protected void SendWithoutRead(params byte[][] cmdWithBinaryArgs)
         {
-            SendReceiveVoid(cmdWithBinaryArgs, null, null, sendWithoutRead: true);
+            SendReceive<long>(cmdWithBinaryArgs, null, null, sendWithoutRead: true);
         }
 
         protected void SendExpectSuccess(params byte[][] cmdWithBinaryArgs)
         {
-            SendReceiveVoid(cmdWithBinaryArgs, ExpectSuccess, Pipeline != null ? Pipeline.CompleteVoidQueuedCommand : (Action<Action>)null);
+            //Turn Action into Func Hack
+            var completePipelineFn = Pipeline != null
+                ? f => { Pipeline.CompleteVoidQueuedCommand(() => f()); }
+            : (Action<Func<long>>)null;
+
+            SendReceive(cmdWithBinaryArgs, ExpectSuccessFn, completePipelineFn);
         }
 
         protected long SendExpectLong(params byte[][] cmdWithBinaryArgs)
@@ -697,6 +653,13 @@ namespace ServiceStack.Redis
             }
 
             log.Debug("S: " + this.lastCommand);
+        }
+
+        //Turn Action into Func Hack
+        protected long ExpectSuccessFn()
+        {
+            ExpectSuccess();
+            return 0;
         }
 
         protected void ExpectSuccess()
