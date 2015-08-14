@@ -22,7 +22,9 @@ namespace ServiceStack.Redis
         public static int DefaultConnectTimeout = 0;
         public static int DefaultSendTimeout = -1;
         public static int DefaultReceiveTimeout = -1;
+        public static int DefaultRetryTimeout = 3 * 1000;
         public static int DefaultIdleTimeOutSecs = 240;
+        public static int BackOffMultiplier = 10;
 
         public static int BufferLength = 1450;
 

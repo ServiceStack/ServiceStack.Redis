@@ -16,6 +16,7 @@ namespace ServiceStack.Redis
             ConnectTimeout = RedisConfig.DefaultConnectTimeout;
             SendTimeout = RedisConfig.DefaultSendTimeout;
             ReceiveTimeout = RedisConfig.DefaultReceiveTimeout;
+            RetryTimeout = RedisConfig.DefaultRetryTimeout;
             IdleTimeOutSecs = RedisConfig.DefaultIdleTimeOutSecs;
         }
 
@@ -34,6 +35,7 @@ namespace ServiceStack.Redis
         public int ConnectTimeout { get; set; }
         public int SendTimeout { get; set; }
         public int ReceiveTimeout { get; set; }
+        public int RetryTimeout { get; set; }
         public int IdleTimeOutSecs { get; set; }
         public long Db { get; set; }
         public string Client { get; set; }
@@ -61,6 +63,8 @@ namespace ServiceStack.Redis
                 args.Add("SendTimeout=" + SendTimeout);
             if (ReceiveTimeout != RedisConfig.DefaultReceiveTimeout)
                 args.Add("ReceiveTimeout=" + ReceiveTimeout);
+            if (RetryTimeout != RedisConfig.DefaultRetryTimeout)
+                args.Add("RetryTimeout=" + RetryTimeout);
             if (IdleTimeOutSecs != RedisConfig.DefaultIdleTimeOutSecs)
                 args.Add("IdleTimeOutSecs=" + IdleTimeOutSecs);
             if (NamespacePrefix != null)
@@ -80,6 +84,7 @@ namespace ServiceStack.Redis
                 && ConnectTimeout == other.ConnectTimeout 
                 && SendTimeout == other.SendTimeout 
                 && ReceiveTimeout == other.ReceiveTimeout 
+                && RetryTimeout == other.RetryTimeout
                 && IdleTimeOutSecs == other.IdleTimeOutSecs 
                 && Db == other.Db 
                 && string.Equals(Client, other.Client) 
@@ -105,6 +110,7 @@ namespace ServiceStack.Redis
                 hashCode = (hashCode * 397) ^ ConnectTimeout;
                 hashCode = (hashCode * 397) ^ SendTimeout;
                 hashCode = (hashCode * 397) ^ ReceiveTimeout;
+                hashCode = (hashCode * 397) ^ RetryTimeout;
                 hashCode = (hashCode * 397) ^ IdleTimeOutSecs;
                 hashCode = (hashCode * 397) ^ Db.GetHashCode();
                 hashCode = (hashCode * 397) ^ (Client != null ? Client.GetHashCode() : 0);

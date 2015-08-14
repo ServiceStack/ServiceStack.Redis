@@ -38,7 +38,7 @@ namespace ServiceStack.Redis.Pipeline
 
         public void Flush()
         {
-            client.FlushSendBuffer();
+            client.FlushAndResetSendBuffer();
         }
     }
 }

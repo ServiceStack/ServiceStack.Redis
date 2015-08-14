@@ -479,7 +479,7 @@ namespace ServiceStack.Redis.Generic
         }
         public void FlushSendBuffer()
         {
-            client.FlushSendBuffer();
+            client.FlushAndResetSendBuffer();
         }
         public void ResetSendBuffer()
         {

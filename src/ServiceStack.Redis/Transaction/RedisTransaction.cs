@@ -53,7 +53,7 @@ namespace ServiceStack.Redis
         private void Exec()
         {
             RedisClient.Exec();
-            RedisClient.FlushSendBuffer();
+            RedisClient.FlushAndResetSendBuffer();
         }
 
         public bool Commit()

@@ -185,6 +185,7 @@
     <Compile Include="RedisSentinelWorker.cs" />
     <Compile Include="RedisState.cs" />
     <Compile Include="RedisStats.cs" />
+    <Compile Include="RedisRetryableException.cs" />
     <Compile Include="ScanResult.cs" />
     <Compile Include="ShardedConnectionPool.cs" />
     <Compile Include="ShardedRedisClientManager.cs" />

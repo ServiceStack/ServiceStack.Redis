@@ -104,7 +104,12 @@ namespace ServiceStack.Redis
         /// </summary>
         public string NamespacePrefix { get; set; }
         public int ConnectTimeout { get; set; }
-        public int RetryTimeout { get; set; }
+        private TimeSpan retryTimeout;
+        public int RetryTimeout
+        {
+            get { return (int) retryTimeout.TotalMilliseconds; }
+            set { retryTimeout = TimeSpan.FromMilliseconds(value); }
+        }
         public int RetryCount { get; set; }
         public int SendTimeout { get; set; }
         public int ReceiveTimeout { get; set; }
@@ -168,6 +173,7 @@ namespace ServiceStack.Redis
             ConnectTimeout = config.ConnectTimeout;
             SendTimeout = config.SendTimeout;
             ReceiveTimeout = config.ReceiveTimeout;
+            RetryTimeout = config.RetryTimeout;
             Password = config.Password;
             NamespacePrefix = config.NamespacePrefix;
             Client = config.Client;
@@ -771,12 +777,12 @@ namespace ServiceStack.Redis
 
         public void Shutdown()
         {
-            SendCommand(Commands.Shutdown);
+            SendWithoutRead(Commands.Shutdown);
         }
 
         public void ShutdownNoSave()
         {
-            SendCommand(Commands.Shutdown, Commands.NoSave);
+            SendWithoutRead(Commands.Shutdown, Commands.NoSave);
         }
 
         public void BgRewriteAof()
@@ -786,7 +792,7 @@ namespace ServiceStack.Redis
 
         public void Quit()
         {
-            SendCommand(Commands.Quit);
+            SendWithoutRead(Commands.Quit);
         }
 
         public void FlushDb()
@@ -924,8 +930,7 @@ namespace ServiceStack.Redis
             //make sure socket is connected. Otherwise, fetch of server info will interfere
             //with pipeline
             AssertConnectedSocket();
-            if (!SendCommand(Commands.Multi))
-                throw CreateConnectionError();
+            SendWithoutRead(Commands.Multi);
         }
 
         /// <summary>
@@ -934,9 +939,7 @@ namespace ServiceStack.Redis
         /// <returns>Number of results</returns>
         internal void Exec()
         {
-            if (!SendCommand(Commands.Exec))
-                throw CreateConnectionError();
-
+            SendWithoutRead(Commands.Exec);
         }
 
         internal void Discard()

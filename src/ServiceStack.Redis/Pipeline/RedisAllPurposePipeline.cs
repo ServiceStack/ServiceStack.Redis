@@ -34,7 +34,7 @@ namespace ServiceStack.Redis
         public void Flush()
         {
             // flush send buffers
-            RedisClient.FlushSendBuffer();
+            RedisClient.FlushAndResetSendBuffer();
 
             //receive expected results
             foreach (var queuedCommand in QueuedCommands)

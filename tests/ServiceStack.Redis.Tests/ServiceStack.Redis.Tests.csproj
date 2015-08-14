@@ -252,6 +252,7 @@
     <Compile Include="RedisTransactionCommonTests.cs" />
     <Compile Include="RedisTransactionTests.cs" />
     <Compile Include="RedisUtilTests.cs" />
+    <Compile Include="RetryCommandTests.cs" />
     <Compile Include="SerializationTests.cs" />
     <Compile Include="Shared\BuiltInsFactory.cs" />
     <Compile Include="Shared\IModelFactory.cs" />

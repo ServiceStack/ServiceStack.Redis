@@ -29,8 +29,8 @@ namespace ServiceStack.Redis.Tests
         [TestCase("host:1?ssl=true", "{Host:host,Port:1,Ssl:True}")]
         [TestCase("host:1?connectTimeout=1&sendtimeout=2&receiveTimeout=3&idletimeoutsecs=4",
             "{Host:host,Port:1,ConnectTimeout:1,SendTimeout:2,ReceiveTimeout:3,IdleTimeOutSecs:4}")]
-        [TestCase("redis://nunit:pass@host:1?ssl=true&db=1&connectTimeout=2&sendtimeout=3&receiveTimeout=4&idletimeoutsecs=5&NamespacePrefix=prefix.",
-            "{Host:host,Port:1,Ssl:True,Client:nunit,Password:pass,Db:1,ConnectTimeout:2,SendTimeout:3,ReceiveTimeout:4,IdleTimeOutSecs:5,NamespacePrefix:prefix.}")]
+        [TestCase("redis://nunit:pass@host:1?ssl=true&db=1&connectTimeout=2&sendtimeout=3&receiveTimeout=4&retryTimeout=5&idletimeoutsecs=5&NamespacePrefix=prefix.",
+            "{Host:host,Port:1,Ssl:True,Client:nunit,Password:pass,Db:1,ConnectTimeout:2,SendTimeout:3,ReceiveTimeout:4,RetryTimeout:5,IdleTimeOutSecs:5,NamespacePrefix:prefix.}")]
         public void Does_handle_different_connection_strings_settings(string connString, string expectedJsv)
         {
             var actual = connString.ToRedisEndpoint();
@@ -108,6 +108,7 @@ namespace ServiceStack.Redis.Tests
             Assert.That(redis.ConnectTimeout, Is.EqualTo(expected.ConnectTimeout));
             Assert.That(redis.SendTimeout, Is.EqualTo(expected.SendTimeout));
             Assert.That(redis.ReceiveTimeout, Is.EqualTo(expected.ReceiveTimeout));
+            Assert.That(redis.RetryTimeout, Is.EqualTo(expected.RetryTimeout));
             Assert.That(redis.IdleTimeOutSecs, Is.EqualTo(expected.IdleTimeOutSecs));
             Assert.That(redis.NamespacePrefix, Is.EqualTo(expected.NamespacePrefix));
         }

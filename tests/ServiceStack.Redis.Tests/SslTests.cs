@@ -211,7 +211,7 @@ namespace ServiceStack.Redis.Tests
         {
             int c = stream.ReadByte();
             if (c == -1)
-                throw new Exception("No more data");
+                throw new RedisRetryableException("No more data");
 
             var s = ReadLine(stream);
             s.Print();

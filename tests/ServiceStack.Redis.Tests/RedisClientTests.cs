@@ -260,7 +260,9 @@ namespace ServiceStack.Redis.Tests
             catch(RedisResponseException e)
             {
                 // if exception has that message then it still proves that BgSave works as expected.
-                if (e.Message.StartsWith("Can't BGSAVE while AOF log rewriting is in progress")) return;
+                if (e.Message.StartsWith("Can't BGSAVE while AOF log rewriting is in progress"))
+                    return;
+
                 throw;
             }
 		}

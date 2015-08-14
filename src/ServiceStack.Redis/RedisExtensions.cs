@@ -93,6 +93,9 @@ namespace ServiceStack.Redis
                         case "receivetimeout":
                             endpoint.ReceiveTimeout = int.Parse(value);
                             break;
+                        case "retrytimeout":
+                            endpoint.RetryTimeout = int.Parse(value);
+                            break;
                         case "idletimeout":
                         case "idletimeoutsecs":
                             endpoint.IdleTimeOutSecs = int.Parse(value);
