@@ -14,6 +14,7 @@ namespace ServiceStack.Redis
     {
         private static ILog log = LogManager.GetLogger(typeof(RedisState));
 
+        internal static long TotalCommandsSent = 0;
         internal static long TotalFailovers = 0;
         internal static long TotalDeactivatedClients = 0;
         internal static long TotalFailedSentinelWorkers = 0;

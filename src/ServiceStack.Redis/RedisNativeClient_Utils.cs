@@ -500,6 +500,8 @@ namespace ServiceStack.Redis
                     if (i > 0)
                         Interlocked.Increment(ref RedisState.TotalRetrySuccess);
 
+                    Interlocked.Increment(ref RedisState.TotalCommandsSent);
+
                     return result;
                 }
                 catch (Exception outerEx)

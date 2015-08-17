@@ -6,6 +6,14 @@ namespace ServiceStack.Redis
     public static class RedisStats
     {
         /// <summary>
+        /// Total number of commands sent
+        /// </summary>
+        public static long TotalCommandsSent
+        {
+            get { return Interlocked.Read(ref RedisState.TotalCommandsSent); }
+        }
+
+        /// <summary>
         /// Number of times the Redis Client Managers have FailoverTo() either by sentinel or manually
         /// </summary>
         public static long TotalFailovers
@@ -130,8 +138,9 @@ namespace ServiceStack.Redis
 
         public static Dictionary<string, long> ToDictionary()
         {
-            return new Dictionary<string, long> 
+            return new Dictionary<string, long>
             {
+                {"TotalCommandsSent", TotalCommandsSent},
                 {"TotalFailovers", TotalFailovers},
                 {"TotalDeactivatedClients", TotalDeactivatedClients},
                 {"TotalFailedSentinelWorkers", TotalFailedSentinelWorkers},
