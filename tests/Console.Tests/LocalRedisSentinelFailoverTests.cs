@@ -19,7 +19,7 @@ namespace ConsoleTests
             "127.0.0.1:26382",
         };
 
-        public bool StartAndStopRedisServers = true;
+        public bool StartAndStopRedisServers = false;
 
         private static void StartRedisServersAndSentinels()
         {

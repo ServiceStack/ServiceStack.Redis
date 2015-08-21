@@ -19,12 +19,18 @@
             //new HashStressTest().Execute("10.0.0.9");
             //new HashCollectionStressTests().Execute("10.0.0.9", noOfThreads: 64);
 
-            //new LocalRedisSentinelFailoverTests().Execute();
-            //new LocalRedisSentinelFailoverTests { StartAndStopRedisServers = false }.Execute();
+            //new LocalRedisSentinelFailoverTests
+            //{
+            //    StartAndStopRedisServers = true
+            //}.Execute();
+
             //new LocalRedisSentinelFailoverTests {
             //    UseRedisManagerPool = true, StartAndStopRedisServers = false }.Execute();
+            //new LocalRedisSentinelFailoverTests().Execute();
 
-            new GoogleRedisSentinelFailoverTests().Execute();
+            new NetworkRedisSentinelFailoverTests().Execute();
+
+            //new GoogleRedisSentinelFailoverTests().Execute();
         }
     }
 }
