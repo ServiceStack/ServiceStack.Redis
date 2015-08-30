@@ -37,7 +37,6 @@ namespace ServiceStack.Redis
             get { return Interlocked.Read(ref RedisState.TotalFailedSentinelWorkers); }
         }
 
-
         /// <summary>
         /// Number of times we've forced Sentinel to failover to another master due to 
         /// consecutive errors beyond sentinel.WaitBeforeForcingMasterFailover
@@ -119,6 +118,14 @@ namespace ServiceStack.Redis
             get { return Interlocked.Read(ref RedisState.TotalRetryTimedout); }
         }
 
+        /// <summary>
+        /// Total number of deactivated clients that are pending being disposed
+        /// </summary>
+        public static long TotalPendingDeactivatedClients
+        {
+            get { return RedisState.DeactivatedClients.Count; }
+        }
+
         public static void Reset()
         {
             Interlocked.Exchange(ref RedisState.TotalFailovers, 0);
@@ -151,7 +158,7 @@ namespace ServiceStack.Redis
                 {"TotalClientsCreatedOutsidePool", TotalClientsCreatedOutsidePool},
                 {"TotalSubjectiveServersDown", TotalSubjectiveServersDown},
                 {"TotalObjectiveServersDown", TotalObjectiveServersDown},
-                {"TotalPendingDeactivatedClients", RedisState.DeactivatedClients.Count },
+                {"TotalPendingDeactivatedClients", TotalPendingDeactivatedClients },
                 {"TotalRetryCount", TotalRetryCount },
                 {"TotalRetrySuccess", TotalRetrySuccess },
                 {"TotalRetryTimedout", TotalRetryTimedout },
