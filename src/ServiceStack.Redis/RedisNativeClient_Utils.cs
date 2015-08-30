@@ -76,7 +76,7 @@ namespace ServiceStack.Redis
             };
             try
             {
-                if (ConnectTimeout == 0)
+                if (ConnectTimeout <= 0)
                 {
                     socket.Connect(Host, Port);
                 }
