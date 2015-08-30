@@ -18,8 +18,6 @@ namespace ServiceStack.Redis
     {
         protected static readonly ILog Log = LogManager.GetLogger(typeof(RedisSentinel));
 
-        public Func<string[], string[], IRedisClientsManager> RedisManagerFactory { get; set; }
-
         public static string DefaultMasterName = "mymaster";
         public static string DefaultAddress = "127.0.0.1:26379";
 
@@ -39,28 +37,92 @@ namespace ServiceStack.Redis
         private RedisSentinelWorker worker;
         private static int MaxFailures = 5;
 
+        /// <summary>
+        /// Change to use a different IRedisClientsManager 
+        /// </summary>
+        public Func<string[], string[], IRedisClientsManager> RedisManagerFactory { get; set; }
+
+        /// <summary>
+        /// Configure the Redis Connection String to use for a Redis Client Host
+        /// </summary>
+        public Func<string, string> HostFilter { get; set; }
+
+        /// <summary>
+        /// The configured Redis Client Manager this Sentinel managers
+        /// </summary>
         public IRedisClientsManager RedisManager { get; set; }
+
+        /// <summary>
+        /// Fired when Sentinel fails over the Redis Client Manager to a new master
+        /// </summary>
         public Action<IRedisClientsManager> OnFailover { get; set; }
+
+        /// <summary>
+        /// Fired when the Redis Sentinel Worker connection fails
+        /// </summary>
         public Action<Exception> OnWorkerError { get; set; }
+
+        /// <summary>
+        /// Fired when the Sentinel worker receives a message from the Sentinel Subscription
+        /// </summary>
         public Action<string, string> OnSentinelMessageReceived { get; set; }
 
+        /// <summary>
+        /// Map the internal IP's returned by Sentinels to its external IP
+        /// </summary>
         public Dictionary<string, string> IpAddressMap { get; set; }
 
+        /// <summary>
+        /// Whether to routinely scan for other sentinel hosts (default true)
+        /// </summary>
         public bool ScanForOtherSentinels { get; set; }
 
-        private DateTime lastSentinelsRefresh;
+        /// <summary>
+        /// What interval to scan for other sentinel hosts (default 10 mins)
+        /// </summary>
         public TimeSpan RefreshSentinelHostsAfter { get; set; }
+        private DateTime lastSentinelsRefresh;
 
-        public TimeSpan WaitBetweenSentinelLookups { get; set; }
-        public TimeSpan MaxWaitBetweenSentinelLookups { get; set; }
+        /// <summary>
+        /// How long to wait after failing before connecting to next redis instance (default 250ms)
+        /// </summary>
+        public TimeSpan WaitBetweenFailedHosts { get; set; }
+
+        /// <summary>
+        /// How long to retry connecting to hosts before throwing (default 60 secs)
+        /// </summary>
+        public TimeSpan MaxWaitBetweenFailedHosts { get; set; }
+
+        /// <summary>
+        /// How long to wait after consecutive failed connection attempts to master before forcing 
+        /// a Sentinel to failover the current master (default 60 secs)
+        /// </summary>
         public TimeSpan WaitBeforeForcingMasterFailover { get; set; }
+
+        /// <summary>
+        /// The Max Connection time for Sentinel Worker (default 100ms)
+        /// </summary>
         public int SentinelWorkerConnectTimeoutMs { get; set; }
+
+        /// <summary>
+        /// The Max TCP Socket Receive time for Sentinel Worker (default 100ms)
+        /// </summary>
         public int SentinelWorkerReceiveTimeoutMs { get; set; }
+
+        /// <summary>
+        /// The Max TCP Socket Send time for Sentinel Worker (default 100ms)
+        /// </summary>
         public int SentinelWorkerSendTimeoutMs { get; set; }
 
+        /// <summary>
+        /// Reset client connections when Sentinel reports redis instance is subjectively down (default true)
+        /// </summary>
         public bool ResetWhenSubjectivelyDown { get; set; }
+
+        /// <summary>
+        /// Reset client connections when Sentinel reports redis instance is objectively down (default true)
+        /// </summary>
         public bool ResetWhenObjectivelyDown { get; set; }
-        public bool ResetSentinelsWhenObjectivelyDown { get; set; }
 
         public RedisSentinel(string sentinelHost = null, string masterName = null)
             : this(new[] { sentinelHost ?? DefaultAddress }, masterName ?? DefaultMasterName) { }
@@ -81,12 +143,11 @@ namespace ServiceStack.Redis
             RefreshSentinelHostsAfter = TimeSpan.FromMinutes(10);
             ResetWhenObjectivelyDown = true;
             ResetWhenSubjectivelyDown = true;
-            ResetSentinelsWhenObjectivelyDown = true;
             SentinelWorkerConnectTimeoutMs = 100;
             SentinelWorkerReceiveTimeoutMs = 100;
             SentinelWorkerSendTimeoutMs = 100;
-            WaitBetweenSentinelLookups = TimeSpan.FromMilliseconds(250);
-            MaxWaitBetweenSentinelLookups = TimeSpan.FromSeconds(60);
+            WaitBetweenFailedHosts = TimeSpan.FromMilliseconds(250);
+            MaxWaitBetweenFailedHosts = TimeSpan.FromSeconds(60);
             WaitBeforeForcingMasterFailover = TimeSpan.FromSeconds(60);
         }
 
@@ -178,8 +239,6 @@ namespace ServiceStack.Redis
             }
         }
 
-        public Func<string, string> HostFilter { get; set; }
-
         internal string[] ConfigureHosts(IEnumerable<string> hosts)
         {
             if (hosts == null)
@@ -267,7 +326,7 @@ namespace ServiceStack.Redis
             }
 
             this.failures = 0; //reset
-            Thread.Sleep(WaitBetweenSentinelLookups);
+            Thread.Sleep(WaitBetweenFailedHosts);
 
             throw new RedisException("No Redis Sentinels were available", lastEx);
         }

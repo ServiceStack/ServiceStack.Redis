@@ -149,7 +149,7 @@ namespace ServiceStack.Redis
                                 Interlocked.Increment(ref RedisState.TotalForcedMasterFailovers);
 
                                 sentinel.ForceMasterFailover();
-                                Thread.Sleep(sentinel.WaitBetweenSentinelLookups);
+                                Thread.Sleep(sentinel.WaitBetweenFailedHosts);
                                 role = client.GetServerRole();
                             }
                         }
@@ -186,11 +186,11 @@ namespace ServiceStack.Redis
                             }
                             catch { /* Ignore errors until MaxWait */ }
 
-                            if (stopwatch.Elapsed > sentinel.MaxWaitBetweenSentinelLookups)
+                            if (stopwatch.Elapsed > sentinel.MaxWaitBetweenFailedHosts)
                                 throw new TimeoutException("Max Wait Between Sentinel Lookups Elapsed: {0}"
-                                    .Fmt(sentinel.MaxWaitBetweenSentinelLookups.ToString()));
+                                    .Fmt(sentinel.MaxWaitBetweenFailedHosts.ToString()));
 
-                            Thread.Sleep(sentinel.WaitBetweenSentinelLookups);
+                            Thread.Sleep(sentinel.WaitBetweenFailedHosts);
                         }
                     }
                     catch (Exception ex)
