@@ -160,7 +160,7 @@ namespace ServiceStack.Redis
                     }
                 }
 
-                if (role != RedisServerRole.Master)
+                if (role != RedisServerRole.Master && RedisConfig.VerifyMasterConnections)
                 {
                     try
                     {
