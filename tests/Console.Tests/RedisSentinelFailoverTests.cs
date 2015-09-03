@@ -86,8 +86,8 @@ namespace ConsoleTests
                 Thread.Sleep(5000);
 
                 log.Debug("Failing over master...");
-                var masterHost = sentinel.ForceMasterFailover();
-                log.Debug("{0} was failed over".Fmt(masterHost));
+                sentinel.ForceMasterFailover();
+                log.Debug("master was failed over");
 
                 log.Debug("Sleeping for 20000ms...");
                 Thread.Sleep(20000);

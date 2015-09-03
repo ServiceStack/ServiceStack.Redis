@@ -49,7 +49,8 @@ namespace ServiceStack.Redis
             if (isObjectivelyDown)
                 Interlocked.Increment(ref RedisState.TotalObjectiveServersDown);
 
-            if (c == "+failover-end"
+            if (c == "+failover-end" 
+                || c == "+switch-master"
                 || (sentinel.ResetWhenSubjectivelyDown && isSubjectivelyDown)
                 || (sentinel.ResetWhenObjectivelyDown && isObjectivelyDown))
             {

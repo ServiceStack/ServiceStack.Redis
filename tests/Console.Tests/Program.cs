@@ -28,9 +28,11 @@
             //    UseRedisManagerPool = true, StartAndStopRedisServers = false }.Execute();
             //new LocalRedisSentinelFailoverTests().Execute();
 
-            new NetworkRedisSentinelFailoverTests().Execute();
+            //new NetworkRedisSentinelFailoverTests().Execute();
 
             //new GoogleRedisSentinelFailoverTests().Execute();
+
+            new ForceFailover().Execute();
         }
     }
 }
