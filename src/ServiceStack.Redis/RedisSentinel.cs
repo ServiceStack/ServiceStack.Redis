@@ -405,12 +405,12 @@ namespace ServiceStack.Redis
             }
         }
 
-        public string ForceMasterFailover()
+        public void ForceMasterFailover()
         {
             var sentinelWorker = GetValidSentinelWorker();
             lock (sentinelWorker)
             {
-                return sentinelWorker.ForceMasterFailover(masterName);
+                sentinelWorker.ForceMasterFailover(masterName);
             }
         }
 

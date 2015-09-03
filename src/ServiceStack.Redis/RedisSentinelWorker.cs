@@ -159,12 +159,9 @@ namespace ServiceStack.Redis
             }
         }
 
-        public string ForceMasterFailover(string masterName)
+        public void ForceMasterFailover(string masterName)
         {
-            var masterInfo = this.sentinelClient.SentinelFailover(masterName);
-            return masterInfo.Count > 0
-                ? SanitizeMasterConfig(masterInfo)
-                : null;
+            this.sentinelClient.SentinelFailover(masterName);
         }
 
         public void Dispose()

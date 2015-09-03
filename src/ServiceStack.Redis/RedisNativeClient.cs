@@ -1542,16 +1542,16 @@ namespace ServiceStack.Redis
             return SendExpectMultiData(args.ToArray()).ToStringList();
         }
 
-        public List<string> SentinelFailover(string masterName)
+        public void SentinelFailover(string masterName)
         {
             var args = new List<byte[]>
             {
                 Commands.Sentinel,
-                Commands.GetMasterAddrByName,
+                Commands.Failover,
                 masterName.ToUtf8Bytes(),
             };
 
-            return SendExpectMultiData(args.ToArray()).ToStringList();
+            SendExpectSuccess(args.ToArray());
         }
 
         #endregion
