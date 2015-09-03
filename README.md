@@ -3,89 +3,6 @@ follow [@servicestack](http://twitter.com/servicestack) for updates.
 
 # C#/.NET Client for Redis
 
-## [Redis Sentinel](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Redis-Sentinel)
-
-To use the new Sentinel support, instead of populating the Redis Client Managers with the 
-connection string of the master and slave instances you would create a single RedisSentinel 
-instance configured with the connection string of the running Redis Sentinels:
-
-```csharp
-var sentinelHosts = new[]{ "sentinel1", "sentinel2:6390", "sentinel3" };
-var sentinel = new RedisSentinel(sentinelHosts, masterName: "mymaster");
-```
-
-This configues a `RedisSentinel` with 3 sentinel hosts looking at **mymaster** group. 
-As the default port for sentinels when unspecified is **26379** and how RedisSentinel is able to 
-auto-discover other sentinels, the minimum configuration required is with a single Sentinel host:
-
-```csharp
-var sentinel = new RedisSentinel("sentinel1");
-```
-
-### Custom Redis Connection String
-
-The host the RedisSentinel is configured with only applies to that Sentinel Host, to use the 
-flexibility of [Redis Connection Strings](#redis-connection-strings) to apply configuration on
-individual Redis Clients you need to register a custom `HostFilter`:
-
-```csharp
-sentinel.HostFilter = host => "{0}?db=1&RetryTimeout=5000".Fmt(host);
-```
-
-An alternative to using connection strings for configuring clients is to modify 
-[default configuration on RedisConfig](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Redis-Config).
-
-### Change to use RedisManagerPool 
-
-By default RedisSentinel uses a `PooledRedisClientManager`, this can be changed to use the 
-newer `RedisManagerPool` with:
-
-```csharp
-sentinel.RedisManagerFactory = (master,slaves) => new RedisManagerPool(master);
-```
-
-### Start monitoring Sentinels
-
-Once configured, you can start monitoring the Redis Sentinel servers and access the pre-configured 
-client manager with:
-
-```csharp
-IRedisClientsManager redisManager = sentinel.Start();
-```
-
-Which as before, can be registered in your preferred IOC as a **singleton** instance:
-
-```csharp
-container.Register<IRedisClientsManager>(c => sentinel.Start());
-```
-
-## [Configure Redis Sentinel Servers](https://github.com/ServiceStack/redis-config)
-
-[![Instant Redis Setup](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/redis/instant-sentinel-setup.png)](https://github.com/ServiceStack/redis-config)
-
-See the
-[redis config project](https://github.com/ServiceStack/redis-config) for a quick way to setup up 
-the minimal 
-[highly available Redis Sentinel configuration](https://github.com/ServiceStack/redis-config/blob/master/README.md#3x-sentinels-monitoring-1x-master-and-2x-slaves)
-including start/stop scripts for instantly running multiple redis instances on a single (or multiple) 
-Windows, OSX or Linux servers. 
-
-### [Redis Stats](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Redis-Stats)
-
-You can use the `RedisStats` class for visibility and introspection into your running instances.
-The [Redis Stats wiki](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Redis-Stats) lists the stats available.
-
-## [Automatic Retries](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Automatic-Retries)
-
-To improve the resilience of client connections, `RedisClient` will transparently retry failed 
-Redis operations due to Socket and I/O Exceptions in an exponential backoff starting from 
-**10ms** up until the `RetryTimeout` of **3000ms**. These defaults can be tweaked with:
-
-```csharp
-RedisConfig.DefaultRetryTimeout = 3000;
-RedisConfig.BackOffMultiplier = 10;
-```
-
 ## Redis Connection Strings
 
 Redis Connection strings have been expanded to support the more versatile URI format which is now able to capture most of Redis Client 
@@ -235,6 +152,89 @@ A more detailed list of the available RedisClient API's used in the example can 
  - [IRedisClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClient.cs)
  - [IRedisTypedClient<T>](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisTypedClient.cs)
  - [IRedisNativeClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisNativeClient.cs)
+
+## [Redis Sentinel](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Redis-Sentinel)
+
+To use the new Sentinel support, instead of populating the Redis Client Managers with the 
+connection string of the master and slave instances you would create a single RedisSentinel 
+instance configured with the connection string of the running Redis Sentinels:
+
+```csharp
+var sentinelHosts = new[]{ "sentinel1", "sentinel2:6390", "sentinel3" };
+var sentinel = new RedisSentinel(sentinelHosts, masterName: "mymaster");
+```
+
+This configues a `RedisSentinel` with 3 sentinel hosts looking at **mymaster** group. 
+As the default port for sentinels when unspecified is **26379** and how RedisSentinel is able to 
+auto-discover other sentinels, the minimum configuration required is with a single Sentinel host:
+
+```csharp
+var sentinel = new RedisSentinel("sentinel1");
+```
+
+### Custom Redis Connection String
+
+The host the RedisSentinel is configured with only applies to that Sentinel Host, to use the 
+flexibility of [Redis Connection Strings](#redis-connection-strings) to apply configuration on
+individual Redis Clients you need to register a custom `HostFilter`:
+
+```csharp
+sentinel.HostFilter = host => "{0}?db=1&RetryTimeout=5000".Fmt(host);
+```
+
+An alternative to using connection strings for configuring clients is to modify 
+[default configuration on RedisConfig](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Redis-Config).
+
+### Change to use RedisManagerPool 
+
+By default RedisSentinel uses a `PooledRedisClientManager`, this can be changed to use the 
+newer `RedisManagerPool` with:
+
+```csharp
+sentinel.RedisManagerFactory = (master,slaves) => new RedisManagerPool(master);
+```
+
+### Start monitoring Sentinels
+
+Once configured, you can start monitoring the Redis Sentinel servers and access the pre-configured 
+client manager with:
+
+```csharp
+IRedisClientsManager redisManager = sentinel.Start();
+```
+
+Which as before, can be registered in your preferred IOC as a **singleton** instance:
+
+```csharp
+container.Register<IRedisClientsManager>(c => sentinel.Start());
+```
+
+## [Configure Redis Sentinel Servers](https://github.com/ServiceStack/redis-config)
+
+[![Instant Redis Setup](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/redis/instant-sentinel-setup.png)](https://github.com/ServiceStack/redis-config)
+
+See the
+[redis config project](https://github.com/ServiceStack/redis-config) for a quick way to setup up 
+the minimal 
+[highly available Redis Sentinel configuration](https://github.com/ServiceStack/redis-config/blob/master/README.md#3x-sentinels-monitoring-1x-master-and-2x-slaves)
+including start/stop scripts for instantly running multiple redis instances on a single (or multiple) 
+Windows, OSX or Linux servers. 
+
+### [Redis Stats](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Redis-Stats)
+
+You can use the `RedisStats` class for visibility and introspection into your running instances.
+The [Redis Stats wiki](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Redis-Stats) lists the stats available.
+
+## [Automatic Retries](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Automatic-Retries)
+
+To improve the resilience of client connections, `RedisClient` will transparently retry failed 
+Redis operations due to Socket and I/O Exceptions in an exponential backoff starting from 
+**10ms** up until the `RetryTimeout` of **3000ms**. These defaults can be tweaked with:
+
+```csharp
+RedisConfig.DefaultRetryTimeout = 3000;
+RedisConfig.BackOffMultiplier = 10;
+```
 
 ## [ServiceStack.Redis SSL Support](https://github.com/ServiceStack/ServiceStack/wiki/Secure-SSL-Redis-connections-to-Azure-Redis)
 
