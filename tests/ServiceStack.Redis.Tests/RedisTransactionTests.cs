@@ -332,5 +332,37 @@ namespace ServiceStack.Redis.Tests
 
             Assert.That(results, Is.EquivalentTo(stringMap));
         }
+
+	    [Test]
+	    public void Can_call_Type_in_transaction()
+	    {
+	        Redis.SetValue("string", "STRING");
+	        Redis.AddItemToList("list", "LIST");
+	        Redis.AddItemToSet("set", "SET");
+	        Redis.AddItemToSortedSet("zset", "ZSET", 1);
+
+	        var keys = new[] { "string", "list", "set", "zset" };
+
+            var results = new Dictionary<string, string>();
+            using (var trans = Redis.CreateTransaction())
+            {
+                foreach (var key in keys)
+                {
+                    trans.QueueCommand(r => r.Type(key), x => results[key] = x);
+                }
+
+                trans.Commit();
+            }
+
+            results.PrintDump();
+
+            Assert.That(results, Is.EquivalentTo(new Dictionary<string,string>
+            {
+                {"string", "string" },
+                {"list", "list" },
+                {"set", "set" },
+                {"zset", "zset" },
+            }));
+        }
     }
 }
