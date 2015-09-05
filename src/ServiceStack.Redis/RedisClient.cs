@@ -367,6 +367,11 @@ namespace ServiceStack.Redis
             base.Rename(fromName, toName);
         }
 
+        public long GetStringCount(string key)
+        {
+            return base.StrLen(key);
+        }
+
         public string GetRandomKey()
         {
             return RandomKey();
