@@ -485,6 +485,10 @@ namespace ServiceStack.Redis.Generic
         {
             client.ResetSendBuffer();
         }
+        internal void EndPipeline()
+        {
+            client.EndPipeline();
+        }
 
         [Obsolete("Does nothing currently, RedisTypedClient will not be IDisposable in a future version")]
         public void Dispose() { }

@@ -67,8 +67,7 @@ namespace ServiceStack.Redis
 
         protected void ClosePipeline()
         {
-            RedisClient.ResetSendBuffer();
-            RedisClient.Pipeline = null;
+            RedisClient.EndPipeline();
         }
 
         public void Dispose()
