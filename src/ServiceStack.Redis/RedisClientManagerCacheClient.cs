@@ -207,5 +207,13 @@ namespace ServiceStack.Redis
             }
             return null;
         }
+
+        public IEnumerable<string> GetKeysByPattern(string pattern)
+        {
+            using (var client = (RedisClient)GetClient())
+            {
+                return client.GetKeysByPattern(pattern);
+            }
+        }
     }
 }

@@ -203,5 +203,10 @@ namespace ServiceStack.Redis
         {
             return SRandMember(setId).FromUtf8Bytes();
         }
+
+        public IEnumerable<string> GetKeysByPattern(string pattern)
+        {
+            return ScanAllKeys(pattern);
+        }
     }
 }
