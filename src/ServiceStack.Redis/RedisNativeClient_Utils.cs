@@ -274,12 +274,19 @@ namespace ServiceStack.Redis
         private RedisResponseException CreateResponseError(string error)
         {
             DeactivatedAt = DateTime.UtcNow;
-            string safeLastCommand = string.IsNullOrEmpty(Password) ? lastCommand : (lastCommand ?? "").Replace(Password, "");
 
-            var throwEx = new RedisResponseException(
-                string.Format("{0}, sPort: {1}, LastCommand: {2}",
-                    error, clientPort, safeLastCommand));
-            log.Error(throwEx.Message);
+            if (!RedisConfig.DisableVerboseLogging)
+            {
+                var safeLastCommand = string.IsNullOrEmpty(Password) 
+                    ? lastCommand 
+                    : (lastCommand ?? "").Replace(Password, "");
+
+                if (!string.IsNullOrEmpty(safeLastCommand))
+                    error = string.Format("{0}, LastCommand:'{1}', srcPort:{2}", error, safeLastCommand, clientPort);
+            }
+
+            var throwEx = new RedisResponseException(error);
+            log.Error(error);
             throw throwEx;
         }
 
