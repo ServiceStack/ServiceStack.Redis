@@ -244,6 +244,11 @@ namespace ServiceStack.Redis
             return GetClientsInfo();
         }
 
+        public void SetValues(Dictionary<string, string> map)
+        {
+            SetAll(map);
+        }
+
         public void SetAll(IEnumerable<string> keys, IEnumerable<string> values)
         {
             if (keys == null || values == null) return;
