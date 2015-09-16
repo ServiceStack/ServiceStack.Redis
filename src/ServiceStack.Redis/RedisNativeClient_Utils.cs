@@ -30,7 +30,13 @@ namespace ServiceStack.Redis
         private const string OK = "OK";
         private const string QUEUED = "QUEUED";
         private static Timer UsageTimer;
+
         private static int __requestsPerHour = 0;
+        public static int RequestsPerHour
+        {
+            get { return __requestsPerHour; }
+        }
+
         private const int Unknown = -1;
         public int ServerVersionNumber { get; set; }
 
@@ -146,14 +152,18 @@ namespace ServiceStack.Redis
                 {
                     if (ServerVersionNumber == 0)
                     {
-                        var parts = ServerVersion.Split('.');
-                        var version = int.Parse(parts[0]) * 1000;
-                        if (parts.Length > 1)
-                            version += int.Parse(parts[1]) * 100;
-                        if (parts.Length > 2)
-                            version += int.Parse(parts[2]);
+                        ServerVersionNumber = RedisConfig.AssumeServerVersion.GetValueOrDefault(0);
+                        if (ServerVersionNumber <= 0)
+                        { 
+                            var parts = ServerVersion.Split('.');
+                            var version = int.Parse(parts[0]) * 1000;
+                            if (parts.Length > 1)
+                                version += int.Parse(parts[1]) * 100;
+                            if (parts.Length > 2)
+                                version += int.Parse(parts[2]);
 
-                        ServerVersionNumber = version;
+                            ServerVersionNumber = version;
+                        }
                     }
                 }
                 catch (Exception)
