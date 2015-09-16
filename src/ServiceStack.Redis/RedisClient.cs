@@ -15,6 +15,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using ServiceStack.Redis.Generic;
 using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
@@ -974,73 +975,101 @@ namespace ServiceStack.Redis
 
         public IEnumerable<string> ScanAllKeys(string pattern = null, int pageSize = 1000)
         {
-            var ret = new ScanResult();
-            while (true)
+            try
             {
-                ret = pattern != null
-                    ? base.Scan(ret.Cursor, pageSize, match: pattern)
-                    : base.Scan(ret.Cursor, pageSize);
-
-                foreach (var key in ret.Results)
+                var ret = CreateScanResult();
+                while (true)
                 {
-                    yield return key.FromUtf8Bytes();
-                }
+                    ret = pattern != null
+                        ? base.Scan(ret.Cursor, pageSize, match: pattern)
+                        : base.Scan(ret.Cursor, pageSize);
 
-                if (ret.Cursor == 0) break;
+                    foreach (var key in ret.Results)
+                    {
+                        yield return key.FromUtf8Bytes();
+                    }
+
+                    if (ret.Cursor == 0) break;
+                }
+            }
+            finally
+            {
+                EndScanResult();
             }
         }
 
         public IEnumerable<string> ScanAllSetItems(string setId, string pattern = null, int pageSize = 1000)
         {
-            var ret = new ScanResult();
-            while (true)
+            try
             {
-                ret = pattern != null
-                    ? base.SScan(setId, ret.Cursor, pageSize, match: pattern)
-                    : base.SScan(setId, ret.Cursor, pageSize);
-
-                foreach (var key in ret.Results)
+                var ret = CreateScanResult();
+                while (true)
                 {
-                    yield return key.FromUtf8Bytes();
-                }
+                    ret = pattern != null
+                        ? base.SScan(setId, ret.Cursor, pageSize, match: pattern)
+                        : base.SScan(setId, ret.Cursor, pageSize);
 
-                if (ret.Cursor == 0) break;
+                    foreach (var key in ret.Results)
+                    {
+                        yield return key.FromUtf8Bytes();
+                    }
+
+                    if (ret.Cursor == 0) break;
+                }
+            }
+            finally
+            {
+                EndScanResult();
             }
         }
 
         public IEnumerable<KeyValuePair<string, double>> ScanAllSortedSetItems(string setId, string pattern = null, int pageSize = 1000)
         {
-            var ret = new ScanResult();
-            while (true)
+            try
             {
-                ret = pattern != null
-                    ? base.ZScan(setId, ret.Cursor, pageSize, match: pattern)
-                    : base.ZScan(setId, ret.Cursor, pageSize);
-
-                foreach (var entry in ret.AsItemsWithScores())
+                var ret = CreateScanResult();
+                while (true)
                 {
-                    yield return entry;
-                }
+                    ret = pattern != null
+                        ? base.ZScan(setId, ret.Cursor, pageSize, match: pattern)
+                        : base.ZScan(setId, ret.Cursor, pageSize);
 
-                if (ret.Cursor == 0) break;
+                    foreach (var entry in ret.AsItemsWithScores())
+                    {
+                        yield return entry;
+                    }
+
+                    if (ret.Cursor == 0) break;
+                }
+            }
+            finally
+            {
+                EndScanResult();
             }
         }
 
         public IEnumerable<KeyValuePair<string, string>> ScanAllHashEntries(string hashId, string pattern = null, int pageSize = 1000)
         {
-            var ret = new ScanResult();
-            while (true)
+            try
             {
-                ret = pattern != null
-                    ? base.HScan(hashId, ret.Cursor, pageSize, match: pattern)
-                    : base.HScan(hashId, ret.Cursor, pageSize);
-
-                foreach (var entry in ret.AsKeyValues())
+                var ret = CreateScanResult();
+                while (true)
                 {
-                    yield return entry;
-                }
+                    ret = pattern != null
+                        ? base.HScan(hashId, ret.Cursor, pageSize, match: pattern)
+                        : base.HScan(hashId, ret.Cursor, pageSize);
 
-                if (ret.Cursor == 0) break;
+                    foreach (var entry in ret.AsKeyValues())
+                    {
+                        yield return entry;
+                    }
+
+                    if (ret.Cursor == 0) break;
+                }
+            }
+            finally
+            {
+                EndScanResult();
             }
         }
 
@@ -1065,9 +1094,9 @@ namespace ServiceStack.Redis
             {
                 var text = base.Role();
                 var roleName = text.Children[0].Text;
-                return ToServerRole(roleName); 
+                return ToServerRole(roleName);
             }
-            
+
             string role;
             this.Info.TryGetValue("role", out role);
             return ToServerRole(role);
@@ -1077,7 +1106,7 @@ namespace ServiceStack.Redis
         {
             if (string.IsNullOrEmpty(roleName))
                 return RedisServerRole.Unknown;
-    
+
             switch (roleName)
             {
                 case "master":

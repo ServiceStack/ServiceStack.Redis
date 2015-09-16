@@ -147,6 +147,8 @@ namespace ServiceStack.Redis
             }
         }
 
+        private bool IsScan;
+
         internal void EndPipeline()
         {
             ResetSendBuffer();
@@ -2136,6 +2138,19 @@ namespace ServiceStack.Redis
             AssertConnectedSocket();
             return new RedisPipelineCommand(this);
         }
+
+        protected ScanResult CreateScanResult()
+        {
+            IsScan = true;
+            return new ScanResult();
+        }
+
+        protected void EndScanResult()
+        {
+            IsScan = false;
+            Interlocked.Increment(ref __requestsPerHour);
+        }
+
 
         #endregion
 
