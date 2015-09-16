@@ -250,6 +250,7 @@
     <Compile Include="RedisPubSubServerTests.cs" />
     <Compile Include="RedisPubSubTests.cs" />
     <Compile Include="RedisScanTests.cs" />
+    <Compile Include="RedisStatsTests.cs" />
     <Compile Include="RedisTransactionCommonTests.cs" />
     <Compile Include="RedisTransactionTests.cs" />
     <Compile Include="RedisUtilTests.cs" />
