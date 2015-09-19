@@ -866,6 +866,30 @@ namespace ServiceStack.Redis
 
         #region LUA EVAL
 
+        public RedisText ExecLua(string body, params string[] args)
+        {
+            var data = base.EvalCommand(body, 0, args.ToMultiByteArray());
+            return data.ToRedisText();
+        }
+
+        public RedisText ExecLua(string luaBody, string[] keys, string[] args)
+        {
+            var data = base.EvalCommand(luaBody, keys.Length, MergeAndConvertToBytes(keys, args));
+            return data.ToRedisText();
+        }
+
+        public RedisText ExecLuaSha(string sha1, params string[] args)
+        {
+            var data = base.EvalShaCommand(sha1, 0, args.ToMultiByteArray());
+            return data.ToRedisText();
+        }
+
+        public RedisText ExecLuaSha(string sha1, string[] keys, string[] args)
+        {
+            var data = base.EvalShaCommand(sha1, keys.Length, MergeAndConvertToBytes(keys, args));
+            return data.ToRedisText();
+        }
+
         public long ExecLuaAsInt(string body, params string[] args)
         {
             return base.EvalInt(body, 0, args.ToMultiByteArray());

@@ -1150,6 +1150,24 @@ namespace ServiceStack.Redis
             return SendExpectMultiData(cmdArgs);
         }
 
+        public RedisData EvalCommand(string luaBody, int numberKeysInArgs, params byte[][] keys)
+        {
+            if (luaBody == null)
+                throw new ArgumentNullException("luaBody");
+
+            var cmdArgs = MergeCommandWithArgs(Commands.Eval, luaBody.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
+            return RawCommand(cmdArgs);
+        }
+
+        public RedisData EvalShaCommand(string sha1, int numberKeysInArgs, params byte[][] keys)
+        {
+            if (sha1 == null)
+                throw new ArgumentNullException("sha1");
+
+            var cmdArgs = MergeCommandWithArgs(Commands.EvalSha, sha1.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
+            return RawCommand(cmdArgs);
+        }
+
         public string CalculateSha1(string luaBody)
         {
             if (luaBody == null)
