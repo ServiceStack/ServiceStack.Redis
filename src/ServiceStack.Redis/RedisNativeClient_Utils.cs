@@ -528,7 +528,10 @@ namespace ServiceStack.Redis
                 {
                     var retryableEx = outerEx as RedisRetryableException;
                     if (retryableEx == null && outerEx is RedisException)
+                    {
+                        ResetSendBuffer();
                         throw;
+                    }
 
                     var ex = retryableEx ?? GetRetryableException(outerEx);
                     if (ex == null)

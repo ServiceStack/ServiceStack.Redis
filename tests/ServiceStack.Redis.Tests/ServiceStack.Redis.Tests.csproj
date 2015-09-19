@@ -183,6 +183,7 @@
     <Compile Include="AdhocClientTests.cs" />
     <Compile Include="ConfigTests.cs" />
     <Compile Include="CustomCommandTests.cs" />
+    <Compile Include="LuaCachedScripts.cs" />
     <Compile Include="Examples\TestData.cs" />
     <Compile Include="Issues\RedisCharacterizationTests.cs" />
     <Compile Include="RedisBatchTests.cs" />

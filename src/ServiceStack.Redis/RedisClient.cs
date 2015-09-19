@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -865,6 +866,29 @@ namespace ServiceStack.Redis
         #endregion
 
         #region LUA EVAL
+
+        static readonly ConcurrentDictionary<string, string> CachedLuaSha1Map =
+            new ConcurrentDictionary<string, string>();
+
+        public T ExecCachedLua<T>(string scriptBody, Func<string, T> scriptSha1)
+        {
+            string sha1;
+            if (!CachedLuaSha1Map.TryGetValue(scriptBody, out sha1))
+                CachedLuaSha1Map[scriptBody] = sha1 = LoadLuaScript(scriptBody);
+
+            try
+            {
+                return scriptSha1(sha1);
+            }
+            catch (RedisResponseException ex)
+            {
+                if (!ex.Message.StartsWith("NOSCRIPT"))
+                    throw;
+
+                CachedLuaSha1Map[scriptBody] = sha1 = LoadLuaScript(scriptBody);
+                return scriptSha1(sha1);
+            }
+        }
 
         public RedisText ExecLua(string body, params string[] args)
         {
