@@ -351,7 +351,7 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         protected void WriteCommandToSendBuffer(params byte[][] cmdWithBinaryArgs)
         {
-            if (Pipeline == null && Transaction == null && !IsScan)
+            if (Pipeline == null && Transaction == null)
             {
                 Interlocked.Increment(ref __requestsPerHour);
                 if (__requestsPerHour % 20 == 0)

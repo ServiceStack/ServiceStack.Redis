@@ -1023,101 +1023,73 @@ namespace ServiceStack.Redis
 
         public IEnumerable<string> ScanAllKeys(string pattern = null, int pageSize = 1000)
         {
-            try
+            var ret = new ScanResult();
+            while (true)
             {
-                var ret = CreateScanResult();
-                while (true)
+                ret = pattern != null
+                    ? base.Scan(ret.Cursor, pageSize, match: pattern)
+                    : base.Scan(ret.Cursor, pageSize);
+
+                foreach (var key in ret.Results)
                 {
-                    ret = pattern != null
-                        ? base.Scan(ret.Cursor, pageSize, match: pattern)
-                        : base.Scan(ret.Cursor, pageSize);
-
-                    foreach (var key in ret.Results)
-                    {
-                        yield return key.FromUtf8Bytes();
-                    }
-
-                    if (ret.Cursor == 0) break;
+                    yield return key.FromUtf8Bytes();
                 }
-            }
-            finally
-            {
-                EndScanResult();
+
+                if (ret.Cursor == 0) break;
             }
         }
 
         public IEnumerable<string> ScanAllSetItems(string setId, string pattern = null, int pageSize = 1000)
         {
-            try
+            var ret = new ScanResult();
+            while (true)
             {
-                var ret = CreateScanResult();
-                while (true)
+                ret = pattern != null
+                    ? base.SScan(setId, ret.Cursor, pageSize, match: pattern)
+                    : base.SScan(setId, ret.Cursor, pageSize);
+
+                foreach (var key in ret.Results)
                 {
-                    ret = pattern != null
-                        ? base.SScan(setId, ret.Cursor, pageSize, match: pattern)
-                        : base.SScan(setId, ret.Cursor, pageSize);
-
-                    foreach (var key in ret.Results)
-                    {
-                        yield return key.FromUtf8Bytes();
-                    }
-
-                    if (ret.Cursor == 0) break;
+                    yield return key.FromUtf8Bytes();
                 }
-            }
-            finally
-            {
-                EndScanResult();
+
+                if (ret.Cursor == 0) break;
             }
         }
 
         public IEnumerable<KeyValuePair<string, double>> ScanAllSortedSetItems(string setId, string pattern = null, int pageSize = 1000)
         {
-            try
+            var ret = new ScanResult();
+            while (true)
             {
-                var ret = CreateScanResult();
-                while (true)
+                ret = pattern != null
+                    ? base.ZScan(setId, ret.Cursor, pageSize, match: pattern)
+                    : base.ZScan(setId, ret.Cursor, pageSize);
+
+                foreach (var entry in ret.AsItemsWithScores())
                 {
-                    ret = pattern != null
-                        ? base.ZScan(setId, ret.Cursor, pageSize, match: pattern)
-                        : base.ZScan(setId, ret.Cursor, pageSize);
-
-                    foreach (var entry in ret.AsItemsWithScores())
-                    {
-                        yield return entry;
-                    }
-
-                    if (ret.Cursor == 0) break;
+                    yield return entry;
                 }
-            }
-            finally
-            {
-                EndScanResult();
+
+                if (ret.Cursor == 0) break;
             }
         }
 
         public IEnumerable<KeyValuePair<string, string>> ScanAllHashEntries(string hashId, string pattern = null, int pageSize = 1000)
         {
-            try
+            var ret = new ScanResult();
+            while (true)
             {
-                var ret = CreateScanResult();
-                while (true)
+                ret = pattern != null
+                    ? base.HScan(hashId, ret.Cursor, pageSize, match: pattern)
+                    : base.HScan(hashId, ret.Cursor, pageSize);
+
+                foreach (var entry in ret.AsKeyValues())
                 {
-                    ret = pattern != null
-                        ? base.HScan(hashId, ret.Cursor, pageSize, match: pattern)
-                        : base.HScan(hashId, ret.Cursor, pageSize);
-
-                    foreach (var entry in ret.AsKeyValues())
-                    {
-                        yield return entry;
-                    }
-
-                    if (ret.Cursor == 0) break;
+                    yield return entry;
                 }
-            }
-            finally
-            {
-                EndScanResult();
+
+                if (ret.Cursor == 0) break;
             }
         }
 
