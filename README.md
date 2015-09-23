@@ -160,15 +160,9 @@ type conventions built in the ServiceStack.Redis Client to provide a rich, human
 
 #### [Live Demo](http://redisreact.servicestack.net/#/)
 
-The Redis React App has been packaged for multiple platforms inc. the ASP.NET Live Demo 
-[redisreact.servicestack.net](http://redisreact.servicestack.net/#/) deployed on AWS which you can use to preview Redis React browsing a redis server populated with the 
-[Northwind Dataset](http://northwind.servicestack.net/) persisted as JSON following the
-[Complex Type Conventions](http://stackoverflow.com/a/8919931/85785) built into the 
-[C# ServiceStack.Redis Client](https://github.com/ServiceStack/ServiceStack.Redis).
-
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/livedemos/redis-react/home.png)](http://redisreact.servicestack.net/#/)
 
-### Downloads available from [Redis React Home Page](https://servicestack.net/redis-react)
+#### Downloads available from [Redis React Home Page](https://servicestack.net/redis-react)
 
 ## [Redis Sentinel](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Redis-Sentinel)
 
