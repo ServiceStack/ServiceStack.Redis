@@ -527,7 +527,8 @@ namespace ServiceStack.Redis
                 catch (Exception outerEx)
                 {
                     var retryableEx = outerEx as RedisRetryableException;
-                    if (retryableEx == null && outerEx is RedisException)
+                    if (retryableEx == null && outerEx is RedisException 
+                        || outerEx is LicenseException)
                     {
                         ResetSendBuffer();
                         throw;
