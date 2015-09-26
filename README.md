@@ -425,7 +425,7 @@ These new operations are available as a 1:1 mapping with redis-server on `IRedis
 public interface IRedisNativeClient
 {
     ...
-    byte[][] ZRangeByLex(string setId, string min, string max, int? skip=null, int? take=null);
+    byte[][] ZRangeByLex(string setId, string min, string max, int? skip, int? take);
     long ZLexCount(string setId, string min, string max);
     long ZRemRangeByLex(string setId, string min, string max);
 }
@@ -592,7 +592,8 @@ r = redis.ExecCachedLua(FastScanScript, sha1 =>
 // Deletes all existing compiled LUA scripts 
 redis.ScriptFlush();
 
-// #3: Executes using cached SHA1 hash, gets NOSCRIPT Error, re-creates and re-executes with SHA1 hash
+// #3: Executes using cached SHA1 hash, gets NOSCRIPT Error, 
+//     re-creates then re-executes the LUA script using its SHA1 hash
 r = redis.ExecCachedLua(FastScanScript, sha1 =>
     redis.ExecLuaSha(sha1, "key:*", "10"));
 ```
@@ -669,7 +670,8 @@ var alphabet = 26.Times(c => ((char)('A' + c)).ToString());
 alphabet.ForEach(x => Redis.AddItemToSortedSet("zalphabet", x, i++));
 
 //Remove the letters with the highest rank from the sorted set 'zalphabet'
-List<string> letters = Redis.ExecLuaAsList(luaBody, keys: new[] { "zalphabet" }, args: new[] { "3" });
+List<string> letters = Redis.ExecLuaAsList(luaBody, 
+    keys: new[] { "zalphabet" }, args: new[] { "3" });
 
 letters.PrintDump(); //[X, Y, Z]
 ```
@@ -686,7 +688,8 @@ int intVal = Redis.ExecLuaAsInt("return ARGV[1] + ARGV[2]", "10", "20"); //30
 Returning an string:
 
 ```csharp
-var strVal = Redis.ExecLuaAsString(@"return 'Hello, ' .. ARGV[1] .. '!'", "Redis Lua"); //Hello, Redis Lua!
+//Hello, Redis Lua!
+var strVal = Redis.ExecLuaAsString(@"return 'Hello, ' .. ARGV[1] .. '!'", "Redis Lua");
 ```
 
 Returning a List of strings:
