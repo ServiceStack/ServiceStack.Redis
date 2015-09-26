@@ -261,7 +261,7 @@ we've added a new
 [Getting connected to Azure Redis via SSL](https://github.com/ServiceStack/ServiceStack/wiki/Secure-SSL-Redis-connections-to-Azure-Redis) 
 to help you get started.
 
-## New Generic API's for calling Custom Redis commands
+## Generic APIs for calling Custom Redis commands
 
 Most of the time when waiting to use a new [Redis Command](http://redis.io/commands) you'll need to wait for an updated version of 
 **ServiceStack.Redis** to add support for the new commands likewise there are times when the Redis Client doesn't offer every permutation 
@@ -328,7 +328,21 @@ Poco dto = ret.GetResult<Poco>();
 dto.Name.Print(); // Bar
 ```
 
-## New Managed Pub/Sub Server 
+This API is used in most of Redis React UI's 
+[redis.js](https://github.com/ServiceStackApps/RedisReact/blob/master/src/RedisReact/RedisReact/js/redis.js) 
+JavaScript client library where Redis server commands are made available via the 
+[single ServiceStack Service](https://github.com/ServiceStackApps/RedisReact/blob/a1b66603d52d2f18b96227fc455ecb5323e424c8/src/RedisReact/RedisReact.ServiceInterface/RedisServices.cs#L73):
+
+```csharp
+public object Any(CallRedis request)
+{
+    var args = request.Args.ToArray();
+    var response = new CallRedisResponse { Result = Redis.Custom(args) };
+    return response;
+}
+```
+
+## Managed Pub/Sub Server 
 
 The Pub/Sub engine powering 
 [Redis ServerEvents](https://github.com/ServiceStack/ServiceStack/wiki/Redis-Server-Events) and 
@@ -400,7 +414,7 @@ var redisPubSub = new RedisPubSubServer(clientsManager, "channel-1", "channel-2"
 Calling `Start()` after it's initialized will get it to start listening and processing any messages 
 published to the subscribed channels.
 
-### New Lex Operations
+### Lex Operations
 
 The new [ZRANGEBYLEX](http://redis.io/commands/zrangebylex) sorted set operations allowing you to query a sorted set lexically have been added. 
 A good showcase for this is available on [autocomplete.redis.io](http://autocomplete.redis.io/).
@@ -446,7 +460,7 @@ Redis.SearchSortedSetCount("zset", "(a", "(c")
 
 More API examples are available in [LexTests.cs](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/LexTests.cs).
 
-### New HyperLog API
+### HyperLog API
 
 The development branch of Redis server (available when v3.0 is released) includes an ingenious algorithm to approximate the unique elements in a set with maximum space and time efficiency. For details about how it works see Redis's creator Salvatore's blog who [explains it in great detail](http://antirez.com/news/75). Essentially it lets you maintain an efficient way to count and merge unique elements in a set without having to store its elements. 
 A Simple example of it in action:
@@ -463,7 +477,7 @@ redis.MergeHyperLogs("mergedset", "set1", "set2");
 var mergeCount = redis.CountHyperLog("mergedset"); //6
 ```
 
-### New Scan APIs Added
+### Scan APIs
 
 Redis v2.8 introduced a beautiful new [SCAN](http://redis.io/commands/scan) operation that provides an optimal strategy for traversing a redis instance entire keyset in managable-size chunks utilizing only a client-side cursor and without introducing any server state. It's a higher performance alternative and should be used instead of [KEYS](http://redis.io/commands/keys) in application code. SCAN and its related operations for traversing members of Sets, Sorted Sets and Hashes are now available in the Redis Client in the following API's:
 
@@ -495,8 +509,95 @@ var scanUsers = Redis.ScanAllKeys("urn:User:*");
 var sampleUsers = scanUsers.Take(10000).ToList(); //Stop after retrieving 10000 user keys 
 ```
 
+### Efficient SCAN in LUA
 
-### New IRedisClient LUA API's
+The C# API below returns the first 10 results matching the `key:*` pattern:
+
+```csharp
+var keys = Redis.ScanAllKeys(pattern: "key:*", pageSize: 10)
+    .Take(10).ToList();
+```
+
+However the C# Streaming API above requires an unknown number of Redis Operations (bounded to the number of keys in Redis) 
+to complete the request. The number of SCAN calls can be reduced by choosing a higher `pageSize` to tell Redis to scan more keys 
+each time the SCAN operation is called.
+
+As the number of API calls has the potential to result in a large number of Redis Operations, it can end up yielding an unacceptable 
+delay due to the latency of multiple dependent remote network calls. An easy solution is to instead have the multiple SCAN calls 
+performed in-process on the Redis Server, eliminating the network latency of multiple SCAN calls, e.g:
+
+```csharp
+const string FastScanScript = @"
+local limit = tonumber(ARGV[2])
+local pattern = ARGV[1]
+local cursor = 0
+local len = 0
+local results = {}
+repeat
+    local r = redis.call('scan', cursor, 'MATCH', pattern, 'COUNT', limit)
+    cursor = tonumber(r[1])
+    for k,v in ipairs(r[2]) do
+        table.insert(results, v)
+        len = len + 1
+        if len == limit then break end
+    end
+until cursor == 0 or len == limit
+return results";
+
+RedisText r = redis.ExecLua(FastScanScript, "key:*", "10");
+r.Children.Count.Print() //= 10
+```
+
+The `ExecLua` API returns this complex LUA table response in the `Children` collection of the `RedisText` Response. 
+
+#### Alternative Complex API Response
+
+Another way to return complex data structures in a LUA operation is to serialize the result as JSON
+
+    return cjson.encode(results)
+
+Which you can access as raw JSON by parsing the response as a String with:
+
+```csharp
+string json = redis.ExecLuaAsString(FastScanScript, "key:*", "10");
+```
+
+> This is also the approach used in Redis React's
+[RedisServices](https://github.com/ServiceStackApps/RedisReact/blob/a1b66603d52d2f18b96227fc455ecb5323e424c8/src/RedisReact/RedisReact.ServiceInterface/RedisServices.cs#L60).
+
+### ExecCachedLua
+
+ExecCachedLua is a convenient high-level API that eliminates the bookkeeping required for executing high-performance server LUA
+Scripts which suffers from many of the problems that RDBMS stored procedures have which depends on pre-existing state in the RDBMS
+that needs to be updated with the latest version of the Stored Procedure. 
+
+With Redis LUA you either have the option to send, parse, load then execute the entire LUA script each time it's called or 
+alternatively you could pre-load the LUA Script into Redis once on StartUp and then execute it using the Script's SHA1 hash. 
+The issue with this is that if the Redis server is accidentally flushed you're left with a broken application relying on a 
+pre-existing script that's no longer there. The new `ExecCachedLua` API provides the best of both worlds where it will always 
+execute the compiled SHA1 script, saving bandwidth and CPU but will also re-create the LUA Script if it no longer exists.
+
+You can instead execute the compiled LUA script above by its SHA1 identifier, which continues to work regardless if it never existed 
+or was removed at runtime, e.g:
+
+```csharp
+// #1: Loads LUA script and caches SHA1 hash in Redis Client
+r = redis.ExecCachedLua(FastScanScript, sha1 =>
+    redis.ExecLuaSha(sha1, "key:*", "10"));
+
+// #2: Executes using cached SHA1 hash
+r = redis.ExecCachedLua(FastScanScript, sha1 =>
+    redis.ExecLuaSha(sha1, "key:*", "10"));
+
+// Deletes all existing compiled LUA scripts 
+redis.ScriptFlush();
+
+// #3: Executes using cached SHA1 hash, gets NOSCRIPT Error, re-creates and re-executes with SHA1 hash
+r = redis.ExecCachedLua(FastScanScript, sha1 =>
+    redis.ExecLuaSha(sha1, "key:*", "10"));
+```
+
+### IRedisClient LUA API's
 
 The `IRedisClient` API's for [redis server-side LUA support](http://redis.io/commands/eval) have been re-factored into the more user-friendly API's below:
 
@@ -504,6 +605,12 @@ The `IRedisClient` API's for [redis server-side LUA support](http://redis.io/com
 public interface IRedisClient 
 {
     //Eval/Lua operations 
+    T ExecCachedLua<T>(string scriptBody, Func<string, T> scriptSha1);
+
+    RedisText ExecLua(string body, params string[] args);
+    RedisText ExecLua(string luaBody, string[] keys, string[] args);
+    RedisText ExecLuaSha(string sha1, params string[] args);
+    RedisText ExecLuaSha(string sha1, string[] keys, string[] args);
 
     string ExecLuaAsString(string luaBody, params string[] args);
     string ExecLuaAsString(string luaBody, string[] keys, string[] args);
