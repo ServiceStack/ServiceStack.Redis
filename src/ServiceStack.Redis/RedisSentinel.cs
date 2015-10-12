@@ -312,6 +312,7 @@ namespace ServiceStack.Redis
                     this.worker = GetNextSentinel();
                     GetRedisManager();
                     this.worker.BeginListeningForConfigurationChanges();
+                    this.failures = 0; //reset
                     return this.worker;
                 }
                 catch (RedisException ex)
