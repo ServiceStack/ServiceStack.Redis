@@ -42,6 +42,9 @@ namespace ServiceStack.Redis
 
         public static Func<RedisClient> NewFactoryFn = () => new RedisClient();
 
+        public static Func<object, Dictionary<string, string>> ConvertToHashFn =
+            x => x.ToJson().FromJson<Dictionary<string, string>>();
+
         /// <summary>
         /// Creates a new instance of the Redis Client from NewFactoryFn. 
         /// </summary>
@@ -736,7 +739,8 @@ namespace ServiceStack.Redis
         public void StoreAsHash<T>(T entity)
         {
             var key = UrnKey(entity);
-            SetRangeInHash(key, entity.ToJson().FromJson<Dictionary<string, string>>());
+            var hash = ConvertToHashFn(entity);
+            SetRangeInHash(key, hash);
             RegisterTypeId(entity);
         }
 

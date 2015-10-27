@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using ServiceStack.Common;
+using ServiceStack.Common.Tests.Models;
+using ServiceStack.Redis.Tests.Generic;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -268,6 +271,35 @@ namespace ServiceStack.Redis.Tests
             }
         }
 
-	}
+        public class HashTest
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        [Test]
+	    public void Can_store_as_Hash()
+	    {
+            var dto = new HashTest { Id = 1 };
+            Redis.StoreAsHash(dto);
+
+            var storedHash = Redis.GetHashKeys(dto.ToUrn());
+            Assert.That(storedHash, Is.EquivalentTo(new[] { "Id" }));
+
+            var hold = RedisClient.ConvertToHashFn;
+            RedisClient.ConvertToHashFn = o =>
+            {
+                var map = new Dictionary<string, string>();
+                o.ToObjectDictionary().Each(x => map[x.Key] = (x.Value ?? "").ToJsv());
+                return map;
+            };
+
+            Redis.StoreAsHash(dto);
+            storedHash = Redis.GetHashKeys(dto.ToUrn());
+            Assert.That(storedHash, Is.EquivalentTo(new[] { "Id", "Name" }));
+
+            RedisClient.ConvertToHashFn = hold;
+	    }
+    }
 
 }
