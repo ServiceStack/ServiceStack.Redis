@@ -736,6 +736,10 @@ namespace ServiceStack.Redis
             return GetAllEntriesFromHash(key).ToJson().FromJson<T>();
         }
 
+        /// <summary>
+        /// Store object fields as a dictionary of values in a Hash value.
+        /// Conversion to Dictionary can be customized with RedisClient.ConvertToHashFn
+        /// </summary>
         public void StoreAsHash<T>(T entity)
         {
             var key = UrnKey(entity);
