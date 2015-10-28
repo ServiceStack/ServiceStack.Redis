@@ -32,7 +32,9 @@
 
             //new GoogleRedisSentinelFailoverTests().Execute();
 
-            new ForceFailover().Execute();
+            //new ForceFailover().Execute();
+
+            new BlockingPop().Execute();
         }
     }
 }
