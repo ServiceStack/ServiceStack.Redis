@@ -1,3 +1,4 @@
+using System;
 using ServiceStack.Logging;
 using ServiceStack.Support;
 
@@ -12,7 +13,10 @@ namespace ServiceStack.Redis.Tests
 
 		public const bool IgnoreLongTests = true;
 
-        public const string SingleHost = "localhost";
+	    public static string SingleHost
+	    {
+	        get { return Environment.GetEnvironmentVariable("CI_REDIS") ?? "localhost"; }
+	    }
         public static readonly string[] MasterHosts = new[] { "localhost" };
         public static readonly string[] SlaveHosts = new[] { "localhost" };
 
