@@ -116,7 +116,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Does_set_Client_name_on_Connection()
         {
-            using (var redis = new RedisClient("localhost?Client=nunit"))
+            using (var redis = new RedisClient(TestConfig.SingleHost + "?Client=nunit"))
             {
                 var clientName = redis.GetClient();
 
@@ -127,7 +127,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Does_set_Client_on_Pooled_Connection()
         {
-            using (var redisManager = new PooledRedisClientManager("localhost?Client=nunit"))
+            using (var redisManager = new PooledRedisClientManager(TestConfig.SingleHost + "?Client=nunit"))
             using (var redis = redisManager.GetClient())
             {
                 var clientName = redis.GetClient();

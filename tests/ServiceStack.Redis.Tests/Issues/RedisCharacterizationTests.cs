@@ -43,8 +43,8 @@ namespace ServiceStack.Redis.Tests.Issues
 
         private void TestForDatabaseOnConnectionString(Func<string, IRedisClientsManager> factory)
         {
-            _db1ClientManager = factory("localhost?db=1");
-            _db2ClientManager = factory("localhost?db=2");
+            _db1ClientManager = factory(TestConfig.SingleHost + "?db=1");
+            _db2ClientManager = factory(TestConfig.SingleHost + "?db=2");
 
             using (var cacheClient = _db1ClientManager.GetCacheClient())
             {
@@ -59,8 +59,8 @@ namespace ServiceStack.Redis.Tests.Issues
         [Test]
         public void WhenUsingAnInitialDatabase_CorrectDatabaseIsUsed()
         {
-            _db1ClientManager = new BasicRedisClientManager(1, "localhost");
-            _db2ClientManager = new BasicRedisClientManager(2, "localhost");
+            _db1ClientManager = new BasicRedisClientManager(1, TestConfig.SingleHost);
+            _db2ClientManager = new BasicRedisClientManager(2, TestConfig.SingleHost);
 
             using (var cacheClient = _db1ClientManager.GetCacheClient())
             {
