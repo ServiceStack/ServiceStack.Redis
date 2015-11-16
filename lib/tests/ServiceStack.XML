@@ -4569,6 +4569,16 @@
             Generic + Useful IService base class
             </summary>
         </member>
+        <member name="P:ServiceStack.Service.VirtualFileSources">
+            <summary>
+            Cascading collection of virtual file sources, inc. Embedded Resources, File System, In Memory, S3
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Service.VirtualFiles">
+            <summary>
+            Read/Write Virtual FileSystem. Defaults to FileSystemVirtualPathProvider
+            </summary>
+        </member>
         <member name="F:ServiceStack.Service.session">
             <summary>
             Dynamic Session Bag
@@ -4772,7 +4782,7 @@
         </member>
         <member name="T:ServiceStack.VirtualPath.InMemoryVirtualPathProvider">
             <summary>
-            In Memory repository for files. Useful for testing.
+            In Memory Virtual Path Provider.
             </summary>
         </member>
         <member name="M:ServiceStack.VirtualFileExtensions.Refresh(ServiceStack.IO.IVirtualFile)">
@@ -5085,6 +5095,16 @@
             however it requires admin user privillages.
             </summary>
         </member>
+        <member name="P:ServiceStack.HostContext.VirtualFiles">
+            <summary>
+            Read/Write Virtual FileSystem. Defaults to FileSystemVirtualPathProvider
+            </summary>
+        </member>
+        <member name="P:ServiceStack.HostContext.VirtualFileSources">
+            <summary>
+            Cascading collection of virtual file sources, inc. Embedded Resources, File System, In Memory, S3
+            </summary>
+        </member>
         <member name="M:ServiceStack.HostContext.CompleteRequest(ServiceStack.Web.IRequest)">
             <summary>
             Call to signal the completion of a ServiceStack-handled Request
@@ -5256,9 +5276,14 @@
             Apply plugins to this AppHost
             </summary>
         </member>
-        <member name="P:ServiceStack.IAppHost.VirtualPathProvider">
+        <member name="P:ServiceStack.IAppHost.VirtualFileSources">
             <summary>
-            Virtual access to file resources
+            Cascading number of file sources, inc. Embedded Resources, File System, In Memory, S3
+            </summary>
+        </member>
+        <member name="P:ServiceStack.IAppHost.VirtualFiles">
+            <summary>
+            Read/Write Virtual FileSystem. Defaults to FileSystemVirtualPathProvider
             </summary>
         </member>
         <member name="M:ServiceStack.IAppHost.CreateServiceRunner``1(ServiceStack.Host.ActionContext)">
