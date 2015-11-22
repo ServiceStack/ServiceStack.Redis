@@ -79,11 +79,11 @@ Any additional configuration can be specified as QueryString parameters. The ful
 
 _Latest v4+ on NuGet is a [commercial release](https://servicestack.net/redis) with [free quotas](https://servicestack.net/download#free-quotas)._
 
-### [Getting Started with AWS ElastiCache Redis and ServiceStack](https://github.com/ServiceStackApps/AwsGettingStarted)
+#### [Getting Started with AWS ElastiCache Redis and ServiceStack](https://github.com/ServiceStackApps/AwsGettingStarted)
 
 ServiceStack.Redis has great support AWS's ElastiCache Redis solution, follow this guide to help getting up and running quickly:
 
-- [ElastiCache Redis](https://github.com/ServiceStackApps/AwsGettingStarted#getting-started-with-aws-elasticache-redis-and-servicestack)
+- [ElastiCache Redis](https://github.com/ServiceStackApps/AwsGettingStarted/blob/master/docs/redis-guide.md)
 
 ## Redis Client Managers
 
