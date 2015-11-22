@@ -73,6 +73,18 @@ Any additional configuration can be specified as QueryString parameters. The ful
     </tr>
 </table>
 
+## Download
+
+    PM> Install-Package ServiceStack.Redis
+
+_Latest v4+ on NuGet is a [commercial release](https://servicestack.net/redis) with [free quotas](https://servicestack.net/download#free-quotas)._
+
+### [Getting Started with AWS ElastiCache Redis and ServiceStack](https://github.com/ServiceStackApps/AwsGettingStarted)
+
+ServiceStack.Redis has great support AWS's ElastiCache Redis solution, follow this guide to help getting up and running quickly:
+
+- [ElastiCache Redis](https://github.com/ServiceStackApps/AwsGettingStarted#getting-started-with-aws-elasticache-redis-and-servicestack)
+
 ## Redis Client Managers
 
 The recommended way to access `RedisClient` instances is to use one of the available Thread-Safe Client Managers below. Client Managers are connection factories which is ideally registered as a Singleton either in your IOC or static classes. 
@@ -743,12 +755,6 @@ For multi-threaded applications you can choose from our different client connect
 
   * BasicRedisClientManager - a load-balance (master-write and read-slaves) client manager that returns a new [IRedisClient](https://github.com/ServiceStack/ServiceStack.Redis/wiki/IRedisClient) connection with the defaults specified (faster when accessing a redis-server instance on the same host).
   * PooledRedisClientManager - a load-balanced (master-write and read-slaves) client manager that utilizes a pool of redis client connections (faster when accessing a redis-server instance over the network).
-
-## Install ServiceStack.Redis
-
-    PM> Install-Package ServiceStack.Redis
-
-_Latest v4+ on NuGet is a [commercial release](https://servicestack.net/redis) with [free quotas](https://servicestack.net/download#free-quotas)._
 
 ### [Docs and Downloads for older v3 BSD releases](https://github.com/ServiceStackV3/ServiceStackV3)
 
