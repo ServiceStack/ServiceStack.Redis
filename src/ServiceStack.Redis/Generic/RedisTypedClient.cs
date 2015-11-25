@@ -150,6 +150,11 @@ namespace ServiceStack.Redis.Generic
             return client.GetAllKeys();
         }
 
+        public string UrnKey(T entity)
+        {
+            return client.UrnKey(entity);
+        }
+
         public IRedisSet TypeIdsSet
         {
             get
@@ -176,28 +181,53 @@ namespace ServiceStack.Redis.Generic
             return serializer.DeserializeFromString(strValue);
         }
 
+        public void SetValue(string key, T entity)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
+
+            client.Set(key, SerializeValue(entity));
+            client.RegisterTypeId(entity);
+        }
+
+        [Obsolete("Use SetValue()")]
         public void SetEntry(string key, T value)
         {
+            SetValue(key, value);
+        }
+
+        public void SetValue(string key, T entity, TimeSpan expireIn)
+        {
             if (key == null)
                 throw new ArgumentNullException("key");
 
-            client.Set(key, SerializeValue(value));
-            client.RegisterTypeId(value);
+            client.Set(key, SerializeValue(entity), expireIn);
+            client.RegisterTypeId(entity);
         }
 
+        [Obsolete("Use SetValue()")]
         public void SetEntry(string key, T value, TimeSpan expireIn)
         {
-            if (key == null)
-                throw new ArgumentNullException("key");
-
-            client.Set(key, SerializeValue(value), expireIn);
-            client.RegisterTypeId(value);
+            SetValue(key, value, expireIn);
         }
 
+        public bool SetValueIfNotExists(string key, T entity)
+        {
+            var success = client.SetNX(key, SerializeValue(entity)) == RedisNativeClient.Success;
+            if (success) client.RegisterTypeId(entity);
+            return success;
+        }
+
+        [Obsolete("Use SetValueIfNotExists()")]
         public bool SetEntryIfNotExists(string key, T value)
         {
-            var success = client.SetNX(key, SerializeValue(value)) == RedisNativeClient.Success;
-            if (success) client.RegisterTypeId(value);
+            return SetValueIfNotExists(key, value);
+        }
+
+        public bool SetValueIfExists(string key, T entity)
+        {
+            var success = client.Set(key, SerializeValue(entity), exists:true);
+            if (success) client.RegisterTypeId(entity);
             return success;
         }
 
@@ -399,8 +429,14 @@ namespace ServiceStack.Redis.Generic
         public T Store(T entity)
         {
             var urnKey = client.UrnKey(entity);
-            this.SetEntry(urnKey, entity);
+            this.SetValue(urnKey, entity);
+            return entity;
+        }
 
+        public T Store(T entity, TimeSpan expireIn)
+        {
+            var urnKey = client.UrnKey(entity);
+            this.SetValue(urnKey, entity, expireIn);
             return entity;
         }
 
