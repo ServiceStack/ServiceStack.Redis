@@ -141,7 +141,10 @@ namespace ServiceStack.Redis
                 try
                 {
                     //inactivePoolIndex == -1 || index of reservedSlot || index of invalid client
-                    var existingClient = inactivePoolIndex >= 0 ? clients[inactivePoolIndex] : null;
+                    var existingClient = inactivePoolIndex >= 0 && inactivePoolIndex < clients.Length 
+                        ? clients[inactivePoolIndex] 
+                        : null;
+
                     if (existingClient != null && existingClient != reservedSlot && existingClient.HadExceptions)
                     {
                         RedisState.DeactivateClient(existingClient);
@@ -155,10 +158,12 @@ namespace ServiceStack.Redis
                         //Create new client outside of pool when max pool size exceeded
                         //Reverting free-slot not needed when -1 since slwo wasn't reserved or 
                         //when existingClient changed (failover) since no longer reserver
-                        if (inactivePoolIndex == -1 || clients[inactivePoolIndex] != existingClient)
+                        var stillReserved = inactivePoolIndex >= 0 && inactivePoolIndex < clients.Length && 
+                            clients[inactivePoolIndex] == existingClient;
+                        if (inactivePoolIndex == -1 || !stillReserved)
                         {
                             if (Log.IsDebugEnabled)
-                                Log.Debug("clients[inactivePoolIndex] != existingClient: {0}".Fmt(clients[inactivePoolIndex]));
+                                Log.Debug("clients[inactivePoolIndex] != existingClient: {0}".Fmt(!stillReserved ? "!stillReserved" : "-1"));
 
                             Interlocked.Increment(ref RedisState.TotalClientsCreatedOutsidePool);
 
@@ -177,7 +182,10 @@ namespace ServiceStack.Redis
                     //Revert free-slot for any I/O exceptions that can throw (before lock)
                     lock (clients)
                     {
-                        clients[inactivePoolIndex] = null;
+                        if (inactivePoolIndex >= 0 && inactivePoolIndex < clients.Length)
+                        {
+                            clients[inactivePoolIndex] = null;
+                        }
                     }
                     throw;
                 }
