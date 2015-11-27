@@ -325,11 +325,14 @@ namespace ServiceStack.Redis
 
             var ret = new Dictionary<string, string>
             {
+                {"VersionString", "" + Text.Env.VersionString},
+
                 {"clientsPoolSize", "" + clientsPoolSize},
                 {"clientsCreated", "" + clientsCreated},
                 {"clientsWithExceptions", "" + clientsWithExceptions},
                 {"clientsInUse", "" + clientsInUse},
                 {"clientsConnected", "" + clientsConnected},
+
                 {"RedisResolver.ReadOnlyHostsCount", "" + RedisResolver.ReadOnlyHostsCount},
                 {"RedisResolver.ReadWriteHostsCount", "" + RedisResolver.ReadWriteHostsCount},
             };

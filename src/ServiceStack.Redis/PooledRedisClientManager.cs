@@ -644,6 +644,8 @@ namespace ServiceStack.Redis
 
             var ret = new Dictionary<string, string>
             {
+                {"VersionString", "" + Text.Env.VersionString},
+
                 {"writeClientsPoolSize", "" + writeClientsPoolSize},
                 {"writeClientsCreated", "" + writeClientsCreated},
                 {"writeClientsWithExceptions", "" + writeClientsWithExceptions},
