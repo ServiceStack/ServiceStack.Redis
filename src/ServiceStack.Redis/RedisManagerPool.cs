@@ -354,6 +354,8 @@ namespace ServiceStack.Redis
                 {"clientsWithExceptions", "" + clientsWithExceptions},
                 {"clientsInUse", "" + clientsInUse},
                 {"clientsConnected", "" + clientsConnected},
+                {"RedisResolver.ReadOnlyHostsCount", "" + RedisResolver.ReadOnlyHostsCount},
+                {"RedisResolver.ReadWriteHostsCount", "" + RedisResolver.ReadWriteHostsCount},
             };
 
             return ret;
