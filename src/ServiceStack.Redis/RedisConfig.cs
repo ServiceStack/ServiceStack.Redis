@@ -48,6 +48,11 @@ namespace ServiceStack.Redis
         public static int DefaultRetryTimeout = 3 * 1000;
 
         /// <summary>
+        /// Default Max Pool Size for Pooled Redis Client Managers (default none)
+        /// </summary>
+        public static int? DefaultMaxPoolSize;
+
+        /// <summary>
         /// The BackOff multiplier failed Auto Retries starts from (default 10ms)
         /// </summary>
         public static int BackOffMultiplier = 10;
@@ -104,6 +109,7 @@ namespace ServiceStack.Redis
             DefaultReceiveTimeout = -1;
             DefaultRetryTimeout = 3 * 1000;
             DefaultIdleTimeOutSecs = 240;
+            DefaultMaxPoolSize = null;
             BackOffMultiplier = 10;
             BufferLength = 1450;
             BufferPoolMaxSize = 500000;

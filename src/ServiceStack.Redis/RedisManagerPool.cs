@@ -12,11 +12,11 @@ namespace ServiceStack.Redis
 {
     public class RedisPoolConfig
     {
-        public const int DefaultMaxPoolSize = 40;
+        public static int DefaultMaxPoolSize = 40;
 
         public RedisPoolConfig()
         {
-            MaxPoolSize = DefaultMaxPoolSize;
+            MaxPoolSize = RedisConfig.DefaultMaxPoolSize ?? DefaultMaxPoolSize;
         }
 
         public int MaxPoolSize { get; set; }
@@ -52,6 +52,7 @@ namespace ServiceStack.Redis
 
         public RedisManagerPool() : this(RedisConfig.DefaultHost) { }
         public RedisManagerPool(string host) : this(new[] { host }) { }
+        public RedisManagerPool(string host, RedisPoolConfig config) : this(new[] { host }, config) { }
         public RedisManagerPool(IEnumerable<string> hosts) : this(hosts, null) { }
 
         public RedisManagerPool(IEnumerable<string> hosts, RedisPoolConfig config)
