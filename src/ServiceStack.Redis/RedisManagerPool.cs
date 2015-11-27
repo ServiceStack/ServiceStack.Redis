@@ -116,21 +116,17 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         public IRedisClient GetClient()
         {
-            int section = 1;
             try
             {
                 var inactivePoolIndex = -1;
                 lock (clients)
                 {
-                    section = 2; 
                     AssertValidPool();
 
-                    section = 3;
                     RedisClient inActiveClient;
                     //-1 when no available clients otherwise index of reservedSlot or existing Client
                     inactivePoolIndex = GetInActiveClient(out inActiveClient);
 
-                    section = 4;
                     //inActiveClient != null only for Valid InActive Clients
                     if (inActiveClient != null)
                     {
@@ -144,23 +140,17 @@ namespace ServiceStack.Redis
                 //Reaches here when there's no Valid InActive Clients
                 try
                 {
-                    section = 5;
                     //inactivePoolIndex == -1 || index of reservedSlot || index of invalid client
                     var existingClient = inactivePoolIndex >= 0 && inactivePoolIndex < clients.Length
                         ? clients[inactivePoolIndex]
                         : null;
 
-                    section = 5;
                     if (existingClient != null && existingClient != reservedSlot && existingClient.HadExceptions)
                     {
-                        section = 6;
                         RedisState.DeactivateClient(existingClient);
                     }
 
-                    section = 7;
-                    var newClient = RedisResolver.CreateMasterClient(Math.Max(inactivePoolIndex, 0));
-                    section = 8;
-                    newClient = InitNewClient(newClient);
+                    var newClient = InitNewClient(RedisResolver.CreateMasterClient(Math.Max(inactivePoolIndex, 0)));
 
                     //Put all blocking I/O or potential Exceptions before lock
                     lock (clients)
@@ -168,12 +158,10 @@ namespace ServiceStack.Redis
                         //Create new client outside of pool when max pool size exceeded
                         //Reverting free-slot not needed when -1 since slwo wasn't reserved or 
                         //when existingClient changed (failover) since no longer reserver
-                        section = 9;
                         var stillReserved = inactivePoolIndex >= 0 && inactivePoolIndex < clients.Length &&
-                                            clients[inactivePoolIndex] == existingClient;
+                            clients[inactivePoolIndex] == existingClient;
                         if (inactivePoolIndex == -1 || !stillReserved)
                         {
-                            section = 10;
                             if (Log.IsDebugEnabled)
                                 Log.Debug("clients[inactivePoolIndex] != existingClient: {0}".Fmt(!stillReserved ? "!stillReserved" : "-1"));
 
@@ -184,7 +172,6 @@ namespace ServiceStack.Redis
                             return newClient;
                         }
 
-                        section = 11;
                         poolIndex++;
                         clients[inactivePoolIndex] = newClient;
                         return newClient;
@@ -195,7 +182,6 @@ namespace ServiceStack.Redis
                     //Revert free-slot for any I/O exceptions that can throw (before lock)
                     lock (clients)
                     {
-                        section = 12;
                         if (inactivePoolIndex >= 0 && inactivePoolIndex < clients.Length)
                         {
                             clients[inactivePoolIndex] = null;
@@ -204,20 +190,9 @@ namespace ServiceStack.Redis
                     throw;
                 }
             }
-            catch (IndexOutOfRangeException ex)
-            {
-                throw new Exception("Error after section: " + section, ex);
-            }
             finally
             {
-                try
-                {
-                    RedisState.DisposeExpiredClients();
-                }
-                catch (IndexOutOfRangeException ex)
-                {
-                    throw new Exception("Error at RedisState.DisposeExpiredClients()", ex);
-                }
+                RedisState.DisposeExpiredClients();
             }
         }
 
