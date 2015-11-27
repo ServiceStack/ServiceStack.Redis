@@ -48,7 +48,7 @@ namespace ServiceStack.Redis
 
         public IRedisResolver RedisResolver { get; set; }
 
-        public int MaxPoolSize { get; set; }
+        public int MaxPoolSize { get; private set; }
 
         public RedisManagerPool() : this(RedisConfig.DefaultHost) { }
         public RedisManagerPool(string host) : this(new[] { host }) { }

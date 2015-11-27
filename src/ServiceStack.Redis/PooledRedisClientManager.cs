@@ -128,8 +128,8 @@ namespace ServiceStack.Redis
 
             this.Config = config ?? new RedisClientManagerConfig
             {
-                MaxWritePoolSize = masters.Length * PoolSizeMultiplier,
-                MaxReadPoolSize = slaves.Length * PoolSizeMultiplier,
+                MaxWritePoolSize = RedisConfig.DefaultMaxPoolSize ?? masters.Length * PoolSizeMultiplier,
+                MaxReadPoolSize = RedisConfig.DefaultMaxPoolSize ?? slaves.Length * PoolSizeMultiplier,
             };
 
             this.OnFailover = new List<Action<IRedisClientsManager>>();
@@ -655,6 +655,9 @@ namespace ServiceStack.Redis
                 {"readClientsWithExceptions", "" + readClientsWithExceptions},
                 {"readClientsInUse", "" + readClientsInUse},
                 {"readClientsConnected", "" + readClientsConnected},
+
+                {"RedisResolver.ReadOnlyHostsCount", "" + RedisResolver.ReadOnlyHostsCount},
+                {"RedisResolver.ReadWriteHostsCount", "" + RedisResolver.ReadWriteHostsCount},
             };
 
             return ret;
