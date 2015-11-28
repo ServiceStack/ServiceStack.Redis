@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using ServiceStack.Caching;
 using ServiceStack.Logging;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
@@ -71,6 +72,8 @@ namespace ServiceStack.Redis
 
             clients = new RedisClient[MaxPoolSize];
             poolIndex = 0;
+
+            JsConfig.InitStatics();
         }
 
         public void FailoverTo(params string[] readWriteHosts)

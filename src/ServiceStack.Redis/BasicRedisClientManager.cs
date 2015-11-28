@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
@@ -79,6 +80,8 @@ namespace ServiceStack.Redis
             RedisResolver = new RedisResolver(readWriteHosts, readOnlyHosts);
 
             this.OnFailover = new List<Action<IRedisClientsManager>>();
+
+            JsConfig.InitStatics();
 
             this.OnStart();
         }

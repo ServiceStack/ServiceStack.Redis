@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading;
 using ServiceStack.Caching;
 using ServiceStack.Logging;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
@@ -139,6 +140,7 @@ namespace ServiceStack.Redis
                 ? poolTimeOutSeconds * 1000
                 : 2000; //Default Timeout
 
+            JsConfig.InitStatics();
 
             if (this.Config.AutoStart)
             {
