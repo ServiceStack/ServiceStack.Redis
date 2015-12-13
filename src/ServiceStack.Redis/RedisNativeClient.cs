@@ -192,6 +192,7 @@ namespace ServiceStack.Redis
             Ssl = config.Ssl;
             IdleTimeOutSecs = config.IdleTimeOutSecs;
             ServerVersionNumber = RedisConfig.AssumeServerVersion.GetValueOrDefault();
+            JsConfig.InitStatics();
         }
 
         public RedisNativeClient()
