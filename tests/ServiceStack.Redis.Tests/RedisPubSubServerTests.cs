@@ -19,10 +19,10 @@ namespace ServiceStack.Redis.Tests
             var pubSub = new RedisPubSubServer(
                 clientsManager,
                 "topic:test")
-                {
-                    HeartbeatInterval = TimeSpan.FromSeconds(intervalSecs),
-                    HeartbeatTimeout = TimeSpan.FromSeconds(timeoutSecs)
-                };
+            {
+                HeartbeatInterval = TimeSpan.FromSeconds(intervalSecs),
+                HeartbeatTimeout = TimeSpan.FromSeconds(timeoutSecs)
+            };
 
             return pubSub;
         }
