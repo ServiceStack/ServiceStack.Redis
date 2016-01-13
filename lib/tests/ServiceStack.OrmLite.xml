@@ -39,7 +39,7 @@
             Value from DB to Populate on POCO Data Model with
             </summary>
         </member>
-        <member name="M:ServiceStack.OrmLite.OrmLiteConverter.GetValue(System.Data.IDataReader,System.Int32)">
+        <member name="M:ServiceStack.OrmLite.OrmLiteConverter.GetValue(System.Data.IDataReader,System.Int32,System.Object[])">
             <summary>
             Retrieve Value from ADO.NET IDataReader. Defaults to reader.GetValue()
             </summary>
@@ -135,7 +135,7 @@
             </summary>
             <returns></returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:ServiceStack.OrmLite.SqlExpression`1.Update(System.Collections.Generic.IList{System.String})" -->
+        <!-- Badly formed XML comment ignored for member "M:ServiceStack.OrmLite.SqlExpression`1.Update(System.Collections.Generic.List{System.String})" -->
         <member name="M:ServiceStack.OrmLite.SqlExpression`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
             Fields to be updated.
@@ -163,7 +163,7 @@
             objectWithProperties
             </typeparam>
         </member>
-        <member name="M:ServiceStack.OrmLite.SqlExpression`1.Insert(System.Collections.Generic.IList{System.String})">
+        <member name="M:ServiceStack.OrmLite.SqlExpression`1.Insert(System.Collections.Generic.List{System.String})">
             <summary>
             fields to be inserted.
             </summary>
@@ -351,10 +351,22 @@
             <para>db.LoadSelect&lt;Person&gt;(x =&gt; x.Age &gt; 40)</para>
             </summary>
         </member>
+        <member name="M:ServiceStack.OrmLite.OrmLiteReadExpressionsApi.LoadSelect``1(System.Data.IDbConnection,System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Func{``0,System.Object})">
+            <summary>
+            Returns results with references from using a LINQ Expression. E.g:
+            <para>db.LoadSelect&lt;Person&gt;(x =&gt; x.Age &gt; 40, include: x => new { x.PrimaryAddress })</para>
+            </summary>
+        </member>
         <member name="M:ServiceStack.OrmLite.OrmLiteReadExpressionsApi.LoadSelect``1(System.Data.IDbConnection,System.Func{ServiceStack.OrmLite.SqlExpression{``0},ServiceStack.OrmLite.SqlExpression{``0}},System.String[])">
             <summary>
             Returns results with references from using an SqlExpression lambda. E.g:
             <para>db.LoadSelect&lt;Person&gt;(q =&gt; q.Where(x =&gt; x.Age &gt; 40))</para>
+            </summary>
+        </member>
+        <member name="M:ServiceStack.OrmLite.OrmLiteReadExpressionsApi.LoadSelect``1(System.Data.IDbConnection,System.Func{ServiceStack.OrmLite.SqlExpression{``0},ServiceStack.OrmLite.SqlExpression{``0}},System.Func{``0,System.Object})">
+            <summary>
+            Returns results with references from using an SqlExpression lambda. E.g:
+            <para>db.LoadSelect&lt;Person&gt;(q =&gt; q.Where(x =&gt; x.Age &gt; 40), include: x => new { x.PrimaryAddress })</para>
             </summary>
         </member>
         <member name="M:ServiceStack.OrmLite.OrmLiteReadExpressionsApi.LoadSelect``1(System.Data.IDbConnection,ServiceStack.OrmLite.SqlExpression{``0},System.String[])">
@@ -363,7 +375,18 @@
             <para>db.LoadSelect(db.From&lt;Person&gt;().Where(x =&gt; x.Age &gt; 40))</para>
             </summary>
         </member>
+        <member name="M:ServiceStack.OrmLite.OrmLiteReadExpressionsApi.LoadSelect``1(System.Data.IDbConnection,ServiceStack.OrmLite.SqlExpression{``0},System.Func{``0,System.Object})">
+            <summary>
+            Returns results with references from using an SqlExpression lambda. E.g:
+            <para>db.LoadSelect(db.From&lt;Person&gt;().Where(x =&gt; x.Age &gt; 40), include: x => new { x.PrimaryAddress })</para>
+            </summary>
+        </member>
         <member name="M:ServiceStack.OrmLite.OrmLiteReadExpressionsApi.LoadSelect``2(System.Data.IDbConnection,ServiceStack.OrmLite.SqlExpression{``1},System.String[])">
+            <summary>
+            Project results with references from a number of joined tables into a different model
+            </summary>
+        </member>
+        <member name="M:ServiceStack.OrmLite.OrmLiteReadExpressionsApi.LoadSelect``2(System.Data.IDbConnection,ServiceStack.OrmLite.SqlExpression{``1},System.Func{``0,System.Object})">
             <summary>
             Project results with references from a number of joined tables into a different model
             </summary>
@@ -1077,6 +1100,12 @@
             </summary>
             <returns>number of rows affected</returns>
         </member>
+        <member name="M:ServiceStack.OrmLite.OrmLiteWriteApi.ExecuteSql(System.Data.IDbConnection,System.String,System.Object)">
+            <summary>
+            Execute any arbitrary raw SQL with db params.
+            </summary>
+            <returns>number of rows affected</returns>
+        </member>
         <member name="M:ServiceStack.OrmLite.OrmLiteWriteApi.Insert``1(System.Data.IDbConnection,``0,System.Boolean)">
             <summary>
             Insert 1 POCO, use selectIdentity to retrieve the last insert AutoIncrement id (if any). E.g:
@@ -1252,11 +1281,6 @@
             <para>db.SaveReferences(customer, customer.Orders)</para> 
             </summary>
         </member>
-        <member name="P:ServiceStack.OrmLite.OrmLiteConfig.UseParameterizeSqlExpressions">
-            <summary>
-            Only used in Oracle or SqlServer DialectProvider
-            </summary>
-        </member>
         <member name="T:ServiceStack.OrmLite.OrmLiteConnection">
             <summary>
             Wrapper IDbConnection class to allow for connection sharing, mocking, etc.
@@ -1293,6 +1317,16 @@
             Allow for code-sharing between OrmLite, IPersistenceProvider and ICacheClient
             </summary>
         </member>
+        <member name="M:ServiceStack.OrmLite.IOrmLiteDialectProvider.GetConverter(System.Type)">
+            <summary>
+            Gets the explicit Converter registered for a specific type
+            </summary>
+        </member>
+        <member name="M:ServiceStack.OrmLite.IOrmLiteDialectProvider.GetConverterBestMatch(System.Type)">
+            <summary>
+            Return best matching converter, falling back to Enum, Value or Ref Type Converters
+            </summary>
+        </member>
         <member name="M:ServiceStack.OrmLite.IOrmLiteDialectProvider.GetQuotedValue(System.String)">
             <summary>
             Quote the string so that it can be used inside an SQL-expression
@@ -1300,11 +1334,6 @@
             </summary>
             <param name="paramValue"></param>
             <returns></returns>
-        </member>
-        <member name="M:ServiceStack.OrmLite.OrmLiteDialectProviderBase`1.SetDbValue(ServiceStack.OrmLite.FieldDefinition,System.Data.IDataReader,System.Int32,System.Object)">
-            <summary>
-            Populates row fields during re-hydration of results.
-            </summary>
         </member>
         <member name="M:ServiceStack.OrmLite.OrmLiteDialectProviderBase`1.ToInsertRowStatement(System.Data.IDbCommand,System.Object,System.Collections.Generic.ICollection{System.String})">
             Fmt
