@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ServiceStack.Redis.Pipeline;
 
 namespace ServiceStack.Redis
@@ -224,6 +225,29 @@ namespace ServiceStack.Redis
             });
             command(RedisClient);
         }
+
+
+        public void QueueCommand(Func<IRedisClient, HashSet<string>> command)
+        {
+            QueueCommand(command, null, null);
+        }
+
+        public void QueueCommand(Func<IRedisClient, HashSet<string>> command, Action<HashSet<string>> onSuccessCallback)
+        {
+            QueueCommand(command, onSuccessCallback, null);
+        }
+
+        public virtual void QueueCommand(Func<IRedisClient, HashSet<string>> command, Action<HashSet<string>> onSuccessCallback, Action<Exception> onErrorCallback)
+        {
+            BeginQueuedCommand(new QueuedRedisCommand
+            {
+                MultiStringReturnCommand = r => command(r).ToList(),
+                OnSuccessMultiStringCallback = list => onSuccessCallback(list.ToHashSet()),
+                OnErrorCallback = onErrorCallback
+            });
+            command(RedisClient);
+        }
+
 
         public void QueueCommand(Func<IRedisClient, Dictionary<string, string>> command)
         {

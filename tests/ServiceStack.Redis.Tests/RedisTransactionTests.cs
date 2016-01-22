@@ -364,5 +364,22 @@ namespace ServiceStack.Redis.Tests
                 {"zset", "zset" },
             }));
         }
+
+        [Test]
+        public void Can_call_HashSet_commands_in_transaction()
+        {
+            Redis.AddItemToSet("set", "ITEM 1");
+            Redis.AddItemToSet("set", "ITEM 2");
+            HashSet<string> result = null;
+
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.GetAllItemsFromSet("set"), values => result = values);
+
+                trans.Commit();
+            }
+
+            Assert.That(result, Is.EquivalentTo(new[] { "ITEM 1", "ITEM 2" }));
+        }
     }
 }

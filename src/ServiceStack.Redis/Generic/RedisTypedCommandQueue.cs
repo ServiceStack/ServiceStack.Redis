@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Generic
@@ -251,6 +252,49 @@ namespace ServiceStack.Redis.Generic
             {
                 MultiObjectReturnCommand = command,
                 OnSuccessMultiTypeCallback = x => onSuccessCallback(x.ConvertAll(y => JsonSerializer.DeserializeFromString<T>(y))),
+                OnErrorCallback = onErrorCallback
+            });
+            command(RedisClient);
+        }
+
+
+        public void QueueCommand(Func<IRedisTypedClient<T>, HashSet<string>> command)
+        {
+            QueueCommand(command, null, null);
+        }
+
+        public void QueueCommand(Func<IRedisTypedClient<T>, HashSet<string>> command, Action<HashSet<string>> onSuccessCallback)
+        {
+            QueueCommand(command, onSuccessCallback, null);
+        }
+
+        public void QueueCommand(Func<IRedisTypedClient<T>, HashSet<string>> command, Action<HashSet<string>> onSuccessCallback, Action<Exception> onErrorCallback)
+        {
+            BeginQueuedCommand(new QueuedRedisTypedCommand<T>
+            {
+                MultiStringReturnCommand = r => command(r).ToList(),
+                OnSuccessMultiStringCallback = list => onSuccessCallback(list.ToHashSet()),
+                OnErrorCallback = onErrorCallback
+            });
+            command(RedisClient);
+        }
+
+        public void QueueCommand(Func<IRedisTypedClient<T>, HashSet<T>> command)
+        {
+            QueueCommand(command, null, null);
+        }
+
+        public void QueueCommand(Func<IRedisTypedClient<T>, HashSet<T>> command, Action<HashSet<T>> onSuccessCallback)
+        {
+            QueueCommand(command, onSuccessCallback, null);
+        }
+
+        public void QueueCommand(Func<IRedisTypedClient<T>, HashSet<T>> command, Action<HashSet<T>> onSuccessCallback, Action<Exception> onErrorCallback)
+        {
+            BeginQueuedCommand(new QueuedRedisTypedCommand<T>
+            {
+                MultiObjectReturnCommand = r => command(r).ToList(),
+                OnSuccessMultiTypeCallback = x => onSuccessCallback(x.ConvertAll(y => JsonSerializer.DeserializeFromString<T>(y)).ToHashSet()),
                 OnErrorCallback = onErrorCallback
             });
             command(RedisClient);
