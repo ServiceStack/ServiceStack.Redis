@@ -217,6 +217,11 @@ namespace ServiceStack.Redis
             return sb.ToString();
         }
 
+        public bool HasConnected
+        {
+            get { return socket != null; }
+        }
+
         public bool IsSocketConnected()
         {
             var part1 = socket.Poll(1000, SelectMode.SelectRead);

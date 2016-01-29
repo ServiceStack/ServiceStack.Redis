@@ -211,7 +211,18 @@ namespace ServiceStack.Redis
             set
             {
                 db = value;
+
+                if (HasConnected)
+                {
+                    ChangeDb(db);
+                }
             }
+        }
+
+        public void ChangeDb(long db)
+        {
+            this.db = db;
+            SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
         }
 
         public long DbSize

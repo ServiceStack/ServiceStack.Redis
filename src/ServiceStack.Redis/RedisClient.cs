@@ -237,12 +237,6 @@ namespace ServiceStack.Redis
                 return base.Set(key, bytesValue, exists: false, expirySeconds: (int)expireIn.TotalSeconds);
         }
 
-        public void ChangeDb(long db)
-        {
-            Db = db;
-            SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
-        }
-
         [Obsolete("Use GetClientsInfo")]
         public List<Dictionary<string, string>> GetClientList()
         {
