@@ -25,6 +25,7 @@ namespace ServiceStack.Redis.Tests
             using (var client = redisManager.GetClient())
             {
                 client.Db = 2;
+                //((RedisClient)client).ChangeDb(2);
                 var db = client.Get<int>("db");
                 Assert.That(db, Is.EqualTo(2));
             }
