@@ -73,6 +73,14 @@
             raw Select expression: "Select SomeField1, SomeField2 from SomeTable"
             </param>
         </member>
+        <member name="M:ServiceStack.OrmLite.SqlExpression`1.Select(System.String[])">
+            <summary>
+            Set the specified selectExpression using matching fields.
+            </summary>
+            <param name='fields'>
+            Matching Fields: "SomeField1, SomeField2"
+            </param>
+        </member>
         <member name="M:ServiceStack.OrmLite.SqlExpression`1.Select``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
             Fields to be selected.
@@ -299,7 +307,7 @@
             <para>db.Select&lt;Person&gt;(x =&gt; x.Age &gt; 40)</para>
             </summary>
         </member>
-        <member name="M:ServiceStack.OrmLite.OrmLiteReadExpressionsApi.Single``1(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression,System.Object)">
+        <member name="M:ServiceStack.OrmLite.OrmLiteReadExpressionsApi.Single``1(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression)">
             <summary>
             Returns results from using an SqlExpression lambda. E.g:
             <para>db.Single(db.From&lt;Person&gt;().Where(x =&gt; x.Age &gt; 40))</para>
@@ -661,6 +669,12 @@
             <summary>
             Returns a lazyily loaded stream of results using a parameterized query. E.g:
             <para>db.SelectLazy&lt;Person&gt;("Age &gt; @age", new { age = 40 })</para>
+            </summary>
+        </member>
+        <member name="M:ServiceStack.OrmLite.OrmLiteReadApi.SelectLazy``1(System.Data.IDbConnection,ServiceStack.OrmLite.SqlExpression{``0})">
+            <summary>
+            Returns a lazyily loaded stream of results using a parameterized query. E.g:
+            <para>db.SelectLazy(db.From&lt;Person&gt;().Where(x =&gt; x == 40))</para>
             </summary>
         </member>
         <member name="M:ServiceStack.OrmLite.OrmLiteReadApi.SelectLazyFmt``1(System.Data.IDbConnection,System.String,System.Object[])">

@@ -24,6 +24,16 @@
             Icon for this ServiceStack Instance (shown in Home Services list)
             </summary>
         </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.Formats">
+            <summary>
+            The different Content Type formats to display
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.MaxLimit">
+            <summary>
+            The configured MaxLimit
+            </summary>
+        </member>
         <member name="P:ServiceStack.AutoQueryViewerConfig.IsPublic">
             <summary>
             Whether to publish this Service to the public Services registry
@@ -87,6 +97,16 @@
         <member name="P:ServiceStack.AutoQueryViewerConfig.IconUrl">
             <summary>
             The default icon for each of your AutoQuery Services
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerUserInfo.IsAuthenticated">
+            <summary>
+            Returns true if the User Is Authenticated
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerUserInfo.QueryCount">
+            <summary>
+            How many queries are available to this user
             </summary>
         </member>
         <member name="T:ServiceStack.Messaging.Redis.RedisMqServer">

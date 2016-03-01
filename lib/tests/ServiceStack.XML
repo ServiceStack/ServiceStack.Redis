@@ -1676,6 +1676,176 @@
             <param name="context">The validator context</param>
             <returns>Returns an error validation result.</returns>
         </member>
+        <member name="M:ServiceStack.Host.Handlers.RedirectHttpHandler.ProcessRequest(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.String)">
+            <summary>
+            Non ASP.NET requests
+            </summary>
+            <param name="request"></param>
+            <param name="response"></param>
+            <param name="operationName"></param>
+        </member>
+        <member name="M:ServiceStack.Host.Handlers.RedirectHttpHandler.ProcessRequest(System.Web.HttpContextBase)">
+            <summary>
+            ASP.NET requests
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:ServiceStack.Host.Handlers.IndexPageHttpHandler.ProcessRequest(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.String)">
+            <summary>
+            Non ASP.NET requests
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.Handlers.IndexPageHttpHandler.ProcessRequest(System.Web.HttpContextBase)">
+            <summary>
+            ASP.NET requests
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.Handlers.StaticFileHandler.SetDefaultFile(System.String,System.Byte[],System.DateTime)">
+            <summary>
+            Keep default file contents in-memory
+            </summary>
+            <param name="defaultFilePath"></param>
+        </member>
+        <member name="M:ServiceStack.Host.ContainerResolveCache.CreateInstance(System.Type)">
+            <summary>
+            Creates instance using straight Resolve approach.
+            This will throw an exception if resolution fails
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.ContainerResolveCache.CreateInstance(System.Type,System.Boolean)">
+            <summary>
+            Creates instance using the TryResolve approach if tryResolve = true.
+            Otherwise uses Resolve approach, which will throw an exception if resolution fails
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.Cookies.AddPermanentCookie(System.String,System.String,System.Nullable{System.Boolean})">
+            <summary>
+            Sets a persistent cookie which never expires
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.Cookies.AddSessionCookie(System.String,System.String,System.Nullable{System.Boolean})">
+            <summary>
+            Sets a session cookie which expires after the browser session closes
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.Cookies.DeleteCookie(System.String)">
+            <summary>
+            Deletes a specified cookie by setting its value to empty and expiration to -1 days
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Host.ActionContext">
+            <summary>
+            Context to capture IService action
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Host.RestPath.PathComponentsCount">
+            <summary>
+            The number of segments separated by '/' determinable by path.Split('/').Length
+            e.g. /path/to/here.ext == 3
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Host.RestPath.TotalComponentsCount">
+            <summary>
+            The total number of segments after subparts have been exploded ('.') 
+            e.g. /path/to/here.ext == 4
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Host.RestPath.FirstMatchHashKey">
+            <summary>
+            Provide for quick lookups based on hashes that can be determined from a request url
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.RestPath.IsMatch(System.String,System.String[])">
+            <summary>
+            For performance withPathInfoParts should already be a lower case string
+            to minimize redundant matching operations.
+            </summary>
+            <param name="httpMethod"></param>
+            <param name="withPathInfoParts"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Host.RestPath.IsMatch(System.String,System.String[],System.Int32@)">
+            <summary>
+            For performance withPathInfoParts should already be a lower case string
+            to minimize redundant matching operations.
+            </summary>
+            <param name="httpMethod"></param>
+            <param name="withPathInfoParts"></param>
+            <param name="wildcardMatchCount"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Host.ServiceController.ExecuteMessage(ServiceStack.Messaging.IMessage)">
+            <summary>
+            Execute MQ
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.ServiceController.ExecuteMessage(ServiceStack.Messaging.IMessage,ServiceStack.Web.IRequest)">
+            <summary>
+            Execute MQ with requestContext
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.ServiceController.Execute(System.Object)">
+            <summary>
+            Execute using empty RequestContext
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.ServiceController.Execute(System.Object,ServiceStack.Web.IRequest)">
+            <summary>
+            Execute HTTP
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.XsdMetadata.GetBaseTypeWithTheSameName(System.Type)">
+            <summary>
+            Gets the name of the base most type in the heirachy tree with the same.
+            
+            We get an exception when trying to create a schema with multiple types of the same name
+            like when inheriting from a DataContract with the same name.
+            </summary>
+            <param name="type">The type.</param>
+            <returns></returns>
+        </member>
+        <member name="T:ServiceStack.Host.HttpListener.HttpListenerBase">
+            <summary>
+            Wrapper class for the HTTPListener to allow easier access to the
+            server, for start and stop management and event routing of the actual
+            inbound requests.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.HttpListener.HttpListenerBase.Start(System.String,System.Threading.WaitCallback)">
+            <summary>
+            Starts the Web Service
+            </summary>
+            <param name="urlBase">
+            A Uri that acts as the base that the server is listening on.
+            Format should be: http://127.0.0.1:8080/ or http://127.0.0.1:8080/somevirtual/
+            Note: the trailing slash is required! For more info see the
+            HttpListener.Prefixes property on MSDN.
+            </param>
+        </member>
+        <member name="M:ServiceStack.Host.HttpListener.HttpListenerBase.Stop">
+            <summary>
+            Shut down the Web Service
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.HttpListener.HttpListenerBase.ProcessRequestAsync(System.Net.HttpListenerContext)">
+            <summary>
+            Overridable method that can be used to implement a custom hnandler
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:ServiceStack.Host.HttpListener.HttpListenerBase.AddUrlReservationToAcl(System.String)">
+            <summary>
+            Reserves the specified URL for non-administrator users and accounts. 
+            http://msdn.microsoft.com/en-us/library/windows/desktop/cc307223(v=vs.85).aspx
+            </summary>
+            <returns>Reserved Url if the process completes successfully</returns>
+        </member>
+        <member name="M:ServiceStack.Host.RestHandler.CreateRequest(ServiceStack.Web.IRequest,System.String)">
+            <summary>
+            Used in Unit tests
+            </summary>
+            <returns></returns>
+        </member>
         <member name="F:ServiceStack.Configuration.Config.DefaultNamespace">
             <summary>
             Would've preferred to use [assembly: ContractNamespace] attribute but it is not supported in Mono
@@ -2463,176 +2633,6 @@
             <summary>
             Don't redirect if the request was a forwarded request, e.g. from a Load Balancer
             </summary>
-        </member>
-        <member name="M:ServiceStack.Host.Handlers.RedirectHttpHandler.ProcessRequest(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.String)">
-            <summary>
-            Non ASP.NET requests
-            </summary>
-            <param name="request"></param>
-            <param name="response"></param>
-            <param name="operationName"></param>
-        </member>
-        <member name="M:ServiceStack.Host.Handlers.RedirectHttpHandler.ProcessRequest(System.Web.HttpContextBase)">
-            <summary>
-            ASP.NET requests
-            </summary>
-            <param name="context"></param>
-        </member>
-        <member name="M:ServiceStack.Host.Handlers.IndexPageHttpHandler.ProcessRequest(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.String)">
-            <summary>
-            Non ASP.NET requests
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.Handlers.IndexPageHttpHandler.ProcessRequest(System.Web.HttpContextBase)">
-            <summary>
-            ASP.NET requests
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.Handlers.StaticFileHandler.SetDefaultFile(System.String,System.Byte[],System.DateTime)">
-            <summary>
-            Keep default file contents in-memory
-            </summary>
-            <param name="defaultFilePath"></param>
-        </member>
-        <member name="M:ServiceStack.Host.ContainerResolveCache.CreateInstance(System.Type)">
-            <summary>
-            Creates instance using straight Resolve approach.
-            This will throw an exception if resolution fails
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.ContainerResolveCache.CreateInstance(System.Type,System.Boolean)">
-            <summary>
-            Creates instance using the TryResolve approach if tryResolve = true.
-            Otherwise uses Resolve approach, which will throw an exception if resolution fails
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.Cookies.AddPermanentCookie(System.String,System.String,System.Nullable{System.Boolean})">
-            <summary>
-            Sets a persistent cookie which never expires
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.Cookies.AddSessionCookie(System.String,System.String,System.Nullable{System.Boolean})">
-            <summary>
-            Sets a session cookie which expires after the browser session closes
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.Cookies.DeleteCookie(System.String)">
-            <summary>
-            Deletes a specified cookie by setting its value to empty and expiration to -1 days
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Host.ActionContext">
-            <summary>
-            Context to capture IService action
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Host.RestPath.PathComponentsCount">
-            <summary>
-            The number of segments separated by '/' determinable by path.Split('/').Length
-            e.g. /path/to/here.ext == 3
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Host.RestPath.TotalComponentsCount">
-            <summary>
-            The total number of segments after subparts have been exploded ('.') 
-            e.g. /path/to/here.ext == 4
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Host.RestPath.FirstMatchHashKey">
-            <summary>
-            Provide for quick lookups based on hashes that can be determined from a request url
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.RestPath.IsMatch(System.String,System.String[])">
-            <summary>
-            For performance withPathInfoParts should already be a lower case string
-            to minimize redundant matching operations.
-            </summary>
-            <param name="httpMethod"></param>
-            <param name="withPathInfoParts"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ServiceStack.Host.RestPath.IsMatch(System.String,System.String[],System.Int32@)">
-            <summary>
-            For performance withPathInfoParts should already be a lower case string
-            to minimize redundant matching operations.
-            </summary>
-            <param name="httpMethod"></param>
-            <param name="withPathInfoParts"></param>
-            <param name="wildcardMatchCount"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ServiceStack.Host.ServiceController.ExecuteMessage(ServiceStack.Messaging.IMessage)">
-            <summary>
-            Execute MQ
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.ServiceController.ExecuteMessage(ServiceStack.Messaging.IMessage,ServiceStack.Web.IRequest)">
-            <summary>
-            Execute MQ with requestContext
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.ServiceController.Execute(System.Object)">
-            <summary>
-            Execute using empty RequestContext
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.ServiceController.Execute(System.Object,ServiceStack.Web.IRequest)">
-            <summary>
-            Execute HTTP
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.XsdMetadata.GetBaseTypeWithTheSameName(System.Type)">
-            <summary>
-            Gets the name of the base most type in the heirachy tree with the same.
-            
-            We get an exception when trying to create a schema with multiple types of the same name
-            like when inheriting from a DataContract with the same name.
-            </summary>
-            <param name="type">The type.</param>
-            <returns></returns>
-        </member>
-        <member name="T:ServiceStack.Host.HttpListener.HttpListenerBase">
-            <summary>
-            Wrapper class for the HTTPListener to allow easier access to the
-            server, for start and stop management and event routing of the actual
-            inbound requests.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.HttpListener.HttpListenerBase.Start(System.String,System.Threading.WaitCallback)">
-            <summary>
-            Starts the Web Service
-            </summary>
-            <param name="urlBase">
-            A Uri that acts as the base that the server is listening on.
-            Format should be: http://127.0.0.1:8080/ or http://127.0.0.1:8080/somevirtual/
-            Note: the trailing slash is required! For more info see the
-            HttpListener.Prefixes property on MSDN.
-            </param>
-        </member>
-        <member name="M:ServiceStack.Host.HttpListener.HttpListenerBase.Stop">
-            <summary>
-            Shut down the Web Service
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.HttpListener.HttpListenerBase.ProcessRequestAsync(System.Net.HttpListenerContext)">
-            <summary>
-            Overridable method that can be used to implement a custom hnandler
-            </summary>
-            <param name="context"></param>
-        </member>
-        <member name="M:ServiceStack.Host.HttpListener.HttpListenerBase.AddUrlReservationToAcl(System.String)">
-            <summary>
-            Reserves the specified URL for non-administrator users and accounts. 
-            http://msdn.microsoft.com/en-us/library/windows/desktop/cc307223(v=vs.85).aspx
-            </summary>
-            <returns>Reserved Url if the process completes successfully</returns>
-        </member>
-        <member name="M:ServiceStack.Host.RestHandler.CreateRequest(ServiceStack.Web.IRequest,System.String)">
-            <summary>
-            Used in Unit tests
-            </summary>
-            <returns></returns>
         </member>
         <member name="T:ServiceStack.Messaging.IMessageHandlerFactory">
             <summary>
@@ -4968,6 +4968,16 @@
                                                     path/
                                                     info
                      * 
+        </member>
+        <member name="M:ServiceStack.HttpRequestExtensions.GetRequestParams(ServiceStack.Web.IRequest)">
+            <summary>
+            Duplicate Params are given a unique key by appending a #1 suffix
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpRequestExtensions.GetFlattenedRequestParams(ServiceStack.Web.IRequest)">
+            <summary>
+            Duplicate params have their values joined together in a comma-delimited string
+            </summary>
         </member>
         <member name="M:ServiceStack.HttpRequestExtensions.ResolveItem(ServiceStack.Web.IRequest,System.String,System.Func{ServiceStack.Web.IRequest,System.Object})">
             <summary>
