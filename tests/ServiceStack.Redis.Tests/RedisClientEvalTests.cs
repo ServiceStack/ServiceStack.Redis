@@ -183,7 +183,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_return_DaysOfWeek_as_list()
         {
-            Enum.GetNames(typeof (DayOfWeek)).ToList()
+            Enum.GetNames(typeof(DayOfWeek)).ToList()
                 .ForEach(x => Redis.AddItemToList("DaysOfWeek", x));
             Redis.ExecLuaAsList("return redis.call('LRANGE', 'DaysOfWeek', 0, -1)").PrintDump();
         }

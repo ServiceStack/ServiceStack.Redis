@@ -7,71 +7,71 @@ using ServiceStack.Common;
 namespace ServiceStack.Redis.Tests.Examples
 {
     [TestFixture, Explicit, Category("Integration")]
-	public class SimplePubSub
-	{
+    public class SimplePubSub
+    {
         const string ChannelName = "SimplePubSubCHANNEL";
-		const string MessagePrefix = "MESSAGE ";
-		const int PublishMessageCount = 5;
+        const string MessagePrefix = "MESSAGE ";
+        const int PublishMessageCount = 5;
 
-		[TestFixtureSetUp]
-		public void TestFixtureSetUp()
-		{
-			using (var redis = new RedisClient(TestConfig.SingleHost))
-			{
-				redis.FlushAll();
-			}
-		}
+        [TestFixtureSetUp]
+        public void TestFixtureSetUp()
+        {
+            using (var redis = new RedisClient(TestConfig.SingleHost))
+            {
+                redis.FlushAll();
+            }
+        }
 
-		[Test]
-		public void Publish_and_receive_5_messages()
-		{
-			var messagesReceived = 0;
-			
-			using (var redisConsumer = new RedisClient(TestConfig.SingleHost))
-			using (var subscription = redisConsumer.CreateSubscription())
-			{
-				subscription.OnSubscribe = channel =>
-				{
-					Debug.WriteLine(String.Format("Subscribed to '{0}'", channel));
-				};
-				subscription.OnUnSubscribe = channel =>
-				{
-					Debug.WriteLine(String.Format("UnSubscribed from '{0}'", channel));
-				};
-				subscription.OnMessage = (channel, msg) =>
-				{
-					Debug.WriteLine(String.Format("Received '{0}' from channel '{1}'", msg, channel));
+        [Test]
+        public void Publish_and_receive_5_messages()
+        {
+            var messagesReceived = 0;
 
-					//As soon as we've received all 5 messages, disconnect by unsubscribing to all channels
-					if (++messagesReceived == PublishMessageCount)
-					{
-						subscription.UnSubscribeFromAllChannels();
-					}
-				};
+            using (var redisConsumer = new RedisClient(TestConfig.SingleHost))
+            using (var subscription = redisConsumer.CreateSubscription())
+            {
+                subscription.OnSubscribe = channel =>
+                {
+                    Debug.WriteLine(String.Format("Subscribed to '{0}'", channel));
+                };
+                subscription.OnUnSubscribe = channel =>
+                {
+                    Debug.WriteLine(String.Format("UnSubscribed from '{0}'", channel));
+                };
+                subscription.OnMessage = (channel, msg) =>
+                {
+                    Debug.WriteLine(String.Format("Received '{0}' from channel '{1}'", msg, channel));
 
-				ThreadPool.QueueUserWorkItem(x =>
-				{
-					Thread.Sleep(200);
-					Debug.WriteLine("Begin publishing messages...");
+                    //As soon as we've received all 5 messages, disconnect by unsubscribing to all channels
+                    if (++messagesReceived == PublishMessageCount)
+                    {
+                        subscription.UnSubscribeFromAllChannels();
+                    }
+                };
 
-					using (var redisPublisher = new RedisClient(TestConfig.SingleHost))
-					{
-						for (var i = 1; i <= PublishMessageCount; i++)
-						{
-							var message = MessagePrefix + i;
-							Debug.WriteLine(String.Format("Publishing '{0}' to '{1}'", message, ChannelName));
-							redisPublisher.PublishMessage(ChannelName, message);
-						}
-					}
-				});
+                ThreadPool.QueueUserWorkItem(x =>
+                {
+                    Thread.Sleep(200);
+                    Debug.WriteLine("Begin publishing messages...");
 
-				Debug.WriteLine(String.Format("Started Listening On '{0}'", ChannelName));
-				subscription.SubscribeToChannels(ChannelName); //blocking
-			}
+                    using (var redisPublisher = new RedisClient(TestConfig.SingleHost))
+                    {
+                        for (var i = 1; i <= PublishMessageCount; i++)
+                        {
+                            var message = MessagePrefix + i;
+                            Debug.WriteLine(String.Format("Publishing '{0}' to '{1}'", message, ChannelName));
+                            redisPublisher.PublishMessage(ChannelName, message);
+                        }
+                    }
+                });
 
-			Debug.WriteLine("EOF");
+                Debug.WriteLine(String.Format("Started Listening On '{0}'", ChannelName));
+                subscription.SubscribeToChannels(ChannelName); //blocking
+            }
 
-			/*Output: 
+            Debug.WriteLine("EOF");
+
+            /*Output: 
 			Started Listening On 'CHANNEL'
 			Subscribed to 'CHANNEL'
 			Begin publishing messages...
@@ -88,65 +88,65 @@ namespace ServiceStack.Redis.Tests.Examples
 			UnSubscribed from 'CHANNEL'
 			EOF
 			 */
-		}
+        }
 
-		[Test]
-		public void Publish_5_messages_to_3_clients()
-		{
-			const int noOfClients = 3;
+        [Test]
+        public void Publish_5_messages_to_3_clients()
+        {
+            const int noOfClients = 3;
 
-			for (var i = 1; i <= noOfClients; i++)
-			{
-				var clientNo = i;
-				ThreadPool.QueueUserWorkItem(x =>
-				{
-					using (var redisConsumer = new RedisClient(TestConfig.SingleHost))
-					using (var subscription = redisConsumer.CreateSubscription())
-					{
-						var messagesReceived = 0;
-						subscription.OnSubscribe = channel =>
-						{
-							Debug.WriteLine(String.Format("Client #{0} Subscribed to '{1}'", clientNo, channel));
-						};
-						subscription.OnUnSubscribe = channel =>
-						{
-							Debug.WriteLine(String.Format("Client #{0} UnSubscribed from '{1}'", clientNo, channel));
-						};
-						subscription.OnMessage = (channel, msg) =>
-						{
-							Debug.WriteLine(String.Format("Client #{0} Received '{1}' from channel '{2}'", 
-								clientNo, msg, channel));
+            for (var i = 1; i <= noOfClients; i++)
+            {
+                var clientNo = i;
+                ThreadPool.QueueUserWorkItem(x =>
+                {
+                    using (var redisConsumer = new RedisClient(TestConfig.SingleHost))
+                    using (var subscription = redisConsumer.CreateSubscription())
+                    {
+                        var messagesReceived = 0;
+                        subscription.OnSubscribe = channel =>
+                        {
+                            Debug.WriteLine(String.Format("Client #{0} Subscribed to '{1}'", clientNo, channel));
+                        };
+                        subscription.OnUnSubscribe = channel =>
+                        {
+                            Debug.WriteLine(String.Format("Client #{0} UnSubscribed from '{1}'", clientNo, channel));
+                        };
+                        subscription.OnMessage = (channel, msg) =>
+                        {
+                            Debug.WriteLine(String.Format("Client #{0} Received '{1}' from channel '{2}'",
+                                clientNo, msg, channel));
 
-							if (++messagesReceived == PublishMessageCount)
-							{
-								subscription.UnSubscribeFromAllChannels();
-							}
-						};
+                            if (++messagesReceived == PublishMessageCount)
+                            {
+                                subscription.UnSubscribeFromAllChannels();
+                            }
+                        };
 
-						Debug.WriteLine(String.Format("Client #{0} started Listening On '{1}'", clientNo, ChannelName));
-						subscription.SubscribeToChannels(ChannelName); //blocking
-					}
+                        Debug.WriteLine(String.Format("Client #{0} started Listening On '{1}'", clientNo, ChannelName));
+                        subscription.SubscribeToChannels(ChannelName); //blocking
+                    }
 
-					Debug.WriteLine(String.Format("Client #{0} EOF", clientNo));
-				});
-			}
+                    Debug.WriteLine(String.Format("Client #{0} EOF", clientNo));
+                });
+            }
 
-			using (var redisClient = new RedisClient(TestConfig.SingleHost))
-			{
-				Thread.Sleep(500);
-				Debug.WriteLine("Begin publishing messages...");
+            using (var redisClient = new RedisClient(TestConfig.SingleHost))
+            {
+                Thread.Sleep(500);
+                Debug.WriteLine("Begin publishing messages...");
 
-				for (var i = 1; i <= PublishMessageCount; i++)
-				{
-					var message = MessagePrefix + i;
-					Debug.WriteLine(String.Format("Publishing '{0}' to '{1}'", message, ChannelName));
-					redisClient.PublishMessage(ChannelName, message);
-				}
-			}
+                for (var i = 1; i <= PublishMessageCount; i++)
+                {
+                    var message = MessagePrefix + i;
+                    Debug.WriteLine(String.Format("Publishing '{0}' to '{1}'", message, ChannelName));
+                    redisClient.PublishMessage(ChannelName, message);
+                }
+            }
 
-			Thread.Sleep(500);
+            Thread.Sleep(500);
 
-			/*Output:
+            /*Output:
 			Client #1 started Listening On 'CHANNEL'
 			Client #2 started Listening On 'CHANNEL'
 			Client #1 Subscribed to 'CHANNEL'
@@ -181,6 +181,6 @@ namespace ServiceStack.Redis.Tests.Examples
 			Client #2 UnSubscribed from 'CHANNEL'
 			Client #2 EOF
 			 */
-		}
-	}
+        }
+    }
 }

@@ -102,57 +102,57 @@ namespace ServiceStack.Redis.Tests.Examples
             };
 
             var blogPosts = new List<BlogPost>
-			{
-				new BlogPost
-				{
-					Id = redisBlogPosts.GetNextSequence(),
-					BlogId = ayendeBlog.Id,
-					Title = "RavenDB",
-					Categories = new List<string> { "NoSQL", "DocumentDB" },
-					Tags = new List<string> {"Raven", "NoSQL", "JSON", ".NET"} ,
-					Comments = new List<BlogPostComment>
-					{
-						new BlogPostComment { Content = "First Comment!", CreatedDate = DateTime.UtcNow,},
-						new BlogPostComment { Content = "Second Comment!", CreatedDate = DateTime.UtcNow,},
-					}
-				},
-				new BlogPost
-				{
-					Id = redisBlogPosts.GetNextSequence(),
-					BlogId = mythzBlog.Id,
-					Title = "Redis",
-					Categories = new List<string> { "NoSQL", "Cache" },
-					Tags = new List<string> {"Redis", "NoSQL", "Scalability", "Performance"},
-					Comments = new List<BlogPostComment>
-					{
-						new BlogPostComment { Content = "First Comment!", CreatedDate = DateTime.UtcNow,}
-					}
-				},
-				new BlogPost
-				{
-					Id = redisBlogPosts.GetNextSequence(),
-					BlogId = ayendeBlog.Id,
-					Title = "Cassandra",
-					Categories = new List<string> { "NoSQL", "Cluster" },
-					Tags = new List<string> {"Cassandra", "NoSQL", "Scalability", "Hashing"},
-					Comments = new List<BlogPostComment>
-					{
-						new BlogPostComment { Content = "First Comment!", CreatedDate = DateTime.UtcNow,}
-					}
-				},
-				new BlogPost
-				{
-					Id = redisBlogPosts.GetNextSequence(),
-					BlogId = mythzBlog.Id,
-					Title = "Couch Db",
-					Categories = new List<string> { "NoSQL", "DocumentDB" },
-					Tags = new List<string> {"CouchDb", "NoSQL", "JSON"},
-					Comments = new List<BlogPostComment>
-					{
-						new BlogPostComment {Content = "First Comment!", CreatedDate = DateTime.UtcNow,}
-					}
-				},
-			};
+            {
+                new BlogPost
+                {
+                    Id = redisBlogPosts.GetNextSequence(),
+                    BlogId = ayendeBlog.Id,
+                    Title = "RavenDB",
+                    Categories = new List<string> { "NoSQL", "DocumentDB" },
+                    Tags = new List<string> {"Raven", "NoSQL", "JSON", ".NET"} ,
+                    Comments = new List<BlogPostComment>
+                    {
+                        new BlogPostComment { Content = "First Comment!", CreatedDate = DateTime.UtcNow,},
+                        new BlogPostComment { Content = "Second Comment!", CreatedDate = DateTime.UtcNow,},
+                    }
+                },
+                new BlogPost
+                {
+                    Id = redisBlogPosts.GetNextSequence(),
+                    BlogId = mythzBlog.Id,
+                    Title = "Redis",
+                    Categories = new List<string> { "NoSQL", "Cache" },
+                    Tags = new List<string> {"Redis", "NoSQL", "Scalability", "Performance"},
+                    Comments = new List<BlogPostComment>
+                    {
+                        new BlogPostComment { Content = "First Comment!", CreatedDate = DateTime.UtcNow,}
+                    }
+                },
+                new BlogPost
+                {
+                    Id = redisBlogPosts.GetNextSequence(),
+                    BlogId = ayendeBlog.Id,
+                    Title = "Cassandra",
+                    Categories = new List<string> { "NoSQL", "Cluster" },
+                    Tags = new List<string> {"Cassandra", "NoSQL", "Scalability", "Hashing"},
+                    Comments = new List<BlogPostComment>
+                    {
+                        new BlogPostComment { Content = "First Comment!", CreatedDate = DateTime.UtcNow,}
+                    }
+                },
+                new BlogPost
+                {
+                    Id = redisBlogPosts.GetNextSequence(),
+                    BlogId = mythzBlog.Id,
+                    Title = "Couch Db",
+                    Categories = new List<string> { "NoSQL", "DocumentDB" },
+                    Tags = new List<string> {"CouchDb", "NoSQL", "JSON"},
+                    Comments = new List<BlogPostComment>
+                    {
+                        new BlogPostComment {Content = "First Comment!", CreatedDate = DateTime.UtcNow,}
+                    }
+                },
+            };
 
             ayende.BlogIds.Add(ayendeBlog.Id);
             ayendeBlog.BlogPostIds.AddRange(blogPosts.Where(x => x.BlogId == ayendeBlog.Id).Map(x => x.Id));
@@ -173,43 +173,43 @@ namespace ServiceStack.Redis.Tests.Examples
             var blogs = redisBlogs.GetAll();
             blogs.PrintDump();
         }
-            /* Output: 
-            [
-                {
-                    Id: 1,
-                    UserId: 1,
-                    UserName: Ayende,
-                    Tags: 
-                    [
-                        Architecture,
-                        .NET,
-                        Databases
-                    ],
-                    BlogPostIds: 
-                    [
-                        1,
-                        3
-                    ]
-                },
-                {
-                    Id: 2,
-                    UserId: 2,
-                    UserName: Demis,
-                    Tags: 
-                    [
-                        Architecture,
-                        .NET,
-                        Databases
-                    ],
-                    BlogPostIds: 
-                    [
-                        2,
-                        4
-                    ]
-                }
-            ]
-             */
-        
+        /* Output: 
+        [
+            {
+                Id: 1,
+                UserId: 1,
+                UserName: Ayende,
+                Tags: 
+                [
+                    Architecture,
+                    .NET,
+                    Databases
+                ],
+                BlogPostIds: 
+                [
+                    1,
+                    3
+                ]
+            },
+            {
+                Id: 2,
+                UserId: 2,
+                UserName: Demis,
+                Tags: 
+                [
+                    Architecture,
+                    .NET,
+                    Databases
+                ],
+                BlogPostIds: 
+                [
+                    2,
+                    4
+                ]
+            }
+        ]
+         */
+
         [Test]
         public void Show_a_list_of_recent_posts_and_comments()
         {

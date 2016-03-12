@@ -129,7 +129,7 @@ namespace ServiceStack.Redis.Tests
                 sslStream = new SslStream(networkStream,
                     leaveInnerStreamOpen: false,
                     userCertificateValidationCallback: RedisConfig.CertificateValidationCallback,
-                    userCertificateSelectionCallback: RedisConfig.CertificateSelectionCallback); 
+                    userCertificateSelectionCallback: RedisConfig.CertificateSelectionCallback);
             }
             else
             {
@@ -139,7 +139,7 @@ namespace ServiceStack.Redis.Tests
                 var policyType = AssemblyUtils.FindType("System.Net.Security.EncryptionPolicy");
                 var policyValue = Enum.Parse(policyType, "RequireEncryption");
 
-                sslStream = (SslStream)ctor.Invoke(new [] {
+                sslStream = (SslStream)ctor.Invoke(new[] {
                         networkStream,
                         false,
                         RedisConfig.CertificateValidationCallback,

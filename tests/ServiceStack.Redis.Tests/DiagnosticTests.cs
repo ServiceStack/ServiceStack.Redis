@@ -41,17 +41,17 @@ namespace ServiceStack.Redis.Tests
                 Count.Times(x =>
                 {
                     var sw = Stopwatch.StartNew();
-                    
+
                     redisClient.Set(key, bytes);
                     bytesSent += bytes.Length;
                     "SEND {0} bytes in {1}ms".Print(bytes.Length, sw.ElapsedMilliseconds);
-                    
+
                     sw.Reset();
                     sw.Start();
                     var receivedBytes = redisClient.Get(key);
                     bytesRecv += receivedBytes.Length;
                     "RECV {0} bytes in {1}ms".Print(receivedBytes.Length, sw.ElapsedMilliseconds);
-                    
+
                     "TOTAL {0} bytes SENT {0} RECV {1} in {2}ms\n".Print(
                         bytesSent, bytesRecv, swTotal.ElapsedMilliseconds);
                 });

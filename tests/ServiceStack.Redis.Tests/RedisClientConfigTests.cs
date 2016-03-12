@@ -75,7 +75,7 @@ namespace ServiceStack.Redis.Tests
             Redis.KillClients(ofType: RedisClientType.PubSub);
             Redis.KillClients(ofType: RedisClientType.Slave);
             Redis.KillClients(skipMe: true);
-            Redis.KillClients(fromAddress: "192.168.0.1:6379", withId: "1", ofType:RedisClientType.Normal);
+            Redis.KillClients(fromAddress: "192.168.0.1:6379", withId: "1", ofType: RedisClientType.Normal);
             Redis.KillClients(skipMe: false);
         }
 

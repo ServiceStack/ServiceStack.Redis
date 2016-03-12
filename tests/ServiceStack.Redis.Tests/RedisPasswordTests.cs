@@ -11,7 +11,7 @@ namespace ServiceStack.Redis.Tests
         public void Can_connect_to_Slaves_and_Masters_with_Password()
         {
             var factory = new PooledRedisClientManager(
-                readWriteHosts: new[] { "pass@10.0.0.59:6379" }, 
+                readWriteHosts: new[] { "pass@10.0.0.59:6379" },
                 readOnlyHosts: new[] { "pass@10.0.0.59:6380" });
 
             using (var readWrite = factory.GetClient())

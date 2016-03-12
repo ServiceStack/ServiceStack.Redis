@@ -24,7 +24,7 @@ namespace ServiceStack.Redis.Tests.Examples
             AddHashes();
         }
 
-        private void  AddLists()
+        private void AddLists()
         {
             var storeMembers = new List<string> { "one", "two", "three", "four" };
             storeMembers.ForEach(x => Redis.AddItemToList("testlist", x));

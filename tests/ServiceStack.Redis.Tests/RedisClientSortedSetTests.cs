@@ -34,8 +34,8 @@ namespace ServiceStack.Redis.Tests
             storeMembers = new List<string> { "one", "two", "three", "four" };
 
             stringDoubleMap = new Dictionary<string, double> {
-     			{"one",1}, {"two",2}, {"three",3}, {"four",4}
-     		};
+                 {"one",1}, {"two",2}, {"three",3}, {"four",4}
+             };
         }
 
         [Test]
@@ -401,11 +401,11 @@ namespace ServiceStack.Redis.Tests
             var redisArticles = Redis.As<Article>();
 
             var articles = new[]
-	        {
-	            new Article { Id = 1, Title = "Article 1", ModifiedDate = new DateTime(2015, 01, 02) },
-	            new Article { Id = 2, Title = "Article 2", ModifiedDate = new DateTime(2015, 01, 01) },
-	            new Article { Id = 3, Title = "Article 3", ModifiedDate = new DateTime(2015, 01, 03) },
-	        };
+            {
+                new Article { Id = 1, Title = "Article 1", ModifiedDate = new DateTime(2015, 01, 02) },
+                new Article { Id = 2, Title = "Article 2", ModifiedDate = new DateTime(2015, 01, 01) },
+                new Article { Id = 3, Title = "Article 3", ModifiedDate = new DateTime(2015, 01, 03) },
+            };
 
             redisArticles.StoreAll(articles);
 

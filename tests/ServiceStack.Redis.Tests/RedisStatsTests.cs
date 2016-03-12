@@ -19,7 +19,7 @@ namespace ServiceStack.Redis.Tests
         {
             var reqCount = RedisNativeClient.RequestsPerHour;
 
-            var map = new Dictionary<string,string>();
+            var map = new Dictionary<string, string>();
             10.Times(i => map["key" + i] = "value" + i);
 
             Redis.SetValues(map);

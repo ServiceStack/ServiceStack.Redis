@@ -3,17 +3,17 @@ using ServiceStack.Redis.Support;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
-	public class ObjectSerializerTests
-	{
-		[Test]
-		public void Can_serialize_object_with_default_serializer()
-		{
-		     var ser = new ObjectSerializer();
-		     string test = "test";
-		     var serialized = ser.Serialize(test);
-             Assert.AreEqual(test, ser.Deserialize(serialized));
-		}
+    [TestFixture]
+    public class ObjectSerializerTests
+    {
+        [Test]
+        public void Can_serialize_object_with_default_serializer()
+        {
+            var ser = new ObjectSerializer();
+            string test = "test";
+            var serialized = ser.Serialize(test);
+            Assert.AreEqual(test, ser.Deserialize(serialized));
+        }
         [Test]
         public void Can_serialize_object_with_optimized_serializer()
         {
@@ -26,6 +26,6 @@ namespace ServiceStack.Redis.Tests
             serialized = ser.Serialize(testFloat);
             Assert.AreEqual(testFloat, ser.Deserialize(serialized));
         }
-	}
+    }
 
 }

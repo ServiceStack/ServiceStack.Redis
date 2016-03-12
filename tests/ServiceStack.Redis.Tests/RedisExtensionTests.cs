@@ -12,7 +12,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_Parse_Host()
         {
-            var hosts = new[] {"pass@host.com:6123"};
+            var hosts = new[] { "pass@host.com:6123" };
             var endPoints = hosts.ToRedisEndPoints();
 
             Assert.AreEqual(1, endPoints.Count);
@@ -26,7 +26,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Host_May_Contain_AtChar()
         {
-            var hosts = new[] {"@pa1@ss@localhost:6123"};
+            var hosts = new[] { "@pa1@ss@localhost:6123" };
             var endPoints = hosts.ToRedisEndPoints();
 
             Assert.AreEqual(1, endPoints.Count);

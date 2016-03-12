@@ -9,7 +9,7 @@ namespace ServiceStack.Redis
 {
     [TestFixture]
     public class CustomCommandTests
-        : RedisClientTestsBase 
+        : RedisClientTestsBase
     {
         [Test]
         public void Can_send_custom_commands()

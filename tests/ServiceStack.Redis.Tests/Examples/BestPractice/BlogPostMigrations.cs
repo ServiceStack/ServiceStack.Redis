@@ -10,76 +10,76 @@ using ServiceStack.Text;
 //New schema types used in this example
 namespace ServiceStack.Redis.Tests.Examples.BestPractice.New
 {
-	public class BlogPost
-	{
-		public BlogPost()
-		{
-			this.Labels = new List<string>();
-			this.Tags = new HashSet<string>();
-			this.Comments = new List<Dictionary<string, string>>();
-		}
+    public class BlogPost
+    {
+        public BlogPost()
+        {
+            this.Labels = new List<string>();
+            this.Tags = new HashSet<string>();
+            this.Comments = new List<Dictionary<string, string>>();
+        }
 
-		//Changed int types to both a long and a double type
-		public long Id { get; set; }
-		public double BlogId { get; set; }
+        //Changed int types to both a long and a double type
+        public long Id { get; set; }
+        public double BlogId { get; set; }
 
-		//Added new field
-		public BlogPostType PostType { get; set; }
+        //Added new field
+        public BlogPostType PostType { get; set; }
 
-		public string Title { get; set; }
-		public string Content { get; set; }
+        public string Title { get; set; }
+        public string Content { get; set; }
 
-		//Renamed from 'Categories' to 'Labels'
-		public List<string> Labels { get; set; }
+        //Renamed from 'Categories' to 'Labels'
+        public List<string> Labels { get; set; }
 
-		//Changed from List to a HashSet
-		public HashSet<string> Tags { get; set; }
+        //Changed from List to a HashSet
+        public HashSet<string> Tags { get; set; }
 
-		//Changed from List of strongly-typed 'BlogPostComment' to loosely-typed string map
-		public List<Dictionary<string, string>> Comments { get; set; }
+        //Changed from List of strongly-typed 'BlogPostComment' to loosely-typed string map
+        public List<Dictionary<string, string>> Comments { get; set; }
 
-		//Added pointless calculated field
-		public int? NoOfComments { get; set; }
-	}
+        //Added pointless calculated field
+        public int? NoOfComments { get; set; }
+    }
 
-	public enum BlogPostType
-	{
-		None,
-		Article,
-		Summary,
-	}
+    public enum BlogPostType
+    {
+        None,
+        Article,
+        Summary,
+    }
 }
 
 namespace ServiceStack.Redis.Tests.Examples.BestPractice
 {
     [TestFixture, Explicit, Category("Integration")]
-	public class BlogPostMigrations
-	{
-		readonly RedisClient redisClient = new RedisClient(TestConfig.SingleHost);
+    public class BlogPostMigrations
+    {
+        readonly RedisClient redisClient = new RedisClient(TestConfig.SingleHost);
 
-		[SetUp]
-		public void OnBeforeEachTest()
-		{
-			redisClient.FlushAll();
-		}
+        [SetUp]
+        public void OnBeforeEachTest()
+        {
+            redisClient.FlushAll();
+        }
 
-		[Test]
-		public void Automatically_migrate_to_new_Schema()
-		{
-			var repository = new BlogRepository(redisClient);
+        [Test]
+        public void Automatically_migrate_to_new_Schema()
+        {
+            var repository = new BlogRepository(redisClient);
 
-			//Populate the datastore with the old schema from the 'BlogPostBestPractice'
-			BlogPostBestPractice.InsertTestData(repository);
+            //Populate the datastore with the old schema from the 'BlogPostBestPractice'
+            BlogPostBestPractice.InsertTestData(repository);
 
-			//Create a typed-client based on the new schema
-		    var redisBlogPosts = redisClient.As<New.BlogPost>();
+            //Create a typed-client based on the new schema
+            var redisBlogPosts = redisClient.As<New.BlogPost>();
             //Automatically retrieve blog posts
             IList<New.BlogPost> allBlogPosts = redisBlogPosts.GetAll();
 
             //Print out the data in the list of 'New.BlogPost' populated from old 'BlogPost' type
             //Note: renamed fields are lost 
-		    allBlogPosts.PrintDump();
-		    /*Output:
+            allBlogPosts.PrintDump();
+            /*Output:
             [
                 {
                     Id: 3,
@@ -171,19 +171,19 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
             ]
 
              */
-		}
+        }
 
-		[Test]
-		public void Manually_migrate_to_new_Schema_using_a_custom_tranlation()
-		{
-			var repository = new BlogRepository(redisClient);
+        [Test]
+        public void Manually_migrate_to_new_Schema_using_a_custom_tranlation()
+        {
+            var repository = new BlogRepository(redisClient);
 
-			//Populate the datastore with the old schema from the 'BlogPostBestPractice'
-			BlogPostBestPractice.InsertTestData(repository);
+            //Populate the datastore with the old schema from the 'BlogPostBestPractice'
+            BlogPostBestPractice.InsertTestData(repository);
 
-			//Create a typed-client based on the new schema
-		    var redisBlogPosts = redisClient.As<BlogPost>();
-		    var redisNewBlogPosts = redisClient.As<New.BlogPost>();
+            //Create a typed-client based on the new schema
+            var redisBlogPosts = redisClient.As<BlogPost>();
+            var redisNewBlogPosts = redisClient.As<New.BlogPost>();
             //Automatically retrieve blog posts
             IList<BlogPost> oldBlogPosts = redisBlogPosts.GetAll();
 
@@ -321,6 +321,6 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
             */
         }
 
-	}
+    }
 
 }

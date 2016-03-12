@@ -121,7 +121,7 @@ namespace ServiceStack.Redis.Tests
     [TestFixture, Explicit]
     public class RawBytesSetBenchmark
     {
-        public void Run(string name, int nBlockSizeBytes, Action<int,byte[]> fn)
+        public void Run(string name, int nBlockSizeBytes, Action<int, byte[]> fn)
         {
             Stopwatch sw;
             long ms1, ms2, interval;

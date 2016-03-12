@@ -8,98 +8,98 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Integration
 {
-	[TestFixture]
-	public class MultiThreadedRedisClientIntegrationTests
-		: IntegrationTestBase
-	{
-		private static string testData;
+    [TestFixture]
+    public class MultiThreadedRedisClientIntegrationTests
+        : IntegrationTestBase
+    {
+        private static string testData;
 
-		[TestFixtureSetUp]
-		public void onBeforeTestFixture()
-		{
-		    var results = 100.Times(x => ModelWithFieldsOfDifferentTypes.Create(x));
+        [TestFixtureSetUp]
+        public void onBeforeTestFixture()
+        {
+            var results = 100.Times(x => ModelWithFieldsOfDifferentTypes.Create(x));
 
             testData = TypeSerializer.SerializeToString(results);
-		}
+        }
 
-		[Test]
-		public void Can_support_64_threads_using_the_client_simultaneously()
-		{
-			var before = Stopwatch.GetTimestamp();
+        [Test]
+        public void Can_support_64_threads_using_the_client_simultaneously()
+        {
+            var before = Stopwatch.GetTimestamp();
 
-			const int noOfConcurrentClients = 64; //WaitHandle.WaitAll limit is <= 64
+            const int noOfConcurrentClients = 64; //WaitHandle.WaitAll limit is <= 64
 
-			var clientAsyncResults = new List<IAsyncResult>();
-			using (var redisClient = new RedisClient(TestConfig.SingleHost))
-			{
-				for (var i = 0; i < noOfConcurrentClients; i++)
-				{
-					var clientNo = i;
-					var action = (Action)(() => UseClientAsync(redisClient, clientNo));
-					clientAsyncResults.Add(action.BeginInvoke(null, null));
-				}
-			}
+            var clientAsyncResults = new List<IAsyncResult>();
+            using (var redisClient = new RedisClient(TestConfig.SingleHost))
+            {
+                for (var i = 0; i < noOfConcurrentClients; i++)
+                {
+                    var clientNo = i;
+                    var action = (Action)(() => UseClientAsync(redisClient, clientNo));
+                    clientAsyncResults.Add(action.BeginInvoke(null, null));
+                }
+            }
 
-			WaitHandle.WaitAll(clientAsyncResults.ConvertAll(x => x.AsyncWaitHandle).ToArray());
+            WaitHandle.WaitAll(clientAsyncResults.ConvertAll(x => x.AsyncWaitHandle).ToArray());
 
-			Debug.WriteLine(String.Format("Time Taken: {0}", (Stopwatch.GetTimestamp() - before) / 1000));
-		}
+            Debug.WriteLine(String.Format("Time Taken: {0}", (Stopwatch.GetTimestamp() - before) / 1000));
+        }
 
-		[Test]
-		public void Can_support_64_threads_using_the_client_sequentially()
-		{
-			var before = Stopwatch.GetTimestamp();
+        [Test]
+        public void Can_support_64_threads_using_the_client_sequentially()
+        {
+            var before = Stopwatch.GetTimestamp();
 
-			const int noOfConcurrentClients = 64; //WaitHandle.WaitAll limit is <= 64
+            const int noOfConcurrentClients = 64; //WaitHandle.WaitAll limit is <= 64
 
-			using (var redisClient = new RedisClient(TestConfig.SingleHost))
-			{
-				for (var i = 0; i < noOfConcurrentClients; i++)
-				{
-					var clientNo = i;
-					UseClient(redisClient, clientNo);
-				}
-			}
+            using (var redisClient = new RedisClient(TestConfig.SingleHost))
+            {
+                for (var i = 0; i < noOfConcurrentClients; i++)
+                {
+                    var clientNo = i;
+                    UseClient(redisClient, clientNo);
+                }
+            }
 
-			Debug.WriteLine(String.Format("Time Taken: {0}", (Stopwatch.GetTimestamp() - before) / 1000));
-		}
+            Debug.WriteLine(String.Format("Time Taken: {0}", (Stopwatch.GetTimestamp() - before) / 1000));
+        }
 
-		private void UseClientAsync(RedisClient client, int clientNo)
-		{
-			lock (this)
-			{
-				UseClient(client, clientNo);
-			}
-		}
+        private void UseClientAsync(RedisClient client, int clientNo)
+        {
+            lock (this)
+            {
+                UseClient(client, clientNo);
+            }
+        }
 
-		private static void UseClient(RedisClient client, int clientNo)
-		{
-			var host = "";
+        private static void UseClient(RedisClient client, int clientNo)
+        {
+            var host = "";
 
-			try
-			{
-				host = client.Host;
+            try
+            {
+                host = client.Host;
 
-				Log("Client '{0}' is using '{1}'", clientNo, client.Host);
+                Log("Client '{0}' is using '{1}'", clientNo, client.Host);
 
-				var testClientKey = "test:" + host + ":" + clientNo;
-				client.SetEntry(testClientKey, testData);
-				var result = client.GetValue(testClientKey) ?? "";
+                var testClientKey = "test:" + host + ":" + clientNo;
+                client.SetEntry(testClientKey, testData);
+                var result = client.GetValue(testClientKey) ?? "";
 
-				Log("\t{0} => {1} len {2} {3} len", testClientKey,
-					testData.Length, testData.Length == result.Length ? "==" : "!=", result.Length);
+                Log("\t{0} => {1} len {2} {3} len", testClientKey,
+                    testData.Length, testData.Length == result.Length ? "==" : "!=", result.Length);
 
-			}
-			catch (NullReferenceException ex)
-			{
-				Debug.WriteLine("NullReferenceException StackTrace: \n" + ex.StackTrace);
-			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine(String.Format("\t[ERROR@{0}]: {1} => {2}",
-					host, ex.GetType().Name, ex.Message));
-			}
-		}
+            }
+            catch (NullReferenceException ex)
+            {
+                Debug.WriteLine("NullReferenceException StackTrace: \n" + ex.StackTrace);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(String.Format("\t[ERROR@{0}]: {1} => {2}",
+                    host, ex.GetType().Name, ex.Message));
+            }
+        }
 
-	}
+    }
 }

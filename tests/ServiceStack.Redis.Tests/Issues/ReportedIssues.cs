@@ -3,32 +3,32 @@ using NUnit.Framework;
 
 namespace ServiceStack.Redis.Tests.Issues
 {
-	[TestFixture]
-	public class ReportedIssues
-		: RedisClientTestsBase
-	{
-		private readonly List<string> storeMembers = new List<string> { "one", "two", "three", "four" };
+    [TestFixture]
+    public class ReportedIssues
+        : RedisClientTestsBase
+    {
+        private readonly List<string> storeMembers = new List<string> { "one", "two", "three", "four" };
 
-		[Test]
-		public void Add_range_to_set_fails_if_first_command()
-		{
-			Redis.AddRangeToSet("testset", storeMembers);
+        [Test]
+        public void Add_range_to_set_fails_if_first_command()
+        {
+            Redis.AddRangeToSet("testset", storeMembers);
 
-			var members = Redis.GetAllItemsFromSet("testset");
-			Assert.That(members, Is.EquivalentTo(storeMembers));
-		}
+            var members = Redis.GetAllItemsFromSet("testset");
+            Assert.That(members, Is.EquivalentTo(storeMembers));
+        }
 
-		[Test]
-		public void Transaction_fails_if_first_command()
-		{
+        [Test]
+        public void Transaction_fails_if_first_command()
+        {
             using (var trans = Redis.CreateTransaction())
-			{
-				trans.QueueCommand(r => r.IncrementValue("A"));
+            {
+                trans.QueueCommand(r => r.IncrementValue("A"));
 
-				trans.Commit();
-			}
-			Assert.That(Redis.GetValue("A"), Is.EqualTo("1"));
-		}
+                trans.Commit();
+            }
+            Assert.That(Redis.GetValue("A"), Is.EqualTo("1"));
+        }
 
         [Test]
         public void Success_callback_fails_for_pipeline_using_GetItemScoreInSortedSet()

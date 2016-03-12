@@ -20,7 +20,7 @@ namespace ServiceStack.Redis.Tests.Issues
                         cacheClient.Remove("key");
                     }
                 }
-            }            
+            }
         }
 
         [Test]

@@ -3,40 +3,41 @@ using NUnit.Framework;
 
 namespace ServiceStack.Redis.Tests.Integration
 {
-	[TestFixture]
-	public class MultiThreadedPoolIntegrationTests
-		 : IntegrationTestBase
-	{
-		static Dictionary<string, int> hostCountMap;
+    [TestFixture]
+    public class MultiThreadedPoolIntegrationTests
+         : IntegrationTestBase
+    {
+        static Dictionary<string, int> hostCountMap;
 
-		public IRedisClientsManager CreateAndStartManager(
-			string[] readWriteHosts, string[] readOnlyHosts)
-		{
-			return new PooledRedisClientManager(readWriteHosts, readOnlyHosts,
-				new RedisClientManagerConfig {
-					MaxWritePoolSize = readWriteHosts.Length,
-					MaxReadPoolSize = readOnlyHosts.Length,
-					AutoStart = true,
-				});
-		}
+        public IRedisClientsManager CreateAndStartManager(
+            string[] readWriteHosts, string[] readOnlyHosts)
+        {
+            return new PooledRedisClientManager(readWriteHosts, readOnlyHosts,
+                new RedisClientManagerConfig
+                {
+                    MaxWritePoolSize = readWriteHosts.Length,
+                    MaxReadPoolSize = readOnlyHosts.Length,
+                    AutoStart = true,
+                });
+        }
 
-		[SetUp]
-		public void BeforeEachTest()
-		{
-			hostCountMap = new Dictionary<string, int>();
-		}
+        [SetUp]
+        public void BeforeEachTest()
+        {
+            hostCountMap = new Dictionary<string, int>();
+        }
 
-		[TearDown]
-		public void AfterEachTest()
-		{
-			CheckHostCountMap(hostCountMap);
-		}
+        [TearDown]
+        public void AfterEachTest()
+        {
+            CheckHostCountMap(hostCountMap);
+        }
 
-		[Test]
-		public void Pool_can_support_64_threads_using_the_client_simultaneously()
-		{
-			RunSimultaneously(CreateAndStartManager, UseClient);
-		}
+        [Test]
+        public void Pool_can_support_64_threads_using_the_client_simultaneously()
+        {
+            RunSimultaneously(CreateAndStartManager, UseClient);
+        }
 
         [Test]
         public void Basic_can_support_64_threads_using_the_client_simultaneously()
@@ -50,24 +51,24 @@ namespace ServiceStack.Redis.Tests.Integration
             RunSimultaneously(CreateAndStartManagerPool, UseClient);
         }
 
-		private static void UseClient(IRedisClientsManager manager, int clientNo)
-		{
-			using (var client = manager.GetReadOnlyClient())
-			{
-				lock (hostCountMap)
-				{
-					int hostCount;
-					if (!hostCountMap.TryGetValue(client.Host, out hostCount))
-					{
-						hostCount = 0;
-					}
+        private static void UseClient(IRedisClientsManager manager, int clientNo)
+        {
+            using (var client = manager.GetReadOnlyClient())
+            {
+                lock (hostCountMap)
+                {
+                    int hostCount;
+                    if (!hostCountMap.TryGetValue(client.Host, out hostCount))
+                    {
+                        hostCount = 0;
+                    }
 
-					hostCountMap[client.Host] = ++hostCount;
-				}
+                    hostCountMap[client.Host] = ++hostCount;
+                }
 
-				Log("Client '{0}' is using '{1}'", clientNo, client.Host);
-			}
-		}
+                Log("Client '{0}' is using '{1}'", clientNo, client.Host);
+            }
+        }
 
-	}
+    }
 }

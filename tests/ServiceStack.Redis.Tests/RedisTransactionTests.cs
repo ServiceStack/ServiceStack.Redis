@@ -5,11 +5,11 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-	[TestFixture]
-	public class RedisTransactionTests
-		: RedisClientTestsBase
-	{
-		private const string Key = "rdtmultitest";
+    [TestFixture]
+    public class RedisTransactionTests
+        : RedisClientTestsBase
+    {
+        private const string Key = "rdtmultitest";
         private const string ListKey = "rdtmultitest-list";
         private const string SetKey = "rdtmultitest-set";
         private const string SortedSetKey = "rdtmultitest-sortedset";
@@ -21,32 +21,32 @@ namespace ServiceStack.Redis.Tests
             base.OnAfterEachTest();
         }
 
-		[Test]
-		public void Can_call_single_operation_in_transaction()
-		{
-			Assert.That(Redis.GetValue(Key), Is.Null);
-			using (var trans = Redis.CreateTransaction())
-			{
-				trans.QueueCommand(r => r.IncrementValue(Key));
-				var map = new Dictionary<string, int>();
-				trans.QueueCommand(r => r.Get<int>(Key), y => map[Key] = y);
+        [Test]
+        public void Can_call_single_operation_in_transaction()
+        {
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.IncrementValue(Key));
+                var map = new Dictionary<string, int>();
+                trans.QueueCommand(r => r.Get<int>(Key), y => map[Key] = y);
 
-				trans.Commit();
-			}
+                trans.Commit();
+            }
 
-			Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));
-		}
+            Assert.That(Redis.GetValue(Key), Is.EqualTo("1"));
+        }
 
-		[Test]
-		public void No_commit_of_atomic_transactions_discards_all_commands()
-		{
-			Assert.That(Redis.GetValue(Key), Is.Null);
-			using (var trans = Redis.CreateTransaction())
-			{
-				trans.QueueCommand(r => r.IncrementValue(Key));
-			}
-			Assert.That(Redis.GetValue(Key), Is.Null);
-		}
+        [Test]
+        public void No_commit_of_atomic_transactions_discards_all_commands()
+        {
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.IncrementValue(Key));
+            }
+            Assert.That(Redis.GetValue(Key), Is.Null);
+        }
 
         [Test]
         public void Watch_aborts_transaction()
@@ -60,7 +60,7 @@ namespace ServiceStack.Redis.Tests
                 Redis.Set(Key, value1);
                 using (var trans = Redis.CreateTransaction())
                 {
-                    trans.QueueCommand(r => r.Set(Key,value1));
+                    trans.QueueCommand(r => r.Set(Key, value1));
                     var success = trans.Commit();
                     Assert.False(success);
                     Assert.AreEqual(value1, Redis.Get<string>(Key));
@@ -72,118 +72,118 @@ namespace ServiceStack.Redis.Tests
             }
         }
 
-		[Test]
-		public void Exception_in_atomic_transactions_discards_all_commands()
-		{
-			Assert.That(Redis.GetValue(Key), Is.Null);
-			try
-			{
-				using (var trans = Redis.CreateTransaction())
-				{
-					trans.QueueCommand(r => r.IncrementValue(Key));
-					throw new NotSupportedException();
-				}
-			}
-			catch (NotSupportedException ignore)
-			{
-				Assert.That(Redis.GetValue(Key), Is.Null);
-			}
-		}
+        [Test]
+        public void Exception_in_atomic_transactions_discards_all_commands()
+        {
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            try
+            {
+                using (var trans = Redis.CreateTransaction())
+                {
+                    trans.QueueCommand(r => r.IncrementValue(Key));
+                    throw new NotSupportedException();
+                }
+            }
+            catch (NotSupportedException ignore)
+            {
+                Assert.That(Redis.GetValue(Key), Is.Null);
+            }
+        }
 
-		[Test]
-		public void Can_call_single_operation_3_Times_in_transaction()
-		{
-			Assert.That(Redis.GetValue(Key), Is.Null);
-			using (var trans = Redis.CreateTransaction())
-			{
-				trans.QueueCommand(r => r.IncrementValue(Key));
-				trans.QueueCommand(r => r.IncrementValue(Key));
-				trans.QueueCommand(r => r.IncrementValue(Key));
+        [Test]
+        public void Can_call_single_operation_3_Times_in_transaction()
+        {
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.IncrementValue(Key));
+                trans.QueueCommand(r => r.IncrementValue(Key));
+                trans.QueueCommand(r => r.IncrementValue(Key));
 
-				trans.Commit();
-			}
+                trans.Commit();
+            }
 
-			Assert.That(Redis.GetValue(Key), Is.EqualTo("3"));
-		}
+            Assert.That(Redis.GetValue(Key), Is.EqualTo("3"));
+        }
 
-		[Test]
-		public void Can_call_single_operation_with_callback_3_Times_in_transaction()
-		{
-			var results = new List<long>();
-			Assert.That(Redis.GetValue(Key), Is.Null);
-			using (var trans = Redis.CreateTransaction())
-			{
-				trans.QueueCommand(r => r.IncrementValue(Key), results.Add);
-				trans.QueueCommand(r => r.IncrementValue(Key), results.Add);
-				trans.QueueCommand(r => r.IncrementValue(Key), results.Add);
+        [Test]
+        public void Can_call_single_operation_with_callback_3_Times_in_transaction()
+        {
+            var results = new List<long>();
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.IncrementValue(Key), results.Add);
+                trans.QueueCommand(r => r.IncrementValue(Key), results.Add);
+                trans.QueueCommand(r => r.IncrementValue(Key), results.Add);
 
-				trans.Commit();
-			}
+                trans.Commit();
+            }
 
-			Assert.That(Redis.GetValue(Key), Is.EqualTo("3"));
-			Assert.That(results, Is.EquivalentTo(new List<long> { 1, 2, 3 }));
-		}
+            Assert.That(Redis.GetValue(Key), Is.EqualTo("3"));
+            Assert.That(results, Is.EquivalentTo(new List<long> { 1, 2, 3 }));
+        }
 
-		[Test]
-		public void Supports_different_operation_types_in_same_transaction()
-		{
-			var incrementResults = new List<long>();
-			var collectionCounts = new List<long>();
-			var containsItem = false;
+        [Test]
+        public void Supports_different_operation_types_in_same_transaction()
+        {
+            var incrementResults = new List<long>();
+            var collectionCounts = new List<long>();
+            var containsItem = false;
 
-			Assert.That(Redis.GetValue(Key), Is.Null);
-			using (var trans = Redis.CreateTransaction())
-			{
-				trans.QueueCommand(r => r.IncrementValue(Key), intResult => incrementResults.Add(intResult));
-				trans.QueueCommand(r => r.AddItemToList(ListKey, "listitem1"));
-				trans.QueueCommand(r => r.AddItemToList(ListKey, "listitem2"));
-				trans.QueueCommand(r => r.AddItemToSet(SetKey, "setitem"));
-				trans.QueueCommand(r => r.SetContainsItem(SetKey, "setitem"), b => containsItem = b);
-				trans.QueueCommand(r => r.AddItemToSortedSet(SortedSetKey, "sortedsetitem1"));
-				trans.QueueCommand(r => r.AddItemToSortedSet(SortedSetKey, "sortedsetitem2"));
-				trans.QueueCommand(r => r.AddItemToSortedSet(SortedSetKey, "sortedsetitem3"));
-				trans.QueueCommand(r => r.GetListCount(ListKey), intResult => collectionCounts.Add(intResult));
-				trans.QueueCommand(r => r.GetSetCount(SetKey), intResult => collectionCounts.Add(intResult));
-				trans.QueueCommand(r => r.GetSortedSetCount(SortedSetKey), intResult => collectionCounts.Add(intResult));
-				trans.QueueCommand(r => r.IncrementValue(Key), intResult => incrementResults.Add(intResult));
+            Assert.That(Redis.GetValue(Key), Is.Null);
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.IncrementValue(Key), intResult => incrementResults.Add(intResult));
+                trans.QueueCommand(r => r.AddItemToList(ListKey, "listitem1"));
+                trans.QueueCommand(r => r.AddItemToList(ListKey, "listitem2"));
+                trans.QueueCommand(r => r.AddItemToSet(SetKey, "setitem"));
+                trans.QueueCommand(r => r.SetContainsItem(SetKey, "setitem"), b => containsItem = b);
+                trans.QueueCommand(r => r.AddItemToSortedSet(SortedSetKey, "sortedsetitem1"));
+                trans.QueueCommand(r => r.AddItemToSortedSet(SortedSetKey, "sortedsetitem2"));
+                trans.QueueCommand(r => r.AddItemToSortedSet(SortedSetKey, "sortedsetitem3"));
+                trans.QueueCommand(r => r.GetListCount(ListKey), intResult => collectionCounts.Add(intResult));
+                trans.QueueCommand(r => r.GetSetCount(SetKey), intResult => collectionCounts.Add(intResult));
+                trans.QueueCommand(r => r.GetSortedSetCount(SortedSetKey), intResult => collectionCounts.Add(intResult));
+                trans.QueueCommand(r => r.IncrementValue(Key), intResult => incrementResults.Add(intResult));
 
-				trans.Commit();
-			}
+                trans.Commit();
+            }
 
-			Assert.That(containsItem, Is.True);
-			Assert.That(Redis.GetValue(Key), Is.EqualTo("2"));
-			Assert.That(incrementResults, Is.EquivalentTo(new List<long> { 1, 2 }));
-			Assert.That(collectionCounts, Is.EquivalentTo(new List<int> { 2, 1, 3 }));
-			Assert.That(Redis.GetAllItemsFromList(ListKey), Is.EquivalentTo(new List<string> { "listitem1", "listitem2" }));
-			Assert.That(Redis.GetAllItemsFromSet(SetKey), Is.EquivalentTo(new List<string> { "setitem" }));
-			Assert.That(Redis.GetAllItemsFromSortedSet(SortedSetKey), Is.EquivalentTo(new List<string> { "sortedsetitem1", "sortedsetitem2", "sortedsetitem3" }));
-		}
+            Assert.That(containsItem, Is.True);
+            Assert.That(Redis.GetValue(Key), Is.EqualTo("2"));
+            Assert.That(incrementResults, Is.EquivalentTo(new List<long> { 1, 2 }));
+            Assert.That(collectionCounts, Is.EquivalentTo(new List<int> { 2, 1, 3 }));
+            Assert.That(Redis.GetAllItemsFromList(ListKey), Is.EquivalentTo(new List<string> { "listitem1", "listitem2" }));
+            Assert.That(Redis.GetAllItemsFromSet(SetKey), Is.EquivalentTo(new List<string> { "setitem" }));
+            Assert.That(Redis.GetAllItemsFromSortedSet(SortedSetKey), Is.EquivalentTo(new List<string> { "sortedsetitem1", "sortedsetitem2", "sortedsetitem3" }));
+        }
 
-		[Test]
-		public void Can_call_multi_string_operations_in_transaction()
-		{
-			string item1 = null;
-			string item4 = null;
+        [Test]
+        public void Can_call_multi_string_operations_in_transaction()
+        {
+            string item1 = null;
+            string item4 = null;
 
-			var results = new List<string>();
-			Assert.That(Redis.GetListCount(ListKey), Is.EqualTo(0));
-			using (var trans = Redis.CreateTransaction())
-			{
-				trans.QueueCommand(r => r.AddItemToList(ListKey, "listitem1"));
-				trans.QueueCommand(r => r.AddItemToList(ListKey, "listitem2"));
-				trans.QueueCommand(r => r.AddItemToList(ListKey, "listitem3"));
-				trans.QueueCommand(r => r.GetAllItemsFromList(ListKey), x => results = x);
-				trans.QueueCommand(r => r.GetItemFromList(ListKey, 0), x => item1 = x);
-				trans.QueueCommand(r => r.GetItemFromList(ListKey, 4), x => item4 = x);
+            var results = new List<string>();
+            Assert.That(Redis.GetListCount(ListKey), Is.EqualTo(0));
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.AddItemToList(ListKey, "listitem1"));
+                trans.QueueCommand(r => r.AddItemToList(ListKey, "listitem2"));
+                trans.QueueCommand(r => r.AddItemToList(ListKey, "listitem3"));
+                trans.QueueCommand(r => r.GetAllItemsFromList(ListKey), x => results = x);
+                trans.QueueCommand(r => r.GetItemFromList(ListKey, 0), x => item1 = x);
+                trans.QueueCommand(r => r.GetItemFromList(ListKey, 4), x => item4 = x);
 
-				trans.Commit();
-			}
+                trans.Commit();
+            }
 
-			Assert.That(Redis.GetListCount(ListKey), Is.EqualTo(3));
-			Assert.That(results, Is.EquivalentTo(new List<string> { "listitem1", "listitem2", "listitem3" }));
-			Assert.That(item1, Is.EqualTo("listitem1"));
-			Assert.That(item4, Is.Null);
-		}
+            Assert.That(Redis.GetListCount(ListKey), Is.EqualTo(3));
+            Assert.That(results, Is.EquivalentTo(new List<string> { "listitem1", "listitem2", "listitem3" }));
+            Assert.That(item1, Is.EqualTo("listitem1"));
+            Assert.That(item4, Is.Null);
+        }
         [Test]
         public void Can_call_multiple_setexs_in_transaction()
         {
@@ -215,12 +215,12 @@ namespace ServiceStack.Redis.Tests
             var temp = new byte[1];
             using (var trans = Redis.CreateTransaction())
             {
-                trans.QueueCommand(r => ((RedisNativeClient)r).SetEx(Key,5,temp));
+                trans.QueueCommand(r => ((RedisNativeClient)r).SetEx(Key, 5, temp));
                 trans.Commit();
             }
         }
 
-       
+
         [Test]
         public void Transaction_can_be_replayed()
         {
@@ -255,7 +255,7 @@ namespace ServiceStack.Redis.Tests
 
             string KeySquared = Key + Key;
             Redis.Del(KeySquared);
-                
+
             Redis.Watch(Key, KeySquared);
             Redis.Set(Key, 7);
 
@@ -267,7 +267,7 @@ namespace ServiceStack.Redis.Tests
             }
 
             Assert.That(Redis.GetValue(Key), Is.EqualTo("7"));
-            Assert.That(Redis.GetValue(KeySquared), Is.Null);   
+            Assert.That(Redis.GetValue(KeySquared), Is.Null);
         }
 
         [Test]
@@ -314,34 +314,34 @@ namespace ServiceStack.Redis.Tests
             Assert.That(Redis.GetTimeToLive(key), Is.EqualTo(TimeSpan.MaxValue));
         }
 
-	    [Test]
+        [Test]
         public void Can_call_GetAllEntriesFromHash_in_transaction()
-	    {
+        {
             var stringMap = new Dictionary<string, string> {
-     			{"one","a"}, {"two","b"}, {"three","c"}, {"four","d"}
-     		};
+                 {"one","a"}, {"two","b"}, {"three","c"}, {"four","d"}
+             };
             stringMap.Each(x => Redis.SetEntryInHash(HashKey, x.Key, x.Value));
 
             Dictionary<string, string> results = null;
             using (var trans = Redis.CreateTransaction())
-	        {
-	            trans.QueueCommand(r => r.GetAllEntriesFromHash(HashKey), x => results = x);
+            {
+                trans.QueueCommand(r => r.GetAllEntriesFromHash(HashKey), x => results = x);
 
-	            trans.Commit();
-	        }
+                trans.Commit();
+            }
 
             Assert.That(results, Is.EquivalentTo(stringMap));
         }
 
-	    [Test]
-	    public void Can_call_Type_in_transaction()
-	    {
-	        Redis.SetValue("string", "STRING");
-	        Redis.AddItemToList("list", "LIST");
-	        Redis.AddItemToSet("set", "SET");
-	        Redis.AddItemToSortedSet("zset", "ZSET", 1);
+        [Test]
+        public void Can_call_Type_in_transaction()
+        {
+            Redis.SetValue("string", "STRING");
+            Redis.AddItemToList("list", "LIST");
+            Redis.AddItemToSet("set", "SET");
+            Redis.AddItemToSortedSet("zset", "ZSET", 1);
 
-	        var keys = new[] { "string", "list", "set", "zset" };
+            var keys = new[] { "string", "list", "set", "zset" };
 
             var results = new Dictionary<string, string>();
             using (var trans = Redis.CreateTransaction())
@@ -356,7 +356,7 @@ namespace ServiceStack.Redis.Tests
 
             results.PrintDump();
 
-            Assert.That(results, Is.EquivalentTo(new Dictionary<string,string>
+            Assert.That(results, Is.EquivalentTo(new Dictionary<string, string>
             {
                 {"string", "string" },
                 {"list", "list" },

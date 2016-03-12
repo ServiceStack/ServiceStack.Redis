@@ -36,7 +36,7 @@ namespace ServiceStack.Redis.Tests
             var actual = connString.ToRedisEndpoint();
             var expected = expectedJsv.FromJsv<RedisEndpoint>();
 
-            Assert.That(actual, Is.EqualTo(expected), 
+            Assert.That(actual, Is.EqualTo(expected),
                 "{0} != {1}".Fmt(actual.ToJsv(), expected.ToJsv()));
         }
 
@@ -83,14 +83,14 @@ namespace ServiceStack.Redis.Tests
 
         private static void AssertClientManager(IRedisClientsManager redisManager, RedisEndpoint expected)
         {
-            using (var readWrite = (RedisClient) redisManager.GetClient())
-            using (var readOnly = (RedisClient) redisManager.GetReadOnlyClient())
-            using (var cacheClientWrapper = (RedisClientManagerCacheClient) redisManager.GetCacheClient())
+            using (var readWrite = (RedisClient)redisManager.GetClient())
+            using (var readOnly = (RedisClient)redisManager.GetReadOnlyClient())
+            using (var cacheClientWrapper = (RedisClientManagerCacheClient)redisManager.GetCacheClient())
             {
                 AssertClient(readWrite, expected);
                 AssertClient(readOnly, expected);
 
-                using (var cacheClient = (RedisClient) cacheClientWrapper.GetClient())
+                using (var cacheClient = (RedisClient)cacheClientWrapper.GetClient())
                 {
                     AssertClient(cacheClient, expected);
                 }

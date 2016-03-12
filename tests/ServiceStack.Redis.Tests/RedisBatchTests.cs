@@ -24,10 +24,11 @@ namespace ServiceStack.Redis.Tests
             const int batchSize = 500;
             var nextIds = redisMessages.GetNextSequence(batchSize);
 
-            var msgBatch = batchSize.Times(i => 
-                new Message {
+            var msgBatch = batchSize.Times(i =>
+                new Message
+                {
                     Id = nextIds - (batchSize - i) + 1,
-                    Key = i.ToString(), 
+                    Key = i.ToString(),
                     Value = Guid.NewGuid().ToString(),
                     Description = "Description"
                 });

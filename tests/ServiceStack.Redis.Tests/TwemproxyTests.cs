@@ -9,7 +9,8 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_connect_to_twemproxy()
         {
-            var redis = new RedisClient("10.0.0.14", 22121) {
+            var redis = new RedisClient("10.0.0.14", 22121)
+            {
                 //ServerVersionNumber = 2611
             };
             //var redis = new RedisClient("10.0.0.14");

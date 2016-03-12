@@ -66,7 +66,7 @@ namespace ServiceStack.Redis.Tests.Issues
 
             users.Store(eventsForUser);
 
-            var all = users.GetAll(); 
+            var all = users.GetAll();
         }
 
         [Test]
