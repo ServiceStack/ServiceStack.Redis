@@ -302,7 +302,7 @@ namespace ServiceStack.Redis
 
             var throwEx = new RedisResponseException(error);
             log.Error(error);
-            throw throwEx;
+            return throwEx;
         }
 
         private RedisRetryableException CreateNoMoreDataError()
