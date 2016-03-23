@@ -321,6 +321,7 @@ namespace ServiceStack.Redis
                         OnWorkerError(ex);
 
                     lastEx = ex;
+                    this.worker = null;
                     this.failures++;
                     Interlocked.Increment(ref RedisState.TotalFailedSentinelWorkers);
                 }
