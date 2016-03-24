@@ -76,10 +76,20 @@ namespace ServiceStack.Redis
 
         internal string GetMasterHost(string masterName)
         {
-            var masterInfo = sentinelClient.SentinelGetMasterAddrByName(masterName);
-            return masterInfo.Count > 0 
-                ? SanitizeMasterConfig(masterInfo) 
-                : null;
+            try
+            {
+                var masterInfo = sentinelClient.SentinelGetMasterAddrByName(masterName);
+                return masterInfo.Count > 0
+                    ? SanitizeMasterConfig(masterInfo)
+                    : null;
+            }
+            catch (Exception ex)
+            {
+                if (OnSentinelError != null)
+                    OnSentinelError(ex);
+
+                return null;
+            }
         }
 
         private string SanitizeMasterConfig(List<string> masterInfo)
