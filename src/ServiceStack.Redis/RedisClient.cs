@@ -869,14 +869,12 @@ namespace ServiceStack.Redis
 
         #region LUA EVAL
 
-        static readonly ConcurrentDictionary<string, string> CachedLuaSha1Map =
+        private readonly ConcurrentDictionary<string, string> cachedLuaSha1Map =
             new ConcurrentDictionary<string, string>();
 
         public T ExecCachedLua<T>(string scriptBody, Func<string, T> scriptSha1)
         {
-            string sha1;
-            if (!CachedLuaSha1Map.TryGetValue(scriptBody, out sha1))
-                CachedLuaSha1Map[scriptBody] = sha1 = LoadLuaScript(scriptBody);
+            string sha1 = this.cachedLuaSha1Map.GetOrAdd(scriptBody, LoadLuaScript);
 
             try
             {
@@ -887,7 +885,7 @@ namespace ServiceStack.Redis
                 if (!ex.Message.StartsWith("NOSCRIPT"))
                     throw;
 
-                CachedLuaSha1Map[scriptBody] = sha1 = LoadLuaScript(scriptBody);
+                sha1 = this.cachedLuaSha1Map.AddOrUpdate(scriptBody, LoadLuaScript, (key, currentValue) => LoadLuaScript(key));
                 return scriptSha1(sha1);
             }
         }
