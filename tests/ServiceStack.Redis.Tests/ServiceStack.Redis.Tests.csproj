@@ -184,6 +184,7 @@
     <Compile Include="BasicRediscClientManagerTests.cs" />
     <Compile Include="ConfigTests.cs" />
     <Compile Include="CustomCommandTests.cs" />
+    <Compile Include="Issues\AuthIssue.cs" />
     <Compile Include="LuaCachedScripts.cs" />
     <Compile Include="Examples\TestData.cs" />
     <Compile Include="Issues\RedisCharacterizationTests.cs" />

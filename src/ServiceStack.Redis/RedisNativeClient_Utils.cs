@@ -140,13 +140,13 @@ namespace ServiceStack.Redis
                 Bstream = new BufferedStream(networkStream, 16 * 1024);
 
                 if (!string.IsNullOrEmpty(Password))
-                    SendExpectSuccess(Commands.Auth, Password.ToUtf8Bytes());
+                    SendUnmanagedExpectSuccess(Commands.Auth, Password.ToUtf8Bytes());
 
                 if (db != 0)
-                    SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
+                    SendUnmanagedExpectSuccess(Commands.Select, db.ToUtf8Bytes());
 
                 if (Client != null)
-                    SendExpectSuccess(Commands.Client, Commands.SetName, Client.ToUtf8Bytes());
+                    SendUnmanagedExpectSuccess(Commands.Client, Commands.SetName, Client.ToUtf8Bytes());
 
                 try
                 {
@@ -368,6 +368,24 @@ namespace ServiceStack.Redis
 
             //Total command lines count
             WriteAllToSendBuffer(cmdWithBinaryArgs);
+        }
+
+        /// <summary>
+        /// Send command outside of managed Write Buffer
+        /// </summary>
+        /// <param name="cmdWithBinaryArgs"></param>
+        protected void SendUnmanagedExpectSuccess(params byte[][] cmdWithBinaryArgs)
+        {
+            var bytes = GetCmdBytes('*', cmdWithBinaryArgs.Length);
+
+            foreach (var safeBinaryValue in cmdWithBinaryArgs)
+            {
+                bytes = bytes.Combine(GetCmdBytes('$', safeBinaryValue.Length), safeBinaryValue, endData);
+            }
+
+            Bstream.Write(bytes, 0, bytes.Length);
+
+            ExpectSuccess();
         }
 
         public void WriteAllToSendBuffer(params byte[][] cmdWithBinaryArgs)
