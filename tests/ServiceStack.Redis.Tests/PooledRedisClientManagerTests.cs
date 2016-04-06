@@ -395,7 +395,7 @@ namespace ServiceStack.Redis.Tests
             }
         }
 
-        [Ignore("tempromental integration test")]
+        [Explicit,Ignore("tempromental integration test")]
         [Test]
         public void Can_support_64_threads_using_the_client_simultaneously()
         {
