@@ -395,40 +395,40 @@ namespace ServiceStack.Redis.Tests
             }
         }
 
-        [Explicit,Ignore("tempromental integration test")]
-        [Test]
-        public void Can_support_64_threads_using_the_client_simultaneously()
-        {
-            const int noOfConcurrentClients = 64; //WaitHandle.WaitAll limit is <= 64
-            var clientUsageMap = new Dictionary<string, int>();
+        //[Explicit,Ignore("tempromental integration test")]
+        //[Test]
+        //public void Can_support_64_threads_using_the_client_simultaneously()
+        //{
+        //    const int noOfConcurrentClients = 64; //WaitHandle.WaitAll limit is <= 64
+        //    var clientUsageMap = new Dictionary<string, int>();
 
-            var clientAsyncResults = new List<IAsyncResult>();
-            using (var manager = CreateAndStartManager())
-            {
-                for (var i = 0; i < noOfConcurrentClients; i++)
-                {
-                    var clientNo = i;
-                    var action = (Action)(() => UseClient(manager, clientNo, clientUsageMap));
-                    clientAsyncResults.Add(action.BeginInvoke(null, null));
-                }
-            }
+        //    var clientAsyncResults = new List<IAsyncResult>();
+        //    using (var manager = CreateAndStartManager())
+        //    {
+        //        for (var i = 0; i < noOfConcurrentClients; i++)
+        //        {
+        //            var clientNo = i;
+        //            var action = (Action)(() => UseClient(manager, clientNo, clientUsageMap));
+        //            clientAsyncResults.Add(action.BeginInvoke(null, null));
+        //        }
+        //    }
 
-            WaitHandle.WaitAll(clientAsyncResults.ConvertAll(x => x.AsyncWaitHandle).ToArray());
+        //    WaitHandle.WaitAll(clientAsyncResults.ConvertAll(x => x.AsyncWaitHandle).ToArray());
 
-            RedisStats.ToDictionary().PrintDump();
+        //    RedisStats.ToDictionary().PrintDump();
 
-            Debug.WriteLine(TypeSerializer.SerializeToString(clientUsageMap));
+        //    Debug.WriteLine(TypeSerializer.SerializeToString(clientUsageMap));
 
-            var hostCount = 0;
-            foreach (var entry in clientUsageMap)
-            {
-                Assert.That(entry.Value, Is.GreaterThanOrEqualTo(2), "Host has unproportianate distribution: " + entry.Value);
-                Assert.That(entry.Value, Is.LessThanOrEqualTo(30), "Host has unproportianate distribution: " + entry.Value);
-                hostCount += entry.Value;
-            }
+        //    var hostCount = 0;
+        //    foreach (var entry in clientUsageMap)
+        //    {
+        //        Assert.That(entry.Value, Is.GreaterThanOrEqualTo(2), "Host has unproportianate distribution: " + entry.Value);
+        //        Assert.That(entry.Value, Is.LessThanOrEqualTo(30), "Host has unproportianate distribution: " + entry.Value);
+        //        hostCount += entry.Value;
+        //    }
 
-            Assert.That(hostCount, Is.EqualTo(noOfConcurrentClients), "Invalid no of clients used");
-        }
+        //    Assert.That(hostCount, Is.EqualTo(noOfConcurrentClients), "Invalid no of clients used");
+        //}
 
         private static void UseClient(IRedisClientsManager manager, int clientNo, Dictionary<string, int> hostCountMap)
         {
