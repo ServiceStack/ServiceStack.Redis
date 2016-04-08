@@ -124,6 +124,11 @@ namespace ServiceStack.Redis
             return base.ZRem(setId, value.ToUtf8Bytes()) == Success;
         }
 
+        public long RemoveItemsFromSortedSet(string setId, List<string> values)
+        {
+            return base.ZRem(setId, values.Map(x => x.ToUtf8Bytes()).ToArray());
+        }
+
         public string PopItemWithLowestScoreFromSortedSet(string setId)
         {
             //TODO: this should be atomic

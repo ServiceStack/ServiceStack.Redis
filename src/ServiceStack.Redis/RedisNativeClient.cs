@@ -1662,6 +1662,7 @@ namespace ServiceStack.Redis
             var cmdWithArgs = MergeCommandWithArgs(Commands.ZRem, setId.ToUtf8Bytes(), values);
             return SendExpectLong(cmdWithArgs);
         }
+
         public double ZIncrBy(string setId, double incrBy, byte[] value)
         {
             AssertSetIdAndValue(setId, value);

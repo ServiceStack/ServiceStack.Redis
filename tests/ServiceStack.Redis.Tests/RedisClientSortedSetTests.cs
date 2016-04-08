@@ -96,6 +96,22 @@ namespace ServiceStack.Redis.Tests
         }
 
         [Test]
+        public void Can_RemoveItemsFromSortedSet()
+        {
+            var removeMembers = new[] { "two" , "four", "six" };
+
+            storeMembers.ForEach(x => Redis.AddItemToSortedSet(SetId, x));
+
+            var removeCount = Redis.RemoveItemsFromSortedSet(SetId, removeMembers.ToList());
+            Assert.That(removeCount, Is.EqualTo(2));
+
+            removeMembers.Each(x => storeMembers.Remove(x));
+
+            var members = Redis.GetAllItemsFromSortedSet(SetId);
+            Assert.That(members, Is.EquivalentTo(storeMembers));
+        }
+
+        [Test]
         public void Can_PopFromSet()
         {
             var i = 0;
