@@ -50,6 +50,11 @@
             The ResultsFilterResponse is called before returning the response allowing responses to be cached.
             </summary>
         </member>
+        <member name="P:ServiceStack.AsyncServiceClient.ExceptionFilter">
+            <summary>
+            Called with requestUri, ResponseType when server returns 304 NotModified
+            </summary>
+        </member>
         <member name="T:ServiceStack.RsaUtils">
             <summary>
             Useful .NET Encryption Utils from:
@@ -196,6 +201,11 @@
             The ResultsFilterResponse is called before returning the response allowing responses to be cached.
             </summary>
         </member>
+        <member name="F:ServiceStack.ServiceClientBase.exceptionFilter">
+            <summary>
+            Called with requestUri, ResponseType when server returns 304 NotModified
+            </summary>
+        </member>
         <member name="P:ServiceStack.ServiceClientBase.responseFilter">
             <summary>
             The response action is called once the server response is available.
@@ -215,6 +225,16 @@
             <c>WebServiceException</c> containing the parsed DTO. Then override Send to handle that exception.
             </summary>
         </member>
+        <member name="M:ServiceStack.ServiceClientBase.Get(System.Object)">
+            <summary>
+            APIs returning HttpWebResponse must be explicitly Disposed, e.g using (var res = client.Get(url)) { ... }
+            </summary>
+        </member>
+        <member name="M:ServiceStack.ServiceClientBase.Get(System.String)">
+            <summary>
+            APIs returning HttpWebResponse must be explicitly Disposed, e.g using (var res = client.Get(url)) { ... }
+            </summary>
+        </member>
         <member name="M:ServiceStack.StreamExt.Compress(System.String,System.String)">
             <summary>
             Compresses the specified text using the default compression method: Deflate
@@ -223,6 +243,11 @@
             <param name="compressionType">Type of the compression.</param>
             <returns></returns>
         </member>
+        <member name="M:ServiceStack.StreamExt.CompressBytes(System.Byte[],System.String)">
+            <summary>
+            Compresses the specified text using the default compression method: Deflate
+            </summary>
+        </member>
         <member name="M:ServiceStack.StreamExt.Decompress(System.Byte[],System.String)">
             <summary>
             Decompresses the specified gz buffer using the default compression method: Inflate
@@ -230,6 +255,11 @@
             <param name="gzBuffer">The gz buffer.</param>
             <param name="compressionType">Type of the compression.</param>
             <returns></returns>
+        </member>
+        <member name="M:ServiceStack.StreamExt.DecompressBytes(System.Byte[],System.String)">
+            <summary>
+            Decompresses the specified gz buffer using the default compression method: Inflate
+            </summary>
         </member>
         <member name="T:ServiceStack.UrlExtensions">
             <summary>

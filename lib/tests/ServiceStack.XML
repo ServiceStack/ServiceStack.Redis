@@ -14,6 +14,186 @@
             Default redirct URL if Required Role or Permission attributes doesn't permit access.
             </summary>
         </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.ServiceBaseUrl">
+            <summary>
+            The BaseUrl of the ServiceStack instance (inferred)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.ServiceName">
+            <summary>
+            Name of the ServiceStack Instance (inferred)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.ServiceDescription">
+            <summary>
+            Textual description of the AutoQuery Services (shown in Home Services list)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.ServiceIconUrl">
+            <summary>
+            Icon for this ServiceStack Instance (shown in Home Services list)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.Formats">
+            <summary>
+            The different Content Type formats to display
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.MaxLimit">
+            <summary>
+            The configured MaxLimit for AutoQuery
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.IsPublic">
+            <summary>
+            Whether to publish this Service to the public Services registry
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.OnlyShowAnnotatedServices">
+            <summary>
+            Only show AutoQuery Services attributed with [AutoQueryViewer]
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.ImplicitConventions">
+            <summary>
+            List of different Search Filters available
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.DefaultSearchField">
+            <summary>
+            The Column which should be selected by default
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.DefaultSearchType">
+            <summary>
+            The Query Type filter which should be selected by default
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.DefaultSearchText">
+            <summary>
+            The search text which should be populated by default
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.BrandUrl">
+            <summary>
+            Link to your website users can click to find out more about you
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.BrandImageUrl">
+            <summary>
+            A custom logo or image that users can click on to visit your site
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.TextColor">
+            <summary>
+            The default color of text
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.LinkColor">
+            <summary>
+            The default color of links
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.BackgroundColor">
+            <summary>
+            The default background color of each screen
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.BackgroundImageUrl">
+            <summary>
+            The default background image of each screen anchored to the bottom left
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerConfig.IconUrl">
+            <summary>
+            The default icon for each of your AutoQuery Services
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerUserInfo.IsAuthenticated">
+            <summary>
+            Returns true if the User Is Authenticated
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AutoQueryViewerUserInfo.QueryCount">
+            <summary>
+            How many queries are available to this user
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheInfo.CacheKey">
+            <summary>
+            The base CacheKey to be use store the response against
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheInfo.ExpiresIn">
+            <summary>
+            How long to cache the resource for. Fallsback to HttpCacheFeature.DefaultExpiresIn
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheInfo.ETag">
+            <summary>
+            The unique ETag returned for this resource clients can use to determine whether their local version has changed
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheInfo.Age">
+            <summary>
+            The Age for this resource returned to clients
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheInfo.MaxAge">
+            <summary>
+            The MaxAge returned to clients to indicate how long they can use their local cache before re-validating
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheInfo.LastModified">
+            <summary>
+            The LastModified date to use for the Cache and HTTP Header 
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheInfo.CacheControl">
+            <summary>
+            Cache-Control HTTP Headers
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheInfo.VaryByUser">
+            <summary>
+            Create unique cache per user
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheInfo.LocalCache">
+            <summary>
+            Use HostContext.LocalCache or HostContext.Cache
+            </summary>
+        </member>
+        <member name="T:ServiceStack.CacheResponseAttribute">
+            <summary>
+            Cache the Response of a Service
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheResponseAttribute.Duration">
+            <summary>
+            Cache expiry in seconds
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheResponseAttribute.MaxAge">
+            <summary>
+            MaxAge in seconds
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheResponseAttribute.CacheControl">
+            <summary>
+            Cache-Control HTTP Headers
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheResponseAttribute.VaryByUser">
+            <summary>
+            Create unique cache per user
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheResponseAttribute.LocalCache">
+            <summary>
+            Use HostContext.LocalCache or HostContext.Cache
+            </summary>
+        </member>
         <member name="M:ServiceStack.FluentValidation.Internal.CollectionPropertyRule`1.Create``1(System.Linq.Expressions.Expression{System.Func{``0,System.Collections.Generic.IEnumerable{`0}}},System.Func{ServiceStack.FluentValidation.CascadeMode})">
             <summary>
             Creates a new property rule from a lambda expression.
