@@ -29,7 +29,7 @@ namespace ConsoleTests
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error {ex.Message}");
+                    Console.WriteLine("Error {0}".Fmt(ex.Message));
                 }
                 Thread.Sleep(3000);
             }
