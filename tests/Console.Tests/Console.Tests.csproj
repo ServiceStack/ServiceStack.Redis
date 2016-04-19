@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="BlockingPop.cs" />
     <Compile Include="ForceFailover.cs" />
+    <Compile Include="MasterFailoverWithPassword.cs" />
     <Compile Include="NetworkRedisSentinelFailoverTests.cs" />
     <Compile Include="GoogleRedisSentinelFailoverTests.cs" />
     <Compile Include="HashCollectionStressTests.cs" />

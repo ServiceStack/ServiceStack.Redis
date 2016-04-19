@@ -34,7 +34,9 @@
 
             //new ForceFailover().Execute();
 
-            new BlockingPop().Execute();
+            //new BlockingPop().Execute();
+
+            new MasterFailoverWithPassword().Execute();
         }
     }
 }
