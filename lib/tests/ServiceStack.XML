@@ -121,7 +121,17 @@
         </member>
         <member name="P:ServiceStack.CacheInfo.CacheKey">
             <summary>
-            The base CacheKey to be use store the response against
+            The CacheKey to be use store the response against
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheInfo.KeyBase">
+            <summary>
+            The base Cache Key used to cache the Service response
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheInfo.KeyModifiers">
+            <summary>
+            Additional CacheKey Modifiers used to cache different outputs for a single Service Response
             </summary>
         </member>
         <member name="P:ServiceStack.CacheInfo.ExpiresIn">
@@ -186,7 +196,12 @@
         </member>
         <member name="P:ServiceStack.CacheResponseAttribute.VaryByUser">
             <summary>
-            Create unique cache per user
+            Vary cache per user
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheResponseAttribute.VaryByRoles">
+            <summary>
+            Vary cache for users in these roles
             </summary>
         </member>
         <member name="P:ServiceStack.CacheResponseAttribute.LocalCache">
@@ -1967,11 +1982,6 @@
         <member name="M:ServiceStack.Host.ServiceController.Execute(System.Object)">
             <summary>
             Execute using empty RequestContext
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.ServiceController.Execute(System.Object,ServiceStack.Web.IRequest)">
-            <summary>
-            Execute HTTP
             </summary>
         </member>
         <member name="M:ServiceStack.Host.XsdMetadata.GetBaseTypeWithTheSameName(System.Type)">
