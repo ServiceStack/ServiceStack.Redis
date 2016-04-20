@@ -22,7 +22,7 @@ namespace ServiceStack.Redis.Tests.Integration
             testData = TypeSerializer.SerializeToString(results);
         }
 
-        //[Explicit]
+        [Explicit("Can hang CI")]
         [Test]
         public void Can_support_64_threads_using_the_client_simultaneously()
         {
