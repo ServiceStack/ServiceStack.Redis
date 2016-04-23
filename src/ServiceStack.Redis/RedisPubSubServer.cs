@@ -258,13 +258,21 @@ namespace ServiceStack.Redis
                                     switch (op)
                                     {
                                         case Operation.Stop:
-                                            Log.Debug("Stop Command Issued");
+                                            if (Log.IsDebugEnabled)
+                                                Log.Debug("Stop Command Issued");
 
-                                            if (Interlocked.CompareExchange(ref status, Status.Stopped, Status.Started) != Status.Started)
+                                            Interlocked.CompareExchange(ref status, Status.Stopping, Status.Started);
+                                            try
+                                            {
+                                                if (Log.IsDebugEnabled)
+                                                    Log.Debug("UnSubscribe From All Channels...");
+
+                                                subscription.UnSubscribeFromAllChannels(); //Un block thread.
+                                            }
+                                            finally
+                                            {
                                                 Interlocked.CompareExchange(ref status, Status.Stopped, Status.Stopping);
-
-                                            Log.Debug("UnSubscribe From All Channels...");
-                                            subscription.UnSubscribeFromAllChannels(); //Un block thread.
+                                            }
                                             return;
 
                                         case Operation.Reset:
@@ -449,7 +457,8 @@ namespace ServiceStack.Redis
                 rand.Next((int)Math.Pow(continuousErrorsCount, 3), (int)Math.Pow(continuousErrorsCount + 1, 3) + 1),
                 MaxSleepMs);
 
-            Log.Debug("Sleeping for {0}ms after {1} continuous errors".Fmt(nextTry, continuousErrorsCount));
+            if (Log.IsDebugEnabled)
+                Log.Debug("Sleeping for {0}ms after {1} continuous errors".Fmt(nextTry, continuousErrorsCount));
 
             Thread.Sleep(nextTry);
         }
