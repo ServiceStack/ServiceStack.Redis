@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using ServiceStack.IO;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
@@ -45,7 +47,7 @@ namespace ServiceStack.Redis
 
         public override string ToString()
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Allocate();
             sb.AppendFormat("{0}:{1}", Host, Port);
 
             var args = new List<string>();
@@ -73,7 +75,7 @@ namespace ServiceStack.Redis
             if (args.Count > 0)
                 sb.Append("?").Append(string.Join("&", args));
             
-            return sb.ToString();
+            return StringBuilderCache.ReturnAndFree(sb);
         }
 
         protected bool Equals(RedisEndpoint other)

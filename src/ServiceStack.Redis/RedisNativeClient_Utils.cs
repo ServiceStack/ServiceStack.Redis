@@ -203,7 +203,7 @@ namespace ServiceStack.Redis
 
         protected string ReadLine()
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Allocate();
 
             int c;
             while ((c = Bstream.ReadByte()) != -1)
@@ -214,7 +214,7 @@ namespace ServiceStack.Redis
                     break;
                 sb.Append((char)c);
             }
-            return sb.ToString();
+            return StringBuilderCache.ReturnAndFree(sb);
         }
 
         public bool HasConnected
@@ -680,7 +680,7 @@ namespace ServiceStack.Redis
 
         protected void CmdLog(byte[][] args)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Allocate();
             foreach (var arg in args)
             {
                 var strArg = arg.FromUtf8Bytes();
@@ -694,7 +694,7 @@ namespace ServiceStack.Redis
                 if (sb.Length > 100)
                     break;
             }
-            this.lastCommand = sb.ToString();
+            this.lastCommand = StringBuilderCache.ReturnAndFree(sb);
             if (this.lastCommand.Length > 100)
             {
                 this.lastCommand = this.lastCommand.Substring(0, 100) + "...";

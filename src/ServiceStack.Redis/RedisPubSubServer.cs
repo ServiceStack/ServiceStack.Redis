@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using ServiceStack.Logging;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
@@ -523,7 +524,7 @@ namespace ServiceStack.Redis
 
         public string GetStatsDescription()
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Allocate();
             sb.AppendLine("===============");
             sb.AppendLine("Current Status: " + GetStatus());
             sb.AppendLine("Times Started: " + Interlocked.CompareExchange(ref timesStarted, 0, 0));
@@ -531,7 +532,7 @@ namespace ServiceStack.Redis
             sb.AppendLine("Num of Continuous Errors: " + Interlocked.CompareExchange(ref noOfContinuousErrors, 0, 0));
             sb.AppendLine("Last ErrorMsg: " + lastExMsg);
             sb.AppendLine("===============");
-            return sb.ToString();
+            return StringBuilderCache.ReturnAndFree(sb);
         }
 
         public virtual void Dispose()
