@@ -1,5 +1,4 @@
-[Join the ServiceStack Google+ group](https://plus.google.com/u/0/communities/112445368900682590445) or
-follow [@servicestack](http://twitter.com/servicestack) for updates.
+Join the [ServiceStack Google+ Community](https://plus.google.com/communities/112445368900682590445) or follow [@ServiceStack](https://twitter.com/servicestack) for updates. 
 
 # C#/.NET Client for Redis
 
