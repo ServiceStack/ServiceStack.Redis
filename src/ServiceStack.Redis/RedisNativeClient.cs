@@ -457,19 +457,25 @@ namespace ServiceStack.Redis
 
         public void Set(string key, byte[] value, int expirySeconds, long expiryMs = 0)
         {
+            Set(key.ToUtf8Bytes(), value, expirySeconds, expiryMs);
+        }
+
+        public void Set(byte[] key, byte[] value, int expirySeconds, long expiryMs = 0)
+        {
             if (key == null)
                 throw new ArgumentNullException("key");
+
             value = value ?? new byte[0];
 
             if (value.Length > OneGb)
                 throw new ArgumentException("value exceeds 1G", "value");
 
             if (expirySeconds > 0)
-                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.Ex, expirySeconds.ToUtf8Bytes());
+                SendExpectSuccess(Commands.Set, key, value, Commands.Ex, expirySeconds.ToUtf8Bytes());
             else if (expiryMs > 0)
-                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value, Commands.Px, expiryMs.ToUtf8Bytes());
+                SendExpectSuccess(Commands.Set, key, value, Commands.Px, expiryMs.ToUtf8Bytes());
             else
-                SendExpectSuccess(Commands.Set, key.ToUtf8Bytes(), value);
+                SendExpectSuccess(Commands.Set, key, value);
         }
 
         public bool Set(string key, byte[] value, bool exists, int expirySeconds = 0, long expiryMs = 0)
@@ -486,6 +492,11 @@ namespace ServiceStack.Redis
 
         public void SetEx(string key, int expireInSeconds, byte[] value)
         {
+            SetEx(key.ToUtf8Bytes(), expireInSeconds, value);
+        }
+
+        public void SetEx(byte[] key, int expireInSeconds, byte[] value)
+        {
             if (key == null)
                 throw new ArgumentNullException("key");
             value = value ?? new byte[0];
@@ -493,7 +504,7 @@ namespace ServiceStack.Redis
             if (value.Length > OneGb)
                 throw new ArgumentException("value exceeds 1G", "value");
 
-            SendExpectSuccess(Commands.SetEx, key.ToUtf8Bytes(), expireInSeconds.ToUtf8Bytes(), value);
+            SendExpectSuccess(Commands.SetEx, key, expireInSeconds.ToUtf8Bytes(), value);
         }
 
         public bool Persist(string key)
@@ -553,6 +564,14 @@ namespace ServiceStack.Redis
             return GetBytes(key);
         }
 
+        public byte[] Get(byte[] key)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
+
+            return SendExpectData(Commands.Get, key);
+        }
+
         public object[] Slowlog(int? top)
         {
             if (top.HasValue)
@@ -597,10 +616,15 @@ namespace ServiceStack.Redis
 
         public long Del(string key)
         {
+            return Del(key.ToUtf8Bytes());
+        }
+
+        public long Del(byte[] key)
+        {
             if (key == null)
                 throw new ArgumentNullException("key");
 
-            return SendExpectLong(Commands.Del, key.ToUtf8Bytes());
+            return SendExpectLong(Commands.Del, key);
         }
 
         public long Del(params string[] keys)
@@ -737,18 +761,28 @@ namespace ServiceStack.Redis
 
         public bool Expire(string key, int seconds)
         {
-            if (key == null)
-                throw new ArgumentNullException("key");
-
-            return SendExpectLong(Commands.Expire, key.ToUtf8Bytes(), seconds.ToUtf8Bytes()) == Success;
+            return Expire(key.ToUtf8Bytes(), seconds);
         }
 
-        public bool PExpire(string key, long ttlMs)
+        public bool Expire(byte[] key, int seconds)
         {
             if (key == null)
                 throw new ArgumentNullException("key");
 
-            return SendExpectLong(Commands.PExpire, key.ToUtf8Bytes(), ttlMs.ToUtf8Bytes()) == Success;
+            return SendExpectLong(Commands.Expire, key, seconds.ToUtf8Bytes()) == Success;
+        }
+
+        public bool PExpire(string key, long ttlMs)
+        {
+            return PExpire(key.ToUtf8Bytes(), ttlMs);
+        }
+
+        public bool PExpire(byte[] key, long ttlMs)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
+
+            return SendExpectLong(Commands.PExpire, key, ttlMs.ToUtf8Bytes()) == Success;
         }
 
         public bool ExpireAt(string key, long unixTime)
@@ -1969,7 +2003,7 @@ namespace ServiceStack.Redis
 
         #region Hash Operations
 
-        private static void AssertHashIdAndKey(string hashId, byte[] key)
+        private static void AssertHashIdAndKey(object hashId, byte[] key)
         {
             if (hashId == null)
                 throw new ArgumentNullException("hashId");
@@ -1979,9 +2013,14 @@ namespace ServiceStack.Redis
 
         public long HSet(string hashId, byte[] key, byte[] value)
         {
+            return HSet(hashId.ToUtf8Bytes(), key, value);
+        }
+
+        public long HSet(byte[] hashId, byte[] key, byte[] value)
+        {
             AssertHashIdAndKey(hashId, key);
 
-            return SendExpectLong(Commands.HSet, hashId.ToUtf8Bytes(), key, value);
+            return SendExpectLong(Commands.HSet, hashId, key, value);
         }
 
         public long HSetNX(string hashId, byte[] key, byte[] value)
@@ -2024,9 +2063,14 @@ namespace ServiceStack.Redis
 
         public byte[] HGet(string hashId, byte[] key)
         {
+            return HGet(hashId.ToUtf8Bytes(), key);
+        }
+
+        public byte[] HGet(byte[] hashId, byte[] key)
+        {
             AssertHashIdAndKey(hashId, key);
 
-            return SendExpectData(Commands.HGet, hashId.ToUtf8Bytes(), key);
+            return SendExpectData(Commands.HGet, hashId, key);
         }
 
         public byte[][] HMGet(string hashId, params byte[][] keys)
@@ -2043,9 +2087,14 @@ namespace ServiceStack.Redis
 
         public long HDel(string hashId, byte[] key)
         {
+            return HDel(hashId.ToUtf8Bytes(), key);
+        }
+
+        public long HDel(byte[] hashId, byte[] key)
+        {
             AssertHashIdAndKey(hashId, key);
 
-            return SendExpectLong(Commands.HDel, hashId.ToUtf8Bytes(), key);
+            return SendExpectLong(Commands.HDel, hashId, key);
         }
 
         public long HDel(string hashId, byte[][] keys)

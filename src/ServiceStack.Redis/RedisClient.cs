@@ -154,6 +154,20 @@ namespace ServiceStack.Redis
             base.Set(key, bytesValue);
         }
 
+        public bool SetValue(byte[] key, byte[] value, TimeSpan expireIn)
+        {
+            if (AssertServerVersionNumber() >= 2600)
+            {
+                Exec(r => r.Set(key, value, 0, expiryMs: (long)expireIn.TotalMilliseconds));
+            }
+            else
+            {
+                Exec(r => r.SetEx(key, (int)expireIn.TotalSeconds, value));
+            }
+
+            return true;
+        }
+
         [Obsolete("Use SetValue()")]
         public void SetEntry(string key, string value, TimeSpan expireIn)
         {
@@ -324,6 +338,11 @@ namespace ServiceStack.Redis
             return Del(key) == Success;
         }
 
+        public bool Remove(byte[] key)
+        {
+            return Del(key) == Success;
+        }
+
         public bool RemoveEntry(params string[] keys)
         {
             if (keys.Length == 0) return false;
@@ -382,6 +401,19 @@ namespace ServiceStack.Redis
         }
 
         public bool ExpireEntryIn(string key, TimeSpan expireIn)
+        {
+            if (AssertServerVersionNumber() >= 2600)
+            {
+                if (expireIn.Milliseconds > 0)
+                {
+                    return PExpire(key, (long)expireIn.TotalMilliseconds);
+                }
+            }
+
+            return Expire(key, (int)expireIn.TotalSeconds);
+        }
+
+        public bool ExpireEntryIn(byte[] key, TimeSpan expireIn)
         {
             if (AssertServerVersionNumber() >= 2600)
             {

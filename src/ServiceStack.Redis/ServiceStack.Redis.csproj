@@ -148,8 +148,6 @@
     <Compile Include="BasicRedisClientManager.cs" />
     <Compile Include="BasicRedisClientManager.ICacheClient.cs" />
     <Compile Include="BasicRedisResolver.cs" />
-    <Compile Include="RedisClient.KeyByteArray.cs" />
-    <Compile Include="RedisNativeClient.KeyByteArray.cs" />
     <Compile Include="RedisResolver.cs" />
     <Compile Include="BufferPool.cs" />
     <Compile Include="Commands.cs" />
