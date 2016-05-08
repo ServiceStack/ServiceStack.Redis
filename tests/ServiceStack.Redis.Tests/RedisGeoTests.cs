@@ -1,8 +1,10 @@
 ﻿using NUnit.Framework;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
     [TestFixture]
+    [Explicit, Ignore("CI requires redis-server v3.2.0")]
     public class RedisGeoTests
     {
         private readonly RedisNativeClient redis;
@@ -22,7 +24,8 @@ namespace ServiceStack.Redis.Tests
         public void Can_GeoAdd_and_GeoPos()
         {
             redis.FlushDb();
-            redis.GeoAdd("Sicily", 13.361389, 38.115556, "Palermo");
+            var count = redis.GeoAdd("Sicily", 13.361389, 38.115556, "Palermo");
+            Assert.That(count, Is.EqualTo(1));
             var results = redis.GeoPos("Sicily", "Palermo");
 
             Assert.That(results.Count, Is.EqualTo(1));
@@ -35,9 +38,10 @@ namespace ServiceStack.Redis.Tests
         public void Can_GeoAdd_and_GeoPos_multiple()
         {
             redis.FlushDb();
-            redis.GeoAdd("Sicily", 
+            var count = redis.GeoAdd("Sicily", 
                 new RedisGeo(13.361389, 38.115556, "Palermo"),
                 new RedisGeo(15.087269, 37.502669, "Catania"));
+            Assert.That(count, Is.EqualTo(2));
 
             var results = redis.GeoPos("Sicily", "Palermo", "Catania");
 
@@ -66,6 +70,7 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_GeoHash()
         {
+            redis.FlushDb();
             redis.GeoAdd("Sicily",
                 new RedisGeo(13.361389, 38.115556, "Palermo"),
                 new RedisGeo(15.087269, 37.502669, "Catania"));
@@ -73,6 +78,123 @@ namespace ServiceStack.Redis.Tests
             var hashes = redis.GeoHash("Sicily", "Palermo", "Catania");
             Assert.That(hashes[0], Is.EqualTo("sqc8b49rny0"));
             Assert.That(hashes[1], Is.EqualTo("sqdtr74hyu0"));
+        }
+
+        [Test]
+        public void Can_GeoRadius_default()
+        {
+            redis.FlushDb();
+            redis.GeoAdd("Sicily",
+                new RedisGeo(13.361389, 38.115556, "Palermo"),
+                new RedisGeo(15.087269, 37.502669, "Catania"));
+
+            var results = redis.GeoRadius("Sicily", 15, 37, 200, RedisGeoUnit.Kilometers);
+
+            Assert.That(results.Count, Is.EqualTo(2));
+            Assert.That(results[0].Member, Is.EqualTo("Palermo"));
+            Assert.That(results[0].Unit, Is.Null);
+            Assert.That(results[1].Member, Is.EqualTo("Catania"));
+            Assert.That(results[1].Unit, Is.Null);
+        }
+
+        [Test]
+        public void Can_GeoRadius_WithCoord()
+        {
+            redis.FlushDb();
+            redis.GeoAdd("Sicily",
+                new RedisGeo(13.361389, 38.115556, "Palermo"),
+                new RedisGeo(15.087269, 37.502669, "Catania"));
+
+            var results = redis.GeoRadius("Sicily", 15, 37, 200, RedisGeoUnit.Kilometers, withCoords: true);
+
+            Assert.That(results.Count, Is.EqualTo(2));
+            Assert.That(results[0].Member, Is.EqualTo("Palermo"));
+            Assert.That(results[0].Unit, Is.EqualTo(RedisGeoUnit.Kilometers));
+            Assert.That(results[0].Longitude, Is.EqualTo(13.361389).Within(.1));
+            Assert.That(results[0].Latitude, Is.EqualTo(38.115556).Within(.1));
+
+            Assert.That(results[1].Member, Is.EqualTo("Catania"));
+            Assert.That(results[1].Unit, Is.EqualTo(RedisGeoUnit.Kilometers));
+            Assert.That(results[1].Longitude, Is.EqualTo(15.087269).Within(.1));
+            Assert.That(results[1].Latitude, Is.EqualTo(37.502669).Within(.1));
+        }
+
+        [Test]
+        public void Can_GeoRadius_WithDist()
+        {
+            redis.FlushDb();
+            redis.GeoAdd("Sicily",
+                new RedisGeo(13.361389, 38.115556, "Palermo"),
+                new RedisGeo(15.087269, 37.502669, "Catania"));
+
+            var results = redis.GeoRadius("Sicily", 15, 37, 200, RedisGeoUnit.Kilometers, withDist: true);
+
+            Assert.That(results.Count, Is.EqualTo(2));
+            Assert.That(results[0].Member, Is.EqualTo("Palermo"));
+            Assert.That(results[0].Unit, Is.EqualTo(RedisGeoUnit.Kilometers));
+            Assert.That(results[0].Distance, Is.EqualTo(190.4424).Within(.1));
+
+            Assert.That(results[1].Member, Is.EqualTo("Catania"));
+            Assert.That(results[1].Unit, Is.EqualTo(RedisGeoUnit.Kilometers));
+            Assert.That(results[1].Distance, Is.EqualTo(56.4413).Within(.1));
+        }
+
+        [Test]
+        public void Can_GeoRadius_WithCoord_WithDist_WithHash()
+        {
+            redis.FlushDb();
+            redis.GeoAdd("Sicily",
+                new RedisGeo(13.361389, 38.115556, "Palermo"),
+                new RedisGeo(15.087269, 37.502669, "Catania"));
+
+            var results = redis.GeoRadius("Sicily", 15, 37, 200, RedisGeoUnit.Kilometers,
+                withCoords: true, withDist: true, withHash: true);
+
+            Assert.That(results.Count, Is.EqualTo(2));
+            Assert.That(results[0].Member, Is.EqualTo("Palermo"));
+            Assert.That(results[0].Unit, Is.EqualTo(RedisGeoUnit.Kilometers));
+            Assert.That(results[0].Longitude, Is.EqualTo(13.361389).Within(.1));
+            Assert.That(results[0].Latitude, Is.EqualTo(38.115556).Within(.1));
+            Assert.That(results[0].Distance, Is.EqualTo(190.4424).Within(.1));
+            Assert.That(results[0].Hash, Is.EqualTo(3479099956230698));
+
+            Assert.That(results[1].Member, Is.EqualTo("Catania"));
+            Assert.That(results[1].Unit, Is.EqualTo(RedisGeoUnit.Kilometers));
+            Assert.That(results[1].Longitude, Is.EqualTo(15.087269).Within(.1));
+            Assert.That(results[1].Latitude, Is.EqualTo(37.502669).Within(.1));
+            Assert.That(results[1].Distance, Is.EqualTo(56.4413).Within(.1));
+            Assert.That(results[1].Hash, Is.EqualTo(3479447370796909));
+        }
+
+        [Test]
+        public void Can_GeoRadius_WithCoord_WithDist_WithHash_Count_and_Asc()
+        {
+            redis.FlushDb();
+            redis.GeoAdd("Sicily",
+                new RedisGeo(13.361389, 38.115556, "Palermo"),
+                new RedisGeo(15.087269, 37.502669, "Catania"));
+
+            var results = redis.GeoRadius("Sicily", 15, 37, 200, RedisGeoUnit.Kilometers,
+                withCoords: true, withDist: true, withHash: true, count:1, asc:false);
+
+            Assert.That(results.Count, Is.EqualTo(1));
+            Assert.That(results[0].Member, Is.EqualTo("Palermo"));
+            Assert.That(results[0].Unit, Is.EqualTo(RedisGeoUnit.Kilometers));
+            Assert.That(results[0].Longitude, Is.EqualTo(13.361389).Within(.1));
+            Assert.That(results[0].Latitude, Is.EqualTo(38.115556).Within(.1));
+            Assert.That(results[0].Distance, Is.EqualTo(190.4424).Within(.1));
+            Assert.That(results[0].Hash, Is.EqualTo(3479099956230698));
+
+             results = redis.GeoRadius("Sicily", 15, 37, 200, RedisGeoUnit.Kilometers,
+                withCoords: true, withDist: true, withHash: true, count: 1, asc: true);
+
+            Assert.That(results.Count, Is.EqualTo(1));
+            Assert.That(results[0].Member, Is.EqualTo("Catania"));
+            Assert.That(results[0].Unit, Is.EqualTo(RedisGeoUnit.Kilometers));
+            Assert.That(results[0].Longitude, Is.EqualTo(15.087269).Within(.1));
+            Assert.That(results[0].Latitude, Is.EqualTo(37.502669).Within(.1));
+            Assert.That(results[0].Distance, Is.EqualTo(56.4413).Within(.1));
+            Assert.That(results[0].Hash, Is.EqualTo(3479447370796909));
         }
     }
 }

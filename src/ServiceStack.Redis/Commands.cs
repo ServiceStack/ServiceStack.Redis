@@ -1,3 +1,4 @@
+using System;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis
@@ -219,5 +220,34 @@ namespace ServiceStack.Redis
         public readonly static byte[] GeoPos = "GEOPOS".ToUtf8Bytes();
         public readonly static byte[] GeoRadius = "GEORADIUS".ToUtf8Bytes();
         public readonly static byte[] GeoRadiusByMember = "GEORADIUSBYMEMBER".ToUtf8Bytes();
+
+        public readonly static byte[] WithCoord = "WITHCOORD".ToUtf8Bytes();
+        public readonly static byte[] WithDist = "WITHDIST".ToUtf8Bytes();
+        public readonly static byte[] WithHash = "WITHHASH".ToUtf8Bytes();
+
+        public readonly static byte[] Meters = RedisGeoUnit.Meters.ToUtf8Bytes();
+        public readonly static byte[] Kilometers = RedisGeoUnit.Kilometers.ToUtf8Bytes();
+        public readonly static byte[] Miles = RedisGeoUnit.Miles.ToUtf8Bytes();
+        public readonly static byte[] Feet = RedisGeoUnit.Feet.ToUtf8Bytes();
+
+        public static byte[] GetUnit(string unit)
+        {
+            if (unit == null)
+                throw new ArgumentNullException("unit");
+
+            switch (unit)
+            {
+                case RedisGeoUnit.Meters:
+                    return Meters;
+                case RedisGeoUnit.Kilometers:
+                    return Kilometers;
+                case RedisGeoUnit.Miles:
+                    return Miles;
+                case RedisGeoUnit.Feet:
+                    return Feet;
+                default:
+                    throw new NotSupportedException("Unit '{0}' is not a valid unit".Fmt(unit));
+            }
+        }
     }
 }
