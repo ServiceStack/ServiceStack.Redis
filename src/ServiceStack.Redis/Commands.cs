@@ -211,5 +211,13 @@ namespace ServiceStack.Redis
         public readonly static byte[] Slaves = "slaves".ToUtf8Bytes();
         public readonly static byte[] Failover = "failover".ToUtf8Bytes();
         public readonly static byte[] GetMasterAddrByName = "get-master-addr-by-name".ToUtf8Bytes();
+
+        //Geo commands
+        public readonly static byte[] GeoAdd = "GEOADD".ToUtf8Bytes();
+        public readonly static byte[] GeoDist = "GEODIST".ToUtf8Bytes();
+        public readonly static byte[] GeoHash = "GEOHASH".ToUtf8Bytes();
+        public readonly static byte[] GeoPos = "GEOPOS".ToUtf8Bytes();
+        public readonly static byte[] GeoRadius = "GEORADIUS".ToUtf8Bytes();
+        public readonly static byte[] GeoRadiusByMember = "GEORADIUSBYMEMBER".ToUtf8Bytes();
     }
 }

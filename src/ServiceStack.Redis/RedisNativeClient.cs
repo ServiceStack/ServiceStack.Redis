@@ -2201,6 +2201,67 @@ namespace ServiceStack.Redis
 
         #endregion
 
+        #region GEO Operations
+
+        public long GeoAdd(string key, double longitude, double latitude, string member)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
+            if (key == null)
+                throw new ArgumentNullException("member");
+
+            return SendExpectLong(Commands.GeoAdd, key.ToUtf8Bytes(), longitude.ToUtf8Bytes(), latitude.ToUtf8Bytes(), member.ToUtf8Bytes());
+        }
+
+        public long GeoAdd(string key, RedisGeo[] geoPoints)
+        {
+            throw new NotImplementedException();
+        }
+
+        public double GeoDist(string key, string fromMember, string toMember, string unit = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public byte[][] GeoHash(string key, params string[] members)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<RedisGeo> GeoPos(string key, params string[] members)
+        {
+            var cmdWithArgs = MergeCommandWithArgs(Commands.GeoPos, key.ToUtf8Bytes(), members.Map(x => x.ToUtf8Bytes()).ToArray());
+            var data = SendExpectComplexResponse(cmdWithArgs);
+            var to = new List<RedisGeo>();
+
+            for (var i = 0; i < members.Length; i++)
+            {
+                var entry = data.Children[i];
+                to.Add(new RedisGeo
+                {
+                    Longitude = double.Parse(entry.Children[0].Data.FromUtf8Bytes()),
+                    Latitude = double.Parse(entry.Children[1].Data.FromUtf8Bytes()),
+                    Member = members[i],
+                });
+            }
+
+            return to;
+        }
+
+        public List<RedisGeoResult> GeoRadius(string key, double longitude, double latitude, double radius,
+            string unit = null, bool withCoords = false, bool withHash = false, int count = 0, bool? asc = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<RedisGeoResult> GeoRadiusByMember(string key, double longitude, double latitude, double radius,
+            string unit = null, bool withCoords = false, bool withHash = false, int count = 0, bool? asc = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
         internal bool IsDisposed { get; set; }
 
         public bool IsManagedClient
