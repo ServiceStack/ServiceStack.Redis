@@ -68,6 +68,64 @@ namespace ServiceStack.Redis
             return multiDataList.ToStringList();
         }
 
+        public long AddGeoMember(string key, double longitude, double latitude, string member)
+        {
+            return base.GeoAdd(key, longitude, latitude, member);
+        }
+
+        public long AddGeoMembers(string key, params RedisGeo[] geoPoints)
+        {
+            return base.GeoAdd(key, geoPoints);
+        }
+
+        public double CalculateDistanceBetweenGeoMembers(string key, string fromMember, string toMember, string unit = null)
+        {
+            return base.GeoDist(key, fromMember, toMember, unit);
+        }
+
+        public string[] GetGeohashes(string key, params string[] members)
+        {
+            return base.GeoHash(key, members);
+        }
+
+        public List<RedisGeo> GetGeoCoordinates(string key, params string[] members)
+        {
+            return base.GeoPos(key, members);
+        }
+
+        public string[] FindGeoMembersInRadius(string key, double longitude, double latitude, double radius, string unit)
+        {
+            var results = base.GeoRadius(key, longitude, latitude, radius, unit);
+            var to = new string[results.Count];
+            for (var i = 0; i < results.Count; i++)
+            {
+                to[i] = results[i].Member;
+            }
+            return to;
+        }
+
+        public List<RedisGeoResult> FindGeoResultsInRadius(string key, double longitude, double latitude, double radius, string unit, 
+            int? count = null, bool? sortByNearest = null)
+        {
+            return base.GeoRadius(key, longitude, latitude, radius, unit, withCoords:true, withDist:true, withHash:true, count:count, asc: sortByNearest);
+        }
+
+        public string[] FindGeoMembersInRadius(string key, string member, double radius, string unit)
+        {
+            var results = base.GeoRadiusByMember(key, member, radius, unit);
+            var to = new string[results.Count];
+            for (var i = 0; i < results.Count; i++)
+            {
+                to[i] = results[i].Member;
+            }
+            return to;
+        }
+
+        public List<RedisGeoResult> FindGeoResultsInRadius(string key, string member, double radius, string unit, int? count = null, bool? sortByNearest = null)
+        {
+            return base.GeoRadiusByMember(key, member, radius, unit, withCoords: true, withDist: true, withHash: true, count: count, asc: sortByNearest);
+        }
+
         public HashSet<string> GetAllItemsFromSet(string setId)
         {
             var multiDataList = SMembers(setId);

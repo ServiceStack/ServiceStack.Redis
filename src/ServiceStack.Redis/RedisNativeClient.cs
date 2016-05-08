@@ -2261,7 +2261,13 @@ namespace ServiceStack.Redis
 
             for (var i = 0; i < members.Length; i++)
             {
+                if (data.Children.Count <= i)
+                    break;
+
                 var entry = data.Children[i];
+                if (entry.Children.Count == 0)
+                    continue;
+
                 to.Add(new RedisGeo
                 {
                     Longitude = double.Parse(entry.Children[0].Data.FromUtf8Bytes()),
@@ -2345,10 +2351,75 @@ namespace ServiceStack.Redis
             return to;
         }
 
-        public List<RedisGeoResult> GeoRadiusByMember(string key, double longitude, double latitude, double radius,
-            string unit = null, bool withCoords = false, bool withHash = false, int count = 0, bool? asc = null)
+        public List<RedisGeoResult> GeoRadiusByMember(string key, string member, double radius, string unit, 
+            bool withCoords = false, bool withDist = false, bool withHash = false, int? count = null, bool? asc = null)
         {
-            throw new NotImplementedException();
+            if (key == null)
+                throw new ArgumentNullException("key");
+
+            var args = new List<byte[]>
+            {
+                member.ToUtf8Bytes(),
+                radius.ToUtf8Bytes(),
+                Commands.GetUnit(unit),
+            };
+
+            if (withCoords)
+                args.Add(Commands.WithCoord);
+            if (withDist)
+                args.Add(Commands.WithDist);
+            if (withHash)
+                args.Add(Commands.WithHash);
+
+            if (count != null)
+            {
+                args.Add(Commands.Count);
+                args.Add(count.Value.ToUtf8Bytes());
+            }
+
+            if (asc == true)
+                args.Add(Commands.Asc);
+            else if (asc == false)
+                args.Add(Commands.Desc);
+
+            var cmdWithArgs = MergeCommandWithArgs(Commands.GeoRadiusByMember, key.ToUtf8Bytes(), args.ToArray());
+
+            var to = new List<RedisGeoResult>();
+
+            if (!(withCoords || withDist || withHash))
+            {
+                var members = SendExpectMultiData(cmdWithArgs).ToStringArray();
+                foreach (var x in members)
+                {
+                    to.Add(new RedisGeoResult { Member = x });
+                }
+            }
+            else
+            {
+                var data = SendExpectComplexResponse(cmdWithArgs);
+
+                foreach (var child in data.Children)
+                {
+                    var i = 0;
+                    var result = new RedisGeoResult { Unit = unit, Member = child.Children[i++].Data.FromUtf8Bytes() };
+
+                    if (withDist)
+                        result.Distance = double.Parse(child.Children[i++].Data.FromUtf8Bytes());
+
+                    if (withHash)
+                        result.Hash = long.Parse(child.Children[i++].Data.FromUtf8Bytes());
+
+                    if (withCoords)
+                    {
+                        result.Longitude = double.Parse(child.Children[i].Children[0].Data.FromUtf8Bytes());
+                        result.Latitude = double.Parse(child.Children[i].Children[1].Data.FromUtf8Bytes());
+                    }
+
+                    to.Add(result);
+                }
+            }
+
+            return to;
         }
 
         #endregion

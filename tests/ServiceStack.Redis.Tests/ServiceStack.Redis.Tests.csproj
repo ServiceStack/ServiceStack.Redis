@@ -190,6 +190,7 @@
     <Compile Include="Issues\RedisCharacterizationTests.cs" />
     <Compile Include="RedisBatchTests.cs" />
     <Compile Include="RedisGeoTests.cs" />
+    <Compile Include="RedisGeoNativeClientTests.cs" />
     <Compile Include="RedisManagerPoolTests.cs" />
     <Compile Include="DiagnosticTests.cs" />
     <Compile Include="Examples\ServiceStack_Redis_UseCase.cs" />
