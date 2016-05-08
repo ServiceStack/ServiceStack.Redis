@@ -2213,19 +2213,32 @@ namespace ServiceStack.Redis
             return SendExpectLong(Commands.GeoAdd, key.ToUtf8Bytes(), longitude.ToUtf8Bytes(), latitude.ToUtf8Bytes(), member.ToUtf8Bytes());
         }
 
-        public long GeoAdd(string key, RedisGeo[] geoPoints)
+        public long GeoAdd(string key, params RedisGeo[] geoPoints)
         {
-            throw new NotImplementedException();
+            var members = new byte[geoPoints.Length * 3][];
+            for (var i = 0; i < geoPoints.Length; i++)
+            {
+                var geoPoint = geoPoints[i];
+                members[i * 3 + 0] = geoPoint.Longitude.ToUtf8Bytes();
+                members[i * 3 + 1] = geoPoint.Latitude.ToUtf8Bytes();
+                members[i * 3 + 2] = geoPoint.Member.ToUtf8Bytes();
+            }
+
+            var cmdWithArgs = MergeCommandWithArgs(Commands.GeoAdd, key.ToUtf8Bytes(), members);
+            return SendExpectLong(cmdWithArgs);
         }
 
         public double GeoDist(string key, string fromMember, string toMember, string unit = null)
         {
-            throw new NotImplementedException();
+            return unit == null
+                ? SendExpectDouble(Commands.GeoDist, key.ToUtf8Bytes(), fromMember.ToUtf8Bytes(), toMember.ToUtf8Bytes())
+                : SendExpectDouble(Commands.GeoDist, key.ToUtf8Bytes(), fromMember.ToUtf8Bytes(), toMember.ToUtf8Bytes(), unit.ToUtf8Bytes());
         }
 
-        public byte[][] GeoHash(string key, params string[] members)
+        public string[] GeoHash(string key, params string[] members)
         {
-            throw new NotImplementedException();
+            var cmdWithArgs = MergeCommandWithArgs(Commands.GeoHash, key.ToUtf8Bytes(), members.Map(x => x.ToUtf8Bytes()).ToArray());
+            return SendExpectMultiData(cmdWithArgs).ToStringArray();
         }
 
         public List<RedisGeo> GeoPos(string key, params string[] members)

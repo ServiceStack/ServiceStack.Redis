@@ -146,6 +146,19 @@ namespace ServiceStack.Redis
             return results;
         }
 
+        public static string[] ToStringArray(this byte[][] multiDataList)
+        {
+            if (multiDataList == null)
+                return new string[0];
+
+            var to = new string[multiDataList.Length];
+            for (int i = 0; i < multiDataList.Length; i++)
+            {
+                to[i] = multiDataList[i].FromUtf8Bytes();
+            }
+            return to;
+        }
+
         public static Dictionary<string, string> ToStringDictionary(this byte[][] multiDataList)
         {
             if (multiDataList == null)
