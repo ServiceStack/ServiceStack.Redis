@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ServiceStack.Text;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Script.Serialization;
 
 namespace ServiceStack.Redis
 {
@@ -40,7 +40,7 @@ namespace ServiceStack.Redis
                 }
             }
 
-            return new JavaScriptSerializer().Serialize(result);
+            return JsonSerializer.SerializeToString(result);
         }
 
         private static IEnumerable<String> SplitRows(String source)
