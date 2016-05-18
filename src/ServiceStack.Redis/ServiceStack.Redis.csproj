@@ -135,6 +135,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Net" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -148,6 +149,7 @@
     <Compile Include="BasicRedisClientManager.cs" />
     <Compile Include="BasicRedisClientManager.ICacheClient.cs" />
     <Compile Include="BasicRedisResolver.cs" />
+    <Compile Include="RedisDataInfoExtensions.cs" />
     <Compile Include="RedisResolver.cs" />
     <Compile Include="BufferPool.cs" />
     <Compile Include="Commands.cs" />
