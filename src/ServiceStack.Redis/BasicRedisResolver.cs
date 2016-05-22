@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ServiceStack.Logging;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
@@ -57,7 +58,7 @@ namespace ServiceStack.Redis
 
         public virtual void ResetSlaves(List<RedisEndpoint> newSlaves)
         {
-            slaves = (newSlaves ?? new List<RedisEndpoint>()).ToArray();
+            slaves = (newSlaves ?? TypeConstants<RedisEndpoint>.EmptyList).ToArray();
             ReadOnlyHostsCount = slaves.Length;
 
             if (log.IsDebugEnabled)

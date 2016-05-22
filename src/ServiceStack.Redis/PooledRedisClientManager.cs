@@ -50,10 +50,10 @@ namespace ServiceStack.Redis
         public IRedisResolver RedisResolver { get; set; }
         public List<Action<IRedisClientsManager>> OnFailover { get; private set; }
 
-        private RedisClient[] writeClients = new RedisClient[0];
+        private RedisClient[] writeClients = TypeConstants<RedisClient>.EmptyArray;
         protected int WritePoolIndex;
 
-        private RedisClient[] readClients = new RedisClient[0];
+        private RedisClient[] readClients = TypeConstants<RedisClient>.EmptyArray;
         protected int ReadPoolIndex;
 
         protected int RedisClientCounter = 0;
@@ -120,8 +120,8 @@ namespace ServiceStack.Redis
                 ? config.DefaultDb ?? initalDb
                 : initalDb;
 
-            var masters = (readWriteHosts ?? new string[0]).ToArray();
-            var slaves = (readOnlyHosts ?? new string[0]).ToArray();
+            var masters = (readWriteHosts ?? TypeConstants.EmptyStringArray).ToArray();
+            var slaves = (readOnlyHosts ?? TypeConstants.EmptyStringArray).ToArray();
 
             RedisResolver = new RedisResolver(masters, slaves);
 

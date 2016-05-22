@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using ServiceStack.Logging;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
@@ -33,7 +34,7 @@ namespace ServiceStack.Redis
         }
 
         public RedisSentinelResolver(RedisSentinel sentinel)
-            : this(sentinel, new RedisEndpoint[0], new RedisEndpoint[0]) { }
+            : this(sentinel, TypeConstants<RedisEndpoint>.EmptyArray, TypeConstants<RedisEndpoint>.EmptyArray) { }
 
         public RedisSentinelResolver(RedisSentinel sentinel, IEnumerable<string> masters, IEnumerable<string> slaves)
             : this(sentinel, masters.ToRedisEndPoints(), slaves.ToRedisEndPoints()) { }

@@ -38,7 +38,7 @@ namespace ServiceStack.Redis
 
         public List<Action<IRedisClientsManager>> OnFailover { get; private set; }
 
-        private RedisClient[] clients = new RedisClient[0];
+        private readonly RedisClient[] clients;
         protected int poolIndex;
 
         protected int RedisClientCounter = 0;

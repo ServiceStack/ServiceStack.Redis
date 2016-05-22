@@ -282,7 +282,7 @@ namespace ServiceStack.Redis
             {
                 if (arg == null)
                 {
-                    byteArgs.Add(new byte[0]);
+                    byteArgs.Add(TypeConstants.EmptyByteArray);
                     continue;
                 }
 
@@ -447,7 +447,7 @@ namespace ServiceStack.Redis
         {
             if (key == null)
                 throw new ArgumentNullException("key");
-            value = value ?? new byte[0];
+            value = value ?? TypeConstants.EmptyByteArray;
 
             if (value.Length > OneGb)
                 throw new ArgumentException("value exceeds 1G", "value");
@@ -465,7 +465,7 @@ namespace ServiceStack.Redis
             if (key == null)
                 throw new ArgumentNullException("key");
 
-            value = value ?? new byte[0];
+            value = value ?? TypeConstants.EmptyByteArray;
 
             if (value.Length > OneGb)
                 throw new ArgumentException("value exceeds 1G", "value");
@@ -499,7 +499,7 @@ namespace ServiceStack.Redis
         {
             if (key == null)
                 throw new ArgumentNullException("key");
-            value = value ?? new byte[0];
+            value = value ?? TypeConstants.EmptyByteArray;
 
             if (value.Length > OneGb)
                 throw new ArgumentException("value exceeds 1G", "value");
@@ -527,7 +527,7 @@ namespace ServiceStack.Redis
         {
             if (key == null)
                 throw new ArgumentNullException("key");
-            value = value ?? new byte[0];
+            value = value ?? TypeConstants.EmptyByteArray;
 
             if (value.Length > OneGb)
                 throw new ArgumentException("value exceeds 1G", "value");
@@ -598,7 +598,7 @@ namespace ServiceStack.Redis
             if (key == null)
                 throw new ArgumentNullException("key");
 
-            value = value ?? new byte[0];
+            value = value ?? TypeConstants.EmptyByteArray;
 
             if (value.Length > OneGb)
                 throw new ArgumentException("value exceeds 1G", "value");

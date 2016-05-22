@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading;
 using ServiceStack;
 using ServiceStack.Logging;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
@@ -242,7 +243,7 @@ namespace ServiceStack.Redis
         internal string[] ConfigureHosts(IEnumerable<string> hosts)
         {
             if (hosts == null)
-                return new string[0];
+                return TypeConstants.EmptyStringArray;
 
             return HostFilter == null
                 ? hosts.ToArray()
@@ -443,8 +444,8 @@ public class SentinelInfo
     public SentinelInfo(string masterName, IEnumerable<string> redisMasters, IEnumerable<string> redisSlaves)
     {
         MasterName = masterName;
-        RedisMasters = redisMasters != null ? redisMasters.ToArray() : new string[0];
-        RedisSlaves = redisSlaves != null ? redisSlaves.ToArray() : new string[0];
+        RedisMasters = redisMasters != null ? redisMasters.ToArray() : TypeConstants.EmptyStringArray;
+        RedisSlaves = redisSlaves != null ? redisSlaves.ToArray() : TypeConstants.EmptyStringArray;
     }
 
     public override string ToString()

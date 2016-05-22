@@ -16,6 +16,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Sockets;
 using ServiceStack.Model;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
@@ -23,8 +24,8 @@ namespace ServiceStack.Redis
     {
         public static List<RedisEndpoint> ToRedisEndPoints(this IEnumerable<string> hosts)
         {
-            return hosts == null 
-                ? new List<RedisEndpoint>() 
+            return hosts == null
+                ? new List<RedisEndpoint>()
                 : hosts.Select(x => ToRedisEndpoint(x)).ToList();
         }
 
@@ -64,7 +65,7 @@ namespace ServiceStack.Redis
                     var value = entry.Length > 1 ? entry[1].UrlDecode() : null;
                     if (value == null) continue;
 
-                    var name = entry[0].ToLower(); 
+                    var name = entry[0].ToLower();
                     switch (name)
                     {
                         case "db":
@@ -149,7 +150,7 @@ namespace ServiceStack.Redis
         public static string[] ToStringArray(this byte[][] multiDataList)
         {
             if (multiDataList == null)
-                return new string[0];
+                return TypeConstants.EmptyStringArray;
 
             var to = new string[multiDataList.Length];
             for (int i = 0; i < multiDataList.Length; i++)
@@ -162,7 +163,7 @@ namespace ServiceStack.Redis
         public static Dictionary<string, string> ToStringDictionary(this byte[][] multiDataList)
         {
             if (multiDataList == null)
-                return new Dictionary<string, string>();
+                return TypeConstants.EmptyStringDictionary;
 
             var map = new Dictionary<string, string>();
 
@@ -190,20 +191,20 @@ namespace ServiceStack.Redis
         {
             var bytes = new byte[strVal.Length];
             for (var i = 0; i < strVal.Length; i++)
-                bytes[i] = (byte) strVal[i];
+                bytes[i] = (byte)strVal[i];
 
             return bytes;
         }
 
-		public static byte[][] ToMultiByteArray(this string[] args)
-    	{
-    		var byteArgs = new byte[args.Length][];
-    		for (var i = 0; i < args.Length; ++i)
-    			byteArgs[i] = args[i].ToUtf8Bytes();
-    		return byteArgs;
-    	}
+        public static byte[][] ToMultiByteArray(this string[] args)
+        {
+            var byteArgs = new byte[args.Length][];
+            for (var i = 0; i < args.Length; ++i)
+                byteArgs[i] = args[i].ToUtf8Bytes();
+            return byteArgs;
+        }
 
-        public static  byte[][] PrependByteArray(this byte[][] args, byte[] valueToPrepend)
+        public static byte[][] PrependByteArray(this byte[][] args, byte[] valueToPrepend)
         {
             var newArgs = new byte[args.Length + 1][];
             newArgs[0] = valueToPrepend;
@@ -213,7 +214,7 @@ namespace ServiceStack.Redis
 
             return newArgs;
         }
-        public static  byte[][] PrependInt(this byte[][] args, int valueToPrepend)
+        public static byte[][] PrependInt(this byte[][] args, int valueToPrepend)
         {
             return args.PrependByteArray(valueToPrepend.ToUtf8Bytes());
         }

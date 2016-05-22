@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ServiceStack.Text;
 
 
 namespace ServiceStack.Redis.Support.Queue.Implementation
@@ -29,7 +30,9 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
                 MaxWritePoolSize = maxWritePoolSize
             };
 
-            clientManager = new PooledRedisClientManager(new[] { host + ":" + port }, new string[0], poolConfig) {
+            clientManager = new PooledRedisClientManager(new[] { host + ":" + port }, 
+                TypeConstants.EmptyStringArray, 
+                poolConfig) {
                 RedisResolver = { ClientFactory = config => new SerializingRedisClient(config) }
             };
         }

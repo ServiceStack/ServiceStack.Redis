@@ -651,7 +651,7 @@ namespace ServiceStack.Redis
         protected byte[][] SendExpectMultiData(params byte[][] cmdWithBinaryArgs)
         {
             return SendReceive(cmdWithBinaryArgs, ReadMultiData, Pipeline != null ? Pipeline.CompleteMultiBytesQueuedCommand : (Action<Func<byte[][]>>)null)
-                ?? new byte[0][];
+                ?? TypeConstants.EmptyByteArrayArray;
         }
 
         protected object[] SendExpectDeeplyNestedMultiData(params byte[][] cmdWithBinaryArgs)
@@ -891,7 +891,7 @@ namespace ServiceStack.Redis
                         if (count == -1)
                         {
                             //redis is in an invalid state
-                            return new byte[0][];
+                            return TypeConstants.EmptyByteArrayArray;
                         }
 
                         var result = new byte[count][];
@@ -1101,7 +1101,7 @@ namespace ServiceStack.Redis
             for (var i = 0; i < keys.Length; i++)
             {
                 var key = keys[i];
-                keyBytes[i] = key != null ? key.ToUtf8Bytes() : new byte[0];
+                keyBytes[i] = key != null ? key.ToUtf8Bytes() : TypeConstants.EmptyByteArray;
             }
             return keyBytes;
         }
@@ -1109,9 +1109,9 @@ namespace ServiceStack.Redis
         protected byte[][] MergeAndConvertToBytes(string[] keys, string[] args)
         {
             if (keys == null)
-                keys = new string[0];
+                keys = TypeConstants.EmptyStringArray;
             if (args == null)
-                args = new string[0];
+                args = TypeConstants.EmptyStringArray;
 
             var keysLength = keys.Length;
             var merged = new string[keysLength + args.Length];

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using ServiceStack.Logging;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
@@ -24,13 +25,14 @@ namespace ServiceStack.Redis
         {
             get { return masters; }
         }
+
         public RedisEndpoint[] Slaves
         {
             get { return slaves; }
         }
 
         public RedisResolver()
-            : this(new RedisEndpoint[0], new RedisEndpoint[0]) { }
+            : this(TypeConstants<RedisEndpoint>.EmptyArray, TypeConstants<RedisEndpoint>.EmptyArray) {}
 
         public RedisResolver(IEnumerable<string> masters, IEnumerable<string> slaves)
             : this(masters.ToRedisEndPoints(), slaves.ToRedisEndPoints()){}
