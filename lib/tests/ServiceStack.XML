@@ -14,6 +14,506 @@
             Default redirct URL if Required Role or Permission attributes doesn't permit access.
             </summary>
         </member>
+        <member name="T:ServiceStack.Auth.IManageApiKeys">
+            <summary>
+            The Interface Auth Repositories need to implement to support API Keys
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.ApiKey">
+            <summary>
+            The POCO Table used to persist API Keys
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.ApiKeyAuthProvider">
+            <summary>
+            Enable access to protected Services using API Keys
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.ApiKeyAuthProvider.ServiceRoutes">
+            <summary>
+            Modify the registration of GetApiKeys and RegenrateApiKeys Services
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.ApiKeyAuthProvider.KeySizeBytes">
+            <summary>
+            How much entropy should the generated keys have. (default 24)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.ApiKeyAuthProvider.Environments">
+            <summary>
+            Generate different keys for different environments. (default live,test)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.ApiKeyAuthProvider.KeyTypes">
+            <summary>
+            Different types of Keys each user can have. (default secret)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.ApiKeyAuthProvider.ExpireKeysAfter">
+            <summary>
+            Whether to automatically expire keys. (default no expiry)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.ApiKeyAuthProvider.InitSchema">
+            <summary>
+            Automatically create the ApiKey Table for AuthRepositories which need it. (default true)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.ApiKeyAuthProvider.RequireSecureConnection">
+            <summary>
+            Whether to only allow access via API Key from a secure connection. (default true)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.ApiKeyAuthProvider.GenerateApiKey">
+            <summary>
+            Change how API Key is generated
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.ApiKeyAuthProvider.CreateApiKeyFilter">
+            <summary>
+            Run custom filter after API Key is created
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.JwtAuthProvider">
+            <summary>
+            Used to Issue and process JWT Tokens and registers ConvertSessionToToken Service to convert Sessions to JWT Tokens
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.JwtAuthProviderReader">
+            <summary>
+            Enable access to protected Services using JWT Tokens
+            </summary>
+        </member>
+        <member name="F:ServiceStack.Auth.JwtAuthProviderReader.HmacAlgorithms">
+            <summary>
+            Different HMAC Algorithms supported
+            </summary>
+        </member>
+        <member name="F:ServiceStack.Auth.JwtAuthProviderReader.RsaSignAlgorithms">
+            <summary>
+            Different RSA Signing Algorithms supported
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.RequireSecureConnection">
+            <summary>
+            Whether to only allow access via API Key from a secure connection. (default true)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.CreateHeaderFilter">
+            <summary>
+            Run custom filter after JWT Header is created
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.CreatePayloadFilter">
+            <summary>
+            Run custom filter after JWT Payload is created
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.PopulateSessionFilter">
+            <summary>
+            Run custom filter after session is restored from a JWT Token
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.EncryptPayload">
+            <summary>
+            Whether to encrypt JWE Payload (default false). 
+            Uses RSA-OAEP for Key Encryption and AES/128/CBC HMAC SHA256 for Conent Encryption
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.HashAlgorithm">
+            <summary>
+            Which Hash Algorithm should be used to sign the JWT Token. (default HS256)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.RequireHashAlgorithm">
+            <summary>
+            Whether to only allow processing of JWT Tokens using the configured HashAlgorithm. (default true)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.Issuer">
+            <summary>
+            The Issuer to embed in the token. (default ssjwt)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.Audience">
+            <summary>
+            The Audience to embed in the token. (default null)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.KeyId">
+            <summary>
+            What Id to use to identify the Key used to sign the token. (default First 3 chars of Base64 Key)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.AuthKey">
+            <summary>
+            The AuthKey used to sign the JWT Token
+            </summary>
+        </member>
+        <member name="F:ServiceStack.Auth.JwtAuthProviderReader.privateKey">
+            <summary>
+            The RSA Private Key used to Sign the JWT Token when RSA is used
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.PrivateKeyXml">
+            <summary>
+            Convenient overload to intialize the Private Key via exported XML
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.PublicKey">
+            <summary>
+            The RSA Public Key used to Verify the JWT Token when RSA is used
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.PublicKeyXml">
+            <summary>
+            Convenient overload to intialize the Public Key via exported XML
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.ExpireTokensIn">
+            <summary>
+            How long should JWT Tokens be valid for. (default 14 days)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.InvalidateTokensIssuedBefore">
+            <summary>
+            Whether to invalidate all JWT Tokens issued before a specified date.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.ServiceRoutes">
+            <summary>
+            Modify the registration of ConvertSessionToToken Service
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.AspNetWindowsAuthProvider.AllRoles">
+            <summary>
+            Specify all roles to be used by this application
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.AspNetWindowsAuthProvider.LimitAccessToRoles">
+            <summary>
+            Only allow access to users in specified roles
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.AuthEvents">
+            <summary>
+            Conveneint base class with empty virtual methods so subclasses only need to override the hooks they need.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.OdnoklassnikiAuthProvider">
+            <summary>
+              Create Odnoklassniki App at: http://www.odnoklassniki.ru/devaccess
+              The Callback URL for your app should match the CallbackUrl provided.
+              
+              NB: They claim they use OAuth 2.0, but they in fact don't. 
+              http://apiok.ru/wiki/display/api/Authorization+OAuth+2.0
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.VkAuthProvider">
+            <summary>
+              Create VK App at: http://vk.com/editapp?act=create
+              The Callback URL for your app should match the CallbackUrl provided.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.VkAuthProvider.EnsureLatestCode(System.String)">
+            <summary>
+            If previous attemts failes, the subsequential calls 
+            build up code value like "code1,code2,code3"
+            so we need the last one only
+            </summary>
+            <param name="code"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ServiceStack.Auth.YandexAuthProvider">
+            <summary>
+              Create Yandex App at: https://oauth.yandex.ru/client/new
+              The Callback URL for your app should match the CallbackUrl provided.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.GithubAuthProvider">
+            <summary>
+              Create an App at: https://github.com/settings/applications/new
+              The Callback URL for your app should match the CallbackUrl provided.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.GithubAuthProvider.UserRequestFilter(System.Net.HttpWebRequest)">
+            <summary>
+              Calling to Github API without defined Useragent throws
+              exception "The server committed a protocol violation. Section=ResponseStatusLine"
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.UserAuthRepositoryExtensions.AssignRoles(ServiceStack.Auth.IAuthRepository,ServiceStack.Auth.IUserAuth,System.Collections.Generic.ICollection{System.String},System.Collections.Generic.ICollection{System.String})">
+            <summary>
+            Creates the required missing tables or DB schema 
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.ValidateFn">
+            <summary>
+            Inject logic into existing services by introspecting the request and injecting your own
+            validation logic. Exceptions thrown will have the same behaviour as if the service threw it.
+            
+            If a non-null object is returned the request will short-circuit and return that response.
+            </summary>
+            <param name="service">The instance of the service</param>
+            <param name="httpMethod">GET,POST,PUT,DELETE</param>
+            <param name="requestDto"></param>
+            <returns>Response DTO; non-null will short-circuit execution and return that response</returns>
+        </member>
+        <member name="M:ServiceStack.Auth.AuthenticateService.Authenticate(ServiceStack.Authenticate)">
+            <summary>
+            Public API entry point to authenticate via code
+            </summary>
+            <param name="request"></param>
+            <returns>null; if already autenticated otherwise a populated instance of AuthResponse</returns>
+        </member>
+        <member name="M:ServiceStack.Auth.AuthenticateService.Authenticate(ServiceStack.Authenticate,System.String,ServiceStack.Auth.IAuthSession,ServiceStack.Auth.IAuthProvider)">
+            <summary>
+            The specified <paramref name="session"/> may change as a side-effect of this method. If
+            subsequent code relies on current <see cref="T:ServiceStack.Auth.IAuthSession"/> data be sure to reload
+            the session istance via <see cref="M:ServiceStack.ServiceExtensions.GetSession(ServiceStack.IServiceBase,System.Boolean)"/>.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.AuthProvider.FallbackConfig(System.String)">
+            <summary>
+            Allows specifying a global fallback config that if exists is formatted with the Provider as the first arg.
+            E.g. this appSetting with the TwitterAuthProvider: 
+            oauth.CallbackUrl="http://localhost:11001/auth/{0}"
+            Would result in: 
+            oauth.CallbackUrl="http://localhost:11001/auth/twitter"
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Auth.AuthProvider.Logout(ServiceStack.IServiceBase,ServiceStack.Authenticate)">
+            <summary>
+            Remove the Users Session
+            </summary>
+            <param name="service"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Auth.AuthProvider.SaveUserAuth(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession,ServiceStack.Auth.IAuthRepository,ServiceStack.Auth.IAuthTokens)">
+            <summary>
+            Saves the Auth Tokens for this request. Called in OnAuthenticated(). 
+            Overrideable, the default behaviour is to call IUserAuthRepository.CreateOrMergeAuthSession().
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.FacebookAuthProvider">
+            <summary>
+            Create a Facebook App at: https://developers.facebook.com/apps
+            The Callback URL for your app should match the CallbackUrl provided.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.AuthHttpGateway.DownloadYammerUserInfo(System.String)">
+            <summary>
+            Download Yammer User Info given its ID.
+            </summary>
+            <param name="yammerUserId">
+            The Yammer User ID.
+            </param>
+            <returns>
+            The User info in JSON format.
+            </returns>
+            <remarks>
+            <para>
+            Yammer provides a method to retrieve current user information via
+            "https://www.yammer.com/api/v1/users/current.json".
+            </para>
+            <para>
+            However, to ensure consistency with the rest of the Auth codebase,
+            the explicit URL will be used, where [:id] denotes the User ID: 
+            "https://www.yammer.com/api/v1/users/[:id].json"
+            </para>
+            <para>
+            Refer to: https://developer.yammer.com/restapi/ for full documentation.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:ServiceStack.Auth.IAuthProvider.Logout(ServiceStack.IServiceBase,ServiceStack.Authenticate)">
+            <summary>
+            Remove the Users Session
+            </summary>
+            <param name="service"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Auth.IAuthProvider.Authenticate(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession,ServiceStack.Authenticate)">
+            <summary>
+            The entry point for all AuthProvider providers. Runs inside the AuthService so exceptions are treated normally.
+            Overridable so you can provide your own Auth implementation.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.IAuthProvider.IsAuthorized(ServiceStack.Auth.IAuthSession,ServiceStack.Auth.IAuthTokens,ServiceStack.Authenticate)">
+            <summary>
+            Determine if the current session is already authenticated with this AuthProvider
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.InMemoryAuthRepository">
+            <summary>
+            Thread-safe In memory UserAuth data store so it can be used without a dependency on Redis.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.OAuthProvider.Authenticate(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession,ServiceStack.Authenticate)">
+            <summary>
+            The entry point for all AuthProvider providers. Runs inside the AuthService so exceptions are treated normally.
+            Overridable so you can provide your own Auth implementation.
+            </summary>
+            <param name="authService"></param>
+            <param name="session"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Auth.OAuthProvider.Init(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession@,ServiceStack.Authenticate)">
+            <summary>
+            Sets the CallbackUrl and session.ReferrerUrl if not set and initializes the session tokens for this AuthProvider
+            </summary>
+            <param name="authService"></param>
+            <param name="session"></param>
+            <param name="request"> </param>
+            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Auth.RegisterService`1.Put(ServiceStack.Register)">
+            <summary>
+            Update an existing registraiton
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.RegisterService`1.Post(ServiceStack.Register)">
+            <summary>
+                Create new Registration
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.RegisterService`1.UpdateUserAuth(ServiceStack.Register)">
+            <summary>
+            Logic to update UserAuth from Registration info, not enabled on PUT because of security.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.SaltedHash">
+            <summary>
+            Thank you Martijn
+            http://www.dijksterhuis.org/creating-salted-hash-values-in-c/
+            
+            Stronger/Slower Alternative: 
+            https://github.com/defuse/password-hashing/blob/master/PasswordStorage.cs
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.TwitterAuthProvider">
+            <summary>
+            Create an app at https://dev.twitter.com/apps to get your ConsumerKey and ConsumerSecret for your app.
+            The Callback URL for your app should match the CallbackUrl provided.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Auth.YammerAuthProvider">
+            <summary>
+            The ServiceStack Yammer OAuth provider.
+            </summary>
+            <remarks>
+            <para>
+            This provider is loosely based on the existing ServiceStack's Facebook OAuth provider.
+            </para>
+            <para>
+            For the full info on Yammer's OAuth2 authentication flow, refer to:
+            https://developer.yammer.com/authentication/#a-oauth2
+            </para>
+            <para>
+            Note: Add these to your application / web config settings under appSettings and replace
+            values as appropriate.
+            <![CDATA[
+                <!-- ServiceStack Yammer OAuth config -->
+                <add key="oauth.yammer.ClientId" value=""/>
+                <add key="oauth.yammer.ClientSecret" value=""/>
+                <add key="oauth.yammer.AccessTokenUrl" value="https://www.yammer.com/oauth2/access_token.json"/>
+                <add key="oauth.yammer.CallbackUrl" value="~/"/>
+                <add key="oauth.yammer.PreAuthUrl" value="https://www.yammer.com/dialog/oauth"/>
+                <add key="oauth.yammer.Realm" value="https://www.yammer.com"/>
+                <add key="oauth.yammer.RedirectUrl" value="~/auth/yammer"/>
+            ]]>
+            </para>
+            </remarks>
+        </member>
+        <member name="F:ServiceStack.Auth.YammerAuthProvider.Name">
+            <summary>
+            The OAuth provider name / identifier.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.YammerAuthProvider.#ctor(ServiceStack.Configuration.IAppSettings)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ServiceStack.Auth.YammerAuthProvider"/> class.
+            </summary>
+            <param name="appSettings">
+            The application settings (in web.config).
+            </param>
+        </member>
+        <member name="P:ServiceStack.Auth.YammerAuthProvider.ClientId">
+            <summary>
+            Gets or sets the Yammer OAuth client id.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.YammerAuthProvider.ClientSecret">
+            <summary>
+            Gets or sets the Yammer OAuth client secret.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.YammerAuthProvider.PreAuthUrl">
+            <summary>
+            Gets or sets the Yammer OAuth pre-auth url.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.YammerAuthProvider.Authenticate(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession,ServiceStack.Authenticate)">
+            <summary>
+            Authenticate against Yammer OAuth endpoint.
+            </summary>
+            <param name="authService">
+            The auth service.
+            </param>
+            <param name="session">
+            The session.
+            </param>
+            <param name="request">
+            The request.
+            </param>
+            <returns>
+            The <see cref="T:System.Object"/>.
+            </returns>
+        </member>
+        <member name="M:ServiceStack.Auth.YammerAuthProvider.LoadUserAuthInfo(ServiceStack.AuthUserSession,ServiceStack.Auth.IAuthTokens,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Load the UserAuth info into the session.
+            </summary>
+            <param name="userSession">
+            The User session.
+            </param>
+            <param name="tokens">
+            The OAuth tokens.
+            </param>
+            <param name="authInfo">
+            The auth info.
+            </param>
+        </member>
+        <member name="M:ServiceStack.Auth.YammerAuthProvider.LoadUserOAuthProvider(ServiceStack.Auth.IAuthSession,ServiceStack.Auth.IAuthTokens)">
+            <summary>
+            Load the UserOAuth info into the session.
+            </summary>
+            <param name="authSession">
+            The auth session.
+            </param>
+            <param name="tokens">
+            The OAuth tokens.
+            </param>
+        </member>
+        <member name="T:ServiceStack.Auth.EmailAddresses">
+            <summary>
+            The Yammer User's email addresses.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.EmailAddresses.Type">
+            <summary>
+            Gets or sets the email address type (e.g. primary).
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.EmailAddresses.Address">
+            <summary>
+            Gets or sets the email address.
+            </summary>
+        </member>
         <member name="P:ServiceStack.AutoQueryViewerConfig.ServiceBaseUrl">
             <summary>
             The BaseUrl of the ServiceStack instance (inferred)
@@ -2036,1210 +2536,66 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="F:ServiceStack.Configuration.Config.DefaultNamespace">
+        <member name="T:ServiceStack.MiniProfiler.Data.Link`2">
             <summary>
-            Would've preferred to use [assembly: ContractNamespace] attribute but it is not supported in Mono
+            This is a micro-cache; suitable when the number of terms is controllable (a few hundred, for example),
+            and strictly append-only; you cannot change existing values. All key matches are on **REFERENCE**
+            equality. The type is fully thread-safe.
             </summary>
         </member>
-        <member name="T:ServiceStack.Configuration.AppSettings">
+        <member name="P:ServiceStack.MiniProfiler.Data.ProfiledDbCommand.BindByName">
             <summary>
-            More familiar name for the new crowd.
+            If the underlying command supports BindByName, this sets/clears the underlying
+            implementation accordingly. This is required to support OracleCommand from dapper-dot-net
             </summary>
         </member>
-        <member name="M:ServiceStack.Configuration.AppSettings.#ctor(System.String)">
+        <member name="T:ServiceStack.MiniProfiler.Data.ProfiledDbConnection">
             <summary>
-            The tier lets you specify a retrieving a setting with the tier prefix first before falling back to the original key. 
-            E.g a tier of 'Live' looks for 'Live.{Key}' or if not found falls back to '{Key}'.
+            Wraps a database connection, allowing sql execution timings to be collected when a <see cref="T:ServiceStack.MiniProfiler.Profiler"/> session is started.
             </summary>
         </member>
-        <member name="M:ServiceStack.Configuration.AppSettings.GetString(System.String)">
+        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbConnection.#ctor(System.Data.Common.DbConnection,ServiceStack.MiniProfiler.Data.IDbProfiler,System.Boolean)">
             <summary>
-            Returns string if exists, otherwise null
+            Returns a new <see cref="T:ServiceStack.MiniProfiler.Data.ProfiledDbConnection"/> that wraps <paramref name="connection"/>, 
+            providing query execution profiling.  If profiler is null, no profiling will occur.
             </summary>
-            <param name="name"></param>
-            <returns></returns>
+            <param name="connection">Your provider-specific flavor of connection, e.g. SqlConnection, OracleConnection</param>
+            <param name="profiler">The currently started <see cref="T:ServiceStack.MiniProfiler.Data.IDbProfiler"/> or null.</param>
+            <param name="autoDisposeConnection">Determines whether the ProfiledDbConnection will dispose the underlying connection.</param>
         </member>
-        <member name="M:ServiceStack.Configuration.ConfigUtils.GetNullableAppSetting(System.String)">
+        <member name="P:ServiceStack.MiniProfiler.Data.ProfiledDbConnection._conn">
             <summary>
-            Gets the nullable app setting.
+            This will be made private; use <see cref="P:ServiceStack.MiniProfiler.Data.ProfiledConnection.InnerConnection"/>
             </summary>
         </member>
-        <member name="M:ServiceStack.Configuration.ConfigUtils.GetAppSetting(System.String)">
+        <member name="P:ServiceStack.MiniProfiler.Data.ProfiledDbConnection._profiler">
             <summary>
-            Gets the app setting.
+            This will be made private; use <see cref="T:ServiceStack.MiniProfiler.Profiler"/>
             </summary>
         </member>
-        <member name="M:ServiceStack.Configuration.ConfigUtils.ConfigSectionExists(System.String)">
+        <member name="T:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory">
             <summary>
-            Determines wheter the Config section identified by the sectionName exists.
+            Wrapper for a db provider factory to enable profiling
             </summary>
         </member>
-        <member name="M:ServiceStack.Configuration.ConfigUtils.GetAppSetting(System.String,System.String)">
+        <member name="F:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.Instance">
             <summary>
-            Returns AppSetting[key] if exists otherwise defaultValue
+            Every provider factory must have an Instance public field
             </summary>
         </member>
-        <member name="M:ServiceStack.Configuration.ConfigUtils.GetAppSetting``1(System.String,``0)">
+        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.#ctor">
             <summary>
-            Returns AppSetting[key] if exists otherwise defaultValue, for non-string values
+            Used for db provider apis internally 
             </summary>
         </member>
-        <member name="M:ServiceStack.Configuration.ConfigUtils.GetConnectionStringSetting(System.String)">
+        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.CreateCommand">
             <summary>
-            Gets the connection string setting.
+            proxy
             </summary>
         </member>
-        <member name="M:ServiceStack.Configuration.ConfigUtils.GetConnectionString(System.String)">
+        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.CreateConnection">
             <summary>
-            Gets the connection string.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Configuration.ConfigUtils.GetListFromAppSetting(System.String)">
-            <summary>
-            Gets the list from app setting.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Configuration.ConfigUtils.GetDictionaryFromAppSetting(System.String)">
-            <summary>
-            Gets the dictionary from app setting.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Configuration.ConfigUtils.GetParseMethod(System.Type)">
-            <summary>
-            Get the static Parse(string) method on the type supplied
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Configuration.ConfigUtils.GetConstructorInfo(System.Type)">
-            <summary>
-            Gets the constructor info for T(string) if exists.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Configuration.ConfigUtils.ParseTextValue``1(System.String)">
-            <summary>
-            Returns the value returned by the 'T.Parse(string)' method if exists otherwise 'new T(string)'. 
-            e.g. if T was a TimeSpan it will return TimeSpan.Parse(textValue).
-            If there is no Parse Method it will attempt to create a new instance of the destined type
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Configuration.ISettings.Get(System.String)">
-            <summary>
-            Provides a common interface for Settings providers such as
-            ConfigurationManager or Azure's RoleEnvironment. The only
-            requirement is that if the implementation cannot find the
-            specified key, the return value must be null
-            </summary>
-            <param name="key">The key for the setting</param>
-            <returns>The string value of the specified key, or null if the key
-            was invalid</returns>
-        </member>
-        <member name="M:ServiceStack.Configuration.ISettings.GetAllKeys">
-            <summary>
-            Return all keys in this configuration source.
-            </summary>
-            <returns></returns>
-        </member>
-        <!-- Badly formed XML comment ignored for member "T:ServiceStack.Html.HtmlCompressor" -->
-        <member name="F:ServiceStack.Html.HtmlCompressor.PHP_TAG_PATTERN">
-            Predefined pattern that matches <code>&lt;?php ... ?></code> tags. 
-            Could be passed inside a list to {@link #setPreservePatterns(List) setPreservePatterns} method.
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressor.SERVER_SCRIPT_TAG_PATTERN">
-            Predefined pattern that matches <code>&lt;% ... %></code> tags. 
-            Could be passed inside a list to {@link #setPreservePatterns(List) setPreservePatterns} method.
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressor.SERVER_SIDE_INCLUDE_PATTERN">
-            Predefined pattern that matches <code>&lt;--# ... --></code> tags. 
-            Could be passed inside a list to {@link #setPreservePatterns(List) setPreservePatterns} method.
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressor.BLOCK_TAGS_MIN">
-            Predefined list of tags that are very likely to be block-level. 
-            Could be passed to {@link #setRemoveSurroundingSpaces(string) setRemoveSurroundingSpaces} method.
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressor.BLOCK_TAGS_MAX">
-            Predefined list of tags that are block-level by default, excluding <code>&lt;div></code> and <code>&lt;li></code> tags. 
-            Table tags are also included.
-            Could be passed to {@link #setRemoveSurroundingSpaces(string) setRemoveSurroundingSpaces} method.
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressor.ALL_TAGS">
-            Could be passed to {@link #setRemoveSurroundingSpaces(string) setRemoveSurroundingSpaces} method 
-            to remove all surrounding spaces (not recommended).
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressor.Enabled">
-            If set to <code>false</code> all compression will be bypassed. Might be useful for testing purposes. 
-            Default is <code>true</code>.
-            
-            @param enabled set <code>false</code> to bypass all compression
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressor.JavaScriptCompressor">
-            Gets or Sets JavaScript compressor implementation that will be used 
-            to compress inline JavaScript in HTML. 
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressor.CssCompressor">
-            Returns CSS compressor implementation that will be used 
-            to compress inline CSS in HTML.
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveComments">
-            If set to <code>true</code> all HTML comments will be removed.   
-            Default is <code>true</code>.
-            
-            @param removeComments set <code>true</code> to remove all HTML comments
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveMultiSpaces">
-            If set to <code>true</code> all multiple whitespace characters will be replaced with single spaces.
-            Default is <code>true</code>.
-            
-            @param removeMultiSpaces set <code>true</code> to replace all multiple whitespace characters 
-            will single spaces.
-        </member>
-        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveIntertagSpaces" -->
-        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveQuotes" -->
-        <member name="F:ServiceStack.Html.HtmlCompressor.CompressJavaScript">
-            Enables JavaScript compression within &lt;script> tags 
-            if set to <code>true</code>. Default is <code>false</code> for performance reasons.
-             
-            <p><b>Note:</b> Compressing JavaScript is not recommended if pages are 
-            compressed dynamically on-the-fly because of performance impact. 
-            You should consider putting JavaScript into a separate file and
-            compressing it using standalone YUICompressor for example.</p>
-            
-            @param compressJavaScript set <code>true</code> to enable JavaScript compression. 
-            Default is <code>false</code>
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressor.CompressCss">
-            Enables CSS compression within &lt;style> tags using 
-            <a href="http://developer.yahoo.com/yui/compressor/">Yahoo YUI ICompressor</a> 
-            if set to <code>true</code>. Default is <code>false</code> for performance reasons.
-             
-            <p><b>Note:</b> Compressing CSS is not recommended if pages are 
-            compressed dynamically on-the-fly because of performance impact. 
-            You should consider putting CSS into a separate file and
-            compressing it using standalone YUICompressor for example.</p>
-            
-            @param compressCss set <code>true</code> to enable CSS compression. 
-            Default is <code>false</code>
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressor.SimpleDoctype">
-            If set to <code>true</code>, existing DOCTYPE declaration will be replaced with simple <code>&lt;!DOCTYPE html></code> declaration.
-            Default is <code>false</code>.
-            
-            @param simpleDoctype set <code>true</code> to replace existing DOCTYPE declaration with <code>&lt;!DOCTYPE html></code>
-        </member>
-        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveScriptAttributes" -->
-        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveStyleAttributes">
-            If set to <code>true</code>, <code>type="text/style"</code> attributes will be removed from <code>&lt;style></code> tags. Default is <code>false</code>.
-            
-            @param removeStyleAttributes set <code>true</code> to remove <code>type="text/style"</code> attributes from <code>&lt;style></code> tags
-        </member>
-        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveLinkAttributes" -->
-        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveFormAttributes">
-            If set to <code>true</code>, <code>method="get"</code> attributes will be removed from <code>&lt;form></code> tags. Default is <code>false</code>.
-            
-            @param removeFormAttributes set <code>true</code> to remove <code>method="get"</code> attributes from <code>&lt;form></code> tags
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveInputAttributes">
-            If set to <code>true</code>, <code>type="text"</code> attributes will be removed from <code>&lt;input></code> tags. Default is <code>false</code>.
-            
-            @param removeInputAttributes set <code>true</code> to remove <code>type="text"</code> attributes from <code>&lt;input></code> tags
-        </member>
-        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.SimpleBooleanAttributes" -->
-        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveJavaScriptProtocol" -->
-        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveHttpProtocol" -->
-        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveHttpsProtocol" -->
-        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveSurroundingSpaces" -->
-        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.PreservePatterns" -->
-        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.GenerateStatistics" -->
-        <member name="F:ServiceStack.Html.HtmlCompressor.Statistics">
-            Returns {@link HtmlCompressorStatistics} object containing statistics of the last HTML compression, if enabled. 
-            Should be called after {@link #compress(string)}
-            
-            @return {@link HtmlCompressorStatistics} object containing last HTML compression statistics
-            
-            @see HtmlCompressorStatistics
-            @see #setGenerateStatistics(bool)
-        </member>
-        <member name="M:ServiceStack.Html.HtmlCompressor.Compress(System.String)">
-            The main method that compresses given HTML source and returns compressed
-            result.
-            
-            @param html HTML content to compress
-            @return compressed content.
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressorStatistics.OriginalMetrics">
-            Returns metrics of an uncompressed document
-            
-            @return metrics of an uncompressed document
-            @see HtmlMetrics
-        </member>
-        <member name="F:ServiceStack.Html.HtmlCompressorStatistics.CompressedMetrics">
-            Returns metrics of a compressed document
-            
-            @return metrics of a compressed document
-            @see HtmlMetrics
-        </member>
-        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressorStatistics.Time" -->
-        <member name="F:ServiceStack.Html.HtmlCompressorStatistics.PreservedSize">
-            Returns total size of blocks that were skipped by the compressor 
-            (for example content inside <code>&lt;pre></code> tags or inside   
-            <code>&lt;script></code> tags with disabled javascript compression)
-            
-            @return the total size of blocks that were skipped by the compressor, in bytes
-        </member>
-        <member name="F:ServiceStack.Html.HtmlMetrics.Filesize">
-            Returns total filesize of a document
-            
-            @return total filesize of a document, in bytes
-        </member>
-        <member name="F:ServiceStack.Html.HtmlMetrics.EmptyChars">
-            Returns number of empty characters (spaces, tabs, end of lines) in a document
-            
-            @return number of empty characters in a document
-        </member>
-        <member name="F:ServiceStack.Html.HtmlMetrics.InlineScriptSize">
-            Returns total size of inline <code>&lt;script></code> tags
-            
-            @return total size of inline <code>&lt;script></code> tags, in bytes
-        </member>
-        <member name="F:ServiceStack.Html.HtmlMetrics.InlineStyleSize">
-            Returns total size of inline <code>&lt;style></code> tags
-            
-            @return total size of inline <code>&lt;style></code> tags, in bytes
-        </member>
-        <member name="F:ServiceStack.Html.HtmlMetrics.InlineEventSize">
-            Returns total size of inline event handlers (<code>onclick</code>, etc)
-            
-            @return total size of inline event handlers, in bytes
-        </member>
-        <member name="T:ServiceStack.Html.AntiXsrf.AntiForgery">
-            <summary>
-            Provides access to the anti-forgery system, which provides protection against
-            Cross-site Request Forgery (XSRF, also called CSRF) attacks.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Html.AntiXsrf.AntiForgery.GetHtml">
-            <summary>
-            Generates an anti-forgery token for this request. This token can
-            be validated by calling the Validate() method.
-            </summary>
-            <returns>An HTML string corresponding to an &lt;input type="hidden"&gt;
-            element. This element should be put inside a &lt;form&gt;.</returns>
-            <remarks>
-            This method has a side effect: it may set a response cookie.
-            </remarks>
-        </member>
-        <member name="M:ServiceStack.Html.AntiXsrf.AntiForgery.GetTokens(System.String,System.String@,System.String@)">
-            <summary>
-            Generates an anti-forgery token pair (cookie and form token) for this request.
-            This method is similar to GetHtml(), but this method gives the caller control
-            over how to persist the returned values. To validate these tokens, call the
-            appropriate overload of Validate.
-            </summary>
-            <param name="oldCookieToken">The anti-forgery token - if any - that already existed
-            for this request. May be null. The anti-forgery system will try to reuse this cookie
-            value when generating a matching form token.</param>
-            <param name="newCookieToken">Will contain a new cookie value if the old cookie token
-            was null or invalid. If this value is non-null when the method completes, the caller
-            must persist this value in the form of a response cookie, and the existing cookie value
-            should be discarded. If this value is null when the method completes, the existing
-            cookie value was valid and needn't be modified.</param>
-            <param name="formToken">The value that should be stored in the &lt;form&gt;. The caller
-            should take care not to accidentally swap the cookie and form tokens.</param>
-            <remarks>
-            Unlike the GetHtml() method, this method has no side effect. The caller
-            is responsible for setting the response cookie and injecting the returned
-            form token as appropriate.
-            </remarks>
-        </member>
-        <member name="M:ServiceStack.Html.AntiXsrf.AntiForgery.Validate">
-            <summary>
-            Validates an anti-forgery token that was supplied for this request.
-            The anti-forgery token may be generated by calling GetHtml().
-            </summary>
-            <remarks>
-            Throws an HttpAntiForgeryException if validation fails.
-            </remarks>
-        </member>
-        <member name="M:ServiceStack.Html.AntiXsrf.AntiForgery.Validate(System.String,System.String)">
-            <summary>
-            Validates an anti-forgery token pair that was generated by the GetTokens method.
-            </summary>
-            <param name="cookieToken">The token that was supplied in the request cookie.</param>
-            <param name="formToken">The token that was supplied in the request form body.</param>
-            <remarks>
-            Throws an HttpAntiForgeryException if validation fails.
-            </remarks>
-        </member>
-        <member name="T:ServiceStack.Html.AntiXsrf.AntiForgeryConfig">
-            <summary>
-            Provides programmatic configuration for the anti-forgery token system.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Html.AntiXsrf.AntiForgeryConfig.AdditionalDataProvider">
-            <summary>
-            Specifies an object that can provide additional data to put into all
-            generated tokens and that can validate additional data in incoming
-            tokens.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Html.AntiXsrf.AntiForgeryConfig.CookieName">
-            <summary>
-            Specifies the name of the cookie that is used by the anti-forgery
-            system.
-            </summary>
-            <remarks>
-            If an explicit name is not provided, the system will automatically
-            generate a name.
-            </remarks>
-        </member>
-        <member name="P:ServiceStack.Html.AntiXsrf.AntiForgeryConfig.RequireSsl">
-            <summary>
-            Specifies whether SSL is required for the anti-forgery system
-            to operate. If this setting is 'true' and a non-SSL request
-            comes into the system, all anti-forgery APIs will fail.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Html.AntiXsrf.AntiForgeryConfig.SuppressIdentityHeuristicChecks">
-            <summary>
-            Specifies whether the anti-forgery system should skip checking
-            for conditions that might indicate misuse of the system. Please
-            use caution when setting this switch, as improper use could open
-            security holes in the application.
-            </summary>
-            <remarks>
-            Setting this switch will disable several checks, including:
-            - Identity.IsAuthenticated = true without Identity.Name being set
-            - special-casing claims-based identities
-            </remarks>
-        </member>
-        <member name="P:ServiceStack.Html.AntiXsrf.AntiForgeryConfig.UniqueClaimTypeIdentifier">
-            <summary>
-            If claims-based authorization is in use, specifies the claim
-            type from the identity that is used to uniquely identify the
-            user. If this property is set, all claims-based identities
-            <em>must</em> return unique values for this claim type.
-            </summary>
-            <remarks>
-            If claims-based authorization is in use and this property has
-            not been set, the anti-forgery system will automatically look
-            for claim types "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-            and "http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider".
-            </remarks>
-        </member>
-        <member name="T:ServiceStack.Html.AntiXsrf.IAntiForgeryAdditionalDataProvider">
-            <summary>
-            Allows providing or validating additional custom data for anti-forgery tokens.
-            For example, the developer could use this to supply a nonce when the token is
-            generated, then he could validate the nonce when the token is validated.
-            </summary>
-            <remarks>
-            The anti-forgery system already embeds the client's username within the
-            generated tokens. This interface provides and consumes <em>supplemental</em>
-            data. If an incoming anti-forgery token contains supplemental data but no
-            additional data provider is configured, the supplemental data will not be
-            validated.
-            </remarks>
-        </member>
-        <member name="M:ServiceStack.Html.AntiXsrf.IAntiForgeryAdditionalDataProvider.GetAdditionalData(System.Web.HttpContextBase)">
-            <summary>
-            Provides additional data to be stored for the anti-forgery tokens generated
-            during this request.
-            </summary>
-            <param name="context">Information about the current request.</param>
-            <returns>Supplemental data to embed within the anti-forgery token.</returns>
-        </member>
-        <member name="M:ServiceStack.Html.AntiXsrf.IAntiForgeryAdditionalDataProvider.ValidateAdditionalData(System.Web.HttpContextBase,System.String)">
-            <summary>
-            Validates additional data that was embedded inside an incoming anti-forgery
-            token.
-            </summary>
-            <param name="context">Information about the current request.</param>
-            <param name="additionalData">Supplemental data that was embedded within the token.</param>
-            <returns>True if the data is valid; false if the data is invalid.</returns>
-        </member>
-        <member name="M:ServiceStack.Html.ScopeStorageDictionary.#ctor(System.Collections.Generic.IDictionary{System.Object,System.Object},System.Collections.Generic.IDictionary{System.Object,System.Object})">
-            <summary>
-            Initializes a new instance of the <see cref="T:ServiceStack.Html.ScopeStorageDictionary"/> class.
-            </summary>
-            <param name="baseScope">The base scope.</param>
-            <param name="backingStore">
-            The dictionary to use as a storage. Since the dictionary would be used as-is, we expect the implementer to 
-            use the same key-value comparison logic as we do here.
-            </param>
-        </member>
-        <member name="T:ServiceStack.Html.ScopeStorageComparer">
-            <summary>
-            Custom comparer for the context dictionaries
-            The comparer treats strings as a special case, performing case insesitive comparison. 
-            This guaratees that we remain consistent throughout the chain of contexts since PageData dictionary 
-            behaves in this manner.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.ServiceStackProvider.SessionAs``1">
-            <summary>
-            Typed UserSession
-            </summary>
-        </member>
-        <member name="F:ServiceStack.ServiceStackProvider.session">
-            <summary>
-            Dynamic Session Bag
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Auth.AspNetWindowsAuthProvider.AllRoles">
-            <summary>
-            Specify all roles to be used by this application
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Auth.AspNetWindowsAuthProvider.LimitAccessToRoles">
-            <summary>
-            Only allow access to users in specified roles
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Auth.AuthEvents">
-            <summary>
-            Conveneint base class with empty virtual methods so subclasses only need to override the hooks they need.
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Auth.OdnoklassnikiAuthProvider">
-            <summary>
-              Create Odnoklassniki App at: http://www.odnoklassniki.ru/devaccess
-              The Callback URL for your app should match the CallbackUrl provided.
-              
-              NB: They claim they use OAuth 2.0, but they in fact don't. 
-              http://apiok.ru/wiki/display/api/Authorization+OAuth+2.0
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Auth.VkAuthProvider">
-            <summary>
-              Create VK App at: http://vk.com/editapp?act=create
-              The Callback URL for your app should match the CallbackUrl provided.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Auth.VkAuthProvider.EnsureLatestCode(System.String)">
-            <summary>
-            If previous attemts failes, the subsequential calls 
-            build up code value like "code1,code2,code3"
-            so we need the last one only
-            </summary>
-            <param name="code"></param>
-            <returns></returns>
-        </member>
-        <member name="T:ServiceStack.Auth.YandexAuthProvider">
-            <summary>
-              Create Yandex App at: https://oauth.yandex.ru/client/new
-              The Callback URL for your app should match the CallbackUrl provided.
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Auth.GithubAuthProvider">
-            <summary>
-              Create an App at: https://github.com/settings/applications/new
-              The Callback URL for your app should match the CallbackUrl provided.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Auth.GithubAuthProvider.UserRequestFilter(System.Net.HttpWebRequest)">
-            <summary>
-              Calling to Github API without defined Useragent throws
-              exception "The server committed a protocol violation. Section=ResponseStatusLine"
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Auth.UserAuthRepositoryExtensions.AssignRoles(ServiceStack.Auth.IAuthRepository,ServiceStack.Auth.IUserAuth,System.Collections.Generic.ICollection{System.String},System.Collections.Generic.ICollection{System.String})">
-            <summary>
-            Creates the required missing tables or DB schema 
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Auth.ValidateFn">
-            <summary>
-            Inject logic into existing services by introspecting the request and injecting your own
-            validation logic. Exceptions thrown will have the same behaviour as if the service threw it.
-            
-            If a non-null object is returned the request will short-circuit and return that response.
-            </summary>
-            <param name="service">The instance of the service</param>
-            <param name="httpMethod">GET,POST,PUT,DELETE</param>
-            <param name="requestDto"></param>
-            <returns>Response DTO; non-null will short-circuit execution and return that response</returns>
-        </member>
-        <member name="M:ServiceStack.Auth.AuthenticateService.Authenticate(ServiceStack.Authenticate)">
-            <summary>
-            Public API entry point to authenticate via code
-            </summary>
-            <param name="request"></param>
-            <returns>null; if already autenticated otherwise a populated instance of AuthResponse</returns>
-        </member>
-        <member name="M:ServiceStack.Auth.AuthenticateService.Authenticate(ServiceStack.Authenticate,System.String,ServiceStack.Auth.IAuthSession,ServiceStack.Auth.IAuthProvider)">
-            <summary>
-            The specified <paramref name="session"/> may change as a side-effect of this method. If
-            subsequent code relies on current <see cref="T:ServiceStack.Auth.IAuthSession"/> data be sure to reload
-            the session istance via <see cref="M:ServiceStack.ServiceExtensions.GetSession(ServiceStack.IServiceBase,System.Boolean)"/>.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Auth.AuthProvider.FallbackConfig(System.String)">
-            <summary>
-            Allows specifying a global fallback config that if exists is formatted with the Provider as the first arg.
-            E.g. this appSetting with the TwitterAuthProvider: 
-            oauth.CallbackUrl="http://localhost:11001/auth/{0}"
-            Would result in: 
-            oauth.CallbackUrl="http://localhost:11001/auth/twitter"
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:ServiceStack.Auth.AuthProvider.Logout(ServiceStack.IServiceBase,ServiceStack.Authenticate)">
-            <summary>
-            Remove the Users Session
-            </summary>
-            <param name="service"></param>
-            <param name="request"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ServiceStack.Auth.AuthProvider.SaveUserAuth(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession,ServiceStack.Auth.IAuthRepository,ServiceStack.Auth.IAuthTokens)">
-            <summary>
-            Saves the Auth Tokens for this request. Called in OnAuthenticated(). 
-            Overrideable, the default behaviour is to call IUserAuthRepository.CreateOrMergeAuthSession().
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Auth.FacebookAuthProvider">
-            <summary>
-            Create a Facebook App at: https://developers.facebook.com/apps
-            The Callback URL for your app should match the CallbackUrl provided.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Auth.AuthHttpGateway.DownloadYammerUserInfo(System.String)">
-            <summary>
-            Download Yammer User Info given its ID.
-            </summary>
-            <param name="yammerUserId">
-            The Yammer User ID.
-            </param>
-            <returns>
-            The User info in JSON format.
-            </returns>
-            <remarks>
-            <para>
-            Yammer provides a method to retrieve current user information via
-            "https://www.yammer.com/api/v1/users/current.json".
-            </para>
-            <para>
-            However, to ensure consistency with the rest of the Auth codebase,
-            the explicit URL will be used, where [:id] denotes the User ID: 
-            "https://www.yammer.com/api/v1/users/[:id].json"
-            </para>
-            <para>
-            Refer to: https://developer.yammer.com/restapi/ for full documentation.
-            </para>
-            </remarks>
-        </member>
-        <member name="M:ServiceStack.Auth.IAuthProvider.Logout(ServiceStack.IServiceBase,ServiceStack.Authenticate)">
-            <summary>
-            Remove the Users Session
-            </summary>
-            <param name="service"></param>
-            <param name="request"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ServiceStack.Auth.IAuthProvider.Authenticate(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession,ServiceStack.Authenticate)">
-            <summary>
-            The entry point for all AuthProvider providers. Runs inside the AuthService so exceptions are treated normally.
-            Overridable so you can provide your own Auth implementation.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Auth.IAuthProvider.IsAuthorized(ServiceStack.Auth.IAuthSession,ServiceStack.Auth.IAuthTokens,ServiceStack.Authenticate)">
-            <summary>
-            Determine if the current session is already authenticated with this AuthProvider
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Auth.InMemoryAuthRepository">
-            <summary>
-            Thread-safe In memory UserAuth data store so it can be used without a dependency on Redis.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Auth.OAuthProvider.Authenticate(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession,ServiceStack.Authenticate)">
-            <summary>
-            The entry point for all AuthProvider providers. Runs inside the AuthService so exceptions are treated normally.
-            Overridable so you can provide your own Auth implementation.
-            </summary>
-            <param name="authService"></param>
-            <param name="session"></param>
-            <param name="request"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ServiceStack.Auth.OAuthProvider.Init(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession@,ServiceStack.Authenticate)">
-            <summary>
-            Sets the CallbackUrl and session.ReferrerUrl if not set and initializes the session tokens for this AuthProvider
-            </summary>
-            <param name="authService"></param>
-            <param name="session"></param>
-            <param name="request"> </param>
-            <returns></returns>
-        </member>
-        <member name="M:ServiceStack.Auth.RegisterService`1.Put(ServiceStack.Register)">
-            <summary>
-            Update an existing registraiton
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Auth.RegisterService`1.Post(ServiceStack.Register)">
-            <summary>
-                Create new Registration
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Auth.RegisterService`1.UpdateUserAuth(ServiceStack.Register)">
-            <summary>
-            Logic to update UserAuth from Registration info, not enabled on PUT because of security.
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Auth.SaltedHash">
-            <summary>
-            Thank you Martijn
-            http://www.dijksterhuis.org/creating-salted-hash-values-in-c/
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Auth.TwitterAuthProvider">
-            <summary>
-            Create an app at https://dev.twitter.com/apps to get your ConsumerKey and ConsumerSecret for your app.
-            The Callback URL for your app should match the CallbackUrl provided.
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Auth.YammerAuthProvider">
-            <summary>
-            The ServiceStack Yammer OAuth provider.
-            </summary>
-            <remarks>
-            <para>
-            This provider is loosely based on the existing ServiceStack's Facebook OAuth provider.
-            </para>
-            <para>
-            For the full info on Yammer's OAuth2 authentication flow, refer to:
-            https://developer.yammer.com/authentication/#a-oauth2
-            </para>
-            <para>
-            Note: Add these to your application / web config settings under appSettings and replace
-            values as appropriate.
-            <![CDATA[
-                <!-- ServiceStack Yammer OAuth config -->
-                <add key="oauth.yammer.ClientId" value=""/>
-                <add key="oauth.yammer.ClientSecret" value=""/>
-                <add key="oauth.yammer.AccessTokenUrl" value="https://www.yammer.com/oauth2/access_token.json"/>
-                <add key="oauth.yammer.CallbackUrl" value="~/"/>
-                <add key="oauth.yammer.PreAuthUrl" value="https://www.yammer.com/dialog/oauth"/>
-                <add key="oauth.yammer.Realm" value="https://www.yammer.com"/>
-                <add key="oauth.yammer.RedirectUrl" value="~/auth/yammer"/>
-            ]]>
-            </para>
-            </remarks>
-        </member>
-        <member name="F:ServiceStack.Auth.YammerAuthProvider.Name">
-            <summary>
-            The OAuth provider name / identifier.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Auth.YammerAuthProvider.#ctor(ServiceStack.Configuration.IAppSettings)">
-            <summary>
-            Initializes a new instance of the <see cref="T:ServiceStack.Auth.YammerAuthProvider"/> class.
-            </summary>
-            <param name="appSettings">
-            The application settings (in web.config).
-            </param>
-        </member>
-        <member name="P:ServiceStack.Auth.YammerAuthProvider.ClientId">
-            <summary>
-            Gets or sets the Yammer OAuth client id.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Auth.YammerAuthProvider.ClientSecret">
-            <summary>
-            Gets or sets the Yammer OAuth client secret.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Auth.YammerAuthProvider.PreAuthUrl">
-            <summary>
-            Gets or sets the Yammer OAuth pre-auth url.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Auth.YammerAuthProvider.Authenticate(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession,ServiceStack.Authenticate)">
-            <summary>
-            Authenticate against Yammer OAuth endpoint.
-            </summary>
-            <param name="authService">
-            The auth service.
-            </param>
-            <param name="session">
-            The session.
-            </param>
-            <param name="request">
-            The request.
-            </param>
-            <returns>
-            The <see cref="T:System.Object"/>.
-            </returns>
-        </member>
-        <member name="M:ServiceStack.Auth.YammerAuthProvider.LoadUserAuthInfo(ServiceStack.AuthUserSession,ServiceStack.Auth.IAuthTokens,System.Collections.Generic.Dictionary{System.String,System.String})">
-            <summary>
-            Load the UserAuth info into the session.
-            </summary>
-            <param name="userSession">
-            The User session.
-            </param>
-            <param name="tokens">
-            The OAuth tokens.
-            </param>
-            <param name="authInfo">
-            The auth info.
-            </param>
-        </member>
-        <member name="M:ServiceStack.Auth.YammerAuthProvider.LoadUserOAuthProvider(ServiceStack.Auth.IAuthSession,ServiceStack.Auth.IAuthTokens)">
-            <summary>
-            Load the UserOAuth info into the session.
-            </summary>
-            <param name="authSession">
-            The auth session.
-            </param>
-            <param name="tokens">
-            The OAuth tokens.
-            </param>
-        </member>
-        <member name="T:ServiceStack.Auth.EmailAddresses">
-            <summary>
-            The Yammer User's email addresses.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Auth.EmailAddresses.Type">
-            <summary>
-            Gets or sets the email address type (e.g. primary).
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Auth.EmailAddresses.Address">
-            <summary>
-            Gets or sets the email address.
-            </summary>
-        </member>
-        <member name="T:ServiceStack.EnsureHttpsAttribute">
-            <summary>
-            Redirect to the https:// version of this url if not already.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.EnsureHttpsAttribute.SkipIfDebugMode">
-            <summary>
-            Don't redirect when in DebugMode
-            </summary>
-        </member>
-        <member name="P:ServiceStack.EnsureHttpsAttribute.SkipIfXForwardedFor">
-            <summary>
-            Don't redirect if the request was a forwarded request, e.g. from a Load Balancer
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Messaging.IMessageHandlerFactory">
-            <summary>
-            Encapsulates creating a new message handler
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Messaging.MessageHandler`1">
-            <summary>
-            Processes all messages in a Normal and Priority Queue.
-            Expects to be called in 1 thread. i.e. Non Thread-Safe.
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="T:ServiceStack.IRepository">
-            <summary>
-            A convenient repository base class you can inherit from to reduce the boilerplate 
-            with accessing a managed IDbConnection
-            </summary>
-        </member>
-        <member name="T:ServiceStack.ILogic">
-            <summary>
-            A convenient base class for your injected service dependencies that reduces the boilerplate
-            with managed access to ServiceStack's built-in providers
-            </summary>
-        </member>
-        <member name="P:ServiceStack.PostmanFeature.DefaultVerbsForAny">
-            <summary>
-            Only generate specified Verb entries for "ANY" routes
-            </summary>
-        </member>
-        <member name="F:ServiceStack.RequestContext.UseThreadStatic">
-            <summary>
-            Tell ServiceStack to use ThreadStatic Items Collection for RequestScoped items.
-            Warning: ThreadStatic Items aren't pinned to the same request in async services which callback on different threads.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.RequestContext.Items">
-            <summary>
-            Gets a list of items for this request. 
-            </summary>
-            <remarks>This list will be cleared on every request and is specific to the original thread that is handling the request.
-            If a handler uses additional threads, this data will not be available on those threads.
-            </remarks>
-        </member>
-        <member name="M:ServiceStack.RequestContext.TrackDisposable(System.IDisposable)">
-            <summary>
-            Track any IDisposable's to dispose of at the end of the request in IAppHost.OnEndRequest()
-            </summary>
-            <param name="instance"></param>
-        </member>
-        <member name="M:ServiceStack.RequestContext.ReleaseDisposables">
-            <summary>
-            Release currently registered dependencies for this request
-            </summary>
-            <returns>true if any dependencies were released</returns>
-        </member>
-        <member name="M:ServiceStack.HttpResult.SoftRedirect(System.String,System.Object)">
-            <summary>
-            Respond with a 'Soft redirect' so smart clients (e.g. ajax) have access to the response and 
-            can decide whether or not they should redirect
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HttpResult.TriggerEvent(System.Object,System.String,System.String)">
-            <summary>
-            Decorate the response with an additional client-side event to instruct participating 
-            smart clients (e.g. ajax) with hints to transparently invoke client-side functionality
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HttpResultUtils.GetDto(System.Object)">
-            <summary>
-            Shortcut to get the ResponseDTO whether it's bare or inside a IHttpResult
-            </summary>
-            <param name="response"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ServiceStack.HttpResultUtils.GetResponseDto(System.Object)">
-            <summary>
-            Alias of AsDto
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HttpResultUtils.GetDto``1(System.Object)">
-            <summary>
-            Shortcut to get the ResponseDTO whether it's bare or inside a IHttpResult
-            </summary>
-            <param name="response"></param>
-            <returns>TResponse if found; otherwise null</returns>
-        </member>
-        <member name="M:ServiceStack.HttpResultUtils.GetResponseDto``1(System.Object)">
-            <summary>
-            Alias of AsDto
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HttpResultUtils.IsErrorResponse(System.Object)">
-            <summary>
-            Whether the response is an IHttpError or Exception
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HttpResultUtils.ExtractHttpRanges(System.String,System.Int64,System.Int64@,System.Int64@)">
-            <summary>
-            rangeHeader should be of the format "bytes=0-" or "bytes=0-12345" or "bytes=123-456"
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HttpResultUtils.AddHttpRangeResponseHeaders(ServiceStack.Web.IResponse,System.Int64,System.Int64,System.Int64)">
-            <summary>
-            Adds 206 PartialContent Status, Content-Range and Content-Length headers
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HttpResultUtils.WritePartialTo(System.IO.Stream,System.IO.Stream,System.Int64,System.Int64)">
-            <summary>
-            Writes partial range as specified by start-end, from fromStream to toStream.
-            </summary>
-        </member>
-        <member name="F:ServiceStack.RedisErrorLoggerFeature.UrnServiceErrorType">
-            <summary>
-            Service error logs are kept in 'urn:ServiceErrors:{ServiceName}'
-            </summary>
-        </member>
-        <member name="F:ServiceStack.RedisErrorLoggerFeature.CombinedServiceLogId">
-            <summary>
-            Combined service error logs are maintained in 'urn:ServiceErrors:All'
-            </summary>
-        </member>
-        <member name="P:ServiceStack.RequestLogsFeature.AtRestPath">
-            <summary>
-            RequestLogs service Route, default is /requestlogs
-            </summary>
-        </member>
-        <member name="P:ServiceStack.RequestLogsFeature.EnableSessionTracking">
-            <summary>
-            Turn On/Off Session Tracking
-            </summary>
-        </member>
-        <member name="P:ServiceStack.RequestLogsFeature.EnableRequestBodyTracking">
-            <summary>
-            Turn On/Off Logging of Raw Request Body, default is Off
-            </summary>
-        </member>
-        <member name="P:ServiceStack.RequestLogsFeature.EnableResponseTracking">
-            <summary>
-            Turn On/Off Tracking of Responses
-            </summary>
-        </member>
-        <member name="P:ServiceStack.RequestLogsFeature.EnableErrorTracking">
-            <summary>
-            Turn On/Off Tracking of Exceptions
-            </summary>
-        </member>
-        <member name="P:ServiceStack.RequestLogsFeature.Capacity">
-            <summary>
-            Size of InMemoryRollingRequestLogger circular buffer
-            </summary>
-        </member>
-        <member name="P:ServiceStack.RequestLogsFeature.RequiredRoles">
-            <summary>
-            Limit access to /requestlogs service to these roles
-            </summary>
-        </member>
-        <member name="P:ServiceStack.RequestLogsFeature.RequestLogger">
-            <summary>
-            Change the RequestLogger provider. Default is InMemoryRollingRequestLogger
-            </summary>
-        </member>
-        <member name="P:ServiceStack.RequestLogsFeature.ExcludeRequestDtoTypes">
-            <summary>
-            Don't log requests of these types. By default RequestLog's are excluded
-            </summary>
-        </member>
-        <member name="P:ServiceStack.RequestLogsFeature.HideRequestBodyForRequestDtoTypes">
-            <summary>
-            Don't log request bodys for services with sensitive information.
-            By default Auth and Registration requests are hidden.
-            </summary>
-        </member>
-        <member name="T:ServiceStack.AuthenticateAttribute">
-            <summary>
-            Indicates that the request dto, which is associated with this attribute,
-            requires authentication.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.AuthenticateAttribute.Provider">
-            <summary>
-            Restrict authentication to a specific <see cref="T:ServiceStack.Auth.IAuthProvider"/>.
-            For example, if this attribute should only permit access
-            if the user is authenticated with <see cref="T:ServiceStack.Auth.BasicAuthProvider"/>,
-            you should set this property to <see cref="F:ServiceStack.Auth.BasicAuthProvider.Name"/>.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.AuthenticateAttribute.HtmlRedirect">
-            <summary>
-            Redirect the client to a specific URL if authentication failed.
-            If this property is null, simply `401 Unauthorized` is returned.
-            </summary>
-        </member>
-        <member name="T:ServiceStack.AuthFeature">
-            <summary>
-            Enable the authentication feature and configure the AuthService.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.CacheClientExtensions.RemoveByPattern(ServiceStack.Caching.ICacheClient,System.String)">
-            <summary>
-            Removes items from cache that have keys matching the specified wildcard pattern
-            </summary>
-            <param name="cacheClient">Cache client</param>
-            <param name="pattern">The wildcard, where "*" means any sequence of characters and "?" means any single character.</param>
-        </member>
-        <member name="M:ServiceStack.CacheClientExtensions.RemoveByRegex(ServiceStack.Caching.ICacheClient,System.String)">
-            <summary>
-            Removes items from the cache based on the specified regular expression pattern
-            </summary>
-            <param name="cacheClient">Cache client</param>
-            <param name="regex">Regular expression pattern to search cache keys</param>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.CacheEntry.#ctor(System.Object,System.Nullable{System.DateTime})">
-            <summary>
-            Create new instance of CacheEntry.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Caching.MemoryCacheClient.CacheEntry.ExpiresAt">
-            <summary>UTC time at which CacheEntry expires.</summary>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.CacheAdd(System.String,System.Object,System.Nullable{System.DateTime})">
-            <summary>
-            Stores The value with key only if such key doesn't exist at the server yet. 
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.CacheSet(System.String,System.Object,System.DateTime)">
-            <summary>
-            Adds or replaces the value with key.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.CacheSet(System.String,System.Object,System.Nullable{System.DateTime},System.Nullable{System.Int64})">
-            <summary>
-            Adds or replaces the value with key. 
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.CacheReplace(System.String,System.Object,System.Nullable{System.DateTime})">
-            <summary>
-            Replace the value with specified key if it exists.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.Add``1(System.String,``0)">
-            <summary>
-            Add the value with key to the cache, set to never expire.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.Set``1(System.String,``0)">
-            <summary>
-            Add or replace the value with key to the cache, set to never expire.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.Replace``1(System.String,``0)">
-            <summary>
-            Replace the value with key in the cache, set to never expire.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.Add``1(System.String,``0,System.DateTime)">
-            <summary>
-            Add the value with key to the cache, set to expire at specified DateTime.
-            </summary>
-            <remarks>This method examines the DateTimeKind of expiresAt to determine if conversion to
-            universal time is needed. The version of Add that takes a TimeSpan expiration is faster 
-            than using this method with a DateTime of Kind other than Utc, and is not affected by 
-            ambiguous local time during daylight savings/standard time transition.</remarks>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.Set``1(System.String,``0,System.DateTime)">
-            <summary>
-            Add or replace the value with key to the cache, set to expire at specified DateTime.
-            </summary>
-            <remarks>This method examines the DateTimeKind of expiresAt to determine if conversion to
-            universal time is needed. The version of Set that takes a TimeSpan expiration is faster 
-            than using this method with a DateTime of Kind other than Utc, and is not affected by 
-            ambiguous local time during daylight savings/standard time transition.</remarks>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.Replace``1(System.String,``0,System.DateTime)">
-            <summary>
-            Replace the value with key in the cache, set to expire at specified DateTime.
-            </summary>
-            <remarks>This method examines the DateTimeKind of expiresAt to determine if conversion to
-            universal time is needed. The version of Replace that takes a TimeSpan expiration is faster 
-            than using this method with a DateTime of Kind other than Utc, and is not affected by 
-            ambiguous local time during daylight savings/standard time transition.</remarks>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.Add``1(System.String,``0,System.TimeSpan)">
-            <summary>
-            Add the value with key to the cache, set to expire after specified TimeSpan.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.Set``1(System.String,``0,System.TimeSpan)">
-            <summary>
-            Add or replace the value with key to the cache, set to expire after specified TimeSpan.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Caching.MemoryCacheClient.Replace``1(System.String,``0,System.TimeSpan)">
-            <summary>
-            Replace the value with key in the cache, set to expire after specified TimeSpan.
-            </summary>
-        </member>
-        <member name="T:ServiceStack.CorsFeature">
-            <summary>
-            Plugin adds support for Cross-origin resource sharing (CORS, see http://www.w3.org/TR/access-control/). 
-            CORS allows to access resources from different domain which usually forbidden by origin policy. 
-            </summary>
-        </member>
-        <member name="M:ServiceStack.CorsFeature.#ctor(System.String,System.String,System.String,System.Boolean,System.String,System.Nullable{System.Int32})">
-            <summary>
-            Represents a default constructor with Allow Origin equals to "*", Allowed GET, POST, PUT, DELETE, OPTIONS request and allowed "Content-Type" header.
-            </summary>
-        </member>
-        <member name="T:ServiceStack.EnableCorsAttribute">
-            <summary>
-            Attribute marks that specific response class has support for Cross-origin resource sharing (CORS, see http://www.w3.org/TR/access-control/). CORS allows to access resources from different domain which usually forbidden by origin policy. 
-            </summary>
-        </member>
-        <member name="M:ServiceStack.EnableCorsAttribute.#ctor(System.String,System.String,System.String,System.Boolean)">
-            <summary>
-            Represents a default constructor with Allow Origin equals to "*", Allowed GET, POST, PUT, DELETE, OPTIONS request and allowed "Content-Type" header.
-            </summary>
-        </member>
-        <member name="T:ServiceStack.DefaultViewAttribute">
-            <summary>
-            Change the default HTML view or template used for the HTML response of this service
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HttpExtensions.EndRequest(System.Web.HttpResponseBase,System.Boolean)">
-            <summary>
-            End a ServiceStack Request
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HttpExtensions.EndRequest(ServiceStack.Web.IResponse,System.Boolean)">
-            <summary>
-            End a ServiceStack Request
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HttpExtensions.EndHttpHandlerRequest(System.Web.HttpContextBase,System.Boolean,System.Boolean,System.Boolean,System.Action{System.Web.HttpResponseBase})">
-            <summary>
-            End a HttpHandler Request
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HttpExtensions.EndHttpHandlerRequest(ServiceStack.Web.IResponse,System.Boolean,System.Boolean,System.Action{ServiceStack.Web.IResponse})">
-            <summary>
-            End a HttpHandler Request
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HttpExtensions.EndMqRequest(ServiceStack.Web.IResponse,System.Boolean)">
-            <summary>
-            End an MQ Request
-            </summary>
-        </member>
-        <member name="M:ServiceStack.HttpExtensions.EndRequestWithNoContent(ServiceStack.Web.IResponse)">
-            <summary>
-            End a ServiceStack Request with no content
-            </summary>
-        </member>
-        <member name="M:ServiceStack.IServiceBase.ResolveService``1">
-            <summary>
-            Resolve an alternate Web Service from ServiceStack's IOC container.
-            </summary>
-            <typeparam name="T"></typeparam>
-            <returns></returns>
-        </member>
-        <member name="T:ServiceStack.RegistrationFeature">
-            <summary>
-            Enable the Registration feature and configure the RegistrationService.
-            </summary>
-        </member>
-        <member name="T:ServiceStack.RequestFilterAttribute">
-            <summary>
-            Base class to create request filter attributes only for specific HTTP methods (GET, POST...)
-            </summary>
-        </member>
-        <member name="M:ServiceStack.RequestFilterAttribute.#ctor(ServiceStack.ApplyTo)">
-            <summary>
-            Creates a new <see cref="T:ServiceStack.RequestFilterAttribute"/>
-            </summary>
-            <param name="applyTo">Defines when the filter should be executed</param>
-        </member>
-        <member name="M:ServiceStack.RequestFilterAttribute.Execute(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.Object)">
-            <summary>
-            This method is only executed if the HTTP method matches the <see cref="P:ServiceStack.RequestFilterAttribute.ApplyTo"/> property.
-            </summary>
-            <param name="req">The http request wrapper</param>
-            <param name="res">The http response wrapper</param>
-            <param name="requestDto">The request DTO</param>
-        </member>
-        <member name="M:ServiceStack.RequestFilterAttribute.Copy">
-            <summary>
-            Create a ShallowCopy of this instance.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:ServiceStack.ContainerTypeExtensions.RegisterAutoWiredType(Funq.Container,System.Type,System.Type,Funq.ReuseScope)">
-            <summary>
-            Registers the type in the IoC container and
-            adds auto-wiring to the specified type.
-            </summary>
-            <param name="serviceType"></param>
-            <param name="inFunqAsType"></param>
-        </member>
-        <member name="M:ServiceStack.ContainerTypeExtensions.RegisterAutoWiredType(Funq.Container,System.Type,Funq.ReuseScope)">
-            <summary>
-            Registers the type in the IoC container and
-            adds auto-wiring to the specified type.
-            The reuse scope is set to none (transient).
-            </summary>
-            <param name="serviceTypes"></param>
-        </member>
-        <member name="M:ServiceStack.ContainerTypeExtensions.RegisterAutoWiredTypes(Funq.Container,System.Collections.Generic.IEnumerable{System.Type},Funq.ReuseScope)">
-            <summary>
-            Registers the types in the IoC container and
-            adds auto-wiring to the specified types.
-            The reuse scope is set to none (transient).
-            </summary>
-            <param name="serviceTypes"></param>
-        </member>
-        <member name="M:ServiceStack.ContainerTypeExtensions.Register(Funq.Container,System.Object,System.Type)">
-            <summary>
-            Register a singleton instance as a runtime type
+            proxy
             </summary>
         </member>
         <member name="T:ServiceStack.MiniProfiler.BaseProfilerProvider">
@@ -3291,196 +2647,6 @@
             profiler using the current storage settings
             </summary>
             <param name="current"></param>
-        </member>
-        <member name="T:ServiceStack.MiniProfiler.Data.ExecuteType">
-            <summary>
-            Categories of sql statements.
-            </summary>
-        </member>
-        <member name="F:ServiceStack.MiniProfiler.Data.ExecuteType.None">
-            <summary>
-            Unknown
-            </summary>
-        </member>
-        <member name="F:ServiceStack.MiniProfiler.Data.ExecuteType.NonQuery">
-            <summary>
-            DML statements that alter database state, e.g. INSERT, UPDATE
-            </summary>
-        </member>
-        <member name="F:ServiceStack.MiniProfiler.Data.ExecuteType.Scalar">
-            <summary>
-            Statements that return a single record
-            </summary>
-        </member>
-        <member name="F:ServiceStack.MiniProfiler.Data.ExecuteType.Reader">
-            <summary>
-            Statements that iterate over a result set
-            </summary>
-        </member>
-        <member name="T:ServiceStack.MiniProfiler.Data.IDbProfiler">
-            <summary>
-            A callback for ProfiledDbConnection and family
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.IDbProfiler.ExecuteStart(System.Data.Common.DbCommand,ServiceStack.MiniProfiler.Data.ExecuteType)">
-            <summary>
-            Called when a command starts executing
-            </summary>
-            <param name="profiledDbCommand"></param>
-            <param name="executeType"></param>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.IDbProfiler.ExecuteFinish(System.Data.Common.DbCommand,ServiceStack.MiniProfiler.Data.ExecuteType,System.Data.Common.DbDataReader)">
-            <summary>
-            Called when a reader finishes executing
-            </summary>
-            <param name="profiledDbCommand"></param>
-            <param name="executeType"></param>
-            <param name="reader"></param>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.IDbProfiler.ReaderFinish(System.Data.Common.DbDataReader)">
-            <summary>
-            Called when a reader is done iterating through the data 
-            </summary>
-            <param name="reader"></param>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.IDbProfiler.OnError(System.Data.Common.DbCommand,ServiceStack.MiniProfiler.Data.ExecuteType,System.Exception)">
-            <summary>
-            Called when an error happens during execution of a command 
-            </summary>
-            <param name="profiledDbCommand"></param>
-            <param name="executeType"></param>
-            <param name="exception"></param>
-        </member>
-        <member name="P:ServiceStack.MiniProfiler.Data.IDbProfiler.IsActive">
-            <summary>
-            True if the profiler instance is active
-            </summary>
-        </member>
-        <member name="T:ServiceStack.MiniProfiler.Data.Link`2">
-            <summary>
-            This is a micro-cache; suitable when the number of terms is controllable (a few hundred, for example),
-            and strictly append-only; you cannot change existing values. All key matches are on **REFERENCE**
-            equality. The type is fully thread-safe.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.MiniProfiler.Data.ProfiledDbCommand.BindByName">
-            <summary>
-            If the underlying command supports BindByName, this sets/clears the underlying
-            implementation accordingly. This is required to support OracleCommand from dapper-dot-net
-            </summary>
-        </member>
-        <member name="T:ServiceStack.MiniProfiler.Data.ProfiledDbConnection">
-            <summary>
-            Wraps a database connection, allowing sql execution timings to be collected when a <see cref="T:ServiceStack.MiniProfiler.Profiler"/> session is started.
-            </summary>
-        </member>
-        <member name="F:ServiceStack.MiniProfiler.Data.ProfiledDbConnection._conn">
-            <summary>
-            This will be made private; use <see cref="P:ServiceStack.MiniProfiler.Data.ProfiledDbConnection.InnerConnection"/>
-            </summary>
-        </member>
-        <member name="P:ServiceStack.MiniProfiler.Data.ProfiledDbConnection.InnerConnection">
-            <summary>
-            The underlying, real database connection to your db provider.
-            </summary>
-        </member>
-        <member name="F:ServiceStack.MiniProfiler.Data.ProfiledDbConnection._profiler">
-            <summary>
-            This will be made private; use <see cref="P:ServiceStack.MiniProfiler.Data.ProfiledDbConnection.Profiler"/>
-            </summary>
-        </member>
-        <member name="P:ServiceStack.MiniProfiler.Data.ProfiledDbConnection.Profiler">
-            <summary>
-            The current profiler instance; could be null.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbConnection.#ctor(System.Data.Common.DbConnection,ServiceStack.MiniProfiler.Data.IDbProfiler,System.Boolean)">
-            <summary>
-            Returns a new <see cref="T:ServiceStack.MiniProfiler.Data.ProfiledDbConnection"/> that wraps <paramref name="connection"/>, 
-            providing query execution profiling.  If profiler is null, no profiling will occur.
-            </summary>
-            <param name="connection">Your provider-specific flavor of connection, e.g. SqlConnection, OracleConnection</param>
-            <param name="profiler">The currently started <see cref="T:ServiceStack.MiniProfiler.Profiler"/> or null.</param>
-            <param name="autoDisposeConnection">Determines whether the ProfiledDbConnection will dispose the underlying connection.</param>
-        </member>
-        <member name="P:ServiceStack.MiniProfiler.Data.ProfiledDbConnection.WrappedConnection">
-            <summary>
-            The raw connection this is wrapping
-            </summary>
-        </member>
-        <member name="T:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory">
-            <summary>
-            Wrapper for a db provider factory to enable profiling
-            </summary>
-        </member>
-        <member name="F:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.Instance">
-            <summary>
-            Every provider factory must have an Instance public field
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.#ctor">
-            <summary>
-            Used for db provider apis internally 
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.InitProfiledDbProviderFactory(ServiceStack.MiniProfiler.Data.IDbProfiler,System.Data.Common.DbProviderFactory)">
-            <summary>
-            Allow to re-init the provider factory.
-            </summary>
-            <param name="profiler"></param>
-            <param name="tail"></param>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.#ctor(ServiceStack.MiniProfiler.Data.IDbProfiler,System.Data.Common.DbProviderFactory)">
-            <summary>
-            proxy
-            </summary>
-            <param name="profiler"></param>
-            <param name="tail"></param>
-        </member>
-        <member name="P:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.CanCreateDataSourceEnumerator">
-            <summary>
-            proxy
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.CreateDataSourceEnumerator">
-            <summary>
-            proxy
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.CreateCommand">
-            <summary>
-            proxy
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.CreateConnection">
-            <summary>
-            proxy
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.CreateParameter">
-            <summary>
-            proxy
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.CreateConnectionStringBuilder">
-            <summary>
-            proxy
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.CreateCommandBuilder">
-            <summary>
-            proxy
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.CreateDataAdapter">
-            <summary>
-            proxy
-            </summary>
-        </member>
-        <member name="M:ServiceStack.MiniProfiler.Data.ProfiledDbProviderFactory.CreatePermission(System.Security.Permissions.PermissionState)">
-            <summary>
-            proxy
-            </summary>
         </member>
         <member name="T:ServiceStack.MiniProfiler.Helpers.ExtensionMethods">
             <summary>
@@ -4592,7 +3758,7 @@
             Add the parameter 'timing' to this Timing's Children collection.
             </summary>
             <remarks>
-            Used outside this assembly for custom deserialization when creating an <see cref="T:ServiceStack.MiniProfiler.Storage.IStorage"/> implementation.
+            Used outside this assembly for custom deserialization when creating an <see cref="!:IStorage"/> implementation.
             </remarks>
         </member>
         <member name="M:ServiceStack.MiniProfiler.Timing.AddSqlTiming(ServiceStack.MiniProfiler.SqlTiming)">
@@ -4601,7 +3767,7 @@
             </summary>
             <param name="sqlTiming">A sql statement profiling that was executed in this Timing step.</param>
             <remarks>
-            Used outside this assembly for custom deserialization when creating an <see cref="T:ServiceStack.MiniProfiler.Storage.IStorage"/> implementation.
+            Used outside this assembly for custom deserialization when creating an <see cref="!:IStorage"/> implementation.
             </remarks>
         </member>
         <member name="M:ServiceStack.MiniProfiler.Timing.GetExecutedCount(ServiceStack.MiniProfiler.Data.ExecuteType)">
@@ -4694,6 +3860,886 @@
         <member name="P:ServiceStack.MiniProfiler.WebRequestProfilerProvider.Settings.UserProvider">
             <summary>
             Provides user identification for a given profiling request.
+            </summary>
+        </member>
+        <member name="F:ServiceStack.Configuration.Config.DefaultNamespace">
+            <summary>
+            Would've preferred to use [assembly: ContractNamespace] attribute but it is not supported in Mono
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Configuration.AppSettings">
+            <summary>
+            More familiar name for the new crowd.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.AppSettings.#ctor(System.String)">
+            <summary>
+            The tier lets you specify a retrieving a setting with the tier prefix first before falling back to the original key. 
+            E.g a tier of 'Live' looks for 'Live.{Key}' or if not found falls back to '{Key}'.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.AppSettings.GetString(System.String)">
+            <summary>
+            Returns string if exists, otherwise null
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Configuration.ConfigUtils.GetNullableAppSetting(System.String)">
+            <summary>
+            Gets the nullable app setting.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.ConfigUtils.GetAppSetting(System.String)">
+            <summary>
+            Gets the app setting.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.ConfigUtils.ConfigSectionExists(System.String)">
+            <summary>
+            Determines wheter the Config section identified by the sectionName exists.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.ConfigUtils.GetAppSetting(System.String,System.String)">
+            <summary>
+            Returns AppSetting[key] if exists otherwise defaultValue
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.ConfigUtils.GetAppSetting``1(System.String,``0)">
+            <summary>
+            Returns AppSetting[key] if exists otherwise defaultValue, for non-string values
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.ConfigUtils.GetConnectionStringSetting(System.String)">
+            <summary>
+            Gets the connection string setting.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.ConfigUtils.GetConnectionString(System.String)">
+            <summary>
+            Gets the connection string.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.ConfigUtils.GetListFromAppSetting(System.String)">
+            <summary>
+            Gets the list from app setting.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.ConfigUtils.GetDictionaryFromAppSetting(System.String)">
+            <summary>
+            Gets the dictionary from app setting.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.ConfigUtils.GetParseMethod(System.Type)">
+            <summary>
+            Get the static Parse(string) method on the type supplied
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.ConfigUtils.GetConstructorInfo(System.Type)">
+            <summary>
+            Gets the constructor info for T(string) if exists.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.ConfigUtils.ParseTextValue``1(System.String)">
+            <summary>
+            Returns the value returned by the 'T.Parse(string)' method if exists otherwise 'new T(string)'. 
+            e.g. if T was a TimeSpan it will return TimeSpan.Parse(textValue).
+            If there is no Parse Method it will attempt to create a new instance of the destined type
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Configuration.ISettings.Get(System.String)">
+            <summary>
+            Provides a common interface for Settings providers such as
+            ConfigurationManager or Azure's RoleEnvironment. The only
+            requirement is that if the implementation cannot find the
+            specified key, the return value must be null
+            </summary>
+            <param name="key">The key for the setting</param>
+            <returns>The string value of the specified key, or null if the key
+            was invalid</returns>
+        </member>
+        <member name="M:ServiceStack.Configuration.ISettings.GetAllKeys">
+            <summary>
+            Return all keys in this configuration source.
+            </summary>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:ServiceStack.Html.HtmlCompressor" -->
+        <member name="F:ServiceStack.Html.HtmlCompressor.PHP_TAG_PATTERN">
+            Predefined pattern that matches <code>&lt;?php ... ?></code> tags. 
+            Could be passed inside a list to {@link #setPreservePatterns(List) setPreservePatterns} method.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.SERVER_SCRIPT_TAG_PATTERN">
+            Predefined pattern that matches <code>&lt;% ... %></code> tags. 
+            Could be passed inside a list to {@link #setPreservePatterns(List) setPreservePatterns} method.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.SERVER_SIDE_INCLUDE_PATTERN">
+            Predefined pattern that matches <code>&lt;--# ... --></code> tags. 
+            Could be passed inside a list to {@link #setPreservePatterns(List) setPreservePatterns} method.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.BLOCK_TAGS_MIN">
+            Predefined list of tags that are very likely to be block-level. 
+            Could be passed to {@link #setRemoveSurroundingSpaces(string) setRemoveSurroundingSpaces} method.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.BLOCK_TAGS_MAX">
+            Predefined list of tags that are block-level by default, excluding <code>&lt;div></code> and <code>&lt;li></code> tags. 
+            Table tags are also included.
+            Could be passed to {@link #setRemoveSurroundingSpaces(string) setRemoveSurroundingSpaces} method.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.ALL_TAGS">
+            Could be passed to {@link #setRemoveSurroundingSpaces(string) setRemoveSurroundingSpaces} method 
+            to remove all surrounding spaces (not recommended).
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.Enabled">
+            If set to <code>false</code> all compression will be bypassed. Might be useful for testing purposes. 
+            Default is <code>true</code>.
+            
+            @param enabled set <code>false</code> to bypass all compression
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.JavaScriptCompressor">
+            Gets or Sets JavaScript compressor implementation that will be used 
+            to compress inline JavaScript in HTML. 
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.CssCompressor">
+            Returns CSS compressor implementation that will be used 
+            to compress inline CSS in HTML.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveComments">
+            If set to <code>true</code> all HTML comments will be removed.   
+            Default is <code>true</code>.
+            
+            @param removeComments set <code>true</code> to remove all HTML comments
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveMultiSpaces">
+            If set to <code>true</code> all multiple whitespace characters will be replaced with single spaces.
+            Default is <code>true</code>.
+            
+            @param removeMultiSpaces set <code>true</code> to replace all multiple whitespace characters 
+            will single spaces.
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveIntertagSpaces" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveQuotes" -->
+        <member name="F:ServiceStack.Html.HtmlCompressor.CompressJavaScript">
+            Enables JavaScript compression within &lt;script> tags 
+            if set to <code>true</code>. Default is <code>false</code> for performance reasons.
+             
+            <p><b>Note:</b> Compressing JavaScript is not recommended if pages are 
+            compressed dynamically on-the-fly because of performance impact. 
+            You should consider putting JavaScript into a separate file and
+            compressing it using standalone YUICompressor for example.</p>
+            
+            @param compressJavaScript set <code>true</code> to enable JavaScript compression. 
+            Default is <code>false</code>
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.CompressCss">
+            Enables CSS compression within &lt;style> tags using 
+            <a href="http://developer.yahoo.com/yui/compressor/">Yahoo YUI ICompressor</a> 
+            if set to <code>true</code>. Default is <code>false</code> for performance reasons.
+             
+            <p><b>Note:</b> Compressing CSS is not recommended if pages are 
+            compressed dynamically on-the-fly because of performance impact. 
+            You should consider putting CSS into a separate file and
+            compressing it using standalone YUICompressor for example.</p>
+            
+            @param compressCss set <code>true</code> to enable CSS compression. 
+            Default is <code>false</code>
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.SimpleDoctype">
+            If set to <code>true</code>, existing DOCTYPE declaration will be replaced with simple <code>&lt;!DOCTYPE html></code> declaration.
+            Default is <code>false</code>.
+            
+            @param simpleDoctype set <code>true</code> to replace existing DOCTYPE declaration with <code>&lt;!DOCTYPE html></code>
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveScriptAttributes" -->
+        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveStyleAttributes">
+            If set to <code>true</code>, <code>type="text/style"</code> attributes will be removed from <code>&lt;style></code> tags. Default is <code>false</code>.
+            
+            @param removeStyleAttributes set <code>true</code> to remove <code>type="text/style"</code> attributes from <code>&lt;style></code> tags
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveLinkAttributes" -->
+        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveFormAttributes">
+            If set to <code>true</code>, <code>method="get"</code> attributes will be removed from <code>&lt;form></code> tags. Default is <code>false</code>.
+            
+            @param removeFormAttributes set <code>true</code> to remove <code>method="get"</code> attributes from <code>&lt;form></code> tags
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressor.RemoveInputAttributes">
+            If set to <code>true</code>, <code>type="text"</code> attributes will be removed from <code>&lt;input></code> tags. Default is <code>false</code>.
+            
+            @param removeInputAttributes set <code>true</code> to remove <code>type="text"</code> attributes from <code>&lt;input></code> tags
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.SimpleBooleanAttributes" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveJavaScriptProtocol" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveHttpProtocol" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveHttpsProtocol" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.RemoveSurroundingSpaces" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.PreservePatterns" -->
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressor.GenerateStatistics" -->
+        <member name="F:ServiceStack.Html.HtmlCompressor.Statistics">
+            Returns {@link HtmlCompressorStatistics} object containing statistics of the last HTML compression, if enabled. 
+            Should be called after {@link #compress(string)}
+            
+            @return {@link HtmlCompressorStatistics} object containing last HTML compression statistics
+            
+            @see HtmlCompressorStatistics
+            @see #setGenerateStatistics(bool)
+        </member>
+        <member name="M:ServiceStack.Html.HtmlCompressor.Compress(System.String)">
+            The main method that compresses given HTML source and returns compressed
+            result.
+            
+            @param html HTML content to compress
+            @return compressed content.
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressorStatistics.OriginalMetrics">
+            Returns metrics of an uncompressed document
+            
+            @return metrics of an uncompressed document
+            @see HtmlMetrics
+        </member>
+        <member name="F:ServiceStack.Html.HtmlCompressorStatistics.CompressedMetrics">
+            Returns metrics of a compressed document
+            
+            @return metrics of a compressed document
+            @see HtmlMetrics
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:ServiceStack.Html.HtmlCompressorStatistics.Time" -->
+        <member name="F:ServiceStack.Html.HtmlCompressorStatistics.PreservedSize">
+            Returns total size of blocks that were skipped by the compressor 
+            (for example content inside <code>&lt;pre></code> tags or inside   
+            <code>&lt;script></code> tags with disabled javascript compression)
+            
+            @return the total size of blocks that were skipped by the compressor, in bytes
+        </member>
+        <member name="F:ServiceStack.Html.HtmlMetrics.Filesize">
+            Returns total filesize of a document
+            
+            @return total filesize of a document, in bytes
+        </member>
+        <member name="F:ServiceStack.Html.HtmlMetrics.EmptyChars">
+            Returns number of empty characters (spaces, tabs, end of lines) in a document
+            
+            @return number of empty characters in a document
+        </member>
+        <member name="F:ServiceStack.Html.HtmlMetrics.InlineScriptSize">
+            Returns total size of inline <code>&lt;script></code> tags
+            
+            @return total size of inline <code>&lt;script></code> tags, in bytes
+        </member>
+        <member name="F:ServiceStack.Html.HtmlMetrics.InlineStyleSize">
+            Returns total size of inline <code>&lt;style></code> tags
+            
+            @return total size of inline <code>&lt;style></code> tags, in bytes
+        </member>
+        <member name="F:ServiceStack.Html.HtmlMetrics.InlineEventSize">
+            Returns total size of inline event handlers (<code>onclick</code>, etc)
+            
+            @return total size of inline event handlers, in bytes
+        </member>
+        <member name="T:ServiceStack.Html.AntiXsrf.AntiForgery">
+            <summary>
+            Provides access to the anti-forgery system, which provides protection against
+            Cross-site Request Forgery (XSRF, also called CSRF) attacks.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Html.AntiXsrf.AntiForgery.GetHtml">
+            <summary>
+            Generates an anti-forgery token for this request. This token can
+            be validated by calling the Validate() method.
+            </summary>
+            <returns>An HTML string corresponding to an &lt;input type="hidden"&gt;
+            element. This element should be put inside a &lt;form&gt;.</returns>
+            <remarks>
+            This method has a side effect: it may set a response cookie.
+            </remarks>
+        </member>
+        <member name="M:ServiceStack.Html.AntiXsrf.AntiForgery.GetTokens(System.String,System.String@,System.String@)">
+            <summary>
+            Generates an anti-forgery token pair (cookie and form token) for this request.
+            This method is similar to GetHtml(), but this method gives the caller control
+            over how to persist the returned values. To validate these tokens, call the
+            appropriate overload of Validate.
+            </summary>
+            <param name="oldCookieToken">The anti-forgery token - if any - that already existed
+            for this request. May be null. The anti-forgery system will try to reuse this cookie
+            value when generating a matching form token.</param>
+            <param name="newCookieToken">Will contain a new cookie value if the old cookie token
+            was null or invalid. If this value is non-null when the method completes, the caller
+            must persist this value in the form of a response cookie, and the existing cookie value
+            should be discarded. If this value is null when the method completes, the existing
+            cookie value was valid and needn't be modified.</param>
+            <param name="formToken">The value that should be stored in the &lt;form&gt;. The caller
+            should take care not to accidentally swap the cookie and form tokens.</param>
+            <remarks>
+            Unlike the GetHtml() method, this method has no side effect. The caller
+            is responsible for setting the response cookie and injecting the returned
+            form token as appropriate.
+            </remarks>
+        </member>
+        <member name="M:ServiceStack.Html.AntiXsrf.AntiForgery.Validate">
+            <summary>
+            Validates an anti-forgery token that was supplied for this request.
+            The anti-forgery token may be generated by calling GetHtml().
+            </summary>
+            <remarks>
+            Throws an HttpAntiForgeryException if validation fails.
+            </remarks>
+        </member>
+        <member name="M:ServiceStack.Html.AntiXsrf.AntiForgery.Validate(System.String,System.String)">
+            <summary>
+            Validates an anti-forgery token pair that was generated by the GetTokens method.
+            </summary>
+            <param name="cookieToken">The token that was supplied in the request cookie.</param>
+            <param name="formToken">The token that was supplied in the request form body.</param>
+            <remarks>
+            Throws an HttpAntiForgeryException if validation fails.
+            </remarks>
+        </member>
+        <member name="T:ServiceStack.Html.AntiXsrf.AntiForgeryConfig">
+            <summary>
+            Provides programmatic configuration for the anti-forgery token system.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Html.AntiXsrf.AntiForgeryConfig.AdditionalDataProvider">
+            <summary>
+            Specifies an object that can provide additional data to put into all
+            generated tokens and that can validate additional data in incoming
+            tokens.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Html.AntiXsrf.AntiForgeryConfig.CookieName">
+            <summary>
+            Specifies the name of the cookie that is used by the anti-forgery
+            system.
+            </summary>
+            <remarks>
+            If an explicit name is not provided, the system will automatically
+            generate a name.
+            </remarks>
+        </member>
+        <member name="P:ServiceStack.Html.AntiXsrf.AntiForgeryConfig.RequireSsl">
+            <summary>
+            Specifies whether SSL is required for the anti-forgery system
+            to operate. If this setting is 'true' and a non-SSL request
+            comes into the system, all anti-forgery APIs will fail.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Html.AntiXsrf.AntiForgeryConfig.SuppressIdentityHeuristicChecks">
+            <summary>
+            Specifies whether the anti-forgery system should skip checking
+            for conditions that might indicate misuse of the system. Please
+            use caution when setting this switch, as improper use could open
+            security holes in the application.
+            </summary>
+            <remarks>
+            Setting this switch will disable several checks, including:
+            - Identity.IsAuthenticated = true without Identity.Name being set
+            - special-casing claims-based identities
+            </remarks>
+        </member>
+        <member name="P:ServiceStack.Html.AntiXsrf.AntiForgeryConfig.UniqueClaimTypeIdentifier">
+            <summary>
+            If claims-based authorization is in use, specifies the claim
+            type from the identity that is used to uniquely identify the
+            user. If this property is set, all claims-based identities
+            <em>must</em> return unique values for this claim type.
+            </summary>
+            <remarks>
+            If claims-based authorization is in use and this property has
+            not been set, the anti-forgery system will automatically look
+            for claim types "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+            and "http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider".
+            </remarks>
+        </member>
+        <member name="T:ServiceStack.Html.AntiXsrf.IAntiForgeryAdditionalDataProvider">
+            <summary>
+            Allows providing or validating additional custom data for anti-forgery tokens.
+            For example, the developer could use this to supply a nonce when the token is
+            generated, then he could validate the nonce when the token is validated.
+            </summary>
+            <remarks>
+            The anti-forgery system already embeds the client's username within the
+            generated tokens. This interface provides and consumes <em>supplemental</em>
+            data. If an incoming anti-forgery token contains supplemental data but no
+            additional data provider is configured, the supplemental data will not be
+            validated.
+            </remarks>
+        </member>
+        <member name="M:ServiceStack.Html.AntiXsrf.IAntiForgeryAdditionalDataProvider.GetAdditionalData(System.Web.HttpContextBase)">
+            <summary>
+            Provides additional data to be stored for the anti-forgery tokens generated
+            during this request.
+            </summary>
+            <param name="context">Information about the current request.</param>
+            <returns>Supplemental data to embed within the anti-forgery token.</returns>
+        </member>
+        <member name="M:ServiceStack.Html.AntiXsrf.IAntiForgeryAdditionalDataProvider.ValidateAdditionalData(System.Web.HttpContextBase,System.String)">
+            <summary>
+            Validates additional data that was embedded inside an incoming anti-forgery
+            token.
+            </summary>
+            <param name="context">Information about the current request.</param>
+            <param name="additionalData">Supplemental data that was embedded within the token.</param>
+            <returns>True if the data is valid; false if the data is invalid.</returns>
+        </member>
+        <member name="M:ServiceStack.Html.ScopeStorageDictionary.#ctor(System.Collections.Generic.IDictionary{System.Object,System.Object},System.Collections.Generic.IDictionary{System.Object,System.Object})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ServiceStack.Html.ScopeStorageDictionary"/> class.
+            </summary>
+            <param name="baseScope">The base scope.</param>
+            <param name="backingStore">
+            The dictionary to use as a storage. Since the dictionary would be used as-is, we expect the implementer to 
+            use the same key-value comparison logic as we do here.
+            </param>
+        </member>
+        <member name="T:ServiceStack.Html.ScopeStorageComparer">
+            <summary>
+            Custom comparer for the context dictionaries
+            The comparer treats strings as a special case, performing case insesitive comparison. 
+            This guaratees that we remain consistent throughout the chain of contexts since PageData dictionary 
+            behaves in this manner.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.ServiceStackProvider.SessionAs``1">
+            <summary>
+            Typed UserSession
+            </summary>
+        </member>
+        <member name="F:ServiceStack.ServiceStackProvider.session">
+            <summary>
+            Dynamic Session Bag
+            </summary>
+        </member>
+        <member name="T:ServiceStack.EnsureHttpsAttribute">
+            <summary>
+            Redirect to the https:// version of this url if not already.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.EnsureHttpsAttribute.SkipIfDebugMode">
+            <summary>
+            Don't redirect when in DebugMode
+            </summary>
+        </member>
+        <member name="P:ServiceStack.EnsureHttpsAttribute.SkipIfXForwardedFor">
+            <summary>
+            Don't redirect if the request was a forwarded request, e.g. from a Load Balancer
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Messaging.IMessageHandlerFactory">
+            <summary>
+            Encapsulates creating a new message handler
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Messaging.MessageHandler`1">
+            <summary>
+            Processes all messages in a Normal and Priority Queue.
+            Expects to be called in 1 thread. i.e. Non Thread-Safe.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:ServiceStack.IRepository">
+            <summary>
+            A convenient repository base class you can inherit from to reduce the boilerplate 
+            with accessing a managed IDbConnection
+            </summary>
+        </member>
+        <member name="T:ServiceStack.ILogic">
+            <summary>
+            A convenient base class for your injected service dependencies that reduces the boilerplate
+            with managed access to ServiceStack's built-in providers
+            </summary>
+        </member>
+        <member name="P:ServiceStack.PostmanFeature.DefaultVerbsForAny">
+            <summary>
+            Only generate specified Verb entries for "ANY" routes
+            </summary>
+        </member>
+        <member name="F:ServiceStack.RequestContext.UseThreadStatic">
+            <summary>
+            Tell ServiceStack to use ThreadStatic Items Collection for RequestScoped items.
+            Warning: ThreadStatic Items aren't pinned to the same request in async services which callback on different threads.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.RequestContext.Items">
+            <summary>
+            Gets a list of items for this request. 
+            </summary>
+            <remarks>This list will be cleared on every request and is specific to the original thread that is handling the request.
+            If a handler uses additional threads, this data will not be available on those threads.
+            </remarks>
+        </member>
+        <member name="M:ServiceStack.RequestContext.TrackDisposable(System.IDisposable)">
+            <summary>
+            Track any IDisposable's to dispose of at the end of the request in IAppHost.OnEndRequest()
+            </summary>
+            <param name="instance"></param>
+        </member>
+        <member name="M:ServiceStack.RequestContext.ReleaseDisposables">
+            <summary>
+            Release currently registered dependencies for this request
+            </summary>
+            <returns>true if any dependencies were released</returns>
+        </member>
+        <member name="M:ServiceStack.HttpResult.SoftRedirect(System.String,System.Object)">
+            <summary>
+            Respond with a 'Soft redirect' so smart clients (e.g. ajax) have access to the response and 
+            can decide whether or not they should redirect
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpResult.TriggerEvent(System.Object,System.String,System.String)">
+            <summary>
+            Decorate the response with an additional client-side event to instruct participating 
+            smart clients (e.g. ajax) with hints to transparently invoke client-side functionality
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpResultUtils.GetDto(System.Object)">
+            <summary>
+            Shortcut to get the ResponseDTO whether it's bare or inside a IHttpResult
+            </summary>
+            <param name="response"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.HttpResultUtils.GetResponseDto(System.Object)">
+            <summary>
+            Alias of AsDto
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpResultUtils.GetDto``1(System.Object)">
+            <summary>
+            Shortcut to get the ResponseDTO whether it's bare or inside a IHttpResult
+            </summary>
+            <param name="response"></param>
+            <returns>TResponse if found; otherwise null</returns>
+        </member>
+        <member name="M:ServiceStack.HttpResultUtils.GetResponseDto``1(System.Object)">
+            <summary>
+            Alias of AsDto
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpResultUtils.IsErrorResponse(System.Object)">
+            <summary>
+            Whether the response is an IHttpError or Exception
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpResultUtils.ExtractHttpRanges(System.String,System.Int64,System.Int64@,System.Int64@)">
+            <summary>
+            rangeHeader should be of the format "bytes=0-" or "bytes=0-12345" or "bytes=123-456"
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpResultUtils.AddHttpRangeResponseHeaders(ServiceStack.Web.IResponse,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Adds 206 PartialContent Status, Content-Range and Content-Length headers
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpResultUtils.WritePartialTo(System.IO.Stream,System.IO.Stream,System.Int64,System.Int64)">
+            <summary>
+            Writes partial range as specified by start-end, from fromStream to toStream.
+            </summary>
+        </member>
+        <member name="F:ServiceStack.RedisErrorLoggerFeature.UrnServiceErrorType">
+            <summary>
+            Service error logs are kept in 'urn:ServiceErrors:{ServiceName}'
+            </summary>
+        </member>
+        <member name="F:ServiceStack.RedisErrorLoggerFeature.CombinedServiceLogId">
+            <summary>
+            Combined service error logs are maintained in 'urn:ServiceErrors:All'
+            </summary>
+        </member>
+        <member name="P:ServiceStack.RequestLogsFeature.AtRestPath">
+            <summary>
+            RequestLogs service Route, default is /requestlogs
+            </summary>
+        </member>
+        <member name="P:ServiceStack.RequestLogsFeature.EnableSessionTracking">
+            <summary>
+            Turn On/Off Session Tracking
+            </summary>
+        </member>
+        <member name="P:ServiceStack.RequestLogsFeature.EnableRequestBodyTracking">
+            <summary>
+            Turn On/Off Logging of Raw Request Body, default is Off
+            </summary>
+        </member>
+        <member name="P:ServiceStack.RequestLogsFeature.EnableResponseTracking">
+            <summary>
+            Turn On/Off Tracking of Responses
+            </summary>
+        </member>
+        <member name="P:ServiceStack.RequestLogsFeature.EnableErrorTracking">
+            <summary>
+            Turn On/Off Tracking of Exceptions
+            </summary>
+        </member>
+        <member name="P:ServiceStack.RequestLogsFeature.Capacity">
+            <summary>
+            Size of InMemoryRollingRequestLogger circular buffer
+            </summary>
+        </member>
+        <member name="P:ServiceStack.RequestLogsFeature.RequiredRoles">
+            <summary>
+            Limit access to /requestlogs service to these roles
+            </summary>
+        </member>
+        <member name="P:ServiceStack.RequestLogsFeature.RequestLogger">
+            <summary>
+            Change the RequestLogger provider. Default is InMemoryRollingRequestLogger
+            </summary>
+        </member>
+        <member name="P:ServiceStack.RequestLogsFeature.ExcludeRequestDtoTypes">
+            <summary>
+            Don't log requests of these types. By default RequestLog's are excluded
+            </summary>
+        </member>
+        <member name="P:ServiceStack.RequestLogsFeature.HideRequestBodyForRequestDtoTypes">
+            <summary>
+            Don't log request bodys for services with sensitive information.
+            By default Auth and Registration requests are hidden.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.AuthenticateAttribute">
+            <summary>
+            Indicates that the request dto, which is associated with this attribute,
+            requires authentication.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AuthenticateAttribute.Provider">
+            <summary>
+            Restrict authentication to a specific <see cref="T:ServiceStack.Auth.IAuthProvider"/>.
+            For example, if this attribute should only permit access
+            if the user is authenticated with <see cref="T:ServiceStack.Auth.BasicAuthProvider"/>,
+            you should set this property to <see cref="F:ServiceStack.Auth.BasicAuthProvider.Name"/>.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.AuthenticateAttribute.HtmlRedirect">
+            <summary>
+            Redirect the client to a specific URL if authentication failed.
+            If this property is null, simply `401 Unauthorized` is returned.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.AuthFeature">
+            <summary>
+            Enable the authentication feature and configure the AuthService.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.CacheClientExtensions.RemoveByPattern(ServiceStack.Caching.ICacheClient,System.String)">
+            <summary>
+            Removes items from cache that have keys matching the specified wildcard pattern
+            </summary>
+            <param name="cacheClient">Cache client</param>
+            <param name="pattern">The wildcard, where "*" means any sequence of characters and "?" means any single character.</param>
+        </member>
+        <member name="M:ServiceStack.CacheClientExtensions.RemoveByRegex(ServiceStack.Caching.ICacheClient,System.String)">
+            <summary>
+            Removes items from the cache based on the specified regular expression pattern
+            </summary>
+            <param name="cacheClient">Cache client</param>
+            <param name="regex">Regular expression pattern to search cache keys</param>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.CacheEntry.#ctor(System.Object,System.Nullable{System.DateTime})">
+            <summary>
+            Create new instance of CacheEntry.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Caching.MemoryCacheClient.CacheEntry.ExpiresAt">
+            <summary>UTC time at which CacheEntry expires.</summary>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.CacheAdd(System.String,System.Object,System.Nullable{System.DateTime})">
+            <summary>
+            Stores The value with key only if such key doesn't exist at the server yet. 
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.CacheSet(System.String,System.Object,System.DateTime)">
+            <summary>
+            Adds or replaces the value with key.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.CacheSet(System.String,System.Object,System.Nullable{System.DateTime},System.Nullable{System.Int64})">
+            <summary>
+            Adds or replaces the value with key. 
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.CacheReplace(System.String,System.Object,System.Nullable{System.DateTime})">
+            <summary>
+            Replace the value with specified key if it exists.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.Add``1(System.String,``0)">
+            <summary>
+            Add the value with key to the cache, set to never expire.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.Set``1(System.String,``0)">
+            <summary>
+            Add or replace the value with key to the cache, set to never expire.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.Replace``1(System.String,``0)">
+            <summary>
+            Replace the value with key in the cache, set to never expire.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.Add``1(System.String,``0,System.DateTime)">
+            <summary>
+            Add the value with key to the cache, set to expire at specified DateTime.
+            </summary>
+            <remarks>This method examines the DateTimeKind of expiresAt to determine if conversion to
+            universal time is needed. The version of Add that takes a TimeSpan expiration is faster 
+            than using this method with a DateTime of Kind other than Utc, and is not affected by 
+            ambiguous local time during daylight savings/standard time transition.</remarks>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.Set``1(System.String,``0,System.DateTime)">
+            <summary>
+            Add or replace the value with key to the cache, set to expire at specified DateTime.
+            </summary>
+            <remarks>This method examines the DateTimeKind of expiresAt to determine if conversion to
+            universal time is needed. The version of Set that takes a TimeSpan expiration is faster 
+            than using this method with a DateTime of Kind other than Utc, and is not affected by 
+            ambiguous local time during daylight savings/standard time transition.</remarks>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.Replace``1(System.String,``0,System.DateTime)">
+            <summary>
+            Replace the value with key in the cache, set to expire at specified DateTime.
+            </summary>
+            <remarks>This method examines the DateTimeKind of expiresAt to determine if conversion to
+            universal time is needed. The version of Replace that takes a TimeSpan expiration is faster 
+            than using this method with a DateTime of Kind other than Utc, and is not affected by 
+            ambiguous local time during daylight savings/standard time transition.</remarks>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.Add``1(System.String,``0,System.TimeSpan)">
+            <summary>
+            Add the value with key to the cache, set to expire after specified TimeSpan.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.Set``1(System.String,``0,System.TimeSpan)">
+            <summary>
+            Add or replace the value with key to the cache, set to expire after specified TimeSpan.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Caching.MemoryCacheClient.Replace``1(System.String,``0,System.TimeSpan)">
+            <summary>
+            Replace the value with key in the cache, set to expire after specified TimeSpan.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.CorsFeature">
+            <summary>
+            Plugin adds support for Cross-origin resource sharing (CORS, see http://www.w3.org/TR/access-control/). 
+            CORS allows to access resources from different domain which usually forbidden by origin policy. 
+            </summary>
+        </member>
+        <member name="M:ServiceStack.CorsFeature.#ctor(System.String,System.String,System.String,System.Boolean,System.String,System.Nullable{System.Int32})">
+            <summary>
+            Represents a default constructor with Allow Origin equals to "*", Allowed GET, POST, PUT, DELETE, OPTIONS request and allowed "Content-Type" header.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.EnableCorsAttribute">
+            <summary>
+            Attribute marks that specific response class has support for Cross-origin resource sharing (CORS, see http://www.w3.org/TR/access-control/). CORS allows to access resources from different domain which usually forbidden by origin policy. 
+            </summary>
+        </member>
+        <member name="M:ServiceStack.EnableCorsAttribute.#ctor(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Represents a default constructor with Allow Origin equals to "*", Allowed GET, POST, PUT, DELETE, OPTIONS request and allowed "Content-Type" header.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.DefaultViewAttribute">
+            <summary>
+            Change the default HTML view or template used for the HTML response of this service
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpExtensions.EndRequest(System.Web.HttpResponseBase,System.Boolean)">
+            <summary>
+            End a ServiceStack Request
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpExtensions.EndRequest(ServiceStack.Web.IResponse,System.Boolean)">
+            <summary>
+            End a ServiceStack Request
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpExtensions.EndHttpHandlerRequest(System.Web.HttpContextBase,System.Boolean,System.Boolean,System.Boolean,System.Action{System.Web.HttpResponseBase})">
+            <summary>
+            End a HttpHandler Request
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpExtensions.EndHttpHandlerRequest(ServiceStack.Web.IResponse,System.Boolean,System.Boolean,System.Action{ServiceStack.Web.IResponse})">
+            <summary>
+            End a HttpHandler Request
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpExtensions.EndMqRequest(ServiceStack.Web.IResponse,System.Boolean)">
+            <summary>
+            End an MQ Request
+            </summary>
+        </member>
+        <member name="M:ServiceStack.HttpExtensions.EndRequestWithNoContent(ServiceStack.Web.IResponse)">
+            <summary>
+            End a ServiceStack Request with no content
+            </summary>
+        </member>
+        <member name="M:ServiceStack.IServiceBase.ResolveService``1">
+            <summary>
+            Resolve an alternate Web Service from ServiceStack's IOC container.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="T:ServiceStack.RegistrationFeature">
+            <summary>
+            Enable the Registration feature and configure the RegistrationService.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.RequestFilterAttribute">
+            <summary>
+            Base class to create request filter attributes only for specific HTTP methods (GET, POST...)
+            </summary>
+        </member>
+        <member name="M:ServiceStack.RequestFilterAttribute.#ctor(ServiceStack.ApplyTo)">
+            <summary>
+            Creates a new <see cref="T:ServiceStack.RequestFilterAttribute"/>
+            </summary>
+            <param name="applyTo">Defines when the filter should be executed</param>
+        </member>
+        <member name="M:ServiceStack.RequestFilterAttribute.Execute(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.Object)">
+            <summary>
+            This method is only executed if the HTTP method matches the <see cref="P:ServiceStack.RequestFilterAttribute.ApplyTo"/> property.
+            </summary>
+            <param name="req">The http request wrapper</param>
+            <param name="res">The http response wrapper</param>
+            <param name="requestDto">The request DTO</param>
+        </member>
+        <member name="M:ServiceStack.RequestFilterAttribute.Copy">
+            <summary>
+            Create a ShallowCopy of this instance.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.ContainerTypeExtensions.RegisterAutoWiredType(Funq.Container,System.Type,System.Type,Funq.ReuseScope)">
+            <summary>
+            Registers the type in the IoC container and
+            adds auto-wiring to the specified type.
+            </summary>
+            <param name="serviceType"></param>
+            <param name="inFunqAsType"></param>
+        </member>
+        <member name="M:ServiceStack.ContainerTypeExtensions.RegisterAutoWiredType(Funq.Container,System.Type,Funq.ReuseScope)">
+            <summary>
+            Registers the type in the IoC container and
+            adds auto-wiring to the specified type.
+            The reuse scope is set to none (transient).
+            </summary>
+            <param name="serviceTypes"></param>
+        </member>
+        <member name="M:ServiceStack.ContainerTypeExtensions.RegisterAutoWiredTypes(Funq.Container,System.Collections.Generic.IEnumerable{System.Type},Funq.ReuseScope)">
+            <summary>
+            Registers the types in the IoC container and
+            adds auto-wiring to the specified types.
+            The reuse scope is set to none (transient).
+            </summary>
+            <param name="serviceTypes"></param>
+        </member>
+        <member name="M:ServiceStack.ContainerTypeExtensions.Register(Funq.Container,System.Object,System.Type)">
+            <summary>
+            Register a singleton instance as a runtime type
             </summary>
         </member>
         <member name="T:ServiceStack.RequiredPermissionAttribute">
@@ -4851,6 +4897,12 @@
             and no more processing should be done.
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:ServiceStack.ServiceStackHost.OnSessionFilter(ServiceStack.Auth.IAuthSession,System.String)">
+            <summary>
+            Inspect or modify ever new UserSession created or resolved from cache. 
+            return null if Session is invalid to create new Session.
+            </summary>
         </member>
         <member name="F:ServiceStack.DtoUtils.ResponseStatusPropertyName">
             <summary>
@@ -5325,7 +5377,7 @@
             Resolves and auto-wires a ServiceStack Service from a HttpListenerContext.
             </summary>
         </member>
-        <member name="M:ServiceStack.HostContext.ResolveService``1(ServiceStack.Web.IHttpRequest)">
+        <member name="M:ServiceStack.HostContext.ResolveService``1(ServiceStack.Web.IRequest)">
             <summary>
             Resolves and auto-wires a ServiceStack Service.
             </summary>
@@ -5491,6 +5543,11 @@
             Register an Adhoc web service on Startup
             </summary>
         </member>
+        <member name="M:ServiceStack.IAppHost.RegisterServicesInAssembly(System.Reflection.Assembly)">
+            <summary>
+            Register all Services in Assembly
+            </summary>
+        </member>
         <member name="P:ServiceStack.IAppHost.Plugins">
             <summary>
             List of pre-registered and user-defined plugins to be enabled in this AppHost
@@ -5525,6 +5582,26 @@
             <summary>
             Resolve localized text, returns itself by default.
             The Request is provided when exists.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.IPlugin">
+            <summary>
+            Callback for Plugins to register necessary handlers with ServiceStack
+            </summary>
+        </member>
+        <member name="T:ServiceStack.IPreInitPlugin">
+            <summary>
+            Callback to pre-configure any logic before IPlugin.Register() is fired
+            </summary>
+        </member>
+        <member name="T:ServiceStack.IPostInitPlugin">
+            <summary>
+            Callback to post-configure any logic after IPlugin.Register() is fired
+            </summary>
+        </member>
+        <member name="T:ServiceStack.IAuthPlugin">
+            <summary>
+            Callback for AuthProviders to register callbacks with AuthFeature
             </summary>
         </member>
         <member name="T:Amib.Threading.Internal.CallerThreadContext">
