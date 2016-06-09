@@ -246,19 +246,16 @@ namespace ServiceStack.Redis
         {
             get
             {
-                if (this.info == null)
+                var lines = SendExpectString(Commands.Info);
+                this.info = new Dictionary<string, string>();
+
+                foreach (var line in lines
+                    .Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    var lines = SendExpectString(Commands.Info);
-                    this.info = new Dictionary<string, string>();
+                    var p = line.IndexOf(':');
+                    if (p == -1) continue;
 
-                    foreach (var line in lines
-                        .Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        var p = line.IndexOf(':');
-                        if (p == -1) continue;
-
-                        this.info.Add(line.Substring(0, p), line.Substring(p + 1));
-                    }
+                    this.info.Add(line.Substring(0, p), line.Substring(p + 1));
                 }
                 return this.info;
             }
