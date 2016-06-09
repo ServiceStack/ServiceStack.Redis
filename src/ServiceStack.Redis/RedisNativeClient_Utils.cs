@@ -38,7 +38,7 @@ namespace ServiceStack.Redis
         }
 
         private const int Unknown = -1;
-        public int ServerVersionNumber { get; set; }
+        public static int ServerVersionNumber { get; set; }
 
         public int AssertServerVersionNumber()
         {
