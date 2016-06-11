@@ -272,6 +272,15 @@ we've added a new
 [Getting connected to Azure Redis via SSL](https://github.com/ServiceStack/ServiceStack/wiki/Secure-SSL-Redis-connections-to-Azure-Redis) 
 to help you get started.
 
+## Redis GEO
+
+The [release of Redis 3.2.0](http://antirez.com/news/104) brings it exciting new 
+[GEO capabilities](http://redis.io/commands/geoadd) which will let you store Lat/Long coordinates in Redis
+and query locations within a specified radius. To demonstrate this functionality we've created a new 
+[Redis GEO Live Demo](https://github.com/ServiceStackApps/redis-geo) which lets you click on anywhere in 
+the U.S. to find the list of nearest cities within a given radius, Live Demo at: http://redisgeo.servicestack.net
+
+
 ## Generic APIs for calling Custom Redis commands
 
 Most of the time when waiting to use a new [Redis Command](http://redis.io/commands) you'll need to wait for an updated version of 
