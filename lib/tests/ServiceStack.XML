@@ -175,6 +175,11 @@
             How long should JWT Tokens be valid for. (default 14 days)
             </summary>
         </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.ExpireTokensInDays">
+            <summary>
+            Convenient overload to initialize ExpireTokensIn with an Integer
+            </summary>
+        </member>
         <member name="P:ServiceStack.Auth.JwtAuthProviderReader.InvalidateTokensIssuedBefore">
             <summary>
             Whether to invalidate all JWT Tokens issued before a specified date.
@@ -4875,6 +4880,11 @@
         <member name="M:ServiceStack.ServiceStackHost.ApplyCustomHandlerRequestFilters(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse)">
             <summary>
             Apply PreRequest Filters for participating Custom Handlers, e.g. RazorFormat, MarkdownFormat, etc
+            </summary>
+        </member>
+        <member name="M:ServiceStack.ServiceStackHost.ApplyPreAuthenticateFilters(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse)">
+            <summary>
+            Apply PreAuthenticate Filters from IAuthWithRequest AuthProviders
             </summary>
         </member>
         <member name="M:ServiceStack.ServiceStackHost.ApplyPreRequestFilters(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse)">
