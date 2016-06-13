@@ -272,7 +272,7 @@ we've added a new
 [Getting connected to Azure Redis via SSL](https://github.com/ServiceStack/ServiceStack/wiki/Secure-SSL-Redis-connections-to-Azure-Redis) 
 to help you get started.
 
-## Redis GEO
+## [Redis GEO](https://github.com/ServiceStackApps/redis-geo)
 
 The [release of Redis 3.2.0](http://antirez.com/news/104) brings it exciting new 
 [GEO capabilities](http://redis.io/commands/geoadd) which will let you store Lat/Long coordinates in Redis
