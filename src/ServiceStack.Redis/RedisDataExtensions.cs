@@ -4,41 +4,43 @@ namespace ServiceStack.Redis
 {
     public static class RedisDataExtensions
     {
-         public static RedisText ToRedisText(this RedisData data)
-         {
-             var to = new RedisText();
+        public static RedisText ToRedisText(this RedisData data)
+        {
+            if (data == null) return null; //In Transaction
 
-             if (data.Data != null)
-                 to.Text = data.Data.FromUtf8Bytes();
+            var to = new RedisText();
 
-             if (data.Children != null)
-                 to.Children = data.Children.ConvertAll(x => x.ToRedisText());
+            if (data.Data != null)
+                to.Text = data.Data.FromUtf8Bytes();
 
-             return to;
-         }
+            if (data.Children != null)
+                to.Children = data.Children.ConvertAll(x => x.ToRedisText());
 
-         public static string GetResult(this RedisText from)
-         {
-             return from.Text;
-         }
+            return to;
+        }
 
-         public static T GetResult<T>(this RedisText from)
-         {
-             return from.Text.FromJson<T>();
-         }
+        public static string GetResult(this RedisText from)
+        {
+            return from.Text;
+        }
 
-         public static List<string> GetResults(this RedisText from)
-         {
-             return from.Children == null
-                 ? new List<string>()
-                 : from.Children.ConvertAll(x => x.Text);
-         }
+        public static T GetResult<T>(this RedisText from)
+        {
+            return from.Text.FromJson<T>();
+        }
 
-         public static List<T> GetResults<T>(this RedisText from)
-         {
-             return from.Children == null
-                 ? new List<T>()
-                 : from.Children.ConvertAll(x => x.Text.FromJson<T>());
-         }
+        public static List<string> GetResults(this RedisText from)
+        {
+            return from.Children == null
+                ? new List<string>()
+                : from.Children.ConvertAll(x => x.Text);
+        }
+
+        public static List<T> GetResults<T>(this RedisText from)
+        {
+            return from.Children == null
+                ? new List<T>()
+                : from.Children.ConvertAll(x => x.Text.FromJson<T>());
+        }
     }
 }

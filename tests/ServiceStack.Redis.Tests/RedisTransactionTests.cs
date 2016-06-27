@@ -381,5 +381,27 @@ namespace ServiceStack.Redis.Tests
 
             Assert.That(result, Is.EquivalentTo(new[] { "ITEM 1", "ITEM 2" }));
         }
+
+        [Test]
+        public void Can_call_LUA_Script_in_transaction()
+        {
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.ExecLua("return {'myval', 'myotherval'}"));
+
+                trans.Commit();
+            }
+
+            RedisText result = null;
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(r => r.ExecLua("return {'myval', 'myotherval'}"), s => result = s);
+
+                trans.Commit();
+            }
+
+            Assert.That(result.Children[0].Text, Is.EqualTo("myval"));
+            Assert.That(result.Children[1].Text, Is.EqualTo("myotherval"));
+        }
     }
 }

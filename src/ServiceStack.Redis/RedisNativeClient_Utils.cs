@@ -661,7 +661,7 @@ namespace ServiceStack.Redis
 
         protected RedisData SendExpectComplexResponse(params byte[][] cmdWithBinaryArgs)
         {
-            return SendReceive(cmdWithBinaryArgs, ReadComplexResponse);
+            return SendReceive(cmdWithBinaryArgs, ReadComplexResponse, Pipeline != null ? Pipeline.CompleteRedisDataQueuedCommand : (Action<Func<RedisData>>)null);
         }
 
         protected string SendExpectString(params byte[][] cmdWithBinaryArgs)

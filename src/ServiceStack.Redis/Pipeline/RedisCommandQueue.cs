@@ -269,5 +269,49 @@ namespace ServiceStack.Redis
             });
             command(RedisClient);
         }
+
+
+        public void QueueCommand(Func<IRedisClient, RedisData> command)
+        {
+            QueueCommand(command, null, null);
+        }
+
+        public void QueueCommand(Func<IRedisClient, RedisData> command, Action<RedisData> onSuccessCallback)
+        {
+            QueueCommand(command, onSuccessCallback, null);
+        }
+
+        public void QueueCommand(Func<IRedisClient, RedisData> command, Action<RedisData> onSuccessCallback, Action<Exception> onErrorCallback)
+        {
+            BeginQueuedCommand(new QueuedRedisCommand
+            {
+                RedisDataReturnCommand = command,
+                OnSuccessRedisDataCallback = onSuccessCallback,
+                OnErrorCallback = onErrorCallback
+            });
+            command(RedisClient);
+        }
+
+
+        public void QueueCommand(Func<IRedisClient, RedisText> command)
+        {
+            QueueCommand(command, null, null);
+        }
+
+        public void QueueCommand(Func<IRedisClient, RedisText> command, Action<RedisText> onSuccessCallback)
+        {
+            QueueCommand(command, onSuccessCallback, null);
+        }
+
+        public void QueueCommand(Func<IRedisClient, RedisText> command, Action<RedisText> onSuccessCallback, Action<Exception> onErrorCallback)
+        {
+            BeginQueuedCommand(new QueuedRedisCommand
+            {
+                RedisTextReturnCommand = command,
+                OnSuccessRedisTextCallback = onSuccessCallback,
+                OnErrorCallback = onErrorCallback
+            });
+            command(RedisClient);
+        }
     }
 }

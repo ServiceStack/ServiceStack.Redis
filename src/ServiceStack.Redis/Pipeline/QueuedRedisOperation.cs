@@ -19,6 +19,7 @@ namespace ServiceStack.Redis.Pipeline
         public Func<List<string>> MultiStringReadCommand { get; set; }
         public Func<Dictionary<string, string>> DictionaryStringReadCommand { get; set; }
         public Func<double> DoubleReadCommand { get; set; }
+        public Func<RedisData> RedisDataReadCommand { get; set; }
 
         public Action OnSuccessVoidCallback { get; set; }
         public Action<int> OnSuccessIntCallback { get; set; }
@@ -29,6 +30,8 @@ namespace ServiceStack.Redis.Pipeline
         public Action<string> OnSuccessStringCallback { get; set; }
         public Action<List<string>> OnSuccessMultiStringCallback { get; set; }
         public Action<Dictionary<string, string>> OnSuccessDictionaryStringCallback { get; set; }
+        public Action<RedisData> OnSuccessRedisDataCallback { get; set; }
+        public Action<RedisText> OnSuccessRedisTextCallback { get; set; }
         public Action<double> OnSuccessDoubleCallback { get; set; }
 
         public Action<string> OnSuccessTypeCallback { get; set; }
@@ -164,6 +167,18 @@ namespace ServiceStack.Redis.Pipeline
                     if (OnSuccessMultiStringCallback != null)
                     {
                         OnSuccessMultiStringCallback(result);
+                    }
+                }
+                else if (RedisDataReadCommand != null)
+                {
+                    var data = RedisDataReadCommand();
+                    if (OnSuccessRedisTextCallback != null)
+                    {
+                        OnSuccessRedisTextCallback(data.ToRedisText());
+                    }
+                    if (OnSuccessRedisDataCallback != null)
+                    {
+                        OnSuccessRedisDataCallback(data);
                     }
                 }
             }
