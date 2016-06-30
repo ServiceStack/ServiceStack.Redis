@@ -740,12 +740,12 @@ The `ServiceStack.Redis.RedisClient` class below implements the following interf
  * [ICacheClient](https://github.com/ServiceStack/ServiceStack/wiki/Caching) - If you are using Redis solely as a cache, you should bind to the [ServiceStack's common interface](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Caching) as there already are In-Memory an Memcached implementations available in ServiceStack, allowing you to easily switch providers in-future.
  * [IRedisNativeClient](https://github.com/ServiceStack/ServiceStack.Redis/wiki/IRedisNativeClient) - For those wanting a low-level raw byte access (where you can control your own serialization/deserialization) that map 1:1 with Redis operations of the same name.
 
-For most cases if you require access to Redis-specific functionality you would want to bind to the interface below:
+For most cases if you require access to Redis specific functionality you would want to bind to the interface below:
 
   * [IRedisClient](https://github.com/ServiceStack/ServiceStack.Redis/wiki/IRedisClient) - Provides a friendlier, more descriptive API that lets you store values as strings (UTF8 encoding).
   * [IRedisTypedClient](https://github.com/ServiceStack/ServiceStack.Redis/wiki/IRedisTypedClient) - created with `IRedisClient.As<T>()` - it returns a 'strongly-typed client' that provides a typed-interface for all redis value operations that works against any C#/.NET POCO type.
 
-The class hierachy for the C# Redis clients effectively look like:
+The class hierarchy for the C# Redis clients effectively look like:
 
     RedisTypedClient (POCO) > RedisClient (string) > RedisNativeClient (raw byte[])
 
