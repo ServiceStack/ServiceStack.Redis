@@ -158,7 +158,7 @@ using (IRedisClient redis = clientsManager.GetClient())
 }
 ```
 
-A more detailed list of the available RedisClient API's used in the example can be seen in the C# interfaces below:
+A more detailed list of the available RedisClient APIs used in the example can be seen in the C# interfaces below:
 
  - [IRedisClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClient.cs)
  - [IRedisTypedClient<T>](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisTypedClient.cs)
@@ -287,7 +287,7 @@ Most of the time when waiting to use a new [Redis Command](http://redis.io/comma
 **ServiceStack.Redis** to add support for the new commands likewise there are times when the Redis Client doesn't offer every permutation 
 that redis-server supports. 
 
-With the new `Custom` and `RawCommand` API's on `IRedisClient` and `IRedisNativeClient` you can now use the RedisClient to send your own 
+With the new `Custom` and `RawCommand` APIs on `IRedisClient` and `IRedisNativeClient` you can now use the RedisClient to send your own 
 custom commands that can call adhoc Redis commands:
 
 ```csharp
@@ -305,7 +305,7 @@ public interface IRedisNativeClient
 }
 ```
 
-These Custom API's take a flexible `object[]` arguments which accepts any serializable value e.g. 
+These Custom APIs take a flexible `object[]` arguments which accepts any serializable value e.g. 
 `byte[]`, `string`, `int` as well as any user-defined Complex Types which are transparently serialized 
 as JSON and send across the wire as UTF-8 bytes. 
 
@@ -337,7 +337,7 @@ var weekDays = ret.GetResults();
 weekDays.PrintDump(); // ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 ```
 
-and some more examples using Complex Types with the Custom API's:
+and some more examples using Complex Types with the Custom APIs:
 
 ```csharp
 var ret = Redis.Custom(Commands.Set, "foo", new Poco { Name = "Bar" }); // ret.Text = "OK"
@@ -499,7 +499,7 @@ var mergeCount = redis.CountHyperLog("mergedset"); //6
 
 ### Scan APIs
 
-Redis v2.8 introduced a beautiful new [SCAN](http://redis.io/commands/scan) operation that provides an optimal strategy for traversing a redis instance entire keyset in managable-size chunks utilizing only a client-side cursor and without introducing any server state. It's a higher performance alternative and should be used instead of [KEYS](http://redis.io/commands/keys) in application code. SCAN and its related operations for traversing members of Sets, Sorted Sets and Hashes are now available in the Redis Client in the following API's:
+Redis v2.8 introduced a beautiful new [SCAN](http://redis.io/commands/scan) operation that provides an optimal strategy for traversing a redis instance entire keyset in managable-size chunks utilizing only a client-side cursor and without introducing any server state. It's a higher performance alternative and should be used instead of [KEYS](http://redis.io/commands/keys) in application code. SCAN and its related operations for traversing members of Sets, Sorted Sets and Hashes are now available in the Redis Client in the following APIs:
 
 ```csharp
 public interface IRedisClient
@@ -618,9 +618,9 @@ r = redis.ExecCachedLua(FastScanScript, sha1 =>
     redis.ExecLuaSha(sha1, "key:*", "10"));
 ```
 
-### IRedisClient LUA API's
+### IRedisClient LUA APIs
 
-The `IRedisClient` API's for [redis server-side LUA support](http://redis.io/commands/eval) have been re-factored into the more user-friendly API's below:
+The `IRedisClient` APIs for [redis server-side LUA support](http://redis.io/commands/eval) have been re-factored into the more user-friendly APIs below:
 
 ```csharp
 public interface IRedisClient 
