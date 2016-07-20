@@ -21,6 +21,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis
@@ -575,7 +576,11 @@ namespace ServiceStack.Redis
                     }
 
                     Interlocked.Increment(ref RedisState.TotalRetryCount);
+#if NETSTANDARD
+                    Task.Delay(GetBackOffMultiplier(++i));
+#else
                     Thread.Sleep(GetBackOffMultiplier(++i));
+#endif
                 }
             }
         }

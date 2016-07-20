@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using ServiceStack.Logging;
 using ServiceStack.Text;
 
@@ -150,7 +151,11 @@ namespace ServiceStack.Redis
                                 Interlocked.Increment(ref RedisState.TotalForcedMasterFailovers);
 
                                 sentinel.ForceMasterFailover();
+#if NETSTANDARD
+                                Task.Delay(sentinel.WaitBetweenFailedHosts);
+#else
                                 Thread.Sleep(sentinel.WaitBetweenFailedHosts);
+#endif
                                 role = client.GetServerRole();
                             }
                         }
@@ -191,7 +196,11 @@ namespace ServiceStack.Redis
                                 throw new TimeoutException("Max Wait Between Sentinel Lookups Elapsed: {0}"
                                     .Fmt(sentinel.MaxWaitBetweenFailedHosts.ToString()));
 
+#if NETSTANDARD
+                            Task.Delay(sentinel.WaitBetweenFailedHosts);
+#else
                             Thread.Sleep(sentinel.WaitBetweenFailedHosts);
+#endif
                         }
                     }
                     catch (Exception ex)

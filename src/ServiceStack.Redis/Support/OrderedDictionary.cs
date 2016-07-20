@@ -16,8 +16,12 @@ namespace ServiceStack.Redis.Support
 
 		private static readonly string KeyTypeName = typeof(TKey).FullName;
 		private static readonly string ValueTypeName = typeof(TValue).FullName;
-		private static readonly bool ValueTypeIsReferenceType = !typeof(ValueType).IsAssignableFrom(typeof(TValue));
-
+		private static readonly bool ValueTypeIsReferenceType =
+#if NETSTANDARD
+	!typeof(ValueType).GetTypeInfo().IsAssignableFrom(typeof(TValue).GetTypeInfo());
+#else
+	!typeof(ValueType).IsAssignableFrom(typeof(TValue));
+#endif
 		private Dictionary<TKey, TValue> dictionary;
 		private List<KeyValuePair<TKey, TValue>> list;
 		private readonly IEqualityComparer<TKey> comparer;

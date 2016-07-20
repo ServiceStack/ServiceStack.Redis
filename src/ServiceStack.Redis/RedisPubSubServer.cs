@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using ServiceStack.Logging;
 using ServiceStack.Text;
 
@@ -40,7 +41,9 @@ namespace ServiceStack.Redis
         private int noOfContinuousErrors = 0;
         private string lastExMsg = null;
         private int status;
+#if !NETSTANDARD
         private Thread bgThread; //Subscription controller thread
+#endif
         private long bgThreadCount = 0;
 
         private const int NO = 0;
@@ -108,6 +111,9 @@ namespace ServiceStack.Redis
                     if (OnStart != null)
                         OnStart();
 
+#if NETSTANDARD
+                    RunLoop();
+#else
                     //Don't kill us if we're the thread that's retrying to Start() after a failure.
                     if (bgThread != Thread.CurrentThread)
                     {
@@ -126,6 +132,7 @@ namespace ServiceStack.Redis
                         Log.Debug("Retrying RunLoop() on Thread: " + bgThread.Name);
                         RunLoop();
                     }
+#endif
                 }
                 catch (Exception ex)
                 {
@@ -327,8 +334,11 @@ namespace ServiceStack.Redis
             if (AutoRestart && Interlocked.CompareExchange(ref status, 0, 0) != Status.Disposed)
             {
                 if (WaitBeforeNextRestart != null)
+#if NETSTANDARD
+                    Task.Delay(WaitBeforeNextRestart.Value);
+#else
                     Thread.Sleep(WaitBeforeNextRestart.Value);
-
+#endif
                 Start();
             }
         }
@@ -428,6 +438,7 @@ namespace ServiceStack.Redis
             Stop(shouldRestart:true);
         }
 
+#if !NETSTANDARD
         private void KillBgThreadIfExists()
         {
             if (bgThread != null && bgThread.IsAlive)
@@ -447,6 +458,7 @@ namespace ServiceStack.Redis
                 bgThread = null;
             }
         }
+#endif
 
         private void SleepBackOffMultiplier(int continuousErrorsCount)
         {
@@ -461,7 +473,11 @@ namespace ServiceStack.Redis
             if (Log.IsDebugEnabled)
                 Log.Debug("Sleeping for {0}ms after {1} continuous errors".Fmt(nextTry, continuousErrorsCount));
 
+#if NETSTANDARD
+            Task.Delay(nextTry);
+#else
             Thread.Sleep(nextTry);
+#endif
         }
 
         public static class Operation //dep-free copy of WorkerOperation
@@ -555,6 +571,7 @@ namespace ServiceStack.Redis
                 Log.Error("Error OnDispose(): ", ex);
             }
 
+#if !NETSTANDARD
             try
             {
                 Thread.Sleep(100); //give it a small chance to die gracefully
@@ -564,6 +581,7 @@ namespace ServiceStack.Redis
             {
                 if (this.OnError != null) this.OnError(ex);
             }
+#endif
 
             DisposeHeartbeatTimer();
         }

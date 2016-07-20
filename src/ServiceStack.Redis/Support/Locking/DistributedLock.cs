@@ -40,7 +40,11 @@ namespace ServiceStack.Redis.Support.Locking
 				int count = 0;
 				while (wasSet == 0 && count < tryCount && totalTime < acquisitionTimeout)
 				{
+#if NETSTANDARD
+					System.Threading.Tasks.Task.Delay(sleepIfLockSet);
+#else
 					System.Threading.Thread.Sleep(sleepIfLockSet);
+#endif
 					totalTime += sleepIfLockSet;					
 					ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
 					newLockExpire = CalculateLockExpire(ts, lockTimeout);
@@ -78,7 +82,11 @@ namespace ServiceStack.Redis.Support.Locking
 					}
 				}
                 if (wasSet != LOCK_NOT_ACQUIRED) break;
+#if NETSTANDARD
+				System.Threading.Tasks.Task.Delay(sleepIfLockSet);
+#else
 				System.Threading.Thread.Sleep(sleepIfLockSet);
+#endif
 				totalTime += sleepIfLockSet;
 			}
             if (wasSet != LOCK_NOT_ACQUIRED)

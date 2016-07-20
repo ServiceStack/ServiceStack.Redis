@@ -2,12 +2,12 @@
   "configurations": {
     "Debug": {
       "buildOptions": {
-        "define": ["NETFX_CORE", "DEBUG", "TRACE"]
+        "define": ["NETSTANDARD", "DEBUG", "TRACE"]
       }
     },
     "Release": {
       "buildOptions": {
-        "define": ["NETFX_CORE", "TRACE"],
+        "define": ["NETSTANDARD", "TRACE"],
         "optimize": true
       }
     }
@@ -30,5 +30,5 @@
 	"bin" : { "assembly":"../../../lib/netcore/ServiceStack.Interfaces.dll", "pdb" : "../../../lib/netcore/ServiceStack.Interfaces.pdb" }
      }
   },
-  "version": "4.1.0-*"
+  "version": "4.0.61"
 }

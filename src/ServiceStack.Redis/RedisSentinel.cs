@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using ServiceStack;
 using ServiceStack.Logging;
 using ServiceStack.Text;
@@ -329,8 +330,11 @@ namespace ServiceStack.Redis
             }
 
             this.failures = 0; //reset
+#if NETSTANDARD
+            Task.Delay(WaitBetweenFailedHosts);
+#else
             Thread.Sleep(WaitBetweenFailedHosts);
-
+#endif
             throw new RedisException("No Redis Sentinels were available", lastEx);
         }
 
