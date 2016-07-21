@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using ServiceStack.Text;
+using ServiceStack;
 
 namespace ServiceStack.Redis.Support
 {
@@ -60,7 +61,7 @@ namespace ServiceStack.Redis.Support
                 return new SerializedObjectWrapper(RawDataFlag, new ArraySegment<byte>(tmpByteArray));
             }
 
-            TypeCode code = value == null ? TypeCode.DBNull : Type.GetTypeCode(value.GetType());
+            TypeCode code = value == null ? TypeCode.DBNull : value.GetType().GetTypeCode();
 
             byte[] data;
             int length = -1;

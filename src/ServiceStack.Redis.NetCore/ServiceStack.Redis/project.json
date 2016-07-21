@@ -20,6 +20,7 @@
     "ServiceStack.Common" : "4.0.*",
   },
   "compile": ["../../ServiceStack.Redis/**/*.cs"],
+  "exclude": ["../../ServiceStack.Redis/RedisPipeline.cs"],
   "frameworks": {
     "netstandard1.3": {
         "dependencies" : {
@@ -37,7 +38,8 @@
 	     "System.Reflection.Emit" : "4.0.1",
 	     "System.Reflection.Emit.Lightweight": "4.0.1",
              "System.Collections.Specialized": "4.0.1",
-             "System.Collections.NonGeneric": "4.0.1"
+             "System.Collections.NonGeneric": "4.0.1",
+	     "System.Security.Cryptography.Algorithms" : "4.2.0"
          }
      }
    

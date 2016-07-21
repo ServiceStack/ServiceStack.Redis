@@ -2480,19 +2480,31 @@ namespace ServiceStack.Redis
             {
                 // workaround for a .net bug: http://support.microsoft.com/kb/821625
                 if (Bstream != null)
+#if NETSTANDARD
+                    Bstream.Dispose();
+#else
                     Bstream.Close();
+#endif
             }
             catch { }
             try
             {
                 if (sslStream != null)
+#if NETSTANDARD
+                    sslStream.Dispose();
+#else
                     sslStream.Close();
+#endif
             }
             catch { }
             try
             {
                 if (socket != null)
+#if NETSTANDARD
+                    socket.Dispose();
+#else
                     socket.Close();
+#endif
             }
             catch { }
 

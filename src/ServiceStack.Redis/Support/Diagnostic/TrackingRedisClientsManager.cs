@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NETSTANDARD
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -31,12 +32,8 @@ namespace ServiceStack.Redis.Support.Diagnostic
             this.redisClientsManager = redisClientsManager;
             Logger.DebugFormat("Constructed");
 
-#if NETSTANDARD
-            var timer = new Timer(state => this.DumpState(), null, TimeSpan.FromSeconds(30), TimeSpan.FromMinutes(1));
-#else
             var timer = new Timer(state => this.DumpState());
             timer.Change(TimeSpan.FromSeconds(30), TimeSpan.FromMinutes(1));
-#endif
         }
 
         public void Dispose()
@@ -138,3 +135,4 @@ namespace ServiceStack.Redis.Support.Diagnostic
         }
     }
 }
+#endif

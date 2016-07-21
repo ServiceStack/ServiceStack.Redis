@@ -177,9 +177,13 @@ namespace ServiceStack.Redis
                     .ToArray();
 
                 var sentinelWorker = GetValidSentinelWorker();
+#if NETSTANDARD
+                if (this.RedisManager == null || sentinelWorker == null)
+                    throw new Exception("Unable to resolve sentinels!");
+#else
                 if (this.RedisManager == null || sentinelWorker == null)
                     throw new ApplicationException("Unable to resolve sentinels!");
-
+#endif
                 return this.RedisManager;
             }
         }
