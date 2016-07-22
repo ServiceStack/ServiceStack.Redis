@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
-using System.Timers;
 using NUnit.Framework;
 using ServiceStack.Logging;
 using ServiceStack.Text;

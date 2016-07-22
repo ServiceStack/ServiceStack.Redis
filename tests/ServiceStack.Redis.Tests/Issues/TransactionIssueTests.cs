@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using NUnit.Framework;
 using ServiceStack.Text;
 
@@ -108,7 +107,7 @@ namespace ServiceStack.Redis.Tests.Issues
             }
         }
 
-        private void CheckConnection(object sender, ElapsedEventArgs e)
+        private void CheckConnection()
         {
             Task.Factory.StartNew(CheckThisConnection);
         }
@@ -116,9 +115,7 @@ namespace ServiceStack.Redis.Tests.Issues
         [Explicit, Test]
         public void Can_queue_large_transaction()
         {
-            var q = new System.Timers.Timer { Interval = 2 };
-            q.Elapsed += CheckConnection;
-            q.Enabled = true;
+            var q = new System.Threading.Timer(CheckConnection, null, 30000, 2);
 
             Thread.Sleep(30000);
         }

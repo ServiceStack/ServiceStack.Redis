@@ -25,23 +25,26 @@ namespace ServiceStack.Redis.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(ServiceStack.Redis.RedisResponseException), UserMessage = "Expected an exception after Redis AUTH command; try using a password that doesn't match.")]
         public void Passwords_are_not_leaked_in_exception_messages()
-        {
+        {            
             const string password = "yesterdayspassword";
-            try
-            {
-                var factory = new PooledRedisClientManager(password + "@" + TestConfig.SingleHost); // redis will throw when using password and it's not configured
-                using (var redis = factory.GetClient())
+
+            Assert.Throws<ServiceStack.Redis.RedisResponseException>(() => {
+                try
                 {
-                    redis.SetEntry("Foo", "Bar");
+                    var factory = new PooledRedisClientManager(password + "@" + TestConfig.SingleHost); // redis will throw when using password and it's not configured
+                    using (var redis = factory.GetClient())
+                    {
+                        redis.SetEntry("Foo", "Bar");
+                    }
                 }
-            }
-            catch (RedisResponseException ex)
-            {
-                Assert.That(ex.Message, Is.Not.StringContaining(password));
-                throw;
-            }
+                catch (RedisResponseException ex)
+                {
+                    Assert.That(ex.Message, Is.Not.StringContaining(password));
+                    throw;
+                }
+            },
+	    "Expected an exception after Redis AUTH command; try using a password that doesn't match.");
         }
     }
 }

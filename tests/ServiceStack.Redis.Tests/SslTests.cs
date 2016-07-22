@@ -93,7 +93,11 @@ namespace ServiceStack.Redis.Tests
 
             if (!socket.Connected)
             {
+#if NETCORE
+                socket.Dispose();
+#else
                 socket.Close();
+#endif
                 throw new Exception("Could not connect");
             }
 
@@ -115,7 +119,11 @@ namespace ServiceStack.Redis.Tests
 
             if (!socket.Connected)
             {
+#if NETCORE
+                socket.Dispose();
+#else
                 socket.Close();
+#endif
                 throw new Exception("Could not connect");
             }
 
@@ -133,8 +141,13 @@ namespace ServiceStack.Redis.Tests
             }
             else
             {
+#if NETCORE
+                var ctor = typeof(SslStream).GetTypeInfo().GetConstructors()
+                    .First(x => x.GetParameters().Length == 5);
+#else
                 var ctor = typeof(SslStream).GetConstructors()
                     .First(x => x.GetParameters().Length == 5);
+#endif
 
                 var policyType = AssemblyUtils.FindType("System.Net.Security.EncryptionPolicy");
                 var policyValue = Enum.Parse(policyType, "RequireEncryption");
@@ -154,7 +167,11 @@ namespace ServiceStack.Redis.Tests
                 //    encryptionPolicy: EncryptionPolicy.RequireEncryption);
             }
 
+#if NETCORE
+            sslStream.AuthenticateAsClientAsync(Host).Wait();
+#else
             sslStream.AuthenticateAsClient(Host);
+#endif
 
             if (!sslStream.IsEncrypted)
                 throw new Exception("Could not establish an encrypted connection to " + Host);
