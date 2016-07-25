@@ -598,7 +598,7 @@ namespace ServiceStack.Redis
 
                     Interlocked.Increment(ref RedisState.TotalRetryCount);
 #if NETSTANDARD
-                    Task.Delay(GetBackOffMultiplier(++i));
+                    Task.Delay(GetBackOffMultiplier(++i)).Wait();
 #else
                     Thread.Sleep(GetBackOffMultiplier(++i));
 #endif

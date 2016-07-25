@@ -107,7 +107,7 @@ namespace ServiceStack.Redis.Tests.Issues
             }
         }
 
-        private void CheckConnection()
+        private void CheckConnection(object state)
         {
             Task.Factory.StartNew(CheckThisConnection);
         }

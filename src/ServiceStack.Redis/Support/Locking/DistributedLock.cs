@@ -41,7 +41,7 @@ namespace ServiceStack.Redis.Support.Locking
 				while (wasSet == 0 && count < tryCount && totalTime < acquisitionTimeout)
 				{
 #if NETSTANDARD
-					System.Threading.Tasks.Task.Delay(sleepIfLockSet);
+					System.Threading.Tasks.Task.Delay(sleepIfLockSet).Wait();
 #else
 					System.Threading.Thread.Sleep(sleepIfLockSet);
 #endif
@@ -83,7 +83,7 @@ namespace ServiceStack.Redis.Support.Locking
 				}
                 if (wasSet != LOCK_NOT_ACQUIRED) break;
 #if NETSTANDARD
-				System.Threading.Tasks.Task.Delay(sleepIfLockSet);
+				System.Threading.Tasks.Task.Delay(sleepIfLockSet).Wait();
 #else
 				System.Threading.Thread.Sleep(sleepIfLockSet);
 #endif

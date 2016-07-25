@@ -14,7 +14,9 @@ namespace ServiceStack.Redis.Tests
     {
         static UserSessionTests()
         {
+#if !NETCORE
             LogManager.LogFactory = new ConsoleLogFactory();
+#endif
         }
 
         //MasterUser master;

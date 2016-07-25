@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NETCORE_SUPPORT
+using System;
 using System.Diagnostics;
 using NUnit.Framework;
 using ServiceStack.Logging;
@@ -248,3 +249,4 @@ namespace ServiceStack.Redis.Tests
     }
 
 }
+#endif

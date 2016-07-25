@@ -335,7 +335,7 @@ namespace ServiceStack.Redis
 
             this.failures = 0; //reset
 #if NETSTANDARD
-            Task.Delay(WaitBetweenFailedHosts);
+            Task.Delay(WaitBetweenFailedHosts).Wait();
 #else
             Thread.Sleep(WaitBetweenFailedHosts);
 #endif

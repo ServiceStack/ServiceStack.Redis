@@ -1,3 +1,4 @@
+#if !NETCORE
 using System;
 using System.Net.Sockets;
 using System.Threading;
@@ -92,12 +93,9 @@ namespace ServiceStack.Redis.Tests.Support
             stream.Read(readbuf, 0, 10); // read
 
             // Disconnect nicely
-#if NETCORE
-            stream.Dispose();
-#else
             stream.Close(); // workaround for a .net bug: http://support.microsoft.com/kb/821625
-#endif
             connection.Close();
         }
     }
 }
+#endif

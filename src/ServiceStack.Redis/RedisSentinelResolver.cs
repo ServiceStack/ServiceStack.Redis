@@ -152,7 +152,7 @@ namespace ServiceStack.Redis
 
                                 sentinel.ForceMasterFailover();
 #if NETSTANDARD
-                                Task.Delay(sentinel.WaitBetweenFailedHosts);
+                                Task.Delay(sentinel.WaitBetweenFailedHosts).Wait();
 #else
                                 Thread.Sleep(sentinel.WaitBetweenFailedHosts);
 #endif

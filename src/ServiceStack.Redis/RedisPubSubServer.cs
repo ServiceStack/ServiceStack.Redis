@@ -335,7 +335,7 @@ namespace ServiceStack.Redis
             {
                 if (WaitBeforeNextRestart != null)
 #if NETSTANDARD
-                    Task.Delay(WaitBeforeNextRestart.Value);
+                    Task.Delay(WaitBeforeNextRestart.Value).Wait();
 #else
                     Thread.Sleep(WaitBeforeNextRestart.Value);
 #endif
@@ -474,7 +474,7 @@ namespace ServiceStack.Redis
                 Log.Debug("Sleeping for {0}ms after {1} continuous errors".Fmt(nextTry, continuousErrorsCount));
 
 #if NETSTANDARD
-            Task.Delay(nextTry);
+            Task.Delay(nextTry).Wait();
 #else
             Thread.Sleep(nextTry);
 #endif
