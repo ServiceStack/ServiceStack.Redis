@@ -1544,7 +1544,7 @@ namespace ServiceStack.Redis
                 Commands.Masters,
             };
             var results = SendExpectDeeplyNestedMultiData(args.ToArray());
-            return (from object[] result in results select ToDictionary(result)).ToList();
+            return ToDictionaryList(results);
         }
 
         public Dictionary<string, string> SentinelMaster(string masterName)
@@ -1568,7 +1568,7 @@ namespace ServiceStack.Redis
                 masterName.ToUtf8Bytes(),
             };
             var results = SendExpectDeeplyNestedMultiData(args.ToArray());
-            return (from object[] result in results select ToDictionary(result)).ToList();
+            return ToDictionaryList(results);
         }
 
         public List<Dictionary<string, string>> SentinelSlaves(string masterName)
@@ -1580,7 +1580,32 @@ namespace ServiceStack.Redis
                 masterName.ToUtf8Bytes(),
             };
             var results = SendExpectDeeplyNestedMultiData(args.ToArray());
-            return (from object[] result in results select ToDictionary(result)).ToList();
+            return ToDictionaryList(results);
+        }
+
+        private static List<Dictionary<string, string>> ToDictionaryList(object[] results)
+        {
+            var to = new List<Dictionary<string, string>>();
+            foreach (object result in results)
+            {
+                var obArray = result as object[];
+                if (obArray == null)
+                {
+                    var value = result.ToString();
+                    var bytes = result as byte[];
+                    if (bytes != null)
+                        value = bytes.FromUtf8Bytes();
+
+                    log.ErrorFormat("Expected object[] received {0}: {1}", 
+                        result.GetType().Name, value);
+
+                    continue;
+                }
+
+                var item = ToDictionary(obArray);
+                to.Add(item);
+            }
+            return to;
         }
 
         public List<string> SentinelGetMasterAddrByName(string masterName)
