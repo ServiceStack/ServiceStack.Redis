@@ -1596,8 +1596,8 @@ namespace ServiceStack.Redis
                     if (bytes != null)
                         value = bytes.FromUtf8Bytes();
 
-                    log.ErrorFormat("Expected object[] received {0}: {1}", 
-                        result.GetType().Name, value);
+                    log.ErrorFormat("[{0}] Expected object[] received {1}: {2}",
+                        DateTime.UtcNow.ToString("HH:mm:ss.fff"), result.GetType().Name, value);
 
                     continue;
                 }
