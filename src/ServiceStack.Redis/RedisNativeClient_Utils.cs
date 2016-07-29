@@ -315,19 +315,21 @@ namespace ServiceStack.Redis
         {
             string safeLastCommand = string.IsNullOrEmpty(Password) ? lastCommand : (lastCommand ?? "").Replace(Password, "");
 
-            var throwEx = new RedisRetryableException(
-                string.Format("{0}, sPort: {1}, LastCommand: {2}",
+            var throwEx = new RedisRetryableException(string.Format("[{0}] {1}, sPort: {2}, LastCommand: {3}",
+                    DateTime.UtcNow.ToString("HH:mm:ss.fff"),
                     error, clientPort, safeLastCommand));
             log.Error(throwEx.Message);
             throw throwEx;
         }
 
-        private RedisException CreateConnectionError()
+        private RedisException CreateConnectionError(Exception originalEx)
         {
             DeactivatedAt = DateTime.UtcNow;
-            var throwEx = new RedisException(
-                string.Format("Unable to Connect: sPort: {0}",
-                    clientPort), lastSocketException);
+            var throwEx = new RedisException(string.Format("[{0}] Unable to Connect: sPort: {1}{2}",
+                    DateTime.UtcNow.ToString("HH:mm:ss.fff"),
+                    clientPort,
+                    originalEx != null ? ", Error: " + originalEx.Message : ""), 
+                lastSocketException);
             log.Error(throwEx.Message);
             throw throwEx;
         }
@@ -559,7 +561,7 @@ namespace ServiceStack.Redis
 
                     var ex = retryableEx ?? GetRetryableException(outerEx);
                     if (ex == null)
-                        throw CreateConnectionError();
+                        throw CreateConnectionError(originalEx ?? outerEx);
 
                     if (originalEx == null)
                         originalEx = ex;
