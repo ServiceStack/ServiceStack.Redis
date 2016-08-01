@@ -328,8 +328,8 @@ namespace ServiceStack.Redis
             var throwEx = new RedisException(string.Format("[{0}] Unable to Connect: sPort: {1}{2}",
                     DateTime.UtcNow.ToString("HH:mm:ss.fff"),
                     clientPort,
-                    originalEx != null ? ", Error: " + originalEx.Message : ""), 
-                lastSocketException);
+                    originalEx != null ? ", Error: " + originalEx.Message + "\n" + originalEx.StackTrace : ""),
+                originalEx ?? lastSocketException);
             log.Error(throwEx.Message);
             throw throwEx;
         }
