@@ -154,7 +154,6 @@ namespace ServiceStack.Redis
                     {
                         ServerVersionNumber = RedisConfig.AssumeServerVersion.GetValueOrDefault(0);
                         if (ServerVersionNumber <= 0)
-                        { 
                         {
                             var parts = ServerVersion.Split('.');
                             var version = int.Parse(parts[0]) * 1000;
@@ -668,6 +667,48 @@ namespace ServiceStack.Redis
         protected RedisData SendExpectComplexResponse(params byte[][] cmdWithBinaryArgs)
         {
             return SendReceive(cmdWithBinaryArgs, ReadComplexResponse, Pipeline != null ? Pipeline.CompleteRedisDataQueuedCommand : (Action<Func<RedisData>>)null);
+        }
+
+        protected List<Dictionary<string, string>> SendExpectStringDictionaryList(params byte[][] cmdWithBinaryArgs)
+        {
+            var results = SendExpectComplexResponse(cmdWithBinaryArgs);
+            var to = new List<Dictionary<string, string>>();
+            foreach (var data in results.Children)
+            {
+                if (data.Children != null)
+                {
+                    var map = ToDictionary(data);
+                    to.Add(map);
+                }
+            }
+            return to;
+        }
+
+        private static Dictionary<string, string> ToDictionary(RedisData data)
+        {
+            string key = null;
+            var map = new Dictionary<string, string>();
+
+            if (data.Children == null)
+                throw new ArgumentNullException("data.Children");
+
+            for (var i = 0; i < data.Children.Count; i++)
+            {
+                var bytes = data.Children[i].Data;
+                if (i % 2 == 0)
+                {
+                    key = bytes.FromUtf8Bytes();
+                }
+                else
+                {
+                    if (key == null)
+                        throw new RedisResponseException("key == null, i={0}, data.Children[i] = {1}".Fmt(i, data.Children[i].ToRedisText().Dump()));
+
+                    var val = bytes.FromUtf8Bytes();
+                    map[key] = val;
+                }
+            }
+            return map;
         }
 
         protected string SendExpectString(params byte[][] cmdWithBinaryArgs)
