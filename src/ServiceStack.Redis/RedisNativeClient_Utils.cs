@@ -155,6 +155,7 @@ namespace ServiceStack.Redis
                         ServerVersionNumber = RedisConfig.AssumeServerVersion.GetValueOrDefault(0);
                         if (ServerVersionNumber <= 0)
                         { 
+                        {
                             var parts = ServerVersion.Split('.');
                             var version = int.Parse(parts[0]) * 1000;
                             if (parts.Length > 1)
@@ -247,7 +248,7 @@ namespace ServiceStack.Redis
                 socket = null;
 
                 DeactivatedAt = DateTime.UtcNow;
-                var message = "" + Host + ":" + Port;
+                var message = Host + ":" + Port;
                 var throwEx = new RedisException(message, ex);
                 log.Error(throwEx.Message, ex);
                 throw throwEx;
@@ -292,8 +293,8 @@ namespace ServiceStack.Redis
 
             if (!RedisConfig.DisableVerboseLogging)
             {
-                var safeLastCommand = string.IsNullOrEmpty(Password) 
-                    ? lastCommand 
+                var safeLastCommand = string.IsNullOrEmpty(Password)
+                    ? lastCommand
                     : (lastCommand ?? "").Replace(Password, "");
 
                 if (!string.IsNullOrEmpty(safeLastCommand))
@@ -503,9 +504,9 @@ namespace ServiceStack.Redis
             return Bstream.ReadByte();
         }
 
-        protected T SendReceive<T>(byte[][] cmdWithBinaryArgs, 
-            Func<T> fn, 
-            Action<Func<T>> completePipelineFn = null, 
+        protected T SendReceive<T>(byte[][] cmdWithBinaryArgs,
+            Func<T> fn,
+            Action<Func<T>> completePipelineFn = null,
             bool sendWithoutRead = false)
         {
             var i = 0;
@@ -518,6 +519,9 @@ namespace ServiceStack.Redis
                 try
                 {
                     TryConnectIfNeeded();
+
+                    if (socket == null)
+                        throw new RedisRetryableException("Socket is not connected");
 
                     if (i == 0) //only write to buffer once
                         WriteCommandToSendBuffer(cmdWithBinaryArgs);
@@ -552,7 +556,7 @@ namespace ServiceStack.Redis
                 catch (Exception outerEx)
                 {
                     var retryableEx = outerEx as RedisRetryableException;
-                    if (retryableEx == null && outerEx is RedisException 
+                    if (retryableEx == null && outerEx is RedisException
                         || outerEx is LicenseException)
                     {
                         ResetSendBuffer();
