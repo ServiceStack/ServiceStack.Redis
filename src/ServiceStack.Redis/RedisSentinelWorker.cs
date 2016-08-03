@@ -66,9 +66,10 @@ namespace ServiceStack.Redis
 
         internal SentinelInfo GetSentinelInfo()
         {
+            var masterHost = GetMasterHostInternal(sentinel.MasterName);
             var sentinelInfo = new SentinelInfo(
                 sentinel.MasterName,
-                new[] { GetMasterHost(sentinel.MasterName) },
+                new[] { masterHost },
                 GetSlaveHosts(sentinel.MasterName));
 
             return sentinelInfo;
@@ -78,10 +79,7 @@ namespace ServiceStack.Redis
         {
             try
             {
-                var masterInfo = sentinelClient.SentinelGetMasterAddrByName(masterName);
-                return masterInfo.Count > 0
-                    ? SanitizeMasterConfig(masterInfo)
-                    : null;
+                return GetMasterHostInternal(masterName);
             }
             catch (Exception ex)
             {
@@ -90,6 +88,14 @@ namespace ServiceStack.Redis
 
                 return null;
             }
+        }
+
+        private string GetMasterHostInternal(string masterName)
+        {
+            var masterInfo = sentinelClient.SentinelGetMasterAddrByName(masterName);
+            return masterInfo.Count > 0
+                ? SanitizeMasterConfig(masterInfo)
+                : null;
         }
 
         private string SanitizeMasterConfig(List<string> masterInfo)
