@@ -67,6 +67,9 @@ namespace ServiceStack.Redis
         internal SentinelInfo GetSentinelInfo()
         {
             var masterHost = GetMasterHostInternal(sentinel.MasterName);
+            if (masterHost == null)
+                throw new RedisException("Redis Sentinel is reporting no master is available");
+
             var sentinelInfo = new SentinelInfo(
                 sentinel.MasterName,
                 new[] { masterHost },
