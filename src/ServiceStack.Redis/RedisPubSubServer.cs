@@ -119,11 +119,13 @@ namespace ServiceStack.Redis
                             Name = "RedisPubSubServer " + Interlocked.Increment(ref bgThreadCount)
                         };
                         bgThread.Start();
-                        Log.Debug("Started Background Thread: " + bgThread.Name);
+                        if (Log.IsDebugEnabled)
+                            Log.Debug("Started Background Thread: " + bgThread.Name);
                     }
                     else
                     {
-                        Log.Debug("Retrying RunLoop() on Thread: " + bgThread.Name);
+                        if (Log.IsDebugEnabled)
+                            Log.Debug("Retrying RunLoop() on Thread: " + bgThread.Name);
                         RunLoop();
                     }
                 }
@@ -347,7 +349,8 @@ namespace ServiceStack.Redis
 
             if (Interlocked.CompareExchange(ref status, Status.Stopping, Status.Started) == Status.Started)
             {
-                Log.Debug("Stopping RedisPubSubServer...");
+                if (Log.IsDebugEnabled)
+                    Log.Debug("Stopping RedisPubSubServer...");
 
                 //Unblock current bgthread by issuing StopCommand
                 SendControlCommand(Operation.Stop);
@@ -417,7 +420,8 @@ namespace ServiceStack.Redis
 
         void HandleUnSubscribe(string channel)
         {
-            Log.Debug("OnUnSubscribe: " + channel);
+            if (Log.IsDebugEnabled)
+                Log.Debug("OnUnSubscribe: " + channel);
 
             if (OnUnSubscribe != null)
                 OnUnSubscribe(channel);
