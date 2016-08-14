@@ -84,6 +84,13 @@ ServiceStack.Redis has great support AWS's ElastiCache Redis solution, follow th
 
 - [ElastiCache Redis](https://github.com/ServiceStackApps/AwsGettingStarted/blob/master/docs/redis-guide.md)
 
+### Try out [ServiceStack.Redis Live](http://gistlyn.com/redis-todo)
+
+A great way to try out ServiceStack.Redis is on [gistlyn.com](http://gistlyn.com) which lets you immediately 
+run and explore Redis features from the comfort of your browser with zero software install:
+
+[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/redis/gistlyn-redis.png)](http://gistlyn.com/redis-todo)
+
 ## Redis Client Managers
 
 The recommended way to access `RedisClient` instances is to use one of the available Thread-Safe Client Managers below. Client Managers are connection factories which is ideally registered as a Singleton either in your IOC or static classes. 
