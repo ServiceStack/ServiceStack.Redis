@@ -84,7 +84,8 @@ namespace ServiceStack.Redis
             try
             {
 #if NETSTANDARD
-                socket.Connect(Host, Port);
+                var addresses = Dns.GetHostAddressesAsync(Host).Result;
+                socket.Connect(addresses[0], Port);
 #else
                 if (ConnectTimeout <= 0)
                 {

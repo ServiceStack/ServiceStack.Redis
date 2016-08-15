@@ -25,7 +25,7 @@ namespace ServiceStack.Redis.Tests
         public void TearDown()
         {
 #if NETCORE
-	    Environment.GetEnvironmentVariable("SERVICESTACK_LICENSE");
+    	    Licensing.RegisterLicense(Environment.GetEnvironmentVariable("SERVICESTACK_LICENSE"));
 #else
             Licensing.RegisterLicense(new AppSettings().GetString("servicestack:license"));
 #endif
