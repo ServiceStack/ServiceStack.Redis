@@ -5,6 +5,9 @@ using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Text;
+#if NETCORE
+using System.Threading.Tasks;
+#endif
 
 namespace ServiceStack.Redis.Tests
 {
@@ -306,7 +309,11 @@ namespace ServiceStack.Redis.Tests
                     client4.Dispose();
                 };
 
+#if NETCORE                
+                Task.Run(func);
+#else
                 func.BeginInvoke(null, null);
+#endif
 
                 var start = DateTime.Now;
 
@@ -338,9 +345,11 @@ namespace ServiceStack.Redis.Tests
                     Thread.Sleep(delay + TimeSpan.FromSeconds(0.5));
                     client3.Dispose();
                 };
-
+#if NETCORE                
+                Task.Run(func);
+#else
                 func.BeginInvoke(null, null);
-
+#endif
                 var start = DateTime.Now;
 
                 var client4 = manager.GetReadOnlyClient();

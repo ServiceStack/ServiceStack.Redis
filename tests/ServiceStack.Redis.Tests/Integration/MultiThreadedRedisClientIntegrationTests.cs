@@ -5,6 +5,9 @@ using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Common.Tests.Models;
 using ServiceStack.Text;
+#if NETCORE
+using System.Threading.Tasks;
+#endif
 
 namespace ServiceStack.Redis.Tests.Integration
 {
@@ -29,19 +32,29 @@ namespace ServiceStack.Redis.Tests.Integration
 
             const int noOfConcurrentClients = 64; //WaitHandle.WaitAll limit is <= 64
 
+#if NETCORE
+            List<Task> tasks = new List<Task>();
+#else
             var clientAsyncResults = new List<IAsyncResult>();
+#endif             
             using (var redisClient = new RedisClient(TestConfig.SingleHost))
             {
                 for (var i = 0; i < noOfConcurrentClients; i++)
                 {
                     var clientNo = i;
                     var action = (Action)(() => UseClientAsync(redisClient, clientNo));
+#if NETCORE
+                    tasks.Add(Task.Run(action));
+#else                                       
                     clientAsyncResults.Add(action.BeginInvoke(null, null));
+#endif
                 }
             }
-
+#if NETCORE
+            Task.WaitAll(tasks.ToArray());
+#else            
             WaitHandle.WaitAll(clientAsyncResults.ConvertAll(x => x.AsyncWaitHandle).ToArray());
-
+#endif
             Debug.WriteLine(String.Format("Time Taken: {0}", (Stopwatch.GetTimestamp() - before) / 1000));
         }
 
