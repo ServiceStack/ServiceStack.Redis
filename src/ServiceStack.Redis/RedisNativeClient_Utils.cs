@@ -173,7 +173,7 @@ namespace ServiceStack.Redis
                     {
                         ServerVersionNumber = RedisConfig.AssumeServerVersion.GetValueOrDefault(0);
                         if (ServerVersionNumber <= 0)
-                        { 
+                        {
                             var parts = ServerVersion.Split('.');
                             var version = int.Parse(parts[0]) * 1000;
                             if (parts.Length > 1)
@@ -270,7 +270,7 @@ namespace ServiceStack.Redis
                 socket = null;
 
                 DeactivatedAt = DateTime.UtcNow;
-                var message = "" + Host + ":" + Port;
+                var message = Host + ":" + Port;
                 var throwEx = new RedisException(message, ex);
                 log.Error(throwEx.Message, ex);
                 throw throwEx;
@@ -315,8 +315,8 @@ namespace ServiceStack.Redis
 
             if (!RedisConfig.DisableVerboseLogging)
             {
-                var safeLastCommand = string.IsNullOrEmpty(Password) 
-                    ? lastCommand 
+                var safeLastCommand = string.IsNullOrEmpty(Password)
+                    ? lastCommand
                     : (lastCommand ?? "").Replace(Password, "");
 
                 if (!string.IsNullOrEmpty(safeLastCommand))
@@ -338,19 +338,21 @@ namespace ServiceStack.Redis
         {
             string safeLastCommand = string.IsNullOrEmpty(Password) ? lastCommand : (lastCommand ?? "").Replace(Password, "");
 
-            var throwEx = new RedisRetryableException(
-                string.Format("{0}, sPort: {1}, LastCommand: {2}",
+            var throwEx = new RedisRetryableException(string.Format("[{0}] {1}, sPort: {2}, LastCommand: {3}",
+                    DateTime.UtcNow.ToString("HH:mm:ss.fff"),
                     error, clientPort, safeLastCommand));
             log.Error(throwEx.Message);
             throw throwEx;
         }
 
-        private RedisException CreateConnectionError()
+        private RedisException CreateConnectionError(Exception originalEx)
         {
             DeactivatedAt = DateTime.UtcNow;
-            var throwEx = new RedisException(
-                string.Format("Unable to Connect: sPort: {0}",
-                    clientPort), lastSocketException);
+            var throwEx = new RedisException(string.Format("[{0}] Unable to Connect: sPort: {1}{2}",
+                    DateTime.UtcNow.ToString("HH:mm:ss.fff"),
+                    clientPort,
+                    originalEx != null ? ", Error: " + originalEx.Message + "\n" + originalEx.StackTrace : ""),
+                originalEx ?? lastSocketException);
             log.Error(throwEx.Message);
             throw throwEx;
         }
@@ -524,9 +526,9 @@ namespace ServiceStack.Redis
             return Bstream.ReadByte();
         }
 
-        protected T SendReceive<T>(byte[][] cmdWithBinaryArgs, 
-            Func<T> fn, 
-            Action<Func<T>> completePipelineFn = null, 
+        protected T SendReceive<T>(byte[][] cmdWithBinaryArgs,
+            Func<T> fn,
+            Action<Func<T>> completePipelineFn = null,
             bool sendWithoutRead = false)
         {
             var i = 0;
@@ -539,6 +541,9 @@ namespace ServiceStack.Redis
                 try
                 {
                     TryConnectIfNeeded();
+
+                    if (socket == null)
+                        throw new RedisRetryableException("Socket is not connected");
 
                     if (i == 0) //only write to buffer once
                         WriteCommandToSendBuffer(cmdWithBinaryArgs);
@@ -573,7 +578,7 @@ namespace ServiceStack.Redis
                 catch (Exception outerEx)
                 {
                     var retryableEx = outerEx as RedisRetryableException;
-                    if (retryableEx == null && outerEx is RedisException 
+                    if (retryableEx == null && outerEx is RedisException
                         || outerEx is LicenseException)
                     {
                         ResetSendBuffer();
@@ -582,7 +587,7 @@ namespace ServiceStack.Redis
 
                     var ex = retryableEx ?? GetRetryableException(outerEx);
                     if (ex == null)
-                        throw CreateConnectionError();
+                        throw CreateConnectionError(originalEx ?? outerEx);
 
                     if (originalEx == null)
                         originalEx = ex;
@@ -693,6 +698,48 @@ namespace ServiceStack.Redis
         protected RedisData SendExpectComplexResponse(params byte[][] cmdWithBinaryArgs)
         {
             return SendReceive(cmdWithBinaryArgs, ReadComplexResponse, Pipeline != null ? Pipeline.CompleteRedisDataQueuedCommand : (Action<Func<RedisData>>)null);
+        }
+
+        protected List<Dictionary<string, string>> SendExpectStringDictionaryList(params byte[][] cmdWithBinaryArgs)
+        {
+            var results = SendExpectComplexResponse(cmdWithBinaryArgs);
+            var to = new List<Dictionary<string, string>>();
+            foreach (var data in results.Children)
+            {
+                if (data.Children != null)
+                {
+                    var map = ToDictionary(data);
+                    to.Add(map);
+                }
+            }
+            return to;
+        }
+
+        private static Dictionary<string, string> ToDictionary(RedisData data)
+        {
+            string key = null;
+            var map = new Dictionary<string, string>();
+
+            if (data.Children == null)
+                throw new ArgumentNullException("data.Children");
+
+            for (var i = 0; i < data.Children.Count; i++)
+            {
+                var bytes = data.Children[i].Data;
+                if (i % 2 == 0)
+                {
+                    key = bytes.FromUtf8Bytes();
+                }
+                else
+                {
+                    if (key == null)
+                        throw new RedisResponseException("key == null, i={0}, data.Children[i] = {1}".Fmt(i, data.Children[i].ToRedisText().Dump()));
+
+                    var val = bytes.FromUtf8Bytes();
+                    map[key] = val;
+                }
+            }
+            return map;
         }
 
         protected string SendExpectString(params byte[][] cmdWithBinaryArgs)

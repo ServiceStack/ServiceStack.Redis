@@ -43,9 +43,9 @@ namespace ServiceStack.Redis
         public static int DefaultIdleTimeOutSecs = 240;
 
         /// <summary>
-        /// The default RetryTimeout for auto retry of failed operations (default 3000ms)
+        /// The default RetryTimeout for auto retry of failed operations (default 10,000ms)
         /// </summary>
-        public static int DefaultRetryTimeout = 3 * 1000;
+        public static int DefaultRetryTimeout = 10 * 1000;
 
         /// <summary>
         /// Default Max Pool Size for Pooled Redis Client Managers (default none)
@@ -107,7 +107,7 @@ namespace ServiceStack.Redis
             DefaultConnectTimeout = -1;
             DefaultSendTimeout = -1;
             DefaultReceiveTimeout = -1;
-            DefaultRetryTimeout = 3 * 1000;
+            DefaultRetryTimeout = 10 * 1000;
             DefaultIdleTimeOutSecs = 240;
             DefaultMaxPoolSize = null;
             BackOffMultiplier = 10;

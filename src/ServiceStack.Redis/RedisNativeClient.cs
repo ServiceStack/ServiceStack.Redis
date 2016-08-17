@@ -1515,27 +1515,6 @@ namespace ServiceStack.Redis
 
         #region Sentinel
 
-        private static Dictionary<string, string> ToDictionary(object[] result)
-        {
-            var map = new Dictionary<string, string>();
-
-            string key = null;
-            for (var i = 0; i < result.Length; i++)
-            {
-                var bytes = (byte[])result[i];
-                if (i % 2 == 0)
-                {
-                    key = bytes.FromUtf8Bytes();
-                }
-                else
-                {
-                    var val = bytes.FromUtf8Bytes();
-                    map[key] = val;
-                }
-            }
-            return map;
-        }
-
         public List<Dictionary<string, string>> SentinelMasters()
         {
             var args = new List<byte[]>
@@ -1543,8 +1522,7 @@ namespace ServiceStack.Redis
                 Commands.Sentinel,
                 Commands.Masters,
             };
-            var results = SendExpectDeeplyNestedMultiData(args.ToArray());
-            return (from object[] result in results select ToDictionary(result)).ToList();
+            return SendExpectStringDictionaryList(args.ToArray());
         }
 
         public Dictionary<string, string> SentinelMaster(string masterName)
@@ -1555,7 +1533,7 @@ namespace ServiceStack.Redis
                 Commands.Master,
                 masterName.ToUtf8Bytes(),
             };
-            var results = SendExpectDeeplyNestedMultiData(args.ToArray());
+            var results = SendExpectComplexResponse(args.ToArray());
             return ToDictionary(results);
         }
 
@@ -1567,8 +1545,7 @@ namespace ServiceStack.Redis
                 Commands.Sentinels,
                 masterName.ToUtf8Bytes(),
             };
-            var results = SendExpectDeeplyNestedMultiData(args.ToArray());
-            return (from object[] result in results select ToDictionary(result)).ToList();
+            return SendExpectStringDictionaryList(args.ToArray());
         }
 
         public List<Dictionary<string, string>> SentinelSlaves(string masterName)
@@ -1579,8 +1556,7 @@ namespace ServiceStack.Redis
                 Commands.Slaves,
                 masterName.ToUtf8Bytes(),
             };
-            var results = SendExpectDeeplyNestedMultiData(args.ToArray());
-            return (from object[] result in results select ToDictionary(result)).ToList();
+            return SendExpectStringDictionaryList(args.ToArray());
         }
 
         public List<string> SentinelGetMasterAddrByName(string masterName)
@@ -1591,7 +1567,6 @@ namespace ServiceStack.Redis
                 Commands.GetMasterAddrByName,
                 masterName.ToUtf8Bytes(),
             };
-
             return SendExpectMultiData(args.ToArray()).ToStringList();
         }
 
