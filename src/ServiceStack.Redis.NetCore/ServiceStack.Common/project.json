@@ -2,24 +2,26 @@
   "configurations": {
     "Debug": {
       "buildOptions": {
-        "define": ["NETSTANDARD", "DEBUG", "TRACE"]
+        "define": ["DEBUG", "TRACE"]
       }
     },
     "Release": {
       "buildOptions": {
-        "define": ["NETSTANDARD", "TRACE"],
+        "define": ["TRACE"],
         "optimize": true
       }
     }
   },
   "dependencies": {
     "NETStandard.Library": "1.6.0",
-    "ServiceStack.Text" : {
-       "version" : "4.0.*"
-    }
+    "ServiceStack.Interfaces" : "1.0.*",
+    "ServiceStack.Text" : "1.0.*"	
   },
   "frameworks": {
-    "netstandard1.1": { 
+    "netstandard1.2": { 
+	"buildOptions" : {
+	    "define": ["NETSTANDARD1_1"]
+	},
         "dependencies" : {
              "System.Linq.Expressions" : "4.1.0",
 	     "System.Runtime.Serialization.Primitives" : "4.1.1-*",
@@ -32,10 +34,15 @@
 	     "System.Reflection": "4.1.0-*",
 	     "System.Reflection.Extensions" : "4.0.1",
 	     "System.Reflection.Emit" : "4.0.1",
-	     "System.Reflection.Emit.Lightweight": "4.0.1"
+	     "System.Reflection.Emit.Lightweight": "4.0.1",
+	     "System.ServiceModel.Primitives" : "4.1.0",
+	     "System.ServiceModel.Http" : "4.1.0",
+	     "System.Xml.XmlSerializer" : "4.0.11",
+	     "System.Data.Common" : "4.1.0"
          },
-	"bin" : { "assembly":"../../../lib/netcore/ServiceStack.Common.dll", "pdb" : "../../../lib/netcore/ServiceStack.Common.pdb" }
+        "bin" : { "assembly":"../../../lib/netcore/ServiceStack.Common.dll", "pdb" : "../../../lib/netcore/ServiceStack.Common.pdb" }
      }
+   
   },
-  "version": "4.0.61"
+  "version": "1.0.0"
 }
