@@ -65,7 +65,7 @@ Then hit "run" button **(F5)**. You should get following output:
 
 ![Output](images/8-Output.png)
 
-## Run ServiceStack.Client on Linux
+## Run ServiceStack.Redis on Linux
 
 ### Install .NET Core
 
