@@ -5,7 +5,7 @@
 
   <PropertyGroup>
     <MajorVersion Condition="$(MajorVersion) == ''">4</MajorVersion>
-    <MinorVersion Condition="$(MinorVersion) == ''">0</MinorVersion>
+    <MinorVersion Condition="$(MinorVersion) == ''">5</MinorVersion>
     <PatchVersion Condition="$(PatchVersion) == ''">$(BUILD_NUMBER)</PatchVersion>
   </PropertyGroup>
 
@@ -74,7 +74,7 @@
 
       <!--Update Min Dependency Version -->
       <RegexTransform Include="$(NuGetPackageDir)/**/*.nuspec">
-        <Find>version="4\.0[^"]*"</Find>
+        <Find>version="4\.5[^"]*"</Find>
         <ReplaceWith>version="$(PackageVersion)"</ReplaceWith>
       </RegexTransform>
     </ItemGroup>
@@ -95,8 +95,8 @@
     <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis/ServiceStack.Redis.Signed.csproj"
              Targets="Build" Properties="Configuration=$(Configuration)" />
  
-    <MakeDir Directories="$(NuGetPackageDir)/ServiceStack.Redis.Signed/lib/net40" Condition="!Exists('$(NuGetPackageDir)/ServiceStack.Redis.Signed/lib/net40')" />
-    <Copy SourceFiles="%(RedisFiles.Identity)" DestinationFolder="$(NuGetPackageDir)/ServiceStack.Redis.Signed/lib/net40" />
+    <MakeDir Directories="$(NuGetPackageDir)/ServiceStack.Redis.Signed/lib/net45" Condition="!Exists('$(NuGetPackageDir)/ServiceStack.Redis.Signed/lib/net45')" />
+    <Copy SourceFiles="%(RedisFiles.Identity)" DestinationFolder="$(NuGetPackageDir)/ServiceStack.Redis.Signed/lib/net45" />
 
     <Exec Command="&quot;$(NuGetPath)&quot; pack &quot;$(NuGetPackageDir)/ServiceStack.Redis.Signed/servicestack.redis.signed.nuspec&quot; -OutputDirectory &quot;$(NuGetPackageDir)&quot; -Version $(PackageVersion) -Symbols"
             LogStandardErrorAsError="true" />
