@@ -79,6 +79,11 @@
             Used to Issue and process JWT Tokens and registers ConvertSessionToToken Service to convert Sessions to JWT Tokens
             </summary>
         </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProvider.SetBearerTokenOnAuthenticateResponse">
+            <summary>
+            Whether to populate the Bearer Token in the AuthenticateResponse
+            </summary>
+        </member>
         <member name="T:ServiceStack.Auth.JwtAuthProviderReader">
             <summary>
             Enable access to protected Services using JWT Tokens
