@@ -7,7 +7,7 @@
   "targets": {
     ".NETStandard,Version=v1.1": {},
     ".NETStandard,Version=v1.1/": {
-      "ServiceStack.Text/1.0.12.0": {
+      "ServiceStack.Text/1.0.0": {
         "dependencies": {
           "System.Linq.Expressions": "4.1.0",
           "System.Runtime.Serialization.Primitives": "4.1.1",
@@ -341,7 +341,7 @@
     }
   },
   "libraries": {
-    "ServiceStack.Text/1.0.12.0": {
+    "ServiceStack.Text/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
