@@ -16,7 +16,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using ServiceStack.Redis.Generic;
 using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
@@ -108,42 +107,36 @@ namespace ServiceStack.Redis
             return ret;
         }
 
-        public DateTime ConvertToServerDate(DateTime expiresAt)
-        {
-            //placeholder if we ever try to compensate for differences in server-time
-            return expiresAt;
-        }
+        public DateTime ConvertToServerDate(DateTime expiresAt) => expiresAt;
 
-        public string GetTypeSequenceKey<T>()
-        {
-            return String.Concat(NamespacePrefix, "seq:", typeof(T).Name);
-        }
+        public string GetTypeSequenceKey<T>() => string.Concat(NamespacePrefix, "seq:", typeof(T).Name);
 
-        public string GetTypeIdsSetKey<T>()
-        {
-            return String.Concat(NamespacePrefix, "ids:", typeof(T).Name);
-        }
+        public string GetTypeIdsSetKey<T>() => string.Concat(NamespacePrefix, "ids:", typeof(T).Name);
 
-        public string GetTypeIdsSetKey(Type type)
-        {
-            return String.Concat(NamespacePrefix, "ids:", type.Name);
-        }
+        public string GetTypeIdsSetKey(Type type) => string.Concat(NamespacePrefix, "ids:", type.Name);
 
-        public void RewriteAppendOnlyFileAsync()
-        {
-            base.BgRewriteAof();
-        }
+        public void RewriteAppendOnlyFileAsync() => base.BgRewriteAof();
 
-        public List<string> GetAllKeys()
-        {
-            return SearchKeys("*");
-        }
+        public List<string> GetAllKeys() => SearchKeys("*");
 
         [Obsolete("Use SetValue()")]
-        public void SetEntry(string key, string value)
-        {
-            SetValue(key, value);
-        }
+        public void SetEntry(string key, string value) => SetValue(key, value);
+        [Obsolete("Use SetValue()")]
+        public void SetEntry(string key, string value, TimeSpan expireIn) => SetValue(key, value, expireIn);
+        [Obsolete("Use SetValueIfExists()")]
+        public bool SetEntryIfExists(string key, string value) => SetValueIfExists(key, value);
+        [Obsolete("Use SetValueIfNotExists()")]
+        public bool SetEntryIfNotExists(string key, string value) => SetValueIfNotExists(key, value);
+        [Obsolete("Use SetValueIfExists()")]
+        public bool SetEntryIfExists(string key, string value, TimeSpan expireIn) => SetValueIfExists(key, value, expireIn);
+        [Obsolete("Use SetValueIfNotExists()")]
+        public bool SetEntryIfNotExists(string key, string value, TimeSpan expireIn) => SetValueIfNotExists(key, value, expireIn);
+        [Obsolete("Use GetClientsInfo")]
+        public List<Dictionary<string, string>> GetClientList() => GetClientsInfo();
+        [Obsolete("Use GetValue()")]
+        public string GetEntry(string key) => GetValue(key);
+        [Obsolete("Use GetAndSetValue()")]
+        public string GetAndSetEntry(string key, string value) => GetAndSetValue(key, value);
 
         public void SetValue(string key, string value)
         {
@@ -168,12 +161,6 @@ namespace ServiceStack.Redis
             return true;
         }
 
-        [Obsolete("Use SetValue()")]
-        public void SetEntry(string key, string value, TimeSpan expireIn)
-        {
-            SetValue(key, value, expireIn);
-        }
-
         public void SetValue(string key, string value, TimeSpan expireIn)
         {
             var bytesValue = value != null
@@ -193,12 +180,6 @@ namespace ServiceStack.Redis
             }
         }
 
-        [Obsolete("Use SetValueIfExists()")]
-        public bool SetEntryIfExists(string key, string value)
-        {
-            return SetValueIfExists(key, value);
-        }
-
         public bool SetValueIfExists(string key, string value)
         {
             var bytesValue = value != null ? value.ToUtf8Bytes() : null;
@@ -206,23 +187,11 @@ namespace ServiceStack.Redis
             return base.Set(key, bytesValue, exists: true);
         }
 
-        [Obsolete("Use SetValueIfNotExists()")]
-        public bool SetEntryIfNotExists(string key, string value)
-        {
-            return SetValueIfNotExists(key, value);
-        }
-
         public bool SetValueIfNotExists(string key, string value)
         {
             var bytesValue = value != null ? value.ToUtf8Bytes() : null;
 
             return base.Set(key, bytesValue, exists: false);
-        }
-
-        [Obsolete("Use SetValueIfExists()")]
-        public bool SetEntryIfExists(string key, string value, TimeSpan expireIn)
-        {
-            return SetValueIfExists(key, value, expireIn);
         }
 
         public bool SetValueIfExists(string key, string value, TimeSpan expireIn)
@@ -235,12 +204,6 @@ namespace ServiceStack.Redis
                 return base.Set(key, bytesValue, exists: true, expirySeconds: (int)expireIn.TotalSeconds);
         }
 
-        [Obsolete("Use SetValueIfNotExists()")]
-        public bool SetEntryIfNotExists(string key, string value, TimeSpan expireIn)
-        {
-            return SetValueIfNotExists(key, value, expireIn);
-        }
-
         public bool SetValueIfNotExists(string key, string value, TimeSpan expireIn)
         {
             var bytesValue = value != null ? value.ToUtf8Bytes() : null;
@@ -249,12 +212,6 @@ namespace ServiceStack.Redis
                 return base.Set(key, bytesValue, exists: false, expiryMs: (long)expireIn.TotalMilliseconds);
             else
                 return base.Set(key, bytesValue, exists: false, expirySeconds: (int)expireIn.TotalSeconds);
-        }
-
-        [Obsolete("Use GetClientsInfo")]
-        public List<Dictionary<string, string>> GetClientList()
-        {
-            return GetClientsInfo();
         }
 
         public void SetValues(Dictionary<string, string> map)
@@ -303,24 +260,12 @@ namespace ServiceStack.Redis
             base.MSet(keyBytes, valBytes);
         }
 
-        [Obsolete("Use GetValue()")]
-        public string GetEntry(string key)
-        {
-            return GetValue(key);
-        }
-
         public string GetValue(string key)
         {
             var bytes = Get(key);
             return bytes == null
                 ? null
                 : bytes.FromUtf8Bytes();
-        }
-
-        [Obsolete("Use GetAndSetValue()")]
-        public string GetAndSetEntry(string key, string value)
-        {
-            return GetAndSetValue(key, value);
         }
 
         public string GetAndSetValue(string key, string value)

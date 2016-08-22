@@ -3,7 +3,7 @@
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>ServiceStack.Redis</id>
     <title>C# Redis client for the Redis NoSQL DB</title>
-    <version>4.0.0</version>
+    <version>4.5.0</version>
     <authors>Service Stack</authors>
     <owners>Service Stack</owners>
     <description>
@@ -19,9 +19,9 @@
     <iconUrl>https://servicestack.net/img/logo-32.png</iconUrl>
     <tags>Redis NoSQL Client Distributed Cache PubSub Messaging Transactions</tags>
     <language>en-US</language>
-    <copyright>ServiceStack 2013 and contributors</copyright>
+    <copyright>ServiceStack 2016 and contributors</copyright>
     <dependencies>
-      <dependency id="ServiceStack.Common" version="4.0" />
+      <dependency id="ServiceStack.Common" version="4.5" />
     </dependencies>
   </metadata>
   <files>
