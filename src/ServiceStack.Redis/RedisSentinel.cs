@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using ServiceStack;
 using ServiceStack.Logging;
 using ServiceStack.Text;
@@ -176,9 +177,13 @@ namespace ServiceStack.Redis
                     .ToArray();
 
                 var sentinelWorker = GetValidSentinelWorker();
+#if NETSTANDARD1_3
+                if (this.RedisManager == null || sentinelWorker == null)
+                    throw new Exception("Unable to resolve sentinels!");
+#else
                 if (this.RedisManager == null || sentinelWorker == null)
                     throw new ApplicationException("Unable to resolve sentinels!");
-
+#endif
                 return this.RedisManager;
             }
         }
@@ -329,8 +334,11 @@ namespace ServiceStack.Redis
             }
 
             this.failures = 0; //reset
+#if NETSTANDARD1_3
+            Task.Delay(WaitBetweenFailedHosts).Wait();
+#else
             Thread.Sleep(WaitBetweenFailedHosts);
-
+#endif
             throw new RedisException("No Redis Sentinels were available", lastEx);
         }
 

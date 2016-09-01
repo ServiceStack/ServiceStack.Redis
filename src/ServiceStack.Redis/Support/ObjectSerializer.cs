@@ -1,5 +1,7 @@
 ﻿using System.IO;
+#if !NETSTANDARD1_3
 using System.Runtime.Serialization.Formatters.Binary;
+#endif
 
 namespace ServiceStack.Redis.Support
 {
@@ -9,8 +11,9 @@ namespace ServiceStack.Redis.Support
 	/// </summary>
 	public class ObjectSerializer : ISerializer
 	{
+#if !NETSTANDARD1_3
 		protected readonly BinaryFormatter bf = new BinaryFormatter();
- 
+#endif 
 
 
 		/// <summary>
@@ -20,12 +23,16 @@ namespace ServiceStack.Redis.Support
 		/// <returns></returns>
 		public virtual byte[] Serialize(object value)
 		{
+#if NETSTANDARD1_3
+			return null;
+#else
 			if (value == null)
 				return null;
 			var memoryStream = new MemoryStream();
 			memoryStream.Seek(0, 0);
 			bf.Serialize(memoryStream, value);
 			return memoryStream.ToArray();
+#endif
 		}
 
 		/// <summary>
@@ -35,6 +42,9 @@ namespace ServiceStack.Redis.Support
 		/// <returns></returns>
 		public virtual object Deserialize(byte[] someBytes)
 		{
+#if NETSTANDARD1_3
+			return null;
+#else
 			if (someBytes == null)
 				return null;
 			var memoryStream = new MemoryStream();
@@ -42,6 +52,7 @@ namespace ServiceStack.Redis.Support
 			memoryStream.Seek(0, 0);
 			var de = bf.Deserialize(memoryStream);
 			return de;
+#endif
 		}
 	}
 }

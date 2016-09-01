@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NETSTANDARD1_3
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -134,3 +135,4 @@ namespace ServiceStack.Redis.Support.Diagnostic
         }
     }
 }
+#endif

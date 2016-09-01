@@ -216,12 +216,12 @@ namespace ServiceStack.Redis.Tests
             var now = Redis.GetServerTime();
 
             now.Kind.PrintDump();
-            now.ToLongDateString().Print();
-            now.ToLongTimeString().Print();
+            now.ToString("D").Print();
+            now.ToString("T").Print();
 
             "UtcNow".Print();
-            DateTime.UtcNow.ToLongDateString().Print();
-            DateTime.UtcNow.ToLongTimeString().Print();
+            DateTime.UtcNow.ToString("D").Print();
+            DateTime.UtcNow.ToString("T").Print();
 
             Assert.That(now.Date, Is.EqualTo(DateTime.UtcNow.Date));
         }
@@ -260,7 +260,8 @@ namespace ServiceStack.Redis.Tests
             catch (RedisResponseException e)
             {
                 // if exception has that message then it still proves that BgSave works as expected.
-                if (e.Message.StartsWith("Can't BGSAVE while AOF log rewriting is in progress"))
+                if (e.Message.StartsWith("Can't BGSAVE while AOF log rewriting is in progress")
+                    || e.Message.StartsWith("An AOF log rewriting in progress: can't BGSAVE right now"))
                     return;
 
                 throw;

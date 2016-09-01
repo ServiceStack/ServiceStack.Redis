@@ -1,3 +1,4 @@
+#if !NETSTANDARD1_3
 using System;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
@@ -54,3 +55,4 @@ namespace ServiceStack.Redis.Support.Diagnostic
         }
     }
 }
+#endif

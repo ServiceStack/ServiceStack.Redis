@@ -5,9 +5,11 @@ namespace ServiceStack.Redis.Support
 	/// <summary>
 	/// wraps a serialized representation of an object
 	/// </summary>
-	/// 
+	///
+#if !NETSTANDARD1_3 
 	[Serializable]
-    public struct SerializedObjectWrapper
+#endif
+	public struct SerializedObjectWrapper
 	{
 		private ArraySegment<byte> data;
 		private ushort flags;

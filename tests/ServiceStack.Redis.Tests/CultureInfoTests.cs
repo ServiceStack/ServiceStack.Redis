@@ -13,15 +13,24 @@ namespace ServiceStack.Redis.Tests
         [TestFixtureSetUp]
         public void TestFixtureSetUp()
         {
+#if NETCORE
+            previousCulture = CultureInfo.CurrentCulture;
+            CultureInfo.CurrentCulture = new CultureInfo("fr-FR");
+#else
             previousCulture = Thread.CurrentThread.CurrentCulture;
             Thread.CurrentThread.CurrentCulture = new CultureInfo("fr-FR");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("fr-FR");
+#endif
         }
 
         [TestFixtureTearDown]
         public void TestFixtureTearDown()
         {
+#if NETCORE
+            CultureInfo.CurrentCulture = previousCulture;
+#else
             Thread.CurrentThread.CurrentCulture = previousCulture;
+#endif
         }
 
         [Test]

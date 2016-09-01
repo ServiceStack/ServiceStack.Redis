@@ -7,6 +7,9 @@ using ServiceStack.Redis.Support.Queue.Implementation;
 namespace ServiceStack.Redis.Tests
 {
     [TestFixture]
+#if NETCORE
+        [Ignore(".NET Core does not implement BinaryFormatter required for these tests")]
+#endif
     public class QueueTests : RedisClientTestsBase
     {
         const int numMessages = 6;
@@ -144,7 +147,7 @@ namespace ServiceStack.Redis.Tests
         }
 
         [Test]
-        public void TestSimpleWorkQueue()
+       public void TestSimpleWorkQueue()
         {
             using (var queue = new RedisSimpleWorkQueue<string>(10, 10, TestConfig.SingleHost, TestConfig.RedisPort))
             {

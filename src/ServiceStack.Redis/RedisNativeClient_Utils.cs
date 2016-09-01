@@ -21,6 +21,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis
@@ -82,6 +83,10 @@ namespace ServiceStack.Redis
             };
             try
             {
+#if NETSTANDARD1_3
+                var addresses = Dns.GetHostAddressesAsync(Host).Result;
+                socket.Connect(addresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork), Port);
+#else
                 if (ConnectTimeout <= 0)
                 {
                     socket.Connect(Host, Port);
@@ -91,10 +96,15 @@ namespace ServiceStack.Redis
                     var connectResult = socket.BeginConnect(Host, Port, null, null);
                     connectResult.AsyncWaitHandle.WaitOne(ConnectTimeout, true);
                 }
+#endif
 
                 if (!socket.Connected)
                 {
+#if NETSTANDARD1_3
+                    socket.Dispose();
+#else
                     socket.Close();
+#endif
                     socket = null;
                     DeactivatedAt = DateTime.UtcNow;
                     return;
@@ -114,8 +124,13 @@ namespace ServiceStack.Redis
                     }
                     else
                     {
+#if NETSTANDARD1_3
+                        var ctor = typeof(SslStream).GetTypeInfo().DeclaredConstructors
+                            .First(x => x.GetParameters().Length == 5);
+#else
                         var ctor = typeof(SslStream).GetConstructors()
                             .First(x => x.GetParameters().Length == 5);
+#endif
 
                         var policyType = AssemblyUtils.FindType("System.Net.Security.EncryptionPolicy");
                         var policyValue = Enum.Parse(policyType, "RequireEncryption");
@@ -129,7 +144,11 @@ namespace ServiceStack.Redis
                         });
                     }
 
+#if NETSTANDARD1_3
+                    sslStream.AuthenticateAsClientAsync(Host).Wait();
+#else
                     sslStream.AuthenticateAsClient(Host);
+#endif
 
                     if (!sslStream.IsEncrypted)
                         throw new Exception("Could not establish an encrypted connection to " + Host);
@@ -242,7 +261,11 @@ namespace ServiceStack.Redis
                 log.Error(ErrorConnect.Fmt(Host, Port));
 
                 if (socket != null)
+#if NETSTANDARD1_3
+                    socket.Dispose();
+#else
                     socket.Close();
+#endif
 
                 socket = null;
 
@@ -580,7 +603,11 @@ namespace ServiceStack.Redis
                     }
 
                     Interlocked.Increment(ref RedisState.TotalRetryCount);
+#if NETSTANDARD1_3
+                    Task.Delay(GetBackOffMultiplier(++i)).Wait();
+#else
                     Thread.Sleep(GetBackOffMultiplier(++i));
+#endif
                 }
             }
         }
@@ -606,7 +633,11 @@ namespace ServiceStack.Redis
             lastSocketException = socketEx;
 
             if (socket != null)
+#if NETSTANDARD1_3
+                socket.Dispose();
+#else
                 socket.Close();
+#endif
 
             socket = null;
             return socketEx;
@@ -1248,8 +1279,13 @@ namespace ServiceStack.Redis
                 throw new ArgumentNullException("luaBody");
 
             byte[] buffer = Encoding.UTF8.GetBytes(luaBody);
+#if NETSTANDARD1_3
+            var sha1 = SHA1.Create();
+            return BitConverter.ToString(sha1.ComputeHash(buffer)).Replace("-", "");
+#else
             var cryptoTransformSHA1 = new SHA1CryptoServiceProvider();
             return BitConverter.ToString(cryptoTransformSHA1.ComputeHash(buffer)).Replace("-", "");
+#endif
         }
 
         public byte[] ScriptLoad(string luaBody)

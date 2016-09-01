@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Service Stack LLC. All Rights Reserved.
 // License: https://raw.github.com/ServiceStack/ServiceStack/master/license.txt
 
-
+#if !NETCORE
 using System.Data;
+#endif
 using NUnit.Framework;
 using ServiceStack.Configuration;
 using ServiceStack.Text;
+using System;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -22,7 +24,11 @@ namespace ServiceStack.Redis.Tests
         [TearDown]
         public void TearDown()
         {
+#if NETCORE
+    	    Licensing.RegisterLicense(Environment.GetEnvironmentVariable("SERVICESTACK_LICENSE"));
+#else
             Licensing.RegisterLicense(new AppSettings().GetString("servicestack:license"));
+#endif
         }
 
         [Test]
@@ -71,7 +77,11 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Allows_access_of_21_types()
         {
+#if NETCORE
+	    Environment.GetEnvironmentVariable("SERVICESTACK_LICENSE");
+#else
             Licensing.RegisterLicense(new AppSettings().GetString("servicestack:license"));
+#endif
 
             using (var client = new RedisClient(TestConfig.SingleHost))
             {
@@ -85,7 +95,11 @@ namespace ServiceStack.Redis.Tests
         [Test, Explicit("Takes too long - but works!")]
         public void Allows_access_of_6100_operations()
         {
+#if NETCORE
+	    Environment.GetEnvironmentVariable("SERVICESTACK_LICENSE");
+#else
             Licensing.RegisterLicense(new AppSettings().GetString("servicestack:license"));
+#endif
 
             using (var client = new RedisClient(TestConfig.SingleHost))
             {

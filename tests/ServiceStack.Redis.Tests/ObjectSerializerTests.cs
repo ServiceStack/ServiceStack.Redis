@@ -4,6 +4,9 @@ using ServiceStack.Redis.Support;
 namespace ServiceStack.Redis.Tests
 {
     [TestFixture]
+#if NETCORE
+        [Ignore(".NET Core does not implement BinaryFormatter required for these tests")]
+#endif
     public class ObjectSerializerTests
     {
         [Test]

@@ -1,3 +1,4 @@
+#if !NETCORE
 using System;
 using System.Net.Sockets;
 using System.Threading;
@@ -97,3 +98,4 @@ namespace ServiceStack.Redis.Tests.Support
         }
     }
 }
+#endif

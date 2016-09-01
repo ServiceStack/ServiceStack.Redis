@@ -4,6 +4,9 @@ using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Text;
+#if NETCORE
+using System.Threading.Tasks;
+#endif
 
 namespace ServiceStack.Redis.Tests
 {
@@ -155,9 +158,11 @@ namespace ServiceStack.Redis.Tests
                     Thread.Sleep(delay + TimeSpan.FromSeconds(0.5));
                     client4.Dispose();
                 };
-
+#if NETCORE
+                Task.Run(func);
+#else                
                 func.BeginInvoke(null, null);
-
+#endif
                 var start = DateTime.Now;
 
                 var client5 = manager.GetClient();
@@ -180,18 +185,30 @@ namespace ServiceStack.Redis.Tests
             const int noOfConcurrentClients = 64; //WaitHandle.WaitAll limit is <= 64
             var clientUsageMap = new Dictionary<string, int>();
 
+#if NETCORE
+            List<Task> tasks = new List<Task>();
+#else
             var clientAsyncResults = new List<IAsyncResult>();
+#endif             
             using (var manager = CreateManager())
             {
                 for (var i = 0; i < noOfConcurrentClients; i++)
                 {
                     var clientNo = i;
                     var action = (Action)(() => UseClient(manager, clientNo, clientUsageMap));
+#if NETCORE
+                    tasks.Add(Task.Run(action));
+#else                                       
                     clientAsyncResults.Add(action.BeginInvoke(null, null));
+#endif
                 }
             }
 
+#if NETCORE
+            Task.WaitAll(tasks.ToArray());
+#else            
             WaitHandle.WaitAll(clientAsyncResults.ConvertAll(x => x.AsyncWaitHandle).ToArray());
+#endif
 
             Debug.WriteLine(TypeSerializer.SerializeToString(clientUsageMap));
 

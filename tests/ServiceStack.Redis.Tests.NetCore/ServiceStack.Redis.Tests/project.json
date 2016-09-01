@@ -1,0 +1,39 @@
+{
+  "configurations": {
+    "Debug": {
+      "buildOptions": {
+        "define": ["NETCORE_SUPPORT", "NETCORE", "DEBUG", "TRACE"]
+      }
+    },
+    "Release": {
+      "buildOptions": {
+        "define": ["NETCORE_SUPPORT", "NETCORE", "TRACE"],
+        "optimize": true
+      }
+    }
+  },
+  "buildOptions": {
+    "debugType": "portable",
+    "emitEntryPoint": true
+  },
+  "compile": ["../../ServiceStack.Redis.Tests/**/*.cs"],
+  "dependencies": {
+    "Microsoft.NETCore.App": {
+          "type": "platform",
+      "version": "1.0.0"
+    },
+    "NUnitLite" : "3.2.1",
+    "ServiceStack.Redis" : "4.0.*",
+    "ServiceStack.Interfaces" : "4.0.*",
+    "ServiceStack.Text" : "4.0.*",
+    "ServiceStack.Common" : "4.0.*"
+  },
+  "frameworks": {
+   "netcoreapp1.0": { 
+            "imports": "dnxcore50",
+	     "dependencies" : {
+		"System.Runtime.Serialization.Primitives": "4.1.1"
+            }	
+     }
+  }
+}

@@ -14,7 +14,9 @@ namespace ServiceStack.Redis.Tests
     {
         static UserSessionTests()
         {
+#if !NETCORE
             LogManager.LogFactory = new ConsoleLogFactory();
+#endif
         }
 
         //MasterUser master;
@@ -273,8 +275,9 @@ namespace ServiceStack.Redis.Tests
         }
     }
 
-
+#if !NETCORE
     [Serializable /* was required when storing in memcached, not required in Redis */]
+#endif
     public class UserSession
     {
         //Empty constructor required for TypeSerializer
@@ -433,7 +436,9 @@ namespace ServiceStack.Redis.Tests
         }
     }
 
+#if !NETCORE
     [Serializable]
+#endif
     public class UserClientSession
         : IHasGuidId
     {

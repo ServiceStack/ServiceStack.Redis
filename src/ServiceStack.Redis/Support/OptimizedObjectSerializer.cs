@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Text;
+using ServiceStack.Text;
+using ServiceStack;
 
 namespace ServiceStack.Redis.Support
 {
@@ -59,7 +61,7 @@ namespace ServiceStack.Redis.Support
                 return new SerializedObjectWrapper(RawDataFlag, new ArraySegment<byte>(tmpByteArray));
             }
 
-            TypeCode code = value == null ? TypeCode.DBNull : Type.GetTypeCode(value.GetType());
+            TypeCode code = value == null ? TypeCode.DBNull : value.GetType().GetTypeCode();
 
             byte[] data;
             int length = -1;
@@ -120,14 +122,18 @@ namespace ServiceStack.Redis.Support
                     break;
 
                 default:
+#if NETSTANDARD1_3
+		    data = new byte[0];
+                    length = 0;
+#else
                     using (var ms = new MemoryStream())
                     {
                         bf.Serialize(ms, value);
-
                         code = TypeCode.Object;
                         data = ms.GetBuffer();
                         length = (int)ms.Length;
                     }
+#endif
                     break;
             }
 
@@ -225,7 +231,11 @@ namespace ServiceStack.Redis.Support
                 case TypeCode.Object:
                     using (var ms = new MemoryStream(data, offset, count))
                     {
+#if NETSTANDARD1_3
+			return null;
+#else
                         return bf.Deserialize(ms);
+#endif
                     }
 
                 default: throw new InvalidOperationException("Unknown TypeCode was returned: " + code);
@@ -233,4 +243,3 @@ namespace ServiceStack.Redis.Support
         }
     }
 }
-
