@@ -83,7 +83,7 @@ namespace ServiceStack.Redis
             };
             try
             {
-#if NETSTANDARD
+#if NETSTANDARD1_3
                 var addresses = Dns.GetHostAddressesAsync(Host).Result;
                 socket.Connect(addresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork), Port);
 #else
@@ -100,7 +100,7 @@ namespace ServiceStack.Redis
 
                 if (!socket.Connected)
                 {
-#if NETSTANDARD
+#if NETSTANDARD1_3
                     socket.Dispose();
 #else
                     socket.Close();
@@ -124,7 +124,7 @@ namespace ServiceStack.Redis
                     }
                     else
                     {
-#if NETSTANDARD
+#if NETSTANDARD1_3
                         var ctor = typeof(SslStream).GetTypeInfo().DeclaredConstructors
                             .First(x => x.GetParameters().Length == 5);
 #else
@@ -144,7 +144,7 @@ namespace ServiceStack.Redis
                         });
                     }
 
-#if NETSTANDARD
+#if NETSTANDARD1_3
                     sslStream.AuthenticateAsClientAsync(Host).Wait();
 #else
                     sslStream.AuthenticateAsClient(Host);
@@ -261,7 +261,7 @@ namespace ServiceStack.Redis
                 log.Error(ErrorConnect.Fmt(Host, Port));
 
                 if (socket != null)
-#if NETSTANDARD
+#if NETSTANDARD1_3
                     socket.Dispose();
 #else
                     socket.Close();
@@ -603,7 +603,7 @@ namespace ServiceStack.Redis
                     }
 
                     Interlocked.Increment(ref RedisState.TotalRetryCount);
-#if NETSTANDARD
+#if NETSTANDARD1_3
                     Task.Delay(GetBackOffMultiplier(++i)).Wait();
 #else
                     Thread.Sleep(GetBackOffMultiplier(++i));
@@ -633,7 +633,7 @@ namespace ServiceStack.Redis
             lastSocketException = socketEx;
 
             if (socket != null)
-#if NETSTANDARD
+#if NETSTANDARD1_3
                 socket.Dispose();
 #else
                 socket.Close();
@@ -1279,7 +1279,7 @@ namespace ServiceStack.Redis
                 throw new ArgumentNullException("luaBody");
 
             byte[] buffer = Encoding.UTF8.GetBytes(luaBody);
-#if NETSTANDARD
+#if NETSTANDARD1_3
             var sha1 = SHA1.Create();
             return BitConverter.ToString(sha1.ComputeHash(buffer)).Replace("-", "");
 #else

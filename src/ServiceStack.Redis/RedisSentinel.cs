@@ -177,7 +177,7 @@ namespace ServiceStack.Redis
                     .ToArray();
 
                 var sentinelWorker = GetValidSentinelWorker();
-#if NETSTANDARD
+#if NETSTANDARD1_3
                 if (this.RedisManager == null || sentinelWorker == null)
                     throw new Exception("Unable to resolve sentinels!");
 #else
@@ -334,7 +334,7 @@ namespace ServiceStack.Redis
             }
 
             this.failures = 0; //reset
-#if NETSTANDARD
+#if NETSTANDARD1_3
             Task.Delay(WaitBetweenFailedHosts).Wait();
 #else
             Thread.Sleep(WaitBetweenFailedHosts);

@@ -1,5 +1,5 @@
 ﻿using System.IO;
-#if !NETSTANDARD
+#if !NETSTANDARD1_3
 using System.Runtime.Serialization.Formatters.Binary;
 #endif
 
@@ -11,7 +11,7 @@ namespace ServiceStack.Redis.Support
 	/// </summary>
 	public class ObjectSerializer : ISerializer
 	{
-#if !NETSTANDARD
+#if !NETSTANDARD1_3
 		protected readonly BinaryFormatter bf = new BinaryFormatter();
 #endif 
 
@@ -23,7 +23,7 @@ namespace ServiceStack.Redis.Support
 		/// <returns></returns>
 		public virtual byte[] Serialize(object value)
 		{
-#if NETSTANDARD
+#if NETSTANDARD1_3
 			return null;
 #else
 			if (value == null)
@@ -42,7 +42,7 @@ namespace ServiceStack.Redis.Support
 		/// <returns></returns>
 		public virtual object Deserialize(byte[] someBytes)
 		{
-#if NETSTANDARD
+#if NETSTANDARD1_3
 			return null;
 #else
 			if (someBytes == null)

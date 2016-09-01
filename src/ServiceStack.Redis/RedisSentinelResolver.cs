@@ -151,7 +151,7 @@ namespace ServiceStack.Redis
                                 Interlocked.Increment(ref RedisState.TotalForcedMasterFailovers);
 
                                 sentinel.ForceMasterFailover();
-#if NETSTANDARD
+#if NETSTANDARD1_3
                                 Task.Delay(sentinel.WaitBetweenFailedHosts).Wait();
 #else
                                 Thread.Sleep(sentinel.WaitBetweenFailedHosts);
@@ -196,7 +196,7 @@ namespace ServiceStack.Redis
                                 throw new TimeoutException("Max Wait Between Sentinel Lookups Elapsed: {0}"
                                     .Fmt(sentinel.MaxWaitBetweenFailedHosts.ToString()));
 
-#if NETSTANDARD
+#if NETSTANDARD1_3
                             Task.Delay(sentinel.WaitBetweenFailedHosts);
 #else
                             Thread.Sleep(sentinel.WaitBetweenFailedHosts);

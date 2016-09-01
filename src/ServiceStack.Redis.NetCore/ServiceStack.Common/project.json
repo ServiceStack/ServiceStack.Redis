@@ -18,7 +18,7 @@
     "ServiceStack.Text" : "1.0.*"	
   },
   "frameworks": {
-    "netstandard1.2": { 
+    "netstandard1.3": { 
 	"buildOptions" : {
 	    "define": ["NETSTANDARD1_1"]
 	},

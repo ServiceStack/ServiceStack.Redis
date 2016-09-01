@@ -6,7 +6,7 @@ namespace ServiceStack.Redis.Support
 	/// wraps a serialized representation of an object
 	/// </summary>
 	///
-#if !NETSTANDARD 
+#if !NETSTANDARD1_3 
 	[Serializable]
 #endif
 	public struct SerializedObjectWrapper
