@@ -100,11 +100,7 @@ namespace ServiceStack.Redis
 
                 if (!socket.Connected)
                 {
-#if NETSTANDARD1_3
-                    socket.Dispose();
-#else
                     socket.Close();
-#endif
                     socket = null;
                     DeactivatedAt = DateTime.UtcNow;
                     return;
@@ -261,11 +257,7 @@ namespace ServiceStack.Redis
                 log.Error(ErrorConnect.Fmt(Host, Port));
 
                 if (socket != null)
-#if NETSTANDARD1_3
-                    socket.Dispose();
-#else
                     socket.Close();
-#endif
 
                 socket = null;
 
@@ -633,11 +625,7 @@ namespace ServiceStack.Redis
             lastSocketException = socketEx;
 
             if (socket != null)
-#if NETSTANDARD1_3
-                socket.Dispose();
-#else
                 socket.Close();
-#endif
 
             socket = null;
             return socketEx;
