@@ -35,6 +35,10 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 App_Data/
 .vs/
+.vscode/
+*.lock.json
+*.nuget.props
+*.nuget.targets
 
 NuGet/
 NuGet.Signed/

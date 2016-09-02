@@ -19,7 +19,6 @@
     "ServiceStack.Common" : "1.0.*"
   },
   "compile": ["../../ServiceStack.Redis/**/*.cs"],
-  "exclude": ["../../ServiceStack.Redis/RedisPipeline.cs"],
   "frameworks": {
     "netstandard1.3": {
         "dependencies" : {
