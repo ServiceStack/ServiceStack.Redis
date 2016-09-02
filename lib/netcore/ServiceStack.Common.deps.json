@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETStandard,Version=v1.3/",
-    "signature": "db0d62b381ef8d172828ceea48ef22a5bb733309"
+    "signature": "f6bdf0627409bf8c8c34a3f2bff1c384ea00737d"
   },
   "compilationOptions": {},
   "targets": {
@@ -14,6 +14,7 @@
           "System.ComponentModel.Primitives": "4.1.0",
           "System.Net.Primitives": "4.0.11",
           "System.Net.NetworkInformation": "4.1.0",
+          "System.Net.Security": "4.0.0",
           "NETStandard.Library": "1.6.0",
           "ServiceStack.Interfaces": "1.0.0",
           "ServiceStack.Text": "1.0.0"
@@ -381,6 +382,31 @@
           "Microsoft.NETCore.Targets": "1.0.1",
           "System.Runtime": "4.1.0",
           "System.Runtime.Handles": "4.0.1"
+        }
+      },
+      "System.Net.Security/4.0.0": {
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "1.0.1",
+          "Microsoft.Win32.Primitives": "4.0.1",
+          "System.Collections": "4.0.11",
+          "System.Collections.Concurrent": "4.0.12",
+          "System.Diagnostics.Tracing": "4.1.0",
+          "System.Globalization": "4.0.11",
+          "System.IO": "4.1.0",
+          "System.Net.Primitives": "4.0.11",
+          "System.Resources.ResourceManager": "4.0.1",
+          "System.Runtime": "4.1.0",
+          "System.Runtime.Extensions": "4.1.0",
+          "System.Runtime.Handles": "4.0.1",
+          "System.Runtime.InteropServices": "4.1.0",
+          "System.Security.Claims": "4.0.1",
+          "System.Security.Cryptography.Primitives": "4.0.0",
+          "System.Security.Cryptography.X509Certificates": "4.1.0",
+          "System.Security.Principal": "4.0.1",
+          "System.Security.Principal.Windows": "4.0.0",
+          "System.Threading": "4.0.11",
+          "System.Threading.Tasks": "4.0.11",
+          "System.Threading.ThreadPool": "4.0.10"
         }
       },
       "System.Net.Sockets/4.1.0": {
@@ -916,6 +942,11 @@
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-tl/51pHaQVIMdpeuDx+s5IzfxluITA9ZWcBESpukkM70qKnMFRHcDae20oqW9rruJd60R56iuKjLn/ftua/UxQ=="
+    },
+    "System.Net.Security/4.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-NtWq5sp36hLdAEPlHq/NQaOtYEywSReOLg5P/SI9Q1wRuGIZhyBXuRni1rFQwoDLxa0qZfbsbApYck8Nadl3wA=="
     },
     "System.Net.Sockets/4.1.0": {
       "type": "package",

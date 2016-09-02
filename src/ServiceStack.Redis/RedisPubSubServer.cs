@@ -336,11 +336,7 @@ namespace ServiceStack.Redis
             if (AutoRestart && Interlocked.CompareExchange(ref status, 0, 0) != Status.Disposed)
             {
                 if (WaitBeforeNextRestart != null)
-#if NETSTANDARD1_3
-                    Task.Delay(WaitBeforeNextRestart.Value).Wait();
-#else
-                    Thread.Sleep(WaitBeforeNextRestart.Value);
-#endif
+                    TaskUtils.Sleep(WaitBeforeNextRestart.Value);
                 Start();
             }
         }
@@ -477,11 +473,7 @@ namespace ServiceStack.Redis
             if (Log.IsDebugEnabled)
                 Log.Debug("Sleeping for {0}ms after {1} continuous errors".Fmt(nextTry, continuousErrorsCount));
 
-#if NETSTANDARD1_3
-            Task.Delay(nextTry).Wait();
-#else
-            Thread.Sleep(nextTry);
-#endif
+            TaskUtils.Sleep(nextTry);
         }
 
         public static class Operation //dep-free copy of WorkerOperation
