@@ -100,11 +100,7 @@ namespace ServiceStack.Redis
 
                 if (!socket.Connected)
                 {
-#if NETSTANDARD1_3
-                    socket.Dispose();
-#else
                     socket.Close();
-#endif
                     socket = null;
                     DeactivatedAt = DateTime.UtcNow;
                     return;
@@ -124,13 +120,8 @@ namespace ServiceStack.Redis
                     }
                     else
                     {
-#if NETSTANDARD1_3
-                        var ctor = typeof(SslStream).GetTypeInfo().DeclaredConstructors
+                        var ctor = typeof(SslStream).GetAllConstructors()
                             .First(x => x.GetParameters().Length == 5);
-#else
-                        var ctor = typeof(SslStream).GetConstructors()
-                            .First(x => x.GetParameters().Length == 5);
-#endif
 
                         var policyType = AssemblyUtils.FindType("System.Net.Security.EncryptionPolicy");
                         var policyValue = Enum.Parse(policyType, "RequireEncryption");
@@ -261,11 +252,7 @@ namespace ServiceStack.Redis
                 log.Error(ErrorConnect.Fmt(Host, Port));
 
                 if (socket != null)
-#if NETSTANDARD1_3
-                    socket.Dispose();
-#else
                     socket.Close();
-#endif
 
                 socket = null;
 
@@ -633,11 +620,7 @@ namespace ServiceStack.Redis
             lastSocketException = socketEx;
 
             if (socket != null)
-#if NETSTANDARD1_3
-                socket.Dispose();
-#else
                 socket.Close();
-#endif
 
             socket = null;
             return socketEx;

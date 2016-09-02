@@ -123,7 +123,7 @@ namespace ServiceStack.Redis.Support
 
                 default:
 #if NETSTANDARD1_3
-		    data = new byte[0];
+        		    data = new byte[0];
                     length = 0;
 #else
                     using (var ms = new MemoryStream())
@@ -232,7 +232,7 @@ namespace ServiceStack.Redis.Support
                     using (var ms = new MemoryStream(data, offset, count))
                     {
 #if NETSTANDARD1_3
-			return null;
+	            		return null;
 #else
                         return bf.Deserialize(ms);
 #endif
