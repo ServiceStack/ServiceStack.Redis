@@ -1,31 +1,20 @@
 {
   "runtimeTarget": {
     "name": ".NETStandard,Version=v1.1/",
-    "signature": "7b7e0ae4297f8834538c98cdb8bf0e7073ea7069"
+    "signature": "87332d22ff0b2d9487498e551d9b7082859e5b9c"
   },
   "compilationOptions": {},
   "targets": {
     ".NETStandard,Version=v1.1": {},
     ".NETStandard,Version=v1.1/": {
-      "ServiceStack.Text/1.0.0": {
+      "ServiceStack.Interfaces/1.0.0": {
         "dependencies": {
+          "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Primitives": "4.1.1",
-          "System.Runtime.Serialization.Xml": "4.1.1",
-          "System.Net.Requests": "4.0.11",
-          "System.Dynamic.Runtime": "4.0.11",
-          "Microsoft.CSharp": "4.0.1",
-          "System.Reflection.Emit": "4.0.1",
           "NETStandard.Library": "1.6.0"
         },
         "runtime": {
-          "ServiceStack.Text.dll": {}
-        }
-      },
-      "Microsoft.CSharp/4.0.1": {
-        "dependencies": {
-          "System.Dynamic.Runtime": "4.0.11",
-          "System.Linq.Expressions": "4.1.0",
-          "System.Runtime": "4.1.0"
+          "ServiceStack.Interfaces.dll": {}
         }
       },
       "Microsoft.NETCore.Platforms/1.0.1": {},
@@ -104,14 +93,6 @@
           "System.Runtime": "4.1.0"
         }
       },
-      "System.Dynamic.Runtime/4.0.11": {
-        "dependencies": {
-          "System.Linq.Expressions": "4.1.0",
-          "System.ObjectModel": "4.0.12",
-          "System.Reflection": "4.1.0",
-          "System.Runtime": "4.1.0"
-        }
-      },
       "System.Globalization/4.0.11": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.0.1",
@@ -163,14 +144,6 @@
           "System.Runtime": "4.1.0"
         }
       },
-      "System.Net.Requests/4.0.11": {
-        "dependencies": {
-          "System.IO": "4.1.0",
-          "System.Net.Primitives": "4.0.11",
-          "System.Runtime": "4.1.0",
-          "System.Threading.Tasks": "4.0.11"
-        }
-      },
       "System.ObjectModel/4.0.12": {
         "dependencies": {
           "System.Runtime": "4.1.0"
@@ -181,22 +154,6 @@
           "Microsoft.NETCore.Platforms": "1.0.1",
           "Microsoft.NETCore.Targets": "1.0.1",
           "System.IO": "4.1.0",
-          "System.Reflection.Primitives": "4.0.1",
-          "System.Runtime": "4.1.0"
-        }
-      },
-      "System.Reflection.Emit/4.0.1": {
-        "dependencies": {
-          "System.IO": "4.1.0",
-          "System.Reflection": "4.1.0",
-          "System.Reflection.Emit.ILGeneration": "4.0.1",
-          "System.Reflection.Primitives": "4.0.1",
-          "System.Runtime": "4.1.0"
-        }
-      },
-      "System.Reflection.Emit.ILGeneration/4.0.1": {
-        "dependencies": {
-          "System.Reflection": "4.1.0",
           "System.Reflection.Primitives": "4.0.1",
           "System.Runtime": "4.1.0"
         }
@@ -268,14 +225,6 @@
           "System.Runtime": "4.1.0"
         }
       },
-      "System.Runtime.Serialization.Xml/4.1.1": {
-        "dependencies": {
-          "System.IO": "4.1.0",
-          "System.Runtime": "4.1.0",
-          "System.Text.Encoding": "4.0.11",
-          "System.Xml.ReaderWriter": "4.0.11"
-        }
-      },
       "System.Text.Encoding/4.0.11": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.0.1",
@@ -327,15 +276,10 @@
     }
   },
   "libraries": {
-    "ServiceStack.Text/1.0.0": {
+    "ServiceStack.Interfaces/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
-    },
-    "Microsoft.CSharp/4.0.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-li1uN0vRls5leO1IhwokUOSC8yWA2ICpUGMxjxm4epzFPYnl2c/9jo1gl9TzpumH/rKIkmRUGpJ+YLWQ1XfIcQ=="
     },
     "Microsoft.NETCore.Platforms/1.0.1": {
       "type": "package",
@@ -382,11 +326,6 @@
       "serviceable": true,
       "sha512": "sha512-SgYmK0myHMZD5hXDPRroeviesDAvFpZ6SItj+mzPEdyA/NX8PoEXBx1BvpQsGaxeK2pOQ5IBBl4xNM4I88ufTQ=="
     },
-    "System.Dynamic.Runtime/4.0.11": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-FKaQnGGKOqMRr8BpVlqv45X8IR6LPD6sExuyeZnXHm1JsWz4WAvPO65rqNHi1Q4jCJHWqrKoLm3RtJx1hKaZyg=="
-    },
     "System.Globalization/4.0.11": {
       "type": "package",
       "serviceable": true,
@@ -422,11 +361,6 @@
       "serviceable": true,
       "sha512": "sha512-tl/51pHaQVIMdpeuDx+s5IzfxluITA9ZWcBESpukkM70qKnMFRHcDae20oqW9rruJd60R56iuKjLn/ftua/UxQ=="
     },
-    "System.Net.Requests/4.0.11": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-oa/P2creoBe+l4CQEUY2HJGFlAPJuDhZlldkPtQGrM1KIJXsdmSYwIqLarGILVyYWmDbkArDgrc1d5D5Om86lQ=="
-    },
     "System.ObjectModel/4.0.12": {
       "type": "package",
       "serviceable": true,
@@ -436,16 +370,6 @@
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-BHn7GJpu7Wvh2Vh8CQuPIcxkm0tHtdc18VJ65jETI0tyUJlDjmoj5FYk5owpwJK2ecHd1LFexMDjtci2E+fj9g=="
-    },
-    "System.Reflection.Emit/4.0.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-kCzOR9me59S4BQLtQQOEzVDDw8LwRUw72oXOQCzpvvGT5p+THbuz1H3R9PQuU0ghBwXLQNIjrIX5VwZU1fNU2w=="
-    },
-    "System.Reflection.Emit.ILGeneration/4.0.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-+9WzFJYZFrm93xXaqAfpwNjfPdpGi7GerHmpXR/uBiKyWDMi4DOXet7DE2rrm5gH3vcZUPuafz58g8WyiZ/rrQ=="
     },
     "System.Reflection.Extensions/4.0.1": {
       "type": "package",
@@ -491,11 +415,6 @@
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-HZ6Du5QrTG8MNJbf4e4qMO3JRAkIboGT5Fk804uZtg3Gq516S7hAqTm2UZKUHa7/6HUGdVy3AqMQKbns06G/cg=="
-    },
-    "System.Runtime.Serialization.Xml/4.1.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-yqfKHkWUAdI0hdDIdD9KDzluKtZ8IIqLF3O7xIZlt6UTs1bOvFRpCvRTvGQva3Ak/ZM9/nq9IHBJ1tC4Ybcrjg=="
     },
     "System.Text.Encoding/4.0.11": {
       "type": "package",
