@@ -26,7 +26,8 @@
             "System.Net.Security" : "4.0.0",
             "System.Collections.Specialized": "4.0.1",
             "System.Collections.NonGeneric": "4.0.1",
-            "System.Net.NameResolution" : "4.0.0"
+            "System.Net.NameResolution" : "4.0.0",
+            "System.Data.Common" : "4.1.0"
          }
      }
    
