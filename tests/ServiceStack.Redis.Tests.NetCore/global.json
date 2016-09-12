@@ -1,6 +1,6 @@
 {
     "projects": [
-       "../../src/ServiceStack.Redis.NetCore",
-       "ServiceStack.Common.Tests"
+       "../../src",
+       "ServiceStack.Redis.Tests"
     ]
 }

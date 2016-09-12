@@ -19,7 +19,7 @@
     "netstandard1.1": { 
         "dependencies" : {
          },
-	"bin" : { "assembly":"../../../lib/netcore/ServiceStack.Interfaces.dll", "pdb" : "../../../lib/netcore/ServiceStack.Interfaces.pdb" }
+	"bin" : { "assembly":"../../lib/netstandard1.1/ServiceStack.Interfaces.dll", "pdb" : "../../lib/netstandard1.1/ServiceStack.Interfaces.pdb" }
      }
   },
   "version": "1.0.0"

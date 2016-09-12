@@ -15,16 +15,19 @@
   "dependencies": {
     "NETStandard.Library": "1.6.0",
     "ServiceStack.Interfaces" : "1.0.*",
-    "ServiceStack.Text" : "1.0.*"	
+    "ServiceStack.Text" : "1.0.*",
+    "ServiceStack.Common" : "1.0.*"
   },
+  "exclude": ["RedisPipeline.cs"],
   "frameworks": {
-    "netstandard1.3": { 
-	"buildOptions" : {
-	    "define": ["NETSTANDARD1_1"]
-	},
+    "netstandard1.3": {
         "dependencies" : {
-         },
-        "bin" : { "assembly":"../../../lib/netcore/ServiceStack.Common.dll", "pdb" : "../../../lib/netcore/ServiceStack.Common.pdb" }
+            "System.Net.Security" : "4.0.0",
+            "System.Collections.Specialized": "4.0.1",
+            "System.Collections.NonGeneric": "4.0.1",
+            "System.Net.NameResolution" : "4.0.0",
+            "System.Data.Common" : "4.1.0"
+         }
      }
    
   },
