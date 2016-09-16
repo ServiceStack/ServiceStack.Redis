@@ -78,7 +78,7 @@ namespace ServiceStack.Redis.Tests
         public void Allows_access_of_21_types()
         {
 #if NETCORE
-	    Environment.GetEnvironmentVariable("SERVICESTACK_LICENSE");
+            Environment.GetEnvironmentVariable("SERVICESTACK_LICENSE");
 #else
             Licensing.RegisterLicense(new AppSettings().GetString("servicestack:license"));
 #endif
@@ -96,7 +96,7 @@ namespace ServiceStack.Redis.Tests
         public void Allows_access_of_6100_operations()
         {
 #if NETCORE
-	    Environment.GetEnvironmentVariable("SERVICESTACK_LICENSE");
+	        Environment.GetEnvironmentVariable("SERVICESTACK_LICENSE");
 #else
             Licensing.RegisterLicense(new AppSettings().GetString("servicestack:license"));
 #endif
