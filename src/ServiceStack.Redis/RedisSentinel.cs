@@ -331,11 +331,7 @@ namespace ServiceStack.Redis
             }
 
             this.failures = 0; //reset
-#if NETSTANDARD1_3
-            Task.Delay(WaitBetweenFailedHosts).Wait();
-#else
-            Thread.Sleep(WaitBetweenFailedHosts);
-#endif
+            TaskUtils.Sleep(WaitBetweenFailedHosts);
             throw new RedisException("No Redis Sentinels were available", lastEx);
         }
 

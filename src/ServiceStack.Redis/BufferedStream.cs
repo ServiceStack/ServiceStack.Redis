@@ -10,44 +10,17 @@ namespace ServiceStack.Redis
         NetworkStream networkStream;
 
         public BufferedStream(Stream stream)
-            : this(stream, 0)
-        {
-        }
+            : this(stream, 0) {}
 
         public BufferedStream(Stream stream, int bufferSize)
         {
-            networkStream = stream as NetworkStream;
-
-            if (networkStream == null)
-                throw new ArgumentNullException("stream");
+            networkStream = (NetworkStream)stream;
         }
+        public override bool CanRead => networkStream.CanRead;
 
+        public override bool CanSeek => networkStream.CanSeek;
 
-/*        public BufferedStream(Stream stream)
-            : this(stream, 0)
-        {
-        }
-
-        public BufferedStream(Stream stream, int bufferSize) : base (stream)
-        {
-            if (stream == null)
-                throw new ArgumentNullException("stream");
-        }
-        */
-        public override bool CanRead
-        {
-            get { return networkStream.CanRead; }
-        }
-
-        public override bool CanSeek
-        {
-            get { return networkStream.CanSeek; }
-        }
-
-        public override bool CanWrite
-        {
-            get { return networkStream.CanWrite; }
-        }
+        public override bool CanWrite => networkStream.CanWrite;
 
         public override long Position
         {
@@ -55,35 +28,17 @@ namespace ServiceStack.Redis
             set { networkStream.Position = value; }
         }
 
-        public override long Length
-        {
-            get { return networkStream.Length; }
-        }
+        public override long Length => networkStream.Length;
 
-        public override int Read(byte[] buffer, int offset, int length)
-        {
-            return networkStream.Read(buffer, offset, length);
-        }
+        public override int Read(byte[] buffer, int offset, int length) => networkStream.Read(buffer, offset, length);
 
-        public override void Write(byte[] buffer, int offset, int length)
-        {
-            networkStream.Write(buffer, offset, length);
-        }
+        public override void Write(byte[] buffer, int offset, int length) => networkStream.Write(buffer, offset, length);
 
-        public override void Flush()
-        {
-            networkStream.Flush();
-        }
+        public override void Flush() => networkStream.Flush();
 
-        public override void SetLength(long length)
-        {
-            networkStream.SetLength(length);
-        }
+        public override void SetLength(long length) => networkStream.SetLength(length);
 
-        public override long Seek(long position, SeekOrigin origin)
-        {
-            return networkStream.Seek(position, origin);
-        }
+        public override long Seek(long position, SeekOrigin origin) => networkStream.Seek(position, origin);
     }
 }
 #endif

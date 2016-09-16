@@ -258,10 +258,10 @@ The [Redis Stats wiki](https://github.com/ServiceStack/ServiceStack.Redis/wiki/R
 
 To improve the resilience of client connections, `RedisClient` will transparently retry failed 
 Redis operations due to Socket and I/O Exceptions in an exponential backoff starting from 
-**10ms** up until the `RetryTimeout` of **3000ms**. These defaults can be tweaked with:
+**10ms** up until the `RetryTimeout` of **10000ms**. These defaults can be tweaked with:
 
 ```csharp
-RedisConfig.DefaultRetryTimeout = 3000;
+RedisConfig.DefaultRetryTimeout = 10000;
 RedisConfig.BackOffMultiplier = 10;
 ```
 

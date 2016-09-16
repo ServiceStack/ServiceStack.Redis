@@ -590,11 +590,7 @@ namespace ServiceStack.Redis
                     }
 
                     Interlocked.Increment(ref RedisState.TotalRetryCount);
-#if NETSTANDARD1_3
-                    Task.Delay(GetBackOffMultiplier(++i)).Wait();
-#else
-                    Thread.Sleep(GetBackOffMultiplier(++i));
-#endif
+                    TaskUtils.Sleep(GetBackOffMultiplier(++i));
                 }
             }
         }
@@ -1262,13 +1258,7 @@ namespace ServiceStack.Redis
                 throw new ArgumentNullException("luaBody");
 
             byte[] buffer = Encoding.UTF8.GetBytes(luaBody);
-#if NETSTANDARD1_3
-            var sha1 = SHA1.Create();
-            return BitConverter.ToString(sha1.ComputeHash(buffer)).Replace("-", "");
-#else
-            var cryptoTransformSHA1 = new SHA1CryptoServiceProvider();
-            return BitConverter.ToString(cryptoTransformSHA1.ComputeHash(buffer)).Replace("-", "");
-#endif
+            return BitConverter.ToString(buffer.ToSha1Hash()).Replace("-", "");
         }
 
         public byte[] ScriptLoad(string luaBody)

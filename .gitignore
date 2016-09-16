@@ -37,6 +37,8 @@ App_Data/
 .vs/
 .vscode/
 *.lock.json
+*.nuget.props
+*.nuget.targets
 
 NuGet/
 NuGet.Signed/
