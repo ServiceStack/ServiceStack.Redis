@@ -16,6 +16,7 @@
           "Microsoft.CSharp": "4.0.1",
           "System.Reflection.Emit": "4.0.1",
           "System.Reflection.Extensions": "4.0.1",
+          "System.Linq.Expressions": "4.1.0",
           "System.Collections.Specialized": "4.0.1",
           "NETStandard.Library": "1.6.0"
         },
