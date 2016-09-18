@@ -1,6 +1,0 @@
-{
-    "projects": [
-       "../../src/ServiceStack.Redis.NetCore",
-       "ServiceStack.Common.Tests"
-    ]
-}

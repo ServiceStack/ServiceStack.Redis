@@ -23,10 +23,10 @@ echo replace AssemblyFileVersion
 find ./src -type f -name "AssemblyInfo.cs" -exec sed -i "s/AssemblyFileVersion(\"[^\"]\+\")/AssemblyFileVersion(\"${Version}\")/g" {} +
 
 echo replace project.json
-sed -i "s/\"version\": \"[^\"]\+\"/\"version\": \"${Version}\"/g" ./src/ServiceStack.Redis.NetCore/ServiceStack.Text/project.json
-sed -i "s/\"version\": \"[^\"]\+\"/\"version\": \"${Version}\"/g" ./src/ServiceStack.Redis.NetCore/ServiceStack.Redis/project.json
-sed -i "s/\"version\": \"[^\"]\+\"/\"version\": \"${Version}\"/g" ./src/ServiceStack.Redis.NetCore/ServiceStack.Interfaces/project.json
-sed -i "s/\"version\": \"[^\"]\+\"/\"version\": \"${Version}\"/g" ./src/ServiceStack.Redis.NetCore/ServiceStack.Common/project.json
+sed -i "s/\"version\": \"[^\"]\+\"/\"version\": \"${Version}\"/g" ./src/ServiceStack.Text/project.json
+sed -i "s/\"version\": \"[^\"]\+\"/\"version\": \"${Version}\"/g" ./src/ServiceStack.Redis/project.json
+sed -i "s/\"version\": \"[^\"]\+\"/\"version\": \"${Version}\"/g" ./src/ServiceStack.Interfaces/project.json
+sed -i "s/\"version\": \"[^\"]\+\"/\"version\": \"${Version}\"/g" ./src/ServiceStack.Common/project.json
 
 echo replace package
 find ./NuGet.Core -type f -name "*.nuspec" -exec sed -i "s/<version>[^<]\+/<version>${PackageVersion}/g" {} +
@@ -36,7 +36,7 @@ find ./NuGet.Core -type f -name "*.nuspec" -exec sed -i "s/\"ServiceStack.Common
 
 
 #restore packages
-#(cd ./src/ServiceStack.Redis.NetCore && dotnet restore)
+#(cd ./src && dotnet restore)
 #(cd ./tests/ServiceStack.Redis.Tests.NetCore/ServiceStack.Redis.Tests && dotnet restore)
 
 #execute tests

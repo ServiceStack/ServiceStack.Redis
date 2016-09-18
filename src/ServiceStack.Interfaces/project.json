@@ -2,17 +2,12 @@
   "configurations": {
     "Debug": {
       "buildOptions": {
-        "define": [
-          "DEBUG",
-          "TRACE"
-        ]
+        "define": ["DEBUG", "TRACE"]
       }
     },
     "Release": {
       "buildOptions": {
-        "define": [
-          "TRACE"
-        ],
+        "define": ["TRACE"],
         "optimize": true
       }
     }
@@ -21,13 +16,11 @@
     "NETStandard.Library": "1.6.0"
   },
   "frameworks": {
-    "netstandard1.1": {
-      "dependencies": {},
-      "bin": {
-        "assembly": "../../lib/netcore/ServiceStack.Interfaces.dll",
-        "pdb": "../../lib/netcore/ServiceStack.Interfaces.pdb"
-      }
-    }
+    "netstandard1.1": { 
+        "dependencies" : {
+         },
+	"bin" : { "assembly":"../../lib/netstandard1.1/ServiceStack.Interfaces.dll", "pdb" : "../../lib/netstandard1.1/ServiceStack.Interfaces.pdb" }
+     }
   },
   "version": "1.0.0"
 }
