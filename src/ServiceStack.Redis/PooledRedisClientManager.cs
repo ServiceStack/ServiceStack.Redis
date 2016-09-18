@@ -34,7 +34,7 @@ namespace ServiceStack.Redis
         private const string PoolTimeoutError =
             "Redis Timeout expired. The timeout period elapsed prior to obtaining a connection from the pool. This may have occurred because all pooled connections were in use.";
 
-        protected readonly int PoolSizeMultiplier = 10;
+        protected readonly int PoolSizeMultiplier = 20;
         public int RecheckPoolAfterMs = 100;
         public int? PoolTimeout { get; set; }
         public int? ConnectTimeout { get; set; }
@@ -125,7 +125,7 @@ namespace ServiceStack.Redis
 
             RedisResolver = new RedisResolver(masters, slaves);
 
-            this.PoolSizeMultiplier = poolSizeMultiplier ?? 10;
+            this.PoolSizeMultiplier = poolSizeMultiplier ?? 20;
 
             this.Config = config ?? new RedisClientManagerConfig
             {
