@@ -1,3 +1,7 @@
+# This page has moved to [docs.servicestack.net/netcore-redis.html](http://docs.servicestack.net/netcore-redis.html)
+
+---
+
 # Using ServiceStack.Redis on .NET Core
 
 This guide shows how to create and execute .NET Core console application which
