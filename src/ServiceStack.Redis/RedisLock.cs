@@ -15,7 +15,7 @@ namespace ServiceStack.Redis
             this.redisClient = redisClient;
             this.key = key;
 
-            ExecExtensions.RetryUntilTrue(
+            ExecUtils.RetryUntilTrue(
                 () =>
                     {
                         //This pattern is taken from the redis command for SETNX http://redis.io/commands/setnx
