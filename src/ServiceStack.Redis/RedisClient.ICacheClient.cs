@@ -54,12 +54,12 @@ namespace ServiceStack.Redis
 
         //Looking up Dictionary<Type,bool> for type is faster than HashSet<Type>.
         private static Dictionary<Type, bool> integralTypes = new Dictionary<Type, bool> {
-            { typeof(byte), true },
+            { typeof(byte), true},
             { typeof(sbyte), true},
             { typeof(short), true},
             { typeof(ushort), true},
             { typeof(int), true},
-            { typeof(uint), true },
+            { typeof(uint), true},
             { typeof(long), true},
             { typeof(ulong), true},
         };

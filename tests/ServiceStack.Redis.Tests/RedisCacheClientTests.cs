@@ -72,7 +72,6 @@ namespace ServiceStack.Redis.Tests
             Assert.That(resultValue, Is.EquivalentTo(value));
         }
 
-#if !NETCORE_SUPPORT
         [Test]
         public void Can_Replace_By_Pattern()
         {
@@ -103,7 +102,6 @@ namespace ServiceStack.Redis.Tests
             result2 = cacheClient.Get<string>("string1");
             Assert.That(result2, Is.Null);
         }
-#endif
 
         [Test]
         public void Can_GetTimeToLive()

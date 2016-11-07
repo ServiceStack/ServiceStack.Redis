@@ -26,13 +26,11 @@ namespace ServiceStack.Redis.Tests
         [TestFixtureSetUp]
         public void TestFixtureSetUp()
         {
-#if !NETCORE_SUPPORT
             var settings = new TextFileSettings("~/azureconfig.txt".MapProjectPath());
             Host = settings.GetString("Host");
             Port = settings.Get("Port", 6379);
             Password = settings.GetString("Password");
             connectionString = "{0}@{1}".Fmt(Password, Host);
-#endif
         }
 
         [Test]
