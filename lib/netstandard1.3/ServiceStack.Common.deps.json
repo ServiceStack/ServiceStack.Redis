@@ -7,7 +7,7 @@
   "targets": {
     ".NETStandard,Version=v1.3": {},
     ".NETStandard,Version=v1.3/": {
-      "ServiceStack.Common/1.0.4.0": {
+      "ServiceStack.Common/1.0.27.0": {
         "dependencies": {
           "System.Dynamic.Runtime": "4.0.11",
           "System.Data.Common": "4.1.0",
@@ -17,8 +17,8 @@
           "System.Net.Security": "4.0.0",
           "System.Reflection.TypeExtensions": "4.1.0",
           "NETStandard.Library": "1.6.0",
-          "ServiceStack.Interfaces": "1.0.4.0",
-          "ServiceStack.Text": "1.0.4.0"
+          "ServiceStack.Interfaces": "1.0.27.0",
+          "ServiceStack.Text": "1.0.27.0"
         },
         "runtime": {
           "ServiceStack.Common.dll": {}
@@ -758,7 +758,7 @@
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
         }
       },
-      "ServiceStack.Interfaces/1.0.4.0": {
+      "ServiceStack.Interfaces/1.0.27.0": {
         "dependencies": {
           "System.Runtime": "4.1.0",
           "System.Runtime.Serialization.Primitives": "4.1.1",
@@ -768,7 +768,7 @@
           "ServiceStack.Interfaces.dll": {}
         }
       },
-      "ServiceStack.Text/1.0.4.0": {
+      "ServiceStack.Text/1.0.27.0": {
         "dependencies": {
           "NETStandard.Library": "1.6.0"
         },
@@ -779,7 +779,7 @@
     }
   },
   "libraries": {
-    "ServiceStack.Common/1.0.4.0": {
+    "ServiceStack.Common/1.0.27.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -1124,12 +1124,12 @@
       "serviceable": true,
       "sha512": "sha512-6/N/0n96EO8HMq240C9ooEAEPIS96E5BPbQYeZ6L7kxqpevIoUAfHuljhGMvfY2sWJ9bPtR7DdVLTFZ3bz60YA=="
     },
-    "ServiceStack.Interfaces/1.0.4.0": {
+    "ServiceStack.Interfaces/1.0.27.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "ServiceStack.Text/1.0.4.0": {
+    "ServiceStack.Text/1.0.27.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
