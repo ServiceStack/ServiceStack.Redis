@@ -52,10 +52,22 @@ namespace ServiceStack.Redis
             );
         }
 
+        //Looking up Dictionary<Type,bool> for type is faster than HashSet<Type>.
+        private static Dictionary<Type, bool> integralTypes = new Dictionary<Type, bool> {
+            { typeof(byte), true },
+            { typeof(sbyte), true},
+            { typeof(short), true},
+            { typeof(ushort), true},
+            { typeof(int), true},
+            { typeof(uint), true },
+            { typeof(long), true},
+            { typeof(ulong), true},
+        };
+
         private static byte[] ToBytes<T>(T value)
         {
             var bytesValue = value as byte[];
-            if (bytesValue == null && !Equals(value, default(T)))
+            if (bytesValue == null && (integralTypes.ContainsKey(typeof(T)) || !Equals(value, default(T))))
                 bytesValue = value.ToJson().ToUtf8Bytes();
             return bytesValue;
         }

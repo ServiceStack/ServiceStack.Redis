@@ -124,5 +124,16 @@ namespace ServiceStack.Redis.Tests
             ttl = cacheClient.GetTimeToLive(key);
             Assert.That(ttl, Is.Null);
         }
+
+        [Test]
+        public void Can_increment_and_reset_values()
+        {
+            using (var client = new RedisManagerPool(TestConfig.SingleHost).GetCacheClient())
+            {
+                Assert.That(client.Increment("incr:counter", 10), Is.EqualTo(10));
+                client.Set("incr:counter", 0);
+                Assert.That(client.Increment("incr:counter", 10), Is.EqualTo(10));
+            }
+        }
     }
 }
