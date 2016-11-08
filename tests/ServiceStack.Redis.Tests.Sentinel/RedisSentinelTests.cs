@@ -3,7 +3,6 @@ using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Logging;
 using ServiceStack.Text;
-using Timer = System.Timers.Timer;
 
 namespace ServiceStack.Redis.Tests.Sentinel
 {
@@ -160,7 +159,8 @@ namespace ServiceStack.Redis.Tests.Sentinel
             }
         }
 
-        [Ignore, Test]
+        [Test]
+        [Ignore("Long running test")]
         public void Run_sentinel_for_10_minutes()
         {
             ILog log = LogManager.GetLogger(GetType());
@@ -173,12 +173,7 @@ namespace ServiceStack.Redis.Tests.Sentinel
 
                 using (var redisManager = sentinel.Start())
                 {
-                    var aTimer = new Timer
-                    {
-                        Interval = 1000,
-                        Enabled = true
-                    };
-                    aTimer.Elapsed += (sender, args) =>
+                    var aTimer = new Timer((state) =>
                     {
                         "Incrementing key".Print();
 
@@ -197,7 +192,7 @@ namespace ServiceStack.Redis.Tests.Sentinel
                             var value = redis.GetValue(key);
                             log.InfoFormat("{0} = {1}", key, value);
                         }
-                    };
+                    }, null, 0, 1000);
                 }
             }
 
