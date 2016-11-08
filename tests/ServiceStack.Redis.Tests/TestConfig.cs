@@ -13,10 +13,10 @@ namespace ServiceStack.Redis.Tests
 
         public const bool IgnoreLongTests = true;
 
-        public static string SingleHost
-        {
-            get { return Environment.GetEnvironmentVariable("CI_REDIS") ?? "localhost"; }
-        }
+        public static string SingleHost => Environment.GetEnvironmentVariable("CI_REDIS") ?? "localhost";
+
+        public static string GeoHost => Environment.GetEnvironmentVariable("CI_REDIS") ?? "10.0.0.121";
+
         public static readonly string[] MasterHosts = new[] { "localhost" };
         public static readonly string[] SlaveHosts = new[] { "localhost" };
 

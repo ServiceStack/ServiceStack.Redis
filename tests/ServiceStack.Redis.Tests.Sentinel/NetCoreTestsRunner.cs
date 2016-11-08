@@ -7,7 +7,7 @@ using System;
 using System.Globalization;
 using System.Threading;
 
-namespace NUnitLite.Tests
+namespace ServiceStack.Redis.Tests.Sentinel
 {
     public class NetCoreTestsRunner
     {

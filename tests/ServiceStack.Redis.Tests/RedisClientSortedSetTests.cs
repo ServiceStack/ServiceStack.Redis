@@ -264,8 +264,10 @@ namespace ServiceStack.Redis.Tests
         public void Can_WorkInSortedSetUnderDifferentCulture()
         {
 #if NETCORE
+            var prevCulture = CultureInfo.CurrentCulture;
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
 #else
+            var prevCulture = Thread.CurrentThread.CurrentCulture;
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("ru-RU");
 #endif
             Redis.AddItemToSortedSet(SetId, "key", 123.22);
@@ -273,6 +275,12 @@ namespace ServiceStack.Redis.Tests
             var map = Redis.GetAllWithScoresFromSortedSet(SetId);
 
             Assert.AreEqual(123.22, map["key"]);
+
+#if NETCORE
+            CultureInfo.CurrentCulture = prevCulture;
+#else
+            Thread.CurrentThread.CurrentCulture = prevCulture;
+#endif
         }
 
 

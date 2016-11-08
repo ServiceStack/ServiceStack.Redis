@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETStandard,Version=v1.1/",
-    "signature": "7b7e0ae4297f8834538c98cdb8bf0e7073ea7069"
+    "signature": "100cd9b2b7dc75b739002d2cebfe3dff4cee6c0d"
   },
   "compilationOptions": {},
   "targets": {
@@ -15,7 +15,10 @@
           "System.Dynamic.Runtime": "4.0.11",
           "Microsoft.CSharp": "4.0.1",
           "System.Reflection.Emit": "4.0.1",
+          "System.Reflection.Emit.LightWeight": "4.0.1",
+          "System.Reflection.Extensions": "4.0.1",
           "System.Linq.Expressions": "4.1.0",
+          "System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
           "NETStandard.Library": "1.6.0"
         },
         "runtime": {
@@ -198,6 +201,14 @@
       "System.Reflection.Emit.ILGeneration/4.0.1": {
         "dependencies": {
           "System.Reflection": "4.1.0",
+          "System.Reflection.Primitives": "4.0.1",
+          "System.Runtime": "4.1.0"
+        }
+      },
+      "System.Reflection.Emit.LightWeight/4.0.1": {
+        "dependencies": {
+          "System.Reflection": "4.1.0",
+          "System.Reflection.Emit.ILGeneration": "4.0.1",
           "System.Reflection.Primitives": "4.0.1",
           "System.Runtime": "4.1.0"
         }
@@ -447,6 +458,11 @@
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-AVE4YgaaxkscGzC/nCZE10Ca5cB3p0tKUAwshy8svDqDtnEMD4R6I4hLNw1d3tXuXxKzp+HWsJUdc6gfj9Ofvg=="
+    },
+    "System.Reflection.Emit.LightWeight/4.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-omS9h4+XfJlC6+GuARjz4YJYjOwdftLUfu1YfDxqBQD4oBbpsxgC/gtU1ZhsLMIwF7x0k4v188WHhNNNbfs55w=="
     },
     "System.Reflection.Extensions/4.0.1": {
       "type": "package",

@@ -72,7 +72,6 @@ namespace ServiceStack.Redis.Tests
             Assert.That(resultValue, Is.EquivalentTo(value));
         }
 
-#if !NETCORE_SUPPORT
         [Test]
         public void Can_Replace_By_Pattern()
         {
@@ -103,7 +102,6 @@ namespace ServiceStack.Redis.Tests
             result2 = cacheClient.Get<string>("string1");
             Assert.That(result2, Is.Null);
         }
-#endif
 
         [Test]
         public void Can_GetTimeToLive()
@@ -123,6 +121,17 @@ namespace ServiceStack.Redis.Tests
             cacheClient.Remove(key);
             ttl = cacheClient.GetTimeToLive(key);
             Assert.That(ttl, Is.Null);
+        }
+
+        [Test]
+        public void Can_increment_and_reset_values()
+        {
+            using (var client = new RedisManagerPool(TestConfig.SingleHost).GetCacheClient())
+            {
+                Assert.That(client.Increment("incr:counter", 10), Is.EqualTo(10));
+                client.Set("incr:counter", 0);
+                Assert.That(client.Increment("incr:counter", 10), Is.EqualTo(10));
+            }
         }
     }
 }

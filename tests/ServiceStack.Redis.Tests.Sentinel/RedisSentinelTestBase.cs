@@ -3,12 +3,15 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using ServiceStack.Text;
+#if NETCORE
+using System.Runtime.InteropServices;
+#endif
 
 namespace ServiceStack.Redis.Tests.Sentinel
 {
     public abstract class RedisSentinelTestBase
     {
-        public const bool DisableLocalServers = true;
+        public const bool DisableLocalServers = false;
 
         public const string MasterName = "mymaster";
         public const string GCloudMasterName = "master";
@@ -74,25 +77,58 @@ namespace ServiceStack.Redis.Tests.Sentinel
 
         public static void StartRedisServer(int port)
         {
+            var exePath = new FileInfo("~/../../src/sentinel/redis/redis-server.exe".MapProjectPath()).FullName;
+#if NETCORE
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                exePath = "redis-server";
+#endif
+            var configDir = "~/../../src/sentinel/redis-{0}/".Fmt(port).MapProjectPath();
+            var configPath = Path.Combine(configDir, "redis.conf");
+
+            File.WriteAllText(configPath,
+                File.ReadAllText(Path.Combine(configDir,"redis.windows.conf")).Replace(
+                    @"C:\\src\\ServiceStack.Redis\\src\\sentinel\\redis-{0}".Fmt(port),
+                    configDir.Replace(@"\", @"\\")
+                )
+            );
+
             var pInfo = new ProcessStartInfo
             {
-                FileName = new FileInfo(@"..\..\..\..\src\sentinel\redis\redis-server.exe").FullName,
-                Arguments = new FileInfo(@"..\..\..\..\src\sentinel\redis-{0}\redis.windows.conf".Fmt(port)).FullName,
+                FileName = exePath,
+                Arguments = new FileInfo(configPath).FullName,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
 
+            var result = Process.Start(pInfo);
+
             ThreadPool.QueueUserWorkItem(state => Process.Start(pInfo));
         }
 
         public static void StartRedisSentinel(int port)
         {
+            var exePath = new FileInfo("~/../../src/sentinel/redis/redis-server.exe".MapProjectPath()).FullName;
+#if NETCORE
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                exePath = "redis-server";
+#endif
+            var configDir = "~/../../src/sentinel/redis-{0}/".Fmt(port).MapProjectPath();
+            var configPath = Path.Combine(configDir, "redis.sentinel.conf");
+
+            File.WriteAllText(configPath,
+                File.ReadAllText(Path.Combine(configDir,"sentinel.conf")).Replace(
+                    @"C:\\src\\ServiceStack.Redis\\src\\sentinel\\redis-{0}".Fmt(port),
+                    configDir.Replace(@"\", @"\\")
+                )
+            );
+
+
             var pInfo = new ProcessStartInfo
             {
-                FileName = new FileInfo(@"..\..\..\..\src\sentinel\redis\redis-server.exe").FullName,
-                Arguments = new FileInfo(@"..\..\..\..\src\sentinel\redis-{0}\sentinel.conf".Fmt(port)).FullName + " --sentinel",
+                FileName = exePath,
+                Arguments = new FileInfo(configPath).FullName + " --sentinel",
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
                 UseShellExecute = false,

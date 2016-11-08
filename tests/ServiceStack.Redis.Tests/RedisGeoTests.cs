@@ -4,14 +4,16 @@ using ServiceStack.Text;
 namespace ServiceStack.Redis.Tests
 {
     [TestFixture]
+#if !NETCORE
     [Explicit, Ignore("CI requires redis-server v3.2.0")]
+#endif
     public class RedisGeoTests
     {
         private readonly RedisClient redis;
 
         public RedisGeoTests()
         {
-            redis = new RedisClient("10.0.0.121");
+            redis = new RedisClient(TestConfig.GeoHost);
         }
 
         [TestFixtureTearDown]
