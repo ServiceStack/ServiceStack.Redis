@@ -2,13 +2,14 @@
   "configurations": {
     "Debug": {
       "buildOptions": {
-        "define": ["DEBUG", "TRACE"]
+        "define": [ "DEBUG", "TRACE" ]
       }
     },
     "Release": {
       "buildOptions": {
-        "define": ["TRACE"],
-        "optimize": true
+        "define": [ "TRACE" ],
+        "optimize": true,
+        "xmlDoc": true
       }
     }
   },
@@ -29,7 +30,7 @@
             "System.Threading.Thread": "4.0.0"
          }
      }
-   
+
   },
   "version": "1.0.0"
 }
