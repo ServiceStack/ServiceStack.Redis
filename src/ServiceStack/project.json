@@ -2,13 +2,14 @@
   "configurations": {
     "Debug": {
       "buildOptions": {
-        "define": ["DEBUG", "TRACE"]
+        "define": [ "DEBUG", "TRACE" ]
       }
     },
     "Release": {
       "buildOptions": {
-        "define": ["TRACE"],
-        "optimize": true
+        "define": [ "TRACE" ],
+        "optimize": true,
+        "xmlDoc": true
       }
     }
   },
@@ -16,12 +17,12 @@
     "NETStandard.Library": "1.6.0"
   },
   "frameworks": {
-    "netstandard1.6": { 
-      	"bin" : { 
-          "assembly":"../../lib/tests/netstandard1.6/ServiceStack.dll",
-          "pdb" : "../../lib/tests/netstandard1.6/ServiceStack.pdb"
-        }
-     }
+    "netstandard1.6": {
+      "bin": {
+        "assembly": "../../lib/tests/netstandard1.6/ServiceStack.dll",
+        "pdb": "../../lib/tests/netstandard1.6/ServiceStack.pdb"
+      }
+    }
   },
   "version": "1.0.0"
 }
