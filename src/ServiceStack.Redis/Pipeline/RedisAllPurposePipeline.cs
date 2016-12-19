@@ -35,14 +35,24 @@ namespace ServiceStack.Redis
         {
             // flush send buffers
             RedisClient.FlushAndResetSendBuffer();
-
-            //receive expected results
-            foreach (var queuedCommand in QueuedCommands)
+            
+            try
             {
-                queuedCommand.ProcessResult();
+                //receive expected results
+                foreach (var queuedCommand in QueuedCommands)
+                {
+                    queuedCommand.ProcessResult();
+                }
             }
+            catch (Exception)
+            {
+                // The connection cannot be reused anymore. All queued commands have been sent to redis. Even if a new command is executed, the next response read from the
+                // network stream can be the response of one of the queued commands, depending on when the exception occurred. This response would be invalid for the new command.
+                RedisClient.DisposeConnection();
+                throw;
+            }
+            
             ClosePipeline();
-
         }
 
         protected void Execute()
