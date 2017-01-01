@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 
 namespace ServiceStack.Redis
 {
@@ -15,7 +16,9 @@ namespace ServiceStack.Redis
             for (var i = 0; i < result.Results.Count; i += 2)
             {
                 var key = result.Results[i];
-                var score = double.Parse(result.Results[i + 1].FromUtf8Bytes());
+                var score = double.Parse(result.Results[i + 1].FromUtf8Bytes(),
+                                         NumberStyles.Float,
+                                         CultureInfo.InvariantCulture);
                 to[key.FromUtf8Bytes()] = score;
             }
             return to;
