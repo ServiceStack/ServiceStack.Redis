@@ -16,9 +16,7 @@ namespace ServiceStack.Redis
             for (var i = 0; i < result.Results.Count; i += 2)
             {
                 var key = result.Results[i];
-                var score = double.Parse(result.Results[i + 1].FromUtf8Bytes(),
-                                         NumberStyles.Float,
-                                         CultureInfo.InvariantCulture);
+                var score = result.Results[i + 1].ToDouble();
                 to[key.FromUtf8Bytes()] = score;
             }
             return to;

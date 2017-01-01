@@ -2236,17 +2236,15 @@ namespace ServiceStack.Redis
                     break;
 
                 var entry = data.Children[i];
-                if (entry.Children.Count == 0)
+
+                var children = entry.Children;
+                if (children.Count == 0)
                     continue;
 
                 to.Add(new RedisGeo
                 {
-                    Longitude = double.Parse(entry.Children[0].Data.FromUtf8Bytes(),
-                                             NumberStyles.Float,
-                                             CultureInfo.InvariantCulture),
-                    Latitude  = double.Parse(entry.Children[1].Data.FromUtf8Bytes(),
-                                             NumberStyles.Float,
-                                             CultureInfo.InvariantCulture),
+                    Longitude = children[0].ToDouble(),
+                    Latitude  = children[1].ToDouble(),
                     Member = members[i],
                 });
             }
@@ -2307,24 +2305,15 @@ namespace ServiceStack.Redis
                     var i = 0;
                     var result = new RedisGeoResult { Unit = unit, Member = child.Children[i++].Data.FromUtf8Bytes() };
 
-                    if (withDist)
-                        result.Distance = double.Parse(child.Children[i++].Data.FromUtf8Bytes(),
-                                                       NumberStyles.Float,
-                                                       CultureInfo.InvariantCulture);
+                    if (withDist) result.Distance = child.Children[i++].ToDouble();
 
-                    if (withHash)
-                        result.Hash = long.Parse(child.Children[i++].Data.FromUtf8Bytes(),
-                                                 NumberStyles.Integer,
-                                                 CultureInfo.InvariantCulture);
+                    if (withHash) result.Hash = child.Children[i++].ToInt64();
 
                     if (withCoords)
                     {
-                        result.Longitude = double.Parse(child.Children[i].Children[0].Data.FromUtf8Bytes(),
-                                                        NumberStyles.Float,
-                                                        CultureInfo.InvariantCulture);
-                        result.Latitude  = double.Parse(child.Children[i].Children[1].Data.FromUtf8Bytes(),
-                                                        NumberStyles.Float,
-                                                        CultureInfo.InvariantCulture);
+                        var children = child.Children[i].Children;
+                        result.Longitude = children[0].ToDouble();
+                        result.Latitude  = children[1].ToDouble();
                     }
 
                     to.Add(result);
@@ -2386,24 +2375,15 @@ namespace ServiceStack.Redis
                     var i = 0;
                     var result = new RedisGeoResult { Unit = unit, Member = child.Children[i++].Data.FromUtf8Bytes() };
 
-                    if (withDist)
-                        result.Distance = double.Parse(child.Children[i++].Data.FromUtf8Bytes(),
-                                                       NumberStyles.Float,
-                                                       CultureInfo.InvariantCulture);
+                    if (withDist) result.Distance = child.Children[i++].ToDouble();
 
-                    if (withHash)
-                        result.Hash = long.Parse(child.Children[i++].Data.FromUtf8Bytes(),
-                                                 NumberStyles.Integer,
-                                                 CultureInfo.InvariantCulture);
+                    if (withHash) result.Hash = child.Children[i++].ToInt64();
 
                     if (withCoords)
                     {
-                        result.Longitude = double.Parse(child.Children[i].Children[0].Data.FromUtf8Bytes(),
-                                                        NumberStyles.Float,
-                                                        CultureInfo.InvariantCulture);
-                        result.Latitude  = double.Parse(child.Children[i].Children[1].Data.FromUtf8Bytes(),
-                                                        NumberStyles.Float,
-                                                        CultureInfo.InvariantCulture);
+                        var children = child.Children[i].Children;
+                        result.Longitude = children[0].ToDouble();
+                        result.Latitude  = children[1].ToDouble();
                     }
 
                     to.Add(result);

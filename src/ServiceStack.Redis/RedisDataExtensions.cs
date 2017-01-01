@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 
 namespace ServiceStack.Redis
 {
@@ -19,28 +20,28 @@ namespace ServiceStack.Redis
             return to;
         }
 
-        public static string GetResult(this RedisText from)
-        {
-            return from.Text;
-        }
+        public static double ToDouble(this RedisData data)
+            => double.Parse(data.Data.FromUtf8Bytes(),
+                            NumberStyles.Float,
+                            CultureInfo.InvariantCulture);
 
-        public static T GetResult<T>(this RedisText from)
-        {
-            return from.Text.FromJson<T>();
-        }
+        public static long ToInt64(this RedisData data)
+            => long.Parse(data.Data.FromUtf8Bytes(),
+                          NumberStyles.Integer,
+                          CultureInfo.InvariantCulture);
+
+        public static string GetResult(this RedisText from) => from.Text;
+
+        public static T GetResult<T>(this RedisText from) => from.Text.FromJson<T>();
 
         public static List<string> GetResults(this RedisText from)
-        {
-            return from.Children == null
-                ? new List<string>()
-                : from.Children.ConvertAll(x => x.Text);
-        }
+            => from.Children == null
+               ? new List<string>()
+               : from.Children.ConvertAll(x => x.Text);
 
         public static List<T> GetResults<T>(this RedisText from)
-        {
-            return from.Children == null
-                ? new List<T>()
-                : from.Children.ConvertAll(x => x.Text.FromJson<T>());
-        }
+            => from.Children == null
+               ? new List<T>()
+               : from.Children.ConvertAll(x => x.Text.FromJson<T>());
     }
 }
