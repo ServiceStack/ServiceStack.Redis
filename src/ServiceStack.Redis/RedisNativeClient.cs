@@ -27,7 +27,7 @@ namespace ServiceStack.Redis
     /// <summary>
     /// This class contains all the common operations for the RedisClient.
     /// The client contains a 1:1 mapping of c# methods to redis operations of the same name.
-    /// 
+    ///
     /// Not threadsafe use a pooled manager
     /// </summary>
     public partial class RedisNativeClient
@@ -105,7 +105,7 @@ namespace ServiceStack.Redis
         private TimeSpan retryTimeout;
         public int RetryTimeout
         {
-            get { return (int) retryTimeout.TotalMilliseconds; }
+            get { return (int)retryTimeout.TotalMilliseconds; }
             set { retryTimeout = TimeSpan.FromMilliseconds(value); }
         }
         public int RetryCount { get; set; }
@@ -897,9 +897,9 @@ namespace ServiceStack.Redis
         public long ClientKill(string addr = null, string id = null, string type = null, string skipMe = null)
         {
             var cmdWithArgs = new List<byte[]>
-           	{
-           		Commands.Client, Commands.Kill,
-           	};
+               {
+                   Commands.Client, Commands.Kill,
+               };
 
             if (addr != null)
             {
@@ -1258,9 +1258,9 @@ namespace ServiceStack.Redis
         public byte[][] Sort(string listOrSetId, SortOptions sortOptions)
         {
             var cmdWithArgs = new List<byte[]>
-           	{
-           		Commands.Sort, listOrSetId.ToUtf8Bytes()
-           	};
+               {
+                   Commands.Sort, listOrSetId.ToUtf8Bytes()
+               };
 
             if (sortOptions.SortPattern != null)
             {
@@ -1702,9 +1702,9 @@ namespace ServiceStack.Redis
                 throw new ArgumentNullException("setId");
 
             var cmdWithArgs = new List<byte[]>
-           	{
-           		commandBytes, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes()
-           	};
+               {
+                   commandBytes, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes()
+               };
 
             if (withScores)
             {
@@ -1741,9 +1741,9 @@ namespace ServiceStack.Redis
                 throw new ArgumentNullException("setId");
 
             var cmdWithArgs = new List<byte[]>
-           	{
-           		commandBytes, setId.ToUtf8Bytes(), min.ToFastUtf8Bytes(), max.ToFastUtf8Bytes()
-           	};
+               {
+                   commandBytes, setId.ToUtf8Bytes(), min.ToFastUtf8Bytes(), max.ToFastUtf8Bytes()
+               };
 
             if (skip.HasValue || take.HasValue)
             {
@@ -1767,9 +1767,9 @@ namespace ServiceStack.Redis
                 throw new ArgumentNullException("setId");
 
             var cmdWithArgs = new List<byte[]>
-           	{
-           		commandBytes, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes()
-           	};
+               {
+                   commandBytes, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes()
+               };
 
             if (skip.HasValue || take.HasValue)
             {
@@ -1937,9 +1937,9 @@ namespace ServiceStack.Redis
                 throw new ArgumentNullException("setId");
 
             var cmdWithArgs = new List<byte[]>
-           	{
-           		Commands.ZRangeByLex, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes()
-           	};
+               {
+                   Commands.ZRangeByLex, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes()
+               };
 
             if (skip.HasValue || take.HasValue)
             {
@@ -2236,13 +2236,15 @@ namespace ServiceStack.Redis
                     break;
 
                 var entry = data.Children[i];
-                if (entry.Children.Count == 0)
+
+                var children = entry.Children;
+                if (children.Count == 0)
                     continue;
 
                 to.Add(new RedisGeo
                 {
-                    Longitude = double.Parse(entry.Children[0].Data.FromUtf8Bytes()),
-                    Latitude = double.Parse(entry.Children[1].Data.FromUtf8Bytes()),
+                    Longitude = children[0].ToDouble(),
+                    Latitude  = children[1].ToDouble(),
                     Member = members[i],
                 });
             }
@@ -2303,16 +2305,15 @@ namespace ServiceStack.Redis
                     var i = 0;
                     var result = new RedisGeoResult { Unit = unit, Member = child.Children[i++].Data.FromUtf8Bytes() };
 
-                    if (withDist)
-                        result.Distance = double.Parse(child.Children[i++].Data.FromUtf8Bytes());
+                    if (withDist) result.Distance = child.Children[i++].ToDouble();
 
-                    if (withHash)
-                        result.Hash = long.Parse(child.Children[i++].Data.FromUtf8Bytes());
+                    if (withHash) result.Hash = child.Children[i++].ToInt64();
 
                     if (withCoords)
                     {
-                        result.Longitude = double.Parse(child.Children[i].Children[0].Data.FromUtf8Bytes());
-                        result.Latitude = double.Parse(child.Children[i].Children[1].Data.FromUtf8Bytes());
+                        var children = child.Children[i].Children;
+                        result.Longitude = children[0].ToDouble();
+                        result.Latitude  = children[1].ToDouble();
                     }
 
                     to.Add(result);
@@ -2322,7 +2323,7 @@ namespace ServiceStack.Redis
             return to;
         }
 
-        public List<RedisGeoResult> GeoRadiusByMember(string key, string member, double radius, string unit, 
+        public List<RedisGeoResult> GeoRadiusByMember(string key, string member, double radius, string unit,
             bool withCoords = false, bool withDist = false, bool withHash = false, int? count = null, bool? asc = null)
         {
             if (key == null)
@@ -2374,16 +2375,15 @@ namespace ServiceStack.Redis
                     var i = 0;
                     var result = new RedisGeoResult { Unit = unit, Member = child.Children[i++].Data.FromUtf8Bytes() };
 
-                    if (withDist)
-                        result.Distance = double.Parse(child.Children[i++].Data.FromUtf8Bytes());
+                    if (withDist) result.Distance = child.Children[i++].ToDouble();
 
-                    if (withHash)
-                        result.Hash = long.Parse(child.Children[i++].Data.FromUtf8Bytes());
+                    if (withHash) result.Hash = child.Children[i++].ToInt64();
 
                     if (withCoords)
                     {
-                        result.Longitude = double.Parse(child.Children[i].Children[0].Data.FromUtf8Bytes());
-                        result.Latitude = double.Parse(child.Children[i].Children[1].Data.FromUtf8Bytes());
+                        var children = child.Children[i].Children;
+                        result.Longitude = children[0].ToDouble();
+                        result.Latitude  = children[1].ToDouble();
                     }
 
                     to.Add(result);
