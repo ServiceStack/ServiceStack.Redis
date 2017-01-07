@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ServiceStack.Caching;
 
 namespace ServiceStack.Redis
@@ -212,7 +213,7 @@ namespace ServiceStack.Redis
         {
             using (var client = (RedisClient)GetClient())
             {
-                return client.GetKeysByPattern(pattern);
+                return client.GetKeysByPattern(pattern).ToList();
             }
         }
     }
