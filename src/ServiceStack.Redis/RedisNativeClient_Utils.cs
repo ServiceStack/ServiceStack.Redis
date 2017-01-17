@@ -234,8 +234,10 @@ namespace ServiceStack.Redis
 
         public bool IsSocketConnected()
         {
+            if (socket == null)
+                return false;
             var part1 = socket.Poll(1000, SelectMode.SelectRead);
-            var part2 = (socket.Available == 0);
+            var part2 = socket.Available == 0;
             return !(part1 & part2);
         }
 
