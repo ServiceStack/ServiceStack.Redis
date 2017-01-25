@@ -74,6 +74,11 @@
             Run custom filter after API Key is created
             </summary>
         </member>
+        <member name="P:ServiceStack.Auth.ApiKeyAuthProvider.SessionCacheDuration">
+            <summary>
+            Cache the User Session so it can be reused between subsequent API Key Requests
+            </summary>
+        </member>
         <member name="T:ServiceStack.Auth.JwtAuthProvider">
             <summary>
             Used to Issue and process JWT Tokens and registers ConvertSessionToToken Service to convert Sessions to JWT Tokens
@@ -1932,6 +1937,16 @@
             <param name="stateProvider"></param>
             <returns></returns>
         </member>
+        <member name="M:ServiceStack.FluentValidation.DefaultValidatorOptions.WithSeverity``2(ServiceStack.FluentValidation.IRuleBuilderOptions{``0,``1},ServiceStack.FluentValidation.Severity)">
+            <summary>
+            Specifies custom severity that should be stored alongside the validation message when validation fails for this rule.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="TProperty"></typeparam>
+            <param name="rule"></param>
+            <param name="severity"></param>
+            <returns></returns>
+        </member>
         <member name="T:ServiceStack.FluentValidation.CascadeMode">
             <summary>
             Specifies how rules should cascade when one fails.
@@ -1960,6 +1975,11 @@
         <member name="F:ServiceStack.FluentValidation.ApplyConditionTo.CurrentValidator">
             <summary>
             Applies the condition to the current validator only.
+            </summary>
+        </member>
+        <member name="T:ServiceStack.FluentValidation.Severity">
+            <summary>
+            Specifies the severity of a rule. 
             </summary>
         </member>
         <member name="T:ServiceStack.FluentValidation.InlineValidator`1">
@@ -2356,6 +2376,11 @@
             Custom state associated with the failure.
             </summary>
         </member>
+        <member name="P:ServiceStack.FluentValidation.Results.ValidationFailure.Severity">
+            <summary>
+            Custom severity level associated with the failure.
+            </summary>
+        </member>
         <member name="P:ServiceStack.FluentValidation.Results.ValidationFailure.PlaceholderValues">
             <summary>
             Placeholder values used for string substitution when building ErrorMessage
@@ -2471,17 +2496,17 @@
             Otherwise uses Resolve approach, which will throw an exception if resolution fails
             </summary>
         </member>
-        <member name="M:ServiceStack.Host.Cookies.AddPermanentCookie(System.String,System.String,System.Nullable{System.Boolean})">
+        <member name="M:ServiceStack.Host.NetCookies.AddPermanentCookie(System.String,System.String,System.Nullable{System.Boolean})">
             <summary>
             Sets a persistent cookie which never expires
             </summary>
         </member>
-        <member name="M:ServiceStack.Host.Cookies.AddSessionCookie(System.String,System.String,System.Nullable{System.Boolean})">
+        <member name="M:ServiceStack.Host.NetCookies.AddSessionCookie(System.String,System.String,System.Nullable{System.Boolean})">
             <summary>
             Sets a session cookie which expires after the browser session closes
             </summary>
         </member>
-        <member name="M:ServiceStack.Host.Cookies.DeleteCookie(System.String)">
+        <member name="M:ServiceStack.Host.NetCookies.DeleteCookie(System.String)">
             <summary>
             Deletes a specified cookie by setting its value to empty and expiration to -1 days
             </summary>
