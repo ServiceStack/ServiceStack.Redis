@@ -120,6 +120,13 @@ namespace ServiceStack.Redis
                     }
                     else
                     {
+#if NETSTANDARD1_3
+                        sslStream = new SslStream(networkStream,
+                            leaveInnerStreamOpen: false,
+                            userCertificateValidationCallback: RedisConfig.CertificateValidationCallback,
+                            userCertificateSelectionCallback: RedisConfig.CertificateSelectionCallback,
+                            encryptionPolicy: EncryptionPolicy.RequireEncryption);
+#else
                         var ctor = typeof(SslStream).GetAllConstructors()
                             .First(x => x.GetParameters().Length == 5);
 
@@ -133,6 +140,7 @@ namespace ServiceStack.Redis
                             RedisConfig.CertificateSelectionCallback,
                             policyValue,
                         });
+#endif                        
                     }
 
 #if NETSTANDARD1_3
