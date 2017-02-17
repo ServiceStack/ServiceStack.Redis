@@ -905,7 +905,7 @@ namespace ServiceStack.Redis
 
         public long ExecLuaShaAsInt(string sha1, params string[] args)
         {
-            return base.EvalShaInt(sha1, args.Length, args.ToMultiByteArray());
+            return base.EvalShaInt(sha1, 0, args.ToMultiByteArray());
         }
 
         public long ExecLuaShaAsInt(string sha1, string[] keys, string[] args)
