@@ -7,14 +7,14 @@ namespace ServiceStack.Redis
 {
     public sealed class BufferedStream : Stream
     {
-        NetworkStream networkStream;
+        Stream networkStream;
 
         public BufferedStream(Stream stream)
             : this(stream, 0) {}
 
         public BufferedStream(Stream stream, int bufferSize)
         {
-            networkStream = (NetworkStream)stream;
+            networkStream = stream;
         }
         public override bool CanRead => networkStream.CanRead;
 
