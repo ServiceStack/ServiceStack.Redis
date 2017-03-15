@@ -10,8 +10,6 @@
         C# Redis Client for the worlds fastest distributed NoSQL datastore. 
         Byte[], String and POCO Typed clients.
         Thread-Safe Basic and Pooled client managers included.
-
-        To revert back to earlier BSD v3, see: servicestack.net/download#v3
     </description>
     <projectUrl>https://github.com/ServiceStack/ServiceStack.Redis</projectUrl>
     <licenseUrl>https://servicestack.net/terms</licenseUrl>
