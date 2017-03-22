@@ -181,7 +181,7 @@ namespace ServiceStack.Redis
         {
             using (var client = GetClient())
             {
-                var redisClient = client as RedisClient;
+                var redisClient = client as IRemoveByPattern;
                 if (redisClient != null)
                 {
                     List<string> keys = redisClient.Keys(pattern).ToStringList();
@@ -200,7 +200,7 @@ namespace ServiceStack.Redis
         {
             using (var client = GetClient())
             {
-                var redisClient = client as RedisClient;
+                var redisClient = client as ICacheClientExtended;
                 if (redisClient != null)
                 {
                     return redisClient.GetTimeToLive(key);
@@ -211,7 +211,7 @@ namespace ServiceStack.Redis
 
         public IEnumerable<string> GetKeysByPattern(string pattern)
         {
-            using (var client = (RedisClient)GetClient())
+            using (var client = (ICacheClientExtended)GetClient())
             {
                 return client.GetKeysByPattern(pattern).ToList();
             }
