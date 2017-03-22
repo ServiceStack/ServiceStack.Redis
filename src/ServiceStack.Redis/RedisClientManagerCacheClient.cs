@@ -181,7 +181,7 @@ namespace ServiceStack.Redis
         {
             using (var client = GetClient())
             {
-                var redisClient = client as IRemoveByPattern;
+                var redisClient = client as RedisClient;
                 if (redisClient != null)
                 {
                     List<string> keys = redisClient.Keys(pattern).ToStringList();
