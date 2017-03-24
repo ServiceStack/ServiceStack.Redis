@@ -19,6 +19,7 @@ using System.Text;
 using ServiceStack.Redis.Generic;
 using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
+using ServiceStack.Caching;
 
 namespace ServiceStack.Redis
 {
@@ -30,7 +31,7 @@ namespace ServiceStack.Redis
     ///		 RedisClient.Sets => ICollection[string]
     /// </summary>
     public partial class RedisClient
-        : RedisNativeClient, IRedisClient
+        : RedisNativeClient, IRedisClient, IRemoveByPattern // IRemoveByPattern is implemented in this file.
     {
         public RedisClient()
         {
@@ -990,9 +991,9 @@ namespace ServiceStack.Redis
 
         public void RemoveByPattern(string pattern)
         {
-            List<string> keys = Keys(pattern).ToStringList();
-            if (keys.Count > 0)
-                Del(keys.ToArray());
+            var keys = Keys(pattern).ToStringArray();
+            if (keys.Length > 0)
+                Del(keys);
         }
 
         public void RemoveByRegex(string pattern)
@@ -1118,6 +1119,7 @@ namespace ServiceStack.Redis
                     return RedisServerRole.Unknown;
             }
         }
+        
     }
 
 }

@@ -181,19 +181,24 @@ namespace ServiceStack.Redis
         {
             using (var client = GetClient())
             {
-                var redisClient = client as RedisClient;
+                var redisClient = client as IRemoveByPattern;
                 if (redisClient != null)
                 {
-                    List<string> keys = redisClient.Keys(pattern).ToStringList();
-                    if (keys.Count > 0)
-                        redisClient.Del(keys.ToArray());
+                    redisClient.RemoveByPattern(pattern);
                 }
             }
         }
 
         public void RemoveByRegex(string pattern)
         {
-            RemoveByPattern(pattern.Replace(".*", "*").Replace(".+", "?"));
+            using (var client = GetClient())
+            {
+                var redisClient = client as IRemoveByPattern;
+                if (redisClient != null)
+                {
+                    redisClient.RemoveByRegex(pattern);
+                }
+            }
         }
 
         public TimeSpan? GetTimeToLive(string key)

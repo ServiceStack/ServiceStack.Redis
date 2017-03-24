@@ -28,7 +28,11 @@ namespace ServiceStack.Redis
     /// This class contains all the common operations for the RedisClient.
     /// The client contains a 1:1 mapping of c# methods to redis operations of the same name.
     ///
-    /// Not threadsafe use a pooled manager
+    /// Not threadsafe, use a pooled manager!
+    /// All redis calls on a single instances write to the same Socket.
+    /// If used in multiple threads (or async Tasks) at the same time you will find
+    /// that commands are not executed properly by redis and Servicestack wont be able to (json) serialize 
+    /// the data that comes back.
     /// </summary>
     public partial class RedisNativeClient
         : IRedisNativeClient

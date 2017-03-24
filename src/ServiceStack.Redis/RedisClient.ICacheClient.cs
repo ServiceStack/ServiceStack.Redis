@@ -20,7 +20,7 @@ using ServiceStack.Text;
 namespace ServiceStack.Redis
 {
     public partial class RedisClient
-        : ICacheClient, IRemoveByPattern
+        : ICacheClient
     {
         public T Exec<T>(Func<RedisClient, T> action)
         {
