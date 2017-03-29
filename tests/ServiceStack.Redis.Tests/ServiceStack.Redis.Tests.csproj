@@ -170,10 +170,6 @@
     <Reference Include="ServiceStack.Text">
       <HintPath>..\..\lib\ServiceStack.Text.dll</HintPath>
     </Reference>
-    <Reference Include="Sider, Version=0.9.3.42023, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\src\packages\Sider.0.9.3\lib\net40-Client\Sider.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -314,7 +310,8 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Examples\BlogPostExample.cd" />
-    <None Include="packages.config" />
+    <None Include="project.json" />
+    <None Include="ServiceStack.Redis.Tests.project.json" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
