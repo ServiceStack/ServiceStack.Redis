@@ -1,348 +1,65 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{951D28EE-5D22-4C62-AC0F-1661A8CEEC5A}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ServiceStack.Redis.Tests</RootNamespace>
+    <!--<TargetFrameworks>net45;netcoreapp1.1</TargetFrameworks>-->
+    <TargetFrameworks>net45</TargetFrameworks>
+    <DebugType>portable</DebugType>
     <AssemblyName>ServiceStack.Redis.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\src\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
+    <OutputType>Exe</OutputType>
+    <PackageId>ServiceStack.Redis.Tests</PackageId>
+    <RuntimeFrameworkVersion>1.1.1</RuntimeFrameworkVersion>
+    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+    <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81+xamarinmac</PackageTargetFallback>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <PlatformTarget>x86</PlatformTarget>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'STATIC_ONLY NO_EXPRESSIONS|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\STATIC_ONLY NO_EXPRESSIONS\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'MonoTouch|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\MonoTouch\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'STATIC_ONLY NO_EXPRESSIONS|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\STATIC_ONLY NO_EXPRESSIONS\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MonoTouch|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\MonoTouch\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Signed|AnyCPU'">
-    <OutputPath>bin\Signed\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Signed|x86'">
-    <OutputPath>bin\x86\Signed\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Moq, Version=2.6.1014.1, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\tests\Moq.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\src\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack">
-      <HintPath>..\..\lib\tests\ServiceStack.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Common">
-      <HintPath>..\..\lib\ServiceStack.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Interfaces">
-      <HintPath>..\..\lib\ServiceStack.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Text">
-      <HintPath>..\..\lib\ServiceStack.Text.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Net" />
+    <ProjectReference Include="..\..\src\ServiceStack.Redis\ServiceStack.Redis.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnitLite" Version="3.5" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Threading" />
+    <Reference Include="System.Threading.Tasks" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="Microsoft.CSharp" />
+
+    <Reference Include="..\..\lib\ServiceStack.Text.dll" />
+    <Reference Include="..\..\lib\ServiceStack.Interfaces.dll" />
+    <Reference Include="..\..\lib\ServiceStack.Client.dll" />
+    <Reference Include="..\..\lib\ServiceStack.Common.dll" />
+    <Reference Include="..\..\lib\tests\ServiceStack.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AdhocClientTests.cs" />
-    <Compile Include="BasicRediscClientManagerTests.cs" />
-    <Compile Include="ConfigTests.cs" />
-    <Compile Include="CustomCommandTests.cs" />
-    <Compile Include="Issues\AuthIssue.cs" />
-    <Compile Include="Issues\PipelineIssueTests.cs" />
-    <Compile Include="LuaCachedScripts.cs" />
-    <Compile Include="Examples\TestData.cs" />
-    <Compile Include="Issues\RedisCharacterizationTests.cs" />
-    <Compile Include="RedisBatchTests.cs" />
-    <Compile Include="RedisGeoTests.cs" />
-    <Compile Include="RedisGeoNativeClientTests.cs" />
-    <Compile Include="RedisManagerPoolTests.cs" />
-    <Compile Include="DiagnosticTests.cs" />
-    <Compile Include="Examples\ServiceStack_Redis_UseCase.cs" />
-    <Compile Include="Generic\RedisClientListTestExtra.cs" />
-    <Compile Include="LexTests.cs" />
-    <Compile Include="LicenseUsageTests.cs" />
-    <Compile Include="ManagedListGenericTests.cs" />
-    <Compile Include="RedisClientConfigTests.cs" />
-    <Compile Include="RedisExtensionTests.cs" />
-    <Compile Include="Examples\TodoApp.cs" />
-    <Compile Include="Issues\DomainEventsTests.cs" />
-    <Compile Include="Benchmarks\DoubleSerializationBenchmarks.cs" />
-    <Compile Include="CultureInfoTests.cs" />
-    <Compile Include="Generic\RedisTypedClientTests.cs" />
-    <Compile Include="ObjectSerializerTests.cs" />
-    <Compile Include="Generic\RedisTypedClientAppTests.cs" />
-    <Compile Include="Generic\RedisTypedPipelineTests.cs" />
-    <Compile Include="RedisClientEvalTests.cs" />
-    <Compile Include="RedisClientsManagerExtensionsTests.cs" />
-    <Compile Include="RedisHyperLogTests.cs" />
-    <Compile Include="RedisPasswordTests.cs" />
-    <Compile Include="RedisPipelineCommonTests.cs" />
-    <Compile Include="RedisPipelineTests.cs" />
-    <Compile Include="Examples\BestPractice\IBlogRepository.cs" />
-    <Compile Include="Examples\SimpleLocks.cs" />
-    <Compile Include="Examples\SimplePubSub.cs" />
-    <Compile Include="Issues\PooledRedisClientManagerIssues.cs" />
-    <Compile Include="Issues\ReportedIssues.cs" />
-    <Compile Include="Issues\TransactionIssueTests.cs" />
-    <Compile Include="RedisBasicPersistenceProviderTests.cs" />
-    <Compile Include="Examples\BestPractice\BlogPostMigrations.cs" />
-    <Compile Include="Examples\BlogPostExample.cs" />
-    <Compile Include="Examples\BestPractice\BlogPostBestPractice.cs" />
-    <Compile Include="Examples\SimpleExamples.cs" />
-    <Compile Include="Generic\RedisClientHashTestsModels.cs" />
-    <Compile Include="Generic\RedisClientHashTestsBase.cs" />
-    <Compile Include="Generic\RedisTypedTransactionTests.cs" />
-    <Compile Include="RedisBenchmarkTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="RedisClientHashTests.cs" />
-    <Compile Include="RedisClientSortedSetTests.cs" />
-    <Compile Include="Generic\RedisClientSetTestsModels.cs" />
-    <Compile Include="Generic\RedisClientListTestsBase.cs" />
-    <Compile Include="Generic\RedisClientListTestsModels.cs" />
-    <Compile Include="Generic\RedisClientSetTestsBase.cs" />
-    <Compile Include="Generic\RedisClientTests.cs" />
-    <Compile Include="Generic\RedisClientTestsBase.cs" />
-    <Compile Include="Generic\RedisPersistenceProviderTestsBase.cs" />
-    <Compile Include="Generic\RedisPersistenceProviderTestsBaseImpl.cs" />
-    <Compile Include="Integration\IntegrationTestBase.cs" />
-    <Compile Include="Integration\MultiThreadedRedisClientIntegrationTests.cs" />
-    <Compile Include="Integration\MultiThreadedPoolIntegrationTests.cs" />
-    <Compile Include="Integration\RedisRegressionTestRun.cs" />
-    <Compile Include="PooledRedisClientManagerTests.cs" />
-    <Compile Include="RedisCacheClientTests.cs" />
-    <Compile Include="RedisClientListTests.cs" />
-    <Compile Include="RedisClientSetTests.cs" />
-    <Compile Include="RedisClientTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RedisClientTestsBase.cs" />
-    <Compile Include="RedisPubSubServerTests.cs" />
-    <Compile Include="RedisPubSubTests.cs" />
-    <Compile Include="RedisScanTests.cs" />
-    <Compile Include="RedisStatsTests.cs" />
-    <Compile Include="RedisTransactionCommonTests.cs" />
-    <Compile Include="RedisTransactionTests.cs" />
-    <Compile Include="RedisUtilTests.cs" />
-    <Compile Include="RetryCommandTests.cs" />
-    <Compile Include="SerializationTests.cs" />
-    <Compile Include="Shared\BuiltInsFactory.cs" />
-    <Compile Include="Shared\IModelFactory.cs" />
-    <Compile Include="Shared\ModelFactoryBase.cs" />
-    <Compile Include="Shared\ModelWithComplexTypes.cs" />
-    <Compile Include="Shared\ModelWithComplexTypesFactory.cs" />
-    <Compile Include="Shared\ModelWithCompositeIndexFields.cs" />
-    <Compile Include="Shared\ModelWithFieldsOfDifferentAndNullableTypes.cs" />
-    <Compile Include="Shared\ModelWithFieldsOfDifferentAndNullableTypesFactory.cs" />
-    <Compile Include="Shared\ModelWithFieldsOfDifferentTypes.cs" />
-    <Compile Include="Shared\ModelWithFieldsOfDifferentTypesFactory.cs" />
-    <Compile Include="Shared\ModelWithFieldsOfNullableTypes.cs" />
-    <Compile Include="Shared\ModelWithFieldsOfNullableTypesFactory.cs" />
-    <Compile Include="Shared\ModelWithIdAndName.cs" />
-    <Compile Include="Shared\ModelWithIdOnly.cs" />
-    <Compile Include="Shared\ModelWithIndexFields.cs" />
-    <Compile Include="Shared\ModelWithLongIdAndStringFields.cs" />
-    <Compile Include="Shared\ModelWithMapAndList.cs" />
-    <Compile Include="Shared\ModelWithNamedCompositeIndex.cs" />
-    <Compile Include="Shared\ModelWithOnlyStringFields.cs" />
-    <Compile Include="Shared\Movie.cs" />
-    <Compile Include="Shared\PerfTestBase.cs" />
-    <Compile Include="Shared\Poco.cs" />
-    <Compile Include="Shared\SampleOrderLine.cs" />
-    <Compile Include="Shared\Shipper.cs" />
-    <Compile Include="Shared\ShipperFactory.cs" />
-    <Compile Include="Shared\TaskQueue.cs" />
-    <Compile Include="SslTests.cs" />
-    <Compile Include="Support\CustomType.cs" />
-    <Compile Include="Support\CustomTypeFactory.cs" />
-    <Compile Include="Support\TcpClientWithTimeout.cs" />
-    <Compile Include="TestConfig.cs" />
-    <Compile Include="RedisPersistenceProviderTests.cs" />
-    <Compile Include="ShippersExample.cs" />
-    <Compile Include="TestData\PopulateTestData.cs" />
-    <Compile Include="TwemproxyTests.cs" />
-    <Compile Include="UserSessionRedisClientTests.cs" />
-    <Compile Include="ValueTypeExamples.cs" />
-    <Compile Include="QueueTests.cs" />
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <DefineConstants>$(DefineConstants);NETCORE_SUPPORT;NETCORE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.1.1" />
+
+    <Reference Include="..\..\lib\netstandard1.3\ServiceStack.Text.dll" />
+    <Reference Include="..\..\lib\netstandard1.1\ServiceStack.Interfaces.dll" />
+    <Reference Include="..\..\lib\netstandard1.3\ServiceStack.Common.dll" />
+    <Reference Include="..\..\lib\tests\netstandard1.6\ServiceStack.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="Examples\BlogPostExample.cd" />
-    <None Include="project.json" />
-    <None Include="ServiceStack.Redis.Tests.project.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\ServiceStack.Redis\ServiceStack.Redis.csproj">
-      <Project>{AF99F19B-4C04-4F58-81EF-B092F1FCC540}</Project>
-      <Name>ServiceStack.Redis</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

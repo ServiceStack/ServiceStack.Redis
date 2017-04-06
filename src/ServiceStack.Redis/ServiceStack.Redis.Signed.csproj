@@ -1,304 +1,41 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{AF99F19B-4C04-4F58-81EF-B092F1FCC540}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ServiceStack.Redis</RootNamespace>
+    <TargetFrameworks>net45</TargetFrameworks>
     <AssemblyName>ServiceStack.Redis</AssemblyName>
-    <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Release\ServiceStack.Redis.XML</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'STATIC_ONLY NO_EXPRESSIONS|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\STATIC_ONLY NO_EXPRESSIONS\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'MonoTouch|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\MonoTouch\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>bin\Release\ServiceStack.Redis.XML</DocumentationFile>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Signed|AnyCPU'">
-    <OutputPath>bin\Signed\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>bin\Release\ServiceStack.Redis.XML</DocumentationFile>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Signed|x86'">
-    <OutputPath>bin\x86\Signed\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>bin\Release\ServiceStack.Redis.XML</DocumentationFile>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MonoTouch|x86'">
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'STATIC_ONLY NO_EXPRESSIONS|x86'">
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
+    <PackageId>ServiceStack.Redis</PackageId>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <SignAssembly>True</SignAssembly>
+    <DelaySign>False</DelaySign>
     <AssemblyOriginatorKeyFile>servicestack-sn.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="ServiceStack.Common">
-      <HintPath>..\..\lib\signed\ServiceStack.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Interfaces, Version=4.0.0.0, Culture=neutral, PublicKeyToken=e06fbc6124f57c43, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\ServiceStack.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Text">
-      <HintPath>..\..\lib\signed\ServiceStack.Text.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+    <OutputPath>bin\Signed\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugType>portable</DebugType>
+    <OutputPath>bin\Debug\Signed\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System.Net" />
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="..\..\lib\ServiceStack.Interfaces.dll" />
+    <Reference Include="..\..\lib\ServiceStack.Text.dll" />
+    <Reference Include="..\..\lib\ServiceStack.Common.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="BasicRedisClientManager.cs" />
-    <Compile Include="BasicRedisClientManager.ICacheClient.cs" />
-    <Compile Include="BasicRedisResolver.cs" />
-    <Compile Include="RedisDataInfoExtensions.cs" />
-    <Compile Include="RedisResolver.cs" />
-    <Compile Include="BufferPool.cs" />
-    <Compile Include="Commands.cs" />
-    <Compile Include="ConnectionUtils.cs" />
-    <Compile Include="IHandleClientDispose.cs" />
-    <Compile Include="IRedisResolver.cs" />
-    <Compile Include="RedisClientExtensions.cs" />
-    <Compile Include="RedisManagerPool.cs" />
-    <Compile Include="RedisClient_Admin.cs" />
-    <Compile Include="Generic\ManagedListGeneric.cs" />
-    <Compile Include="Generic\QueuedRedisTypedCommand.cs" />
-    <Compile Include="Generic\RedisClientsManagerExtensionsGeneric.cs" />
-    <Compile Include="Generic\RedisTypedClient_App.cs" />
-    <Compile Include="Generic\RedisTypedPipeline.cs" />
-    <Compile Include="Generic\RedisTypedCommandQueue.cs" />
-    <Compile Include="IRedisFailover.cs" />
-    <Compile Include="IRedisSentinel.cs" />
-    <Compile Include="RedisClientManagerCacheClient.cs" />
-    <Compile Include="RedisClientsManagerExtensions.cs" />
-    <Compile Include="Pipeline\QueuedRedisCommand.cs" />
-    <Compile Include="Pipeline\RedisCommand.cs" />
-    <Compile Include="RedisClient_Slowlog.cs" />
-    <Compile Include="RedisConfig.cs" />
-    <Compile Include="RedisDataExtensions.cs" />
-    <Compile Include="RedisEndpoint.cs" />
-    <Compile Include="RedisPubSubServer.cs" />
-    <Compile Include="RedisSentinel.cs" />
-    <Compile Include="RedisSentinelResolver.cs" />
-    <Compile Include="RedisSentinelWorker.cs" />
-    <Compile Include="RedisState.cs" />
-    <Compile Include="RedisStats.cs" />
-    <Compile Include="RedisRetryableException.cs" />
-    <Compile Include="ScanResult.cs" />
-    <Compile Include="ShardedConnectionPool.cs" />
-    <Compile Include="ShardedRedisClientManager.cs" />
-    <Compile Include="Support\ConsistentHash.cs" />
-    <Compile Include="Support\Diagnostic\InvokeEventArgs.cs" />
-    <Compile Include="Support\Diagnostic\TrackingFrame.cs" />
-    <Compile Include="Support\Diagnostic\TrackingRedisClientProxy.cs" />
-    <Compile Include="Support\Diagnostic\TrackingRedisClientsManager.cs" />
-    <Compile Include="Support\Locking\IDistributedLock.cs" />
-    <Compile Include="Support\OptimizedObjectSerializer.cs" />
-    <Compile Include="Support\Queue\ISequentialData.cs" />
-    <Compile Include="Support\Queue\Implementation\RedisSequentialWorkQueue.Locks.cs" />
-    <Compile Include="Support\Queue\Implementation\SequentialData.cs" />
-    <Compile Include="Support\SerializedObjectWrapper.cs" />
-    <Compile Include="Support\ISerializer.cs" />
-    <Compile Include="Support\Locking\DisposableDistributedLock.cs" />
-    <Compile Include="Support\Queue\IChronologicalWorkQueue.cs" />
-    <Compile Include="Support\Queue\ISequentialWorkQueue.cs" />
-    <Compile Include="Support\Queue\ISimpleWorkQueue.cs" />
-    <Compile Include="Support\Queue\Implementation\RedisChronologicalWorkQueue.cs" />
-    <Compile Include="Support\Queue\Implementation\RedisSequentialWorkQueue.cs" />
-    <Compile Include="Support\Queue\Implementation\RedisSimpleWorkQueue.cs" />
-    <Compile Include="Support\Queue\Implementation\RedisWorkQueue.cs" />
-    <Compile Include="Support\Queue\Implementation\SerializingRedisClient.cs" />
-    <Compile Include="Pipeline\RedisAllPurposePipeline.cs" />
-    <Compile Include="Generic\RedisClientHash.Generic.cs" />
-    <Compile Include="Generic\RedisTypedTransaction.cs" />
-    <Compile Include="Generic\RedisTypedClient_Hash.cs" />
-    <Compile Include="Generic\RedisTypedClient_SortedSet.cs" />
-    <Compile Include="Generic\RedisClientSortedSet.Generic.cs" />
-    <Compile Include="Pipeline\RedisQueueCompletableOperation.cs" />
-    <Compile Include="Pipeline\QueuedRedisOperation.cs" />
-    <Compile Include="RedisClientHash.cs" />
-    <Compile Include="Generic\RedisTypedClient_Set.cs" />
-    <Compile Include="Generic\RedisTypedClient_List.cs" />
-    <Compile Include="RedisClientSortedSet.cs" />
-    <Compile Include="Pipeline\RedisCommandQueue.cs" />
-    <Compile Include="RedisException.cs" />
-    <Compile Include="RedisLock.cs" />
-    <Compile Include="Pipeline\RedisPipelineCommand.cs" />
-    <Compile Include="RedisSubscription.cs" />
-    <Compile Include="Transaction\RedisTransaction.cs" />
-    <Compile Include="Generic\RedisClientSet.Generic.cs" />
-    <Compile Include="Generic\RedisClientList.Generic.cs" />
-    <Compile Include="RedisClient.ICacheClient.cs" />
-    <Compile Include="Generic\RedisTypedClient.cs" />
-    <Compile Include="RedisClientManagerConfig.cs" />
-    <Compile Include="RedisClientSet.cs" />
-    <Compile Include="RedisClient.cs" />
-    <Compile Include="RedisClient_Hash.cs" />
-    <Compile Include="RedisClient_List.cs" />
-    <Compile Include="RedisClient_Set.cs" />
-    <Compile Include="RedisClient_SortedSet.cs" />
-    <Compile Include="RedisNativeClient.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RedisClientList.cs" />
-    <Compile Include="PooledRedisClientManager.cs" />
-    <Compile Include="RedisNativeClient_Utils.cs" />
-    <Compile Include="RedisResponseException.cs" />
-    <Compile Include="RedisExtensions.cs" />
-    <Compile Include="Support\IOrderedDictionary.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Support\OrderedDictionary.cs" />
-    <Compile Include="Transaction\RedisTransactionFailedException.cs" />
-    <Compile Include="UtilExtensions.cs" />
-    <Compile Include="Support\Locking\DistributedLock.cs" />
-    <Compile Include="Support\Locking\ILockingStrategy.cs" />
-    <Compile Include="Support\Locking\NoLockingStrategy.cs" />
-    <Compile Include="Support\Locking\ReaderWriterLockingStrategy.cs" />
-    <Compile Include="Support\Locking\ReadLock.cs" />
-    <Compile Include="Support\Locking\WriteLock.cs" />
-    <Compile Include="Support\ObjectSerializer.cs" />
-    <Compile Include="Support\RedisNamespace.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
