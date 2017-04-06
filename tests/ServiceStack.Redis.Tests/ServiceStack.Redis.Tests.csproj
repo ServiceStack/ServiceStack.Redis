@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!--<TargetFrameworks>net45;netcoreapp1.1</TargetFrameworks>-->
-    <TargetFrameworks>net45</TargetFrameworks>
+    <TargetFrameworks>net45;netcoreapp1.1</TargetFrameworks>
+    <!--<TargetFrameworks>netcoreapp1.1</TargetFrameworks>-->
     <DebugType>portable</DebugType>
     <AssemblyName>ServiceStack.Redis.Tests</AssemblyName>
     <OutputType>Exe</OutputType>
@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="NUnitLite" Version="3.5" />
+    <Reference Include="..\..\lib\ServiceStack.Interfaces.dll" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
@@ -43,8 +44,6 @@
     <Reference Include="Microsoft.CSharp" />
 
     <Reference Include="..\..\lib\ServiceStack.Text.dll" />
-    <Reference Include="..\..\lib\ServiceStack.Interfaces.dll" />
-    <Reference Include="..\..\lib\ServiceStack.Client.dll" />
     <Reference Include="..\..\lib\ServiceStack.Common.dll" />
     <Reference Include="..\..\lib\tests\ServiceStack.dll" />
   </ItemGroup>
@@ -54,10 +53,10 @@
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />
     <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.1.1" />
 
     <Reference Include="..\..\lib\netstandard1.3\ServiceStack.Text.dll" />
-    <Reference Include="..\..\lib\netstandard1.1\ServiceStack.Interfaces.dll" />
     <Reference Include="..\..\lib\netstandard1.3\ServiceStack.Common.dll" />
     <Reference Include="..\..\lib\tests\netstandard1.6\ServiceStack.dll" />
   </ItemGroup>
