@@ -43,7 +43,6 @@
     <PackageReference Include="System.Net.NameResolution" Version="4.0.0" />
     <PackageReference Include="System.Data.Common" Version="4.1.0" />
     <PackageReference Include="System.Threading.Thread" Version="4.0.0" />
-    <ProjectReference Include="..\ServiceStack.Interfaces\ServiceStack.Interfaces.csproj" />
     <Reference Include="..\..\lib\netstandard1.1\ServiceStack.Interfaces.dll" />
     <Reference Include="..\..\lib\netstandard1.3\ServiceStack.Text.dll" />
     <Reference Include="..\..\lib\netstandard1.3\ServiceStack.Common.dll" />
