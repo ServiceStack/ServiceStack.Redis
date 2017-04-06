@@ -20,11 +20,9 @@
     <PackageVersion>$(MajorVersion).$(MinorVersion).$(PatchVersion)$(UnstableTag)</PackageVersion>
   </PropertyGroup>
 
-
   <ItemGroup>
       <NugetPackageFilesToDelete Include="$(NuGetPackageDir)/*.nupkg"/>
   </ItemGroup>
-
 
   <PropertyGroup>
     <DoBuildSolutionsDependsOn>
@@ -89,7 +87,7 @@
     <Delete Files="@(NugetPackageFilesToDelete)" />
 
     <ItemGroup>
-      <RedisFiles Include="$(SrcDir)/ServiceStack.Redis/bin/$(Configuration)/ServiceStack.Redis.*"></RedisFiles>
+      <RedisFiles Include="$(SrcDir)/ServiceStack.Redis/bin/$(Configuration)/net45/ServiceStack.Redis.*"></RedisFiles>
     </ItemGroup>
 
     <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis/ServiceStack.Redis.Signed.csproj"
