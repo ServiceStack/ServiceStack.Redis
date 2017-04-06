@@ -15,16 +15,18 @@
     <Configuration Condition="$(Configuration) == ''">Release</Configuration>
     <NuGetPath>$(BuildSolutionDir)/src/.nuget/nuget.exe</NuGetPath>
     <NuGetPackageDir>$(BuildSolutionDir)/NuGet/</NuGetPackageDir>
+    <NuGetPackageCoreDir>$(BuildSolutionDir)/NuGet.Core/</NuGetPackageCoreDir>
     <Version>$(MajorVersion).$(MinorVersion).$(PatchVersion).0</Version>
     <UnstableTag Condition="$(RELEASE) == ''">-unstable</UnstableTag>
     <PackageVersion>$(MajorVersion).$(MinorVersion).$(PatchVersion)$(UnstableTag)</PackageVersion>
+    <PackageCoreVersion>1.0.$(PatchCoreVersion)$(UnstableTag)</PackageCoreVersion>
   </PropertyGroup>
 
 
   <ItemGroup>
-      <NugetPackageFilesToDelete Include="$(NuGetPackageDir)/*.nupkg"/>
+    <NugetPackageFilesToDelete Include="$(NuGetPackageDir)/*.nupkg"/>
+    <NugetPackageFilesToDelete Include="$(NuGetPackageCoreDir)/*.nupkg"/>
   </ItemGroup>
-
 
   <PropertyGroup>
     <DoBuildSolutionsDependsOn>
@@ -77,6 +79,10 @@
         <Find>version="4\.5[^"]*"</Find>
         <ReplaceWith>version="$(PackageVersion)"</ReplaceWith>
       </RegexTransform>
+      <RegexTransform Include="$(NuGetPackageCoreDir)/**/*.nuspec">
+        <Find>version="1\.0\.[^"]*"</Find>
+        <ReplaceWith>version="$(PackageCoreVersion)"</ReplaceWith>
+      </RegexTransform>
     </ItemGroup>
 
     <RegexTransform Items="@(RegexTransform)" />
@@ -89,7 +95,8 @@
     <Delete Files="@(NugetPackageFilesToDelete)" />
 
     <ItemGroup>
-      <RedisFiles Include="$(SrcDir)/ServiceStack.Redis/bin/$(Configuration)/ServiceStack.Redis.*"></RedisFiles>
+      <RedisFiles Include="$(SrcDir)/ServiceStack.Redis/bin/$(Configuration)/net45/ServiceStack.Redis.*"></RedisFiles>
+      <RedisCoreFiles Include="$(SrcDir)/ServiceStack.Redis/bin/$(Configuration)/netstandard1.3/ServiceStack.Redis.*"></RedisCoreFiles>
     </ItemGroup>
 
     <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis/ServiceStack.Redis.csproj"
@@ -101,6 +108,13 @@
 
     <Exec Command="&quot;$(NuGetPath)&quot; pack &quot;$(NuGetPackageDir)/ServiceStack.Redis/servicestack.redis.nuspec&quot; -OutputDirectory &quot;$(NuGetPackageDir)&quot; -Version $(PackageVersion) -Symbols"
             LogStandardErrorAsError="true" />
+
+    <!-- .NET Core -->
+    <MakeDir Directories="$(NuGetPackageCoreDir)/ServiceStack.Redis.Core/lib/netstandard1.3" Condition="!Exists('$(NuGetPackageCoreDir)/ServiceStack.Redis.Core/lib/netstandard1.3')" />
+    <Copy SourceFiles="%(RedisCoreFiles.Identity)" DestinationFolder="$(NuGetPackageCoreDir)/ServiceStack.Redis.Core/lib/netstandard1.3" />
+
+    <Exec Command="&quot;$(NuGetPath)&quot; pack &quot;$(NuGetPackageCoreDir)/ServiceStack.Redis.Core/servicestack.redis.core.nuspec&quot; -OutputDirectory &quot;$(NuGetPackageCoreDir)&quot; -Version $(PackageCoreVersion) -Symbols"
+          LogStandardErrorAsError="true" />
 
   </Target>
 </Project>
