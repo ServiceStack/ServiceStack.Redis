@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{38F69F8F
 		..\build\build.tasks = ..\build\build.tasks
 		..\build\copy.bat = ..\build\copy.bat
 		..\README.md = ..\README.md
+		..\NuGet.Core\ServiceStack.Redis.Core\servicestack.redis.core.nuspec = ..\NuGet.Core\ServiceStack.Redis.Core\servicestack.redis.core.nuspec
 		..\NuGet\ServiceStack.Redis\servicestack.redis.nuspec = ..\NuGet\ServiceStack.Redis\servicestack.redis.nuspec
 		..\NuGet.Signed\ServiceStack.Redis.Signed\servicestack.redis.signed.nuspec = ..\NuGet.Signed\ServiceStack.Redis.Signed\servicestack.redis.signed.nuspec
 	EndProjectSection
