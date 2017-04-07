@@ -34,8 +34,8 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System.Net" />
     <Reference Include="..\..\lib\ServiceStack.Interfaces.dll" />
-    <Reference Include="..\..\lib\ServiceStack.Text.dll" />
-    <Reference Include="..\..\lib\ServiceStack.Common.dll" />
+    <Reference Include="..\..\lib\signed\ServiceStack.Text.dll" />
+    <Reference Include="..\..\lib\signed\ServiceStack.Common.dll" />
   </ItemGroup>
 
 </Project>

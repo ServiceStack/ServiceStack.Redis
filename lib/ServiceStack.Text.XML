@@ -562,26 +562,6 @@
         <member name="F:ServiceStack.Text.Pools.SharedPools.ByteBufferSize">
             pooled memory : 4K * 512 = 4MB
         </member>
-        <member name="T:ServiceStack.Text.StringBuilderCache">
-            <summary>
-            Reusable StringBuilder ThreadStatic Cache
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Text.StringBuilderCacheAlt">
-            <summary>
-            Alternative Reusable StringBuilder ThreadStatic Cache
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Text.StringWriterCache">
-            <summary>
-            Reusable StringWriter ThreadStatic Cache
-            </summary>
-        </member>
-        <member name="T:ServiceStack.Text.StringWriterCacheAlt">
-            <summary>
-            Alternative Reusable StringWriter ThreadStatic Cache
-            </summary>
-        </member>
         <member name="T:ServiceStack.Text.RecyclableMemoryStreamManager">
             <summary>
             Manages pools of RecyclableMemoryStream objects.
@@ -1122,6 +1102,26 @@
             Release the large buffer (either stores it for eventual release or returns it immediately).
             </summary>
         </member>
+        <member name="T:ServiceStack.Text.StringBuilderCache">
+            <summary>
+            Reusable StringBuilder ThreadStatic Cache
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Text.StringBuilderCacheAlt">
+            <summary>
+            Alternative Reusable StringBuilder ThreadStatic Cache
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Text.StringWriterCache">
+            <summary>
+            Reusable StringWriter ThreadStatic Cache
+            </summary>
+        </member>
+        <member name="T:ServiceStack.Text.StringWriterCacheAlt">
+            <summary>
+            Alternative Reusable StringWriter ThreadStatic Cache
+            </summary>
+        </member>
         <member name="T:ServiceStack.Text.Support.DoubleConverter">
             <summary>
             A class to allow the conversion of doubles to string representations of
@@ -1243,18 +1243,6 @@
             <param name="recursionInfo">Tracks how deeply nested we are</param>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.PlatformExtensions.AddAttributes(System.Reflection.PropertyInfo,System.Attribute[])">
-            <summary>
-            Add a Property attribute at runtime. 
-            <para>Not threadsafe, should only add attributes on Startup.</para>
-            </summary>
-        </member>
-        <member name="M:ServiceStack.PlatformExtensions.ReplaceAttribute(System.Reflection.PropertyInfo,System.Attribute)">
-            <summary>
-            Add a Property attribute at runtime. 
-            <para>Not threadsafe, should only add attributes on Startup.</para>
-            </summary>
-        </member>
         <member name="T:ServiceStack.Licensing">
             <summary>
             Public Code API to register commercial license for ServiceStack.
@@ -1289,6 +1277,18 @@
             <param name="relativePath">the relative path</param>
             <returns>the absolute path</returns>
             <remarks>Assumes static content is in the parent folder of the /bin/ directory</remarks>
+        </member>
+        <member name="M:ServiceStack.PlatformExtensions.AddAttributes(System.Reflection.PropertyInfo,System.Attribute[])">
+            <summary>
+            Add a Property attribute at runtime. 
+            <para>Not threadsafe, should only add attributes on Startup.</para>
+            </summary>
+        </member>
+        <member name="M:ServiceStack.PlatformExtensions.ReplaceAttribute(System.Reflection.PropertyInfo,System.Attribute)">
+            <summary>
+            Add a Property attribute at runtime. 
+            <para>Not threadsafe, should only add attributes on Startup.</para>
+            </summary>
         </member>
         <member name="T:ServiceStack.QueryStringWriter`1">
             <summary>
