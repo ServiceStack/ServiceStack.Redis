@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.6.1" />
-    <Reference Include="..\..\lib\ServiceStack.Interfaces.dll" />
+    <Reference Include="..\..\lib\pcl\ServiceStack.Interfaces.dll" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
@@ -43,9 +43,9 @@
     <Reference Include="System.Web.Extensions" />
     <Reference Include="Microsoft.CSharp" />
 
-    <Reference Include="..\..\lib\ServiceStack.Text.dll" />
-    <Reference Include="..\..\lib\ServiceStack.Common.dll" />
-    <Reference Include="..\..\lib\tests\ServiceStack.dll" />
+    <Reference Include="..\..\lib\net45\ServiceStack.Text.dll" />
+    <Reference Include="..\..\lib\net45\ServiceStack.Common.dll" />
+    <Reference Include="..\..\lib\net45\ServiceStack.dll" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
@@ -58,7 +58,7 @@
 
     <Reference Include="..\..\lib\netstandard1.3\ServiceStack.Text.dll" />
     <Reference Include="..\..\lib\netstandard1.3\ServiceStack.Common.dll" />
-    <Reference Include="..\..\lib\tests\netstandard1.6\ServiceStack.dll" />
+    <Reference Include="..\..\lib\netstandard1.6\ServiceStack.dll" />
   </ItemGroup>
 
 </Project>
