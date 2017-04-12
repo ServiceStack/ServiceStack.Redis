@@ -25,9 +25,9 @@
         <dependency id="System.Collections.NonGeneric" version="[4.0.1, )" />
         <dependency id="System.Net.NameResolution" version="[4.0.0, )" />
         <dependency id="NETStandard.Library" version="[1.6.0, )" />
-        <dependency id="ServiceStack.Interfaces.Core" version="[1.0.0, )" />
-        <dependency id="ServiceStack.Text.Core" version="[1.0.0, )" />
-        <dependency id="ServiceStack.Common.Core" version="[1.0.0, )" />
+        <dependency id="ServiceStack.Interfaces.Core" version="1.0.0" />
+        <dependency id="ServiceStack.Text.Core" version="1.0.0" />
+        <dependency id="ServiceStack.Common.Core" version="1.0.0" />
       </group>
     </dependencies>
   </metadata>
