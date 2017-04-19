@@ -1,5 +1,8 @@
+using ServiceStack.Text;
+
 namespace ServiceStack.Redis.Tests.Support
 {
+    [RuntimeSerializable]
     public class CustomType
     {
         public long CustomId { get; set; }
