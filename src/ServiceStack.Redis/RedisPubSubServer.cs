@@ -54,15 +54,9 @@ namespace ServiceStack.Redis
             set { Interlocked.CompareExchange(ref autoRestart, value ? YES : NO, autoRestart); }
         }
 
-        public DateTime CurrentServerTime
-        {
-            get { return new DateTime(serverTimeAtStart.Ticks + startedAt.ElapsedTicks, DateTimeKind.Utc); }
-        }
+        public DateTime CurrentServerTime => new DateTime(serverTimeAtStart.Ticks + startedAt.ElapsedTicks, DateTimeKind.Utc);
 
-        public long BgThreadCount
-        {
-            get { return Interlocked.CompareExchange(ref bgThreadCount, 0, 0); }
-        }
+        public long BgThreadCount => Interlocked.CompareExchange(ref bgThreadCount, 0, 0);
 
         public const string AllChannelsWildCard = "*";
         public IRedisClientsManager ClientsManager { get; set; }
@@ -76,10 +70,7 @@ namespace ServiceStack.Redis
             this.Channels = channels;
 
             var failoverHost = clientsManager as IRedisFailover;
-            if (failoverHost != null)
-            {
-                failoverHost.OnFailover.Add(HandleFailover);
-            }
+            failoverHost?.OnFailover.Add(HandleFailover);
         }
 
         public IRedisPubSubServer Start()
@@ -89,8 +80,7 @@ namespace ServiceStack.Redis
             if (Interlocked.CompareExchange(ref status, 0, 0) == Status.Started)
             {
                 //Start any stopped worker threads
-                if (OnStart != null)
-                    OnStart();
+                OnStart?.Invoke();
 
                 return this;
             }
@@ -106,8 +96,7 @@ namespace ServiceStack.Redis
 
                     SleepBackOffMultiplier(Interlocked.CompareExchange(ref noOfContinuousErrors, 0, 0));
 
-                    if (OnStart != null)
-                        OnStart();
+                    OnStart?.Invoke();
 
                     //Don't kill us if we're the thread that's retrying to Start() after a failure.
                     if (bgThread != Thread.CurrentThread)
@@ -132,8 +121,7 @@ namespace ServiceStack.Redis
                 }
                 catch (Exception ex)
                 {
-                    if (this.OnError != null) 
-                        this.OnError(ex);
+                    OnError?.Invoke(ex);
                 }
             }
 
@@ -154,8 +142,7 @@ namespace ServiceStack.Redis
             }
             catch (Exception ex)
             {
-                if (OnError != null)
-                    OnError(ex);
+                OnError?.Invoke(ex);
             }
 
             DisposeHeartbeatTimer();
@@ -168,8 +155,7 @@ namespace ServiceStack.Redis
 
             Interlocked.CompareExchange(ref lastHeartbeatTicks, DateTime.UtcNow.Ticks, lastHeartbeatTicks);
 
-            if (OnInit != null)
-                OnInit();
+            OnInit?.Invoke();
         }
 
         void SendHeartbeat(object state)
@@ -181,8 +167,7 @@ namespace ServiceStack.Redis
             if (DateTime.UtcNow - new DateTime(lastHeartbeatTicks) < HeartbeatInterval.Value)
                 return;
 
-            if (OnHeartbeatSent != null)
-                OnHeartbeatSent();
+            OnHeartbeatSent?.Invoke();
 
             NotifyAllSubscribers(ControlCommand.Pulse);
 
@@ -200,8 +185,7 @@ namespace ServiceStack.Redis
         {
             Interlocked.CompareExchange(ref lastHeartbeatTicks, DateTime.UtcNow.Ticks, lastHeartbeatTicks);
 
-            if (OnHeartbeatReceived != null)
-                OnHeartbeatReceived();
+            OnHeartbeatReceived?.Invoke();
         }
 
         private void DisposeHeartbeatTimer()
@@ -215,7 +199,7 @@ namespace ServiceStack.Redis
             }
             catch (Exception ex)
             {
-                if (this.OnError != null) this.OnError(ex);
+                OnError?.Invoke(ex);
             }
             heartbeatTimer = null;
         }
@@ -256,8 +240,7 @@ namespace ServiceStack.Redis
                                         ? ctrlMsg[1]
                                         : null;
 
-                                    if (OnControlCommand != null)
-                                        OnControlCommand(msgType ?? Operation.GetName(op));
+                                    OnControlCommand?.Invoke(msgType ?? Operation.GetName(op));
 
                                     switch (op)
                                     {
@@ -308,8 +291,7 @@ namespace ServiceStack.Redis
                     }
                 }
 
-                if (OnStop != null)
-                    OnStop();
+                OnStop?.Invoke();
             }
             catch (Exception ex)
             {
@@ -320,11 +302,9 @@ namespace ServiceStack.Redis
                 if (Interlocked.CompareExchange(ref status, Status.Stopped, Status.Started) != Status.Started)
                     Interlocked.CompareExchange(ref status, Status.Stopped, Status.Stopping);
 
-                if (OnStop != null)
-                    OnStop();
+                OnStop?.Invoke();
 
-                if (this.OnError != null)
-                    this.OnError(ex);
+                OnError?.Invoke(ex);
             }
 
             if (AutoRestart && Interlocked.CompareExchange(ref status, 0, 0) != Status.Disposed)
@@ -381,7 +361,7 @@ namespace ServiceStack.Redis
             }
             catch (Exception ex)
             {
-                if (this.OnError != null) this.OnError(ex);
+                OnError?.Invoke(ex);
                 Log.Warn("Could not send '{0}' message to bg thread: {1}".Fmt(msg, ex.Message));
             }
         }
@@ -390,8 +370,7 @@ namespace ServiceStack.Redis
         {
             try
             {
-                if (OnFailover != null)
-                    OnFailover(this);
+                OnFailover?.Invoke(this);
 
                 if (masterClient != null)
                 {
@@ -412,7 +391,7 @@ namespace ServiceStack.Redis
             }
             catch (Exception ex)
             {
-                if (this.OnError != null) this.OnError(ex);
+                OnError?.Invoke(ex);
                 Log.Warn("Error trying to UnSubscribeFromChannels in OnFailover. Restarting...", ex);
                 Restart();
             }
@@ -423,8 +402,7 @@ namespace ServiceStack.Redis
             if (Log.IsDebugEnabled)
                 Log.Debug("OnUnSubscribe: " + channel);
 
-            if (OnUnSubscribe != null)
-                OnUnSubscribe(channel);
+            OnUnSubscribe?.Invoke(channel);
         }
 
         public void Restart()
@@ -553,8 +531,7 @@ namespace ServiceStack.Redis
 
             try
             {
-                if (OnDispose != null)
-                    OnDispose();
+                OnDispose?.Invoke();
             }
             catch (Exception ex)
             {
@@ -568,7 +545,7 @@ namespace ServiceStack.Redis
             }
             catch (Exception ex)
             {
-                if (this.OnError != null) this.OnError(ex);
+                OnError?.Invoke(ex);
             }
 
             DisposeHeartbeatTimer();
