@@ -403,5 +403,22 @@ namespace ServiceStack.Redis.Tests
             Assert.That(result.Children[0].Text, Is.EqualTo("myval"));
             Assert.That(result.Children[1].Text, Is.EqualTo("myotherval"));
         }
+
+        [Test]
+        public void Can_call_SetValueIfNotExists_in_transaction()
+        {
+            bool f = false;
+            bool s = false;
+
+            using (var trans = Redis.CreateTransaction())
+            {
+                trans.QueueCommand(c => c.SetValueIfNotExists("foo", "blah"), r => f = r);
+                trans.QueueCommand(c => c.SetValueIfNotExists("bar", "blah"), r => s = r);
+                trans.Commit();
+            }
+
+            Assert.That(f);
+            Assert.That(s);
+        }
     }
 }

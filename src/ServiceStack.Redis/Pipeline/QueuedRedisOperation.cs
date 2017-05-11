@@ -128,6 +128,10 @@ namespace ServiceStack.Redis.Pipeline
                     {
                         OnSuccessIntCallback(result != null ? int.Parse(Encoding.UTF8.GetString(result)) : 0);
                     }
+                    if (OnSuccessBoolCallback != null)
+                    {
+                        OnSuccessBoolCallback(result != null && Encoding.UTF8.GetString(result) == "OK");
+                    }
                 }
                 else if (StringReadCommand != null)
                 {
