@@ -1,10 +1,11 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.10
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{38F69F8F-9303-4BAF-B081-D28339163E07}"
 	ProjectSection(SolutionItems) = preProject
 		..\build\appsettings.license.txt = ..\build\appsettings.license.txt
+		..\build\build-core.proj = ..\build\build-core.proj
 		..\build\build-sn.proj = ..\build\build-sn.proj
 		..\build\build.bat = ..\build\build.bat
 		..\build\build.proj = ..\build\build.proj
@@ -22,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Redis.Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console.Tests", "..\tests\Console.Tests\Console.Tests.csproj", "{8368C965-B4F6-4263-9ABB-731A175B2E77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Redis.Tests.Sentinel", "..\tests\ServiceStack.Redis.Tests.Sentinel\ServiceStack.Redis.Tests.Sentinel.csproj", "{91C55091-A946-49B5-9517-8794EBCC5784}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Redis.Tests.Sentinel", "..\tests\ServiceStack.Redis.Tests.Sentinel\ServiceStack.Redis.Tests.Sentinel.csproj", "{91C55091-A946-49B5-9517-8794EBCC5784}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
