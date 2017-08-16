@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using ServiceStack.Configuration;
@@ -24,15 +25,23 @@ namespace ServiceStack.Redis
     {
         public IRedisClientsManager RedisManager { get; set; }
         public IAppSettings AppSettings { get; set; }
-        T exec<T>(Func<IRedisClient, T> fn)
+
+        T exec<T>(Func<IRedisClient, T> fn, TemplateScopeContext scope, object options)
         {
-            using (var db = RedisManager.GetClient())
+            try
             {
-                return fn(db);
+                using (var db = RedisManager.GetClient())
+                {
+                    return fn(db);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new StopFilterExecutionException(scope, options, ex);
             }
         }
 
-        static Dictionary<string, int> cmdArgCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) {
+        static readonly Dictionary<string, int> cmdArgCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) {
             { "SET", 3 }
         };
 
@@ -81,14 +90,34 @@ namespace ServiceStack.Redis
             return r.Text;
         }
 
-        public object redisCall(string cmd)
+        public object redisCall(TemplateScopeContext scope, object redisCommand) => redisCall(scope, redisCommand, null);
+        public object redisCall(TemplateScopeContext scope, object redisCommand, object options)
         {
-            if (string.IsNullOrEmpty(cmd))
+            if (redisCommand == null)
                 return null;
 
-            var args = parseCommandString(cmd);
+            List<string> args;
+            if (redisCommand is string cmd)
+            {
+                if (string.IsNullOrEmpty(cmd))
+                    return null;
+
+                args = parseCommandString(cmd);
+            }
+            else if (redisCommand is IEnumerable e && !(e is IDictionary))
+            {
+                args = new List<string>();
+                foreach (var arg in e)
+                {
+                    if (arg == null) continue;
+                    args.Add(arg.ToString());
+                }
+            }
+            else
+                throw new NotSupportedException($"redisCall expects a string or an object args but received a {redisCommand.GetType().Name} instead.");
+
             var objParams = args.Select(x => (object)x).ToArray();
-            var redisText = exec(r => r.Custom(objParams));
+            var redisText = exec(r => r.Custom(objParams), scope, options);
             var result = toObject(redisText);
             return result;
         }
@@ -110,12 +139,14 @@ namespace ServiceStack.Redis
             if (string.IsNullOrEmpty(query))
                 return null;
 
-            var args = scope.AssertOptions(nameof(redisSearchKeys), options);
-            var limit = args.TryGetValue("limit", out object value)
-                ? value.ConvertTo<int>()
-                : scope.GetValue("redis.search.limit") ?? 100;
+            try
+            {
+                var args = scope.AssertOptions(nameof(redisSearchKeys), options);
+                var limit = args.TryGetValue("limit", out object value)
+                    ? value.ConvertTo<int>()
+                    : scope.GetValue("redis.search.limit") ?? 100;
 
-            const string LuaScript = @"
+                const string LuaScript = @"
 local limit = tonumber(ARGV[2])
 local pattern = ARGV[1]
 local cursor = tonumber(ARGV[3])
@@ -157,10 +188,15 @@ end
 cursorAttrs['results'] = keyAttrs
 return cjson.encode(cursorAttrs)";
 
-            var json = exec(r => r.ExecCachedLua(LuaScript, sha1 =>
-                r.ExecLuaShaAsString(sha1, query, limit.ToString(), "0")));
+                var json = exec(r => r.ExecCachedLua(LuaScript, sha1 =>
+                    r.ExecLuaShaAsString(sha1, query, limit.ToString(), "0")), scope, options);
 
-            return json;
+                return json;
+            }
+            catch (Exception ex)
+            {
+                throw new StopFilterExecutionException(scope, options, ex);
+            }
         }
     }
 }
