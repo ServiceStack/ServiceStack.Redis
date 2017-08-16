@@ -20,11 +20,11 @@
     <copyright>ServiceStack 2017 and contributors</copyright>
     <dependencies>
       <group targetFramework=".NETStandard1.3">
-        <dependency id="System.Net.Security" version="[4.0.0, )" />
-        <dependency id="System.Collections.Specialized" version="[4.0.1, )" />
-        <dependency id="System.Collections.NonGeneric" version="[4.0.1, )" />
-        <dependency id="System.Net.NameResolution" version="[4.0.0, )" />
-        <dependency id="NETStandard.Library" version="[1.6.0, )" />
+        <dependency id="System.Net.Security" version="[4.3.1, )" />
+        <dependency id="System.Collections.Specialized" version="[4.3.0, )" />
+        <dependency id="System.Collections.NonGeneric" version="[4.3.0, )" />
+        <dependency id="System.Net.NameResolution" version="[4.3.0, )" />
+        <dependency id="NETStandard.Library" version="[1.6.1, )" />
         <dependency id="ServiceStack.Interfaces.Core" version="1.0.0" />
         <dependency id="ServiceStack.Text.Core" version="1.0.0" />
         <dependency id="ServiceStack.Common.Core" version="1.0.0" />
