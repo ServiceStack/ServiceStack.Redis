@@ -23,16 +23,20 @@ namespace ServiceStack.Redis
 
     public class TemplateRedisFilters : TemplateFilter
     {
-        public IRedisClientsManager RedisManager { get; set; }
-        public IAppSettings AppSettings { get; set; }
+        private IRedisClientsManager redisManager;
+        public IRedisClientsManager RedisManager
+        {
+            get => redisManager ?? (redisManager = Context.Container.Resolve<IRedisClientsManager>());
+            set => redisManager = value;
+        }
 
         T exec<T>(Func<IRedisClient, T> fn, TemplateScopeContext scope, object options)
         {
             try
             {
-                using (var db = RedisManager.GetClient())
+                using (var redis = RedisManager.GetClient())
                 {
-                    return fn(db);
+                    return fn(redis);
                 }
             }
             catch (Exception ex)
@@ -132,6 +136,54 @@ namespace ServiceStack.Redis
 
             var searchResults = json.FromJson<RedisSearchCursorResult>();
             return searchResults.Results;
+        }
+
+        public string redisConnectionString(TemplateScopeContext scope) => exec(r => $"{r.Host}:{r.Port}?db={r.Db}", scope, null);
+
+        public string redisToConnectionString(TemplateScopeContext scope, object connectionInfo) => redisToConnectionString(scope, connectionInfo, null);
+        public string redisToConnectionString(TemplateScopeContext scope, object connectionInfo, object options)
+        {
+            var connectionString = connectionInfo as string;
+            if (connectionString != null)
+                return connectionString;
+
+            if (connectionInfo is IDictionary<string, object> d)
+            {
+                var host = (d.TryGetValue("host", out object h) ? h as string : null) ?? "localhost";
+                var port = d.TryGetValue("port", out object p) ? DynamicInt.Instance.ConvertFrom(p) : 6379;
+                var db = d.TryGetValue("db", out object oDb) ? DynamicInt.Instance.ConvertFrom(oDb) : 0;
+
+                connectionString = $"{host}:{port}?db={db}";
+
+                if (d.TryGetValue("password", out object password))
+                    connectionString += "&password=" + password.ToString().UrlEncode();
+            }
+
+            return connectionString;
+        }
+
+        public string redisChangeConnection(TemplateScopeContext scope, object newConnection) => redisChangeConnection(scope, newConnection, null);
+        public string redisChangeConnection(TemplateScopeContext scope, object newConnection, object options)
+        {
+            try
+            {
+                var connectionString = redisToConnectionString(scope, newConnection, options);
+                if (connectionString == null)
+                    throw new NotSupportedException(nameof(redisChangeConnection) + " expects a String or an ObjectDictionary but received: " + (newConnection?.GetType().Name ?? "null"));
+
+                using (var testConnection = new RedisClient(connectionString))
+                {
+                    testConnection.Ping();
+                }
+
+                ((IRedisFailover)RedisManager).FailoverTo(connectionString);
+
+                return connectionString;
+            }
+            catch (Exception ex)
+            {
+                throw new StopFilterExecutionException(scope, options ?? newConnection as IDictionary<string,object>, ex);
+            }
         }
 
         public string redisSearchKeysAsJson(TemplateScopeContext scope, string query, object options)
