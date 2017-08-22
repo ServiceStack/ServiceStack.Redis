@@ -140,6 +140,13 @@ namespace ServiceStack.Redis
 
         public string redisConnectionString(TemplateScopeContext scope) => exec(r => $"{r.Host}:{r.Port}?db={r.Db}", scope, null);
 
+        public Dictionary<string, object> redisConnection(TemplateScopeContext scope) => exec(r => new Dictionary<string, object>
+        {
+            { "host", r.Host },
+            { "port", r.Port },
+            { "db", r.Db },
+        }, scope, null);
+
         public string redisToConnectionString(TemplateScopeContext scope, object connectionInfo) => redisToConnectionString(scope, connectionInfo, null);
         public string redisToConnectionString(TemplateScopeContext scope, object connectionInfo, object options)
         {
