@@ -138,6 +138,9 @@ namespace ServiceStack.Redis
             return searchResults.Results;
         }
 
+        public Dictionary<string, string> redisInfo(TemplateScopeContext scope) => redisInfo(scope, null);
+        public Dictionary<string, string> redisInfo(TemplateScopeContext scope, object options) => exec(r => r.Info, scope, options);
+
         public string redisConnectionString(TemplateScopeContext scope) => exec(r => $"{r.Host}:{r.Port}?db={r.Db}", scope, null);
 
         public Dictionary<string, object> redisConnection(TemplateScopeContext scope) => exec(r => new Dictionary<string, object>
