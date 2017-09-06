@@ -48,6 +48,11 @@
             Enable the authentication feature and configure the AuthService.
             </summary>
         </member>
+        <member name="P:ServiceStack.AuthFeature.SaveUserNamesInLowerCase">
+            <summary>
+            Should UserName or Emails be saved in AuthRepository in LowerCase
+            </summary>
+        </member>
         <member name="T:ServiceStack.Auth.IManageApiKeys">
             <summary>
             The Interface Auth Repositories need to implement to support API Keys
@@ -784,6 +789,11 @@
         <member name="P:ServiceStack.CacheResponseAttribute.VaryByRoles">
             <summary>
             Vary cache for users in these roles
+            </summary>
+        </member>
+        <member name="P:ServiceStack.CacheResponseAttribute.VaryByHeaders">
+            <summary>
+            Vary cache for different HTTP Headers
             </summary>
         </member>
         <member name="P:ServiceStack.CacheResponseAttribute.LocalCache">
@@ -4293,19 +4303,6 @@
             Deletes a specified cookie by setting its value to empty and expiration to -1 days
             </summary>
         </member>
-        <member name="M:ServiceStack.Host.Handlers.IndexPageHttpHandler.ProcessRequest(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.String)">
-            <summary>
-            Non ASP.NET requests
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Host.Handlers.RedirectHttpHandler.ProcessRequest(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.String)">
-            <summary>
-            Non ASP.NET requests
-            </summary>
-            <param name="request"></param>
-            <param name="response"></param>
-            <param name="operationName"></param>
-        </member>
         <member name="M:ServiceStack.Host.Handlers.StaticFileHandler.#ctor(System.String)">
             <summary>
             Return File at specified virtualPath from AppHost.VirtualFiles ContentRootPath
@@ -4372,6 +4369,11 @@
         <member name="M:ServiceStack.Host.ServiceController.Execute(System.Object)">
             <summary>
             Execute using empty RequestContext
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Host.ServiceController.Execute(System.Object,ServiceStack.Web.IRequest)">
+            <summary>
+            External HTTP Request called from HTTP handlers
             </summary>
         </member>
         <member name="M:ServiceStack.Host.XsdMetadata.GetBaseTypeWithTheSameName(System.Type)">
@@ -4681,7 +4683,7 @@
             Deletes a specified cookie by setting its value to empty and expiration to -1 days
             </summary>
         </member>
-        <member name="M:ServiceStack.HttpResponseExtensionsInternal.WriteToResponse(ServiceStack.Web.IResponse,System.Object,ServiceStack.Web.ResponseSerializerDelegate,ServiceStack.Web.IRequest,System.Byte[],System.Byte[])">
+        <member name="M:ServiceStack.HttpResponseExtensionsInternal.WriteToResponse(ServiceStack.Web.IResponse,System.Object,ServiceStack.Web.ResponseSerializerDelegate,ServiceStack.Web.IRequest,System.Byte[],System.Byte[],System.Threading.CancellationToken)">
             <summary>
             Writes to response.
             Response headers are customizable by implementing IHasOptions an returning Dictionary of Http headers.
@@ -4755,9 +4757,19 @@
             Writes partial range as specified by start-end, from fromStream to toStream.
             </summary>
         </member>
+        <member name="M:ServiceStack.HttpResultUtils.WritePartialToAsync(System.IO.Stream,System.IO.Stream,System.Int64,System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Writes partial range as specified by start-end, from fromStream to toStream.
+            </summary>
+        </member>
         <member name="T:ServiceStack.IAppHost">
             <summary>
             ASP.NET or HttpListener ServiceStack host
+            </summary>
+        </member>
+        <member name="P:ServiceStack.IAppHost.ServiceAssemblies">
+            <summary>
+            The assemblies reflected to find api services provided in the AppHost constructor
             </summary>
         </member>
         <member name="M:ServiceStack.IAppHost.Register``1(``0)">
@@ -4983,6 +4995,11 @@
         <member name="P:ServiceStack.IAppHost.VirtualFiles">
             <summary>
             Read/Write Virtual FileSystem. Defaults to FileSystemVirtualPathProvider
+            </summary>
+        </member>
+        <member name="P:ServiceStack.IAppHost.AddVirtualFileSources">
+            <summary>
+            Register additional Virtual File Sources
             </summary>
         </member>
         <member name="M:ServiceStack.IAppHost.CreateServiceRunner``1(ServiceStack.Host.ActionContext)">
@@ -5521,6 +5538,11 @@
             Turn On/Off Tracking of Exceptions
             </summary>
         </member>
+        <member name="P:ServiceStack.RequestLogsFeature.SkipLogging">
+            <summary>
+            Don't log matching requests
+            </summary>
+        </member>
         <member name="P:ServiceStack.RequestLogsFeature.Capacity">
             <summary>
             Size of InMemoryRollingRequestLogger circular buffer
@@ -5545,6 +5567,11 @@
             <summary>
             Don't log request bodys for services with sensitive information.
             By default Auth and Registration requests are hidden.
+            </summary>
+        </member>
+        <member name="P:ServiceStack.RequestLogsFeature.LimitToServiceRequests">
+            <summary>
+            Limit logging to only Service Requests
             </summary>
         </member>
         <member name="T:ServiceStack.RequiredPermissionAttribute">
@@ -5737,12 +5764,6 @@
             this methods needs to be overwritten in subclass to provider a listener to start handling requests.
             </summary>
             <param name="urlBase">Url to listen to</param>
-        </member>
-        <member name="M:ServiceStack.ServiceStackHost.RedirectDirectory(ServiceStack.Web.IHttpRequest)">
-            <summary>
-            Retain the same behavior as ASP.NET and redirect requests to directores 
-            without a trailing '/'
-            </summary>
         </member>
         <member name="P:ServiceStack.ServiceStackHost.Container">
             <summary>
@@ -6000,16 +6021,6 @@
             </summary>
             <param name="container">The IoC container</param>
             <param name="assemblies">The assemblies to scan for a validator</param>
-        </member>
-        <member name="T:ServiceStack.VirtualPath.InMemoryVirtualPathProvider">
-            <summary>
-            In Memory Virtual Path Provider.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.VirtualFileExtensions.Refresh(ServiceStack.IO.IVirtualFile)">
-            <summary>
-            Refresh file stats for this node if supported
-            </summary>
         </member>
         <member name="T:Funq.Container">
             <summary>

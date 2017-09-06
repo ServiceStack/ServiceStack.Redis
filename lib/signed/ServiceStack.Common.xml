@@ -402,6 +402,129 @@
             to provide a detailed analysis of your logs.
             </summary>
         </member>
+        <member name="P:ServiceStack.Templates.PageResult.LayoutPage">
+            <summary>
+            Use specified Layout 
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.Layout">
+            <summary>
+            Use Layout with specified name
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.NoLayout">
+            <summary>
+            Render without any Layout
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.Model">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.Args">
+            <summary>
+            Add additional Args available to all pages 
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.TemplateFilters">
+            <summary>
+            Add additional template filters available to all pages
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.Options">
+            <summary>
+            Return additional HTTP Headers in HTTP Requests
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.ContentType">
+            <summary>
+            Specify the Content-Type of the Response 
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.PageTransformers">
+            <summary>
+            Transform the Page output using a chain of stream transformers
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.OutputTransformers">
+            <summary>
+            Transform the entire output using a chain of stream transformers
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.FilterTransformers">
+            <summary>
+            Available transformers that can transform context filter stream outputs
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.ExcludeFiltersNamed">
+            <summary>
+            Don't allow access to specified filters
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.LastFilterError">
+            <summary>
+            The last error thrown by a filter
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.LastFilterStackTrace">
+            <summary>
+            The StackTrace where the Last Error Occured 
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.AssignExceptionsTo">
+            <summary>
+            What argument errors should be binded to
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.SkipFilterExecution">
+            <summary>
+            Whether to skip execution of all page filters and just write template string fragments
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.SkipExecutingFiltersIfError">
+            <summary>
+            Overrides Context to specify whether to Ignore or Continue executing filters on error 
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.RethrowExceptions">
+            <summary>
+            Whether to always rethrow Exceptions
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.PageResult.HaltExecution">
+            <summary>
+            Immediately halt execution of the page
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.TemplateConfig.FatalExceptions">
+            <summary>
+            Rethrow fatal exceptions thrown on incorrect API usage    
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.TemplateContext.FilterTransformers">
+            <summary>
+            Available transformers that can transform context filter stream outputs
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.TemplateContext.CheckForModifiedPagesAfter">
+            How long in between checking for modified pages
+        </member>
+        <member name="P:ServiceStack.Templates.TemplateContext.RenderExpressionExceptions">
+            <summary>
+            Render render filter exceptions in-line where filter is located
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.TemplateContext.AssignExceptionsTo">
+            <summary>
+            What argument to assign Fitler Exceptions to
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Templates.TemplateContext.SkipExecutingFiltersIfError">
+            <summary>
+            Whether to 
+            </summary>
+        </member>
         <member name="T:ServiceStack.UrnId">
             <summary>
             Creates a Unified Resource Name (URN) with the following formats:
@@ -409,6 +532,11 @@
             	- urn:{TypeName}:{IdFieldValue}						e.g. urn:UserSession:1
             	- urn:{TypeName}:{IdFieldName}:{IdFieldValue}		e.g. urn:UserSession:UserId:1			
             
+            </summary>
+        </member>
+        <member name="T:ServiceStack.VirtualPath.InMemoryVirtualPathProvider">
+            <summary>
+            In Memory Virtual Path Provider.
             </summary>
         </member>
     </members>
