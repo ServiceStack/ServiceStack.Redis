@@ -2182,7 +2182,7 @@ namespace ServiceStack.Redis
         {
             if (key == null)
                 throw new ArgumentNullException("key");
-            if (key == null)
+            if (member == null)
                 throw new ArgumentNullException("member");
 
             return SendExpectLong(Commands.GeoAdd, key.ToUtf8Bytes(), longitude.ToUtf8Bytes(), latitude.ToUtf8Bytes(), member.ToUtf8Bytes());
