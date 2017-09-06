@@ -14,8 +14,8 @@ namespace ServiceStack.Redis.Tests
                 //ServerVersionNumber = 2611
             };
             //var redis = new RedisClient("10.0.0.14");
-            redis.SetEntry("foo", "bar");
-            var foo = redis.GetEntry("foo");
+            redis.SetValue("foo", "bar");
+            var foo = redis.GetValue("foo");
 
             Assert.That(foo, Is.EqualTo("bar"));
         }

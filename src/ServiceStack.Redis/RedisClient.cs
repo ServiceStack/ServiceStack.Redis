@@ -96,7 +96,7 @@ namespace ServiceStack.Redis
         public string this[string key]
         {
             get { return GetValue(key); }
-            set { SetEntry(key, value); }
+            set { SetValue(key, value); }
         }
 
         public override void OnConnected() { }
@@ -675,7 +675,7 @@ namespace ServiceStack.Redis
             var urnKey = UrnKey(entity);
             var valueString = JsonSerializer.SerializeToString(entity);
 
-            this.SetEntry(urnKey, valueString);
+            this.SetValue(urnKey, valueString);
             RegisterTypeId(entity);
 
             return entity;
@@ -690,7 +690,7 @@ namespace ServiceStack.Redis
             var urnKey = UrnKey(entityType, id);
             var valueString = JsonSerializer.SerializeToString(entity);
 
-            this.SetEntry(urnKey, valueString);
+            this.SetValue(urnKey, valueString);
 
             RegisterTypeId(GetTypeIdsSetKey(entityType), id.ToString());
 

@@ -7,8 +7,8 @@ namespace ServiceStack.Redis.Tests
     public class RedisStatsTests
         : RedisClientTestsBase
     {
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             RedisConfig.AssumeServerVersion = 2821;
         }

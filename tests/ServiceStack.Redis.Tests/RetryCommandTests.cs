@@ -91,7 +91,7 @@ namespace ServiceStack.Redis.Tests
             }
             catch (RedisException ex)
             {
-                Assert.That(ex.Message, Is.StringStarting("Exceeded timeout"));
+                Assert.That(ex.Message, Does.StartWith("Exceeded timeout"));
 
                 redis.OnBeforeFlush = null;
                 Assert.That(redis.Get<int>("retryCounter"), Is.EqualTo(1));
@@ -127,7 +127,7 @@ namespace ServiceStack.Redis.Tests
             }
             catch (Exception ex)
             {
-                Assert.That(ex.Message, Is.StringStarting("Exceeded timeout"));
+                Assert.That(ex.Message, Does.StartWith("Exceeded timeout"));
 
                 redis.OnBeforeFlush = null;
                 Assert.That(redis.Get<int>("retryCounter"), Is.EqualTo(1));

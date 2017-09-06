@@ -10,7 +10,7 @@ namespace ServiceStack.Redis.Tests.Sentinel
     public class RedisSentinelTests
         : RedisSentinelTestBase
     {
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void OnBeforeTestFixture()
         {
             StartAllRedisServers();
@@ -18,7 +18,7 @@ namespace ServiceStack.Redis.Tests.Sentinel
             LogManager.LogFactory = new ConsoleLogFactory(debugEnabled:true);
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void OnAfterTestFixture()
         {
             ShutdownAllRedisSentinels();

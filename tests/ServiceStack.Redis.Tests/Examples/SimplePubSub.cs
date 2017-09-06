@@ -13,8 +13,8 @@ namespace ServiceStack.Redis.Tests.Examples
         const string MessagePrefix = "MESSAGE ";
         const int PublishMessageCount = 5;
 
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             using (var redis = new RedisClient(TestConfig.SingleHost))
             {

@@ -39,7 +39,7 @@ namespace ServiceStack.Redis.Tests.Generic
 
             using (var trans = typedClient.CreateTransaction())
             {
-                trans.QueueCommand(r => r.SetEntry(Key, model));
+                trans.QueueCommand(r => r.SetValue(Key, model));
 
                 trans.Commit();
             }
@@ -54,7 +54,7 @@ namespace ServiceStack.Redis.Tests.Generic
 
             using (var trans = typedClient.CreateTransaction())
             {
-                trans.QueueCommand(r => r.SetEntry(Key, model));
+                trans.QueueCommand(r => r.SetValue(Key, model));
             }
 
             Assert.That(typedClient.GetValue(Key), Is.Null);
@@ -68,7 +68,7 @@ namespace ServiceStack.Redis.Tests.Generic
             {
                 using (var trans = typedClient.CreateTransaction())
                 {
-                    trans.QueueCommand(r => r.SetEntry(Key, model));
+                    trans.QueueCommand(r => r.SetValue(Key, model));
                     throw new NotSupportedException();
                 }
             }

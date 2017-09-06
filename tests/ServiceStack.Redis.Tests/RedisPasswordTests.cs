@@ -17,8 +17,8 @@ namespace ServiceStack.Redis.Tests
             using (var readWrite = factory.GetClient())
             using (var readOnly = factory.GetReadOnlyClient())
             {
-                readWrite.SetEntry("Foo", "Bar");
-                var value = readOnly.GetEntry("Foo");
+                readWrite.SetValue("Foo", "Bar");
+                var value = readOnly.GetValue("Foo");
 
                 Assert.That(value, Is.EqualTo("Bar"));
             }
@@ -35,12 +35,12 @@ namespace ServiceStack.Redis.Tests
                     var factory = new PooledRedisClientManager(password + "@" + TestConfig.SingleHost); // redis will throw when using password and it's not configured
                     using (var redis = factory.GetClient())
                     {
-                        redis.SetEntry("Foo", "Bar");
+                        redis.SetValue("Foo", "Bar");
                     }
                 }
                 catch (RedisResponseException ex)
                 {
-                    Assert.That(ex.Message, Is.Not.StringContaining(password));
+                    Assert.That(ex.Message, Is.Not.Contains(password));
                     throw;
                 }
             },

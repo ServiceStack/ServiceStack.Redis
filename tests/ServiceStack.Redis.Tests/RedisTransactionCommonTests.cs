@@ -25,7 +25,7 @@ namespace ServiceStack.Redis.Tests
             Assert.That(Redis.GetValue(Prefix + "key"), Is.Null);
             using (var trans = Redis.CreateTransaction())              //Calls 'MULTI'
             {
-                trans.QueueCommand(r => r.SetEntry(Prefix + "key", "a"));      //Queues 'SET key a'
+                trans.QueueCommand(r => r.SetValue(Prefix + "key", "a"));      //Queues 'SET key a'
                 trans.QueueCommand(r => r.ExpireEntryIn(Prefix + "key", oneSec)); //Queues 'EXPIRE key 1'
 
                 trans.Commit();                                        //Calls 'EXEC'

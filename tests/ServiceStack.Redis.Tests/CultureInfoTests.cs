@@ -10,8 +10,8 @@ namespace ServiceStack.Redis.Tests
     {
         private CultureInfo previousCulture = CultureInfo.InvariantCulture;
 
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
 #if NETCORE
             previousCulture = CultureInfo.CurrentCulture;
@@ -23,8 +23,8 @@ namespace ServiceStack.Redis.Tests
 #endif
         }
 
-        [TestFixtureTearDown]
-        public void TestFixtureTearDown()
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
         {
 #if NETCORE
             CultureInfo.CurrentCulture = previousCulture;

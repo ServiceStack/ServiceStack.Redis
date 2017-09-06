@@ -16,8 +16,8 @@ namespace ServiceStack.Redis.Tests
             redis = new RedisClient(TestConfig.GeoHost);
         }
 
-        [TestFixtureTearDown]
-        public void TestFixtureTearDown()
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
         {
             redis.Dispose();
         }

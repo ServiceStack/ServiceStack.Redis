@@ -17,7 +17,7 @@ namespace ServiceStack.Redis.Tests.Integration
     {
         private static string testData;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void onBeforeTestFixture()
         {
             var results = 100.Times(x => ModelWithFieldsOfDifferentTypes.Create(x));
@@ -96,7 +96,7 @@ namespace ServiceStack.Redis.Tests.Integration
                 Log("Client '{0}' is using '{1}'", clientNo, client.Host);
 
                 var testClientKey = "test:" + host + ":" + clientNo;
-                client.SetEntry(testClientKey, testData);
+                client.SetValue(testClientKey, testData);
                 var result = client.GetValue(testClientKey) ?? "";
 
                 Log("\t{0} => {1} len {2} {3} len", testClientKey,

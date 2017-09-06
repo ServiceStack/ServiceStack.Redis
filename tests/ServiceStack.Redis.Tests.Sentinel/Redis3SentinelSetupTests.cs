@@ -58,9 +58,9 @@ namespace ServiceStack.Redis.Tests.Sentinel
 
                 client.FlushAll();
 
-                client.SetEntry("Sentinel3Setup", "GoogleCloud");
+                client.SetValue("Sentinel3Setup", "GoogleCloud");
 
-                var result = client.GetEntry("Sentinel3Setup");
+                var result = client.GetValue("Sentinel3Setup");
                 Assert.That(result, Is.EqualTo("GoogleCloud"));
             }
 
@@ -68,7 +68,7 @@ namespace ServiceStack.Redis.Tests.Sentinel
             {
                 "{0}:{1}".Print(readOnly.Host, readOnly.Port);
 
-                var result = readOnly.GetEntry("Sentinel3Setup");
+                var result = readOnly.GetValue("Sentinel3Setup");
                 Assert.That(result, Is.EqualTo("GoogleCloud"));
             }
         }
