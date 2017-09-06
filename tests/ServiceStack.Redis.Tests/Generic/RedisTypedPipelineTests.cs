@@ -40,7 +40,7 @@ namespace ServiceStack.Redis.Tests.Generic
 
             using (var pipeline = typedClient.CreatePipeline())
             {
-                pipeline.QueueCommand(r => r.SetEntry(Key, model));
+                pipeline.QueueCommand(r => r.SetValue(Key, model));
 
                 pipeline.Flush();
             }
@@ -55,7 +55,7 @@ namespace ServiceStack.Redis.Tests.Generic
 
             using (var pipeline = typedClient.CreatePipeline())
             {
-                pipeline.QueueCommand(r => r.SetEntry(Key, model));
+                pipeline.QueueCommand(r => r.SetValue(Key, model));
             }
 
             Assert.That(typedClient.GetValue(Key), Is.Null);
@@ -69,7 +69,7 @@ namespace ServiceStack.Redis.Tests.Generic
             {
                 using (var pipeline = typedClient.CreatePipeline())
                 {
-                    pipeline.QueueCommand(r => r.SetEntry(Key, model));
+                    pipeline.QueueCommand(r => r.SetValue(Key, model));
                     throw new NotSupportedException();
                 }
             }

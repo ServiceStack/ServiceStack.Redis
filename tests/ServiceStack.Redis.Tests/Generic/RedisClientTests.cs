@@ -8,7 +8,7 @@ namespace ServiceStack.Redis.Tests.Generic
     [TestFixture, Category("Integration")]
     public class RedisClientTests : RedisClientTestsBase
     {
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void TestFixture()
         {
         }

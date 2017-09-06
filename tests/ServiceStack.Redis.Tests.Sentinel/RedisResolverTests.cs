@@ -9,14 +9,14 @@ namespace ServiceStack.Redis.Tests.Sentinel
     public class RedisResolverTests
         : RedisSentinelTestBase
     {
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             StartAllRedisServers();
         }
 
-        [TestFixtureTearDown]
-        public void TestFixtureTearDown()
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
         {
             ShutdownAllRedisServers();
         }

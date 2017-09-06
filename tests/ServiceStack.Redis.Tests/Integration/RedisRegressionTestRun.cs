@@ -14,7 +14,7 @@ namespace ServiceStack.Redis.Tests.Integration
     {
         private static string testData;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void onBeforeTestFixture()
         {
             var results = 100.Times(x => ModelWithFieldsOfDifferentTypes.Create(x));

@@ -16,7 +16,7 @@ namespace ServiceStack.Redis.Tests
             Debug.WriteLine("{0}", string.Format(fmt, args).Trim());
         }
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public virtual void OnBeforeTestFixture()
         {
             RedisClient.NewFactoryFn = () => new RedisClient(TestConfig.SingleHost);
@@ -26,7 +26,7 @@ namespace ServiceStack.Redis.Tests
             }
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public virtual void OnAfterTestFixture()
         {
         }

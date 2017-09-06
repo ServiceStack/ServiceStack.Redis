@@ -23,8 +23,8 @@ namespace ServiceStack.Redis.Tests
         private string Password;
         private string connectionString;
 
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             var settings = new TextFileSettings("~/azureconfig.txt".MapProjectPath());
             Host = settings.GetString("Host");
@@ -316,7 +316,7 @@ namespace ServiceStack.Redis.Tests
                 Log("Client '{0}' is using '{1}'", clientNo, client.Host);
 
                 var testClientKey = "test:" + host + ":" + clientNo;
-                client.SetEntry(testClientKey, testData);
+                client.SetValue(testClientKey, testData);
                 var result = client.GetValue(testClientKey) ?? "";
 
                 Log("\t{0} => {1} len {2} {3} len", testClientKey,

@@ -14,14 +14,14 @@ namespace ServiceStack.Redis.Tests
     [TestFixture, Category("Integration")]
     public class PooledRedisClientManagerTests
     {
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             RedisConfig.VerifyMasterConnections = false;
         }
 
-        [TestFixtureTearDown]
-        public void TestFixtureTearDown()
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
         {
             RedisConfig.VerifyMasterConnections = true;
         }
@@ -387,7 +387,7 @@ namespace ServiceStack.Redis.Tests
                 }
                 catch (TimeoutException ex)
                 {
-                    Assert.That(ex.Message, Is.StringStarting("Redis Timeout expired."));
+                    Assert.That(ex.Message, Does.StartWith("Redis Timeout expired."));
                 }
 
                 var slaves = 4.Times(i => manager.GetReadOnlyClient());
@@ -399,7 +399,7 @@ namespace ServiceStack.Redis.Tests
                 }
                 catch (TimeoutException ex)
                 {
-                    Assert.That(ex.Message, Is.StringStarting("Redis Timeout expired."));
+                    Assert.That(ex.Message, Does.StartWith("Redis Timeout expired."));
                 }
             }
         }

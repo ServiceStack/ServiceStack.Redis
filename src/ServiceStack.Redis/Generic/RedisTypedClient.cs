@@ -166,7 +166,7 @@ namespace ServiceStack.Redis.Generic
         public T this[string key]
         {
             get { return GetValue(key); }
-            set { SetEntry(key, value); }
+            set { SetValue(key, value); }
         }
 
         public byte[] SerializeValue(T value)

@@ -34,7 +34,7 @@ namespace ServiceStack.Redis.Tests
         {
             string value = redisManager.Exec(r =>
             {
-                r.SetEntry("key", "value");
+                r.SetValue("key", "value");
                 return r.GetValue("key");
             });
             Assert.That(value, Is.EqualTo("value"));

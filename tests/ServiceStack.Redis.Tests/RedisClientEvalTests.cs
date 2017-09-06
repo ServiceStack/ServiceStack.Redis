@@ -125,7 +125,7 @@ namespace ServiceStack.Redis.Tests
             }
             catch (RedisResponseException ex)
             {
-                Assert.That(ex.Message, Is.StringContaining("NOSCRIPT"));
+                Assert.That(ex.Message, Does.Contain("NOSCRIPT"));
             }
         }
 

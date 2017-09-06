@@ -24,14 +24,14 @@ namespace ServiceStack.Redis.Tests
         private string firstReadWriteHost;
         private string firstReadOnlyHost;
 
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             RedisConfig.VerifyMasterConnections = false;
         }
 
-        [TestFixtureTearDown]
-        public void TestFixtureTearDown()
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
         {
             RedisConfig.VerifyMasterConnections = true;
         }
