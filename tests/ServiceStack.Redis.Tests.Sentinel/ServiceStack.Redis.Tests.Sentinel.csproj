@@ -37,7 +37,7 @@
     <Reference Include="System.Web" />
     <Reference Include="Microsoft.CSharp" />
 
-    <Reference Include="..\..\lib\pcl\ServiceStack.Interfaces.dll" />
+    <Reference Include="..\..\lib\net45\ServiceStack.Interfaces.dll" />
     <Reference Include="..\..\lib\net45\ServiceStack.Text.dll" />
     <Reference Include="..\..\lib\net45\ServiceStack.Common.dll" />
     <Reference Include="..\..\lib\net45\ServiceStack.dll" />
@@ -61,12 +61,12 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="2.0.0" />
 
-    <Reference Include="..\..\lib\netstandard1.1\ServiceStack.Interfaces.dll" />
-    <Reference Include="..\..\lib\netstandard1.3\ServiceStack.Text.dll" />
-    <Reference Include="..\..\lib\netstandard1.3\ServiceStack.Common.dll" />
-    <Reference Include="..\..\lib\netstandard1.6\ServiceStack.dll" />
+    <Reference Include="..\..\lib\netstandard2.0\ServiceStack.Interfaces.dll" />
+    <Reference Include="..\..\lib\netstandard2.0\ServiceStack.Text.dll" />
+    <Reference Include="..\..\lib\netstandard2.0\ServiceStack.Common.dll" />
+    <Reference Include="..\..\lib\netstandard2.0\ServiceStack.dll" />
   </ItemGroup>
 
 </Project>

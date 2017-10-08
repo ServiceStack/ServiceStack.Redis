@@ -19,7 +19,7 @@
     <language>en-US</language>
     <copyright>ServiceStack 2017 and contributors</copyright>
     <dependencies>
-      <group targetFramework=".NETStandard1.3">
+      <group targetFramework=".netstandard2.0">
         <dependency id="System.Net.Security" version="[4.3.1, )" />
         <dependency id="System.Collections.Specialized" version="[4.3.0, )" />
         <dependency id="System.Collections.NonGeneric" version="[4.3.0, )" />
