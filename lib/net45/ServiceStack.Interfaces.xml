@@ -382,7 +382,7 @@
         </member>
         <member name="M:ServiceStack.Caching.ISessionFactory.GetOrCreateSession(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse)">
             <summary>
-            Gets the session for this request, creates one if it doesn't exist.
+            Gets the Session Bag for this request, creates one if it doesn't exist.
             </summary>
             <param name="httpReq"></param>
             <param name="httpRes"></param>
@@ -390,9 +390,16 @@
         </member>
         <member name="M:ServiceStack.Caching.ISessionFactory.GetOrCreateSession">
             <summary>
-            Gets the session for this request, creates one if it doesn't exist.
+            Gets the Session Bag for this request, creates one if it doesn't exist.
             Only for ASP.NET apps. Uses the HttpContext.Current singleton.
             </summary>
+        </member>
+        <member name="M:ServiceStack.Caching.ISessionFactory.CreateSession(System.String)">
+            <summary>
+            Create a Session Bag using a custom sessionId
+            </summary>
+            <param name="sessionId"></param>
+            <returns></returns>
         </member>
         <member name="T:ServiceStack.Configuration.IContainerAdapter">
             <summary>
@@ -509,6 +516,11 @@
         <member name="T:ServiceStack.IHasResponseStatus">
             <summary>
             Contract indication that the Response DTO has a ResponseStatus
+            </summary>
+        </member>
+        <member name="M:ServiceStack.IO.IVirtualFile.Refresh">
+            <summary>
+            Refresh file stats for this node if supported
             </summary>
         </member>
         <member name="P:ServiceStack.IQuery.Skip">
@@ -1080,6 +1092,16 @@
             retry attempts and store the message straight into the DLQ
             </summary>
         </member>
+        <member name="T:ServiceStack.PageAttribute">
+            <summary>
+            Specify a VirtualPath or Layout for a Code Page
+            </summary>
+        </member>
+        <member name="T:ServiceStack.PageArgAttribute">
+            <summary>
+            Specify static page arguments
+            </summary>
+        </member>
         <member name="T:ServiceStack.Redis.Generic.IRedisList`1">
             <summary>
             Wrap the common redis list operations under a IList[string] interface.
@@ -1510,17 +1532,23 @@
             Adds a new Set-Cookie instruction for ss-id
             </summary>
         </member>
-        <member name="T:ServiceStack.Web.IHasRequestFilter">
-            <summary>
-            This interface can be implemented by an attribute
-            which adds an request filter for the specific request DTO the attribute marked.
-            </summary>
-        </member>
-        <member name="P:ServiceStack.Web.IHasRequestFilter.Priority">
+        <member name="P:ServiceStack.Web.IRequestFilterBase.Priority">
             <summary>
             Order in which Request Filters are executed. 
             &lt;0 Executed before global request filters
             &gt;0 Executed after global request filters
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Web.IRequestFilterBase.Copy">
+            <summary>
+            A new shallow copy of this filter is used on every request.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:ServiceStack.Web.IHasRequestFilter">
+            <summary>
+            This interface can be implemented by an attribute
+            which adds an request filter for the specific request DTO the attribute marked.
             </summary>
         </member>
         <member name="M:ServiceStack.Web.IHasRequestFilter.RequestFilter(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.Object)">
@@ -1531,7 +1559,28 @@
             <param name="res">The http response wrapper</param>
             <param name="requestDto">The request DTO</param>
         </member>
-        <member name="M:ServiceStack.Web.IHasRequestFilter.Copy">
+        <member name="T:ServiceStack.Web.IHasRequestFilterAsync">
+            <summary>
+            This interface can be implemented by an attribute
+            which adds an request filter for the specific request DTO the attribute marked.
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Web.IHasRequestFilterAsync.RequestFilterAsync(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.Object)">
+            <summary>
+            The request filter is executed before the service.
+            </summary>
+            <param name="req">The http request wrapper</param>
+            <param name="res">The http response wrapper</param>
+            <param name="requestDto">The request DTO</param>
+        </member>
+        <member name="P:ServiceStack.Web.IResponseFilterBase.Priority">
+            <summary>
+            Order in which Response Filters are executed. 
+            &lt;0 Executed before global response filters
+            &gt;0 Executed after global response filters
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Web.IResponseFilterBase.Copy">
             <summary>
             A new shallow copy of this filter is used on every request.
             </summary>
@@ -1543,13 +1592,6 @@
             which adds an response filter for the specific response DTO the attribute marked.
             </summary>
         </member>
-        <member name="P:ServiceStack.Web.IHasResponseFilter.Priority">
-            <summary>
-            Order in which Response Filters are executed. 
-            &lt;0 Executed before global response filters
-            &gt;0 Executed after global response filters
-            </summary>
-        </member>
         <member name="M:ServiceStack.Web.IHasResponseFilter.ResponseFilter(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.Object)">
             <summary>
             The response filter is executed after the service
@@ -1557,11 +1599,18 @@
             <param name="req">The http request wrapper</param>
             <param name="res">The http response wrapper</param>
         </member>
-        <member name="M:ServiceStack.Web.IHasResponseFilter.Copy">
+        <member name="T:ServiceStack.Web.IHasResponseFilterAsync">
             <summary>
-            A new shallow copy of this filter is used on every request.
+            This interface can be implemented by an attribute
+            which adds an response filter for the specific response DTO the attribute marked.
             </summary>
-            <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Web.IHasResponseFilterAsync.ResponseFilterAsync(ServiceStack.Web.IRequest,ServiceStack.Web.IResponse,System.Object)">
+            <summary>
+            The response filter is executed after the service
+            </summary>
+            <param name="req">The http request wrapper</param>
+            <param name="res">The http response wrapper</param>
         </member>
         <member name="T:ServiceStack.Web.IHttpRequest">
             <summary>
@@ -1684,6 +1733,16 @@
             Write a partial content result
             </summary>
         </member>
+        <member name="P:ServiceStack.Web.IPartialWriterAsync.IsPartialRequest">
+            <summary>
+            Whether this HttpResult allows Partial Response
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Web.IPartialWriterAsync.WritePartialToAsync(ServiceStack.Web.IResponse,System.Threading.CancellationToken)">
+            <summary>
+            Write a partial content result
+            </summary>
+        </member>
         <member name="T:ServiceStack.Web.IRequest">
             <summary>
             A thin wrapper around each host's Request e.g: ASP.NET, HttpListener, MQ, etc
@@ -1800,6 +1859,11 @@
             Turn On/Off Tracking of Exceptions
             </summary>
         </member>
+        <member name="P:ServiceStack.Web.IRequestLogger.LimitToServiceRequests">
+            <summary>
+            Limit logging to only Service Requests
+            </summary>
+        </member>
         <member name="P:ServiceStack.Web.IRequestLogger.RequiredRoles">
             <summary>
             Limit access to /requestlogs service to role
@@ -1866,12 +1930,6 @@
             <summary>
             The Response DTO
             </summary>
-        </member>
-        <member name="M:ServiceStack.Web.IResponse.Write(System.String)">
-            <summary>
-            Write once to the Response Stream then close it. 
-            </summary>
-            <param name="text"></param>
         </member>
         <member name="P:ServiceStack.Web.IResponse.UseBufferedStream">
             <summary>
