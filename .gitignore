@@ -43,7 +43,6 @@ App_Data/
 NuGet/
 NuGet.Signed/
 packages/
-*.pfx
 
 build/
 tests/ServiceStack.Redis.Tests/azureconfig.txt
