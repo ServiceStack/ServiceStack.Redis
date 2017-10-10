@@ -19,7 +19,7 @@
     <language>en-US</language>
     <copyright>ServiceStack 2017 and contributors</copyright>
     <dependencies>
-      <dependency id="ServiceStack.Common" version="4.5" />
+      <dependency id="ServiceStack.Common" version="5.0" />
     </dependencies>
   </metadata>
   <files>
