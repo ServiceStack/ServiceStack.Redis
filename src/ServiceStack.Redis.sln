@@ -1,12 +1,10 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{38F69F8F-9303-4BAF-B081-D28339163E07}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\appsettings.license.txt = ..\build\appsettings.license.txt
 		..\build\build-core.proj = ..\build\build-core.proj
-		..\build\build-sn.proj = ..\build\build-sn.proj
 		..\build\build.bat = ..\build\build.bat
 		..\build\build.proj = ..\build\build.proj
 		..\build\build.tasks = ..\build\build.tasks
@@ -14,7 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{38F69F8F
 		..\README.md = ..\README.md
 		..\NuGet.Core\ServiceStack.Redis.Core\servicestack.redis.core.nuspec = ..\NuGet.Core\ServiceStack.Redis.Core\servicestack.redis.core.nuspec
 		..\NuGet\ServiceStack.Redis\servicestack.redis.nuspec = ..\NuGet\ServiceStack.Redis\servicestack.redis.nuspec
-		..\NuGet.Signed\ServiceStack.Redis.Signed\servicestack.redis.signed.nuspec = ..\NuGet.Signed\ServiceStack.Redis.Signed\servicestack.redis.signed.nuspec
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Redis", "ServiceStack.Redis\ServiceStack.Redis.csproj", "{AF99F19B-4C04-4F58-81EF-B092F1FCC540}"

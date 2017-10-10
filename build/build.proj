@@ -4,8 +4,8 @@
   <Import Project="$(MSBuildProjectDirectory)/build.tasks" />
 
   <PropertyGroup>
-    <MajorVersion Condition="$(MajorVersion) == ''">4</MajorVersion>
-    <MinorVersion Condition="$(MinorVersion) == ''">5</MinorVersion>
+    <MajorVersion Condition="$(MajorVersion) == ''">5</MajorVersion>
+    <MinorVersion Condition="$(MinorVersion) == ''">0</MinorVersion>
     <PatchVersion Condition="$(PatchVersion) == ''">$(BUILD_NUMBER)</PatchVersion>
   </PropertyGroup>
 
@@ -33,6 +33,7 @@
   <Target Name="Default" DependsOnTargets="$(DoBuildSolutionsDependsOn)" />
 
   <Target Name="TeamCityBuild">
+    <CallTarget Targets="UpdateVersion" />
     <CallTarget Targets="Default" />
   </Target>
 
@@ -51,13 +52,9 @@
         <Find>AssemblyFileVersion\(\"\d+\.\d+\.\d+\.\d+\"\)</Find>
         <ReplaceWith>AssemblyFileVersion("$(Version)")</ReplaceWith>
       </RegexTransform>
-      <RegexTransform Include="$(SrcDir)/**/AssemblyInfo.cs">
-        <Find>AssemblyVersion\(\"\d+\.\d+\.\d+\.\d+\"\)</Find>
-        <ReplaceWith>AssemblyVersion("$(Version)")</ReplaceWith>
-      </RegexTransform>
       <!--Update Min Dependency Version -->
       <RegexTransform Include="$(NuGetPackageDir)/**/*.nuspec">
-        <Find>version="4\.5[^"]*"</Find>
+        <Find>version="5\.0[^"]*"</Find>
         <ReplaceWith>version="$(PackageVersion)"</ReplaceWith>
       </RegexTransform>
     </ItemGroup>
@@ -66,13 +63,11 @@
   </Target>
 
   <Target Name="NuGetPack">
-
-    <CallTarget Targets="UpdateVersion" />
-
     <Delete Files="@(NugetPackageFilesToDelete)" />
 
     <ItemGroup>
       <RedisFiles Include="$(SrcDir)/ServiceStack.Redis/bin/$(Configuration)/net45/ServiceStack.Redis.*"></RedisFiles>
+      <RedisCoreFiles Include="$(SrcDir)/ServiceStack.Redis/bin/$(Configuration)/netstandard2.0/ServiceStack.Redis.*"></RedisCoreFiles>
     </ItemGroup>
 
     <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis/ServiceStack.Redis.csproj"
@@ -81,6 +76,9 @@
  
     <MakeDir Directories="$(NuGetPackageDir)/ServiceStack.Redis/lib/net45" Condition="!Exists('$(NuGetPackageDir)/ServiceStack.Redis/lib/net45')" />
     <Copy SourceFiles="%(RedisFiles.Identity)" DestinationFolder="$(NuGetPackageDir)/ServiceStack.Redis/lib/net45" />
+
+    <MakeDir Directories="$(NuGetPackageDir)/ServiceStack.Redis/lib/netstandard2.0" Condition="!Exists('$(NuGetPackageDir)/ServiceStack.Redis/lib/netstandard2.0')" />
+    <Copy SourceFiles="%(RedisCoreFiles.Identity)" DestinationFolder="$(NuGetPackageDir)/ServiceStack.Redis/lib/netstandard2.0" />
 
     <Exec Command="&quot;$(NuGetPath)&quot; pack &quot;$(NuGetPackageDir)/ServiceStack.Redis/servicestack.redis.nuspec&quot; -OutputDirectory &quot;$(NuGetPackageDir)&quot; -Version $(PackageVersion) -Symbols"
             LogStandardErrorAsError="true" />
