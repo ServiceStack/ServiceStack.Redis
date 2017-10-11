@@ -11,11 +11,11 @@
         "dependencies": {
           "Microsoft.Extensions.Primitives": "2.0.0",
           "NETStandard.Library": "2.0.0",
+          "ServiceStack.Interfaces": "1.0.0",
           "System.Collections.Specialized": "4.3.0",
           "System.Net.Requests": "4.3.0",
           "System.ServiceModel.Primitives": "4.3.0",
           "System.Xml.XmlSerializer": "4.3.0",
-          "ServiceStack.Interfaces": "5.0.0.0",
           "ServiceStack.Text": "5.0.0.0"
         },
         "runtime": {
@@ -1109,7 +1109,10 @@
           "lib/netstandard1.3/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "ServiceStack.Interfaces/5.0.0.0": {
+      "ServiceStack.Interfaces/1.0.0": {
+        "dependencies": {
+          "System.Runtime.Serialization.Primitives": "4.3.0"
+        },
         "runtime": {
           "ServiceStack.Interfaces.dll": {}
         }
@@ -1792,8 +1795,8 @@
       "path": "system.xml.xmlserializer/4.3.0",
       "hashPath": "system.xml.xmlserializer.4.3.0.nupkg.sha512"
     },
-    "ServiceStack.Interfaces/5.0.0.0": {
-      "type": "reference",
+    "ServiceStack.Interfaces/1.0.0": {
+      "type": "project",
       "serviceable": false,
       "sha512": ""
     },
