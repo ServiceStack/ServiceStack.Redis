@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -79,6 +80,25 @@ namespace ServiceStack.Redis.Tests
             {
                 AssertClientManager(basicManager, expected);
             }
+        }
+
+        [Test]
+        public void Does_encode_values_when_serializing_to_ConnectionString()
+        {
+            var config = new RedisEndpoint
+            {
+                Host = "host",
+                Port = 1,
+                Password = "p@55W0rd="
+            };
+
+            var connString = config.ToString();
+            Assert.That(connString, Is.EqualTo("host:1?Password=p%4055W0rd%3d"));
+
+            var fromConfig = connString.ToRedisEndpoint();
+            Assert.That(fromConfig.Host, Is.EqualTo(config.Host));
+            Assert.That(fromConfig.Port, Is.EqualTo(config.Port));
+            Assert.That(fromConfig.Password, Is.EqualTo(config.Password));
         }
 
         private static void AssertClientManager(IRedisClientsManager redisManager, RedisEndpoint expected)

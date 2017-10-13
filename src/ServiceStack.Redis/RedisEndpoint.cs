@@ -54,7 +54,7 @@ namespace ServiceStack.Redis
             if (Client != null)
                 args.Add("Client=" + Client);
             if (Password != null)
-                args.Add("Password=" + Password);
+                args.Add("Password=" + Password.UrlEncode());
             if (Db != RedisConfig.DefaultDb)
                 args.Add("Db=" + Db);
             if (Ssl)
