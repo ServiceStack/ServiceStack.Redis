@@ -25,7 +25,12 @@ namespace ServiceStack.Redis
         public Action OnHeartbeatReceived { get; set; }
         public Action OnStop { get; set; }
         public Action OnDispose { get; set; }
+        
+        /// <summary>
+        /// Callback fired on each message received, handle with (channel, msg) => ... 
+        /// </summary>
         public Action<string, string> OnMessage { get; set; }
+
         public Action<string> OnControlCommand { get; set; }
         public Action<string> OnUnSubscribe { get; set; }
         public Action<Exception> OnError { get; set; }
