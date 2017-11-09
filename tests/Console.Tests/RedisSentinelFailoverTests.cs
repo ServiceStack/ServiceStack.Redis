@@ -68,7 +68,7 @@ namespace ConsoleTests
                             log.DebugFormat("{0} = {1}", key, value);
                         }
                     }
-                    catch (ObjectDisposedException ex)
+                    catch (ObjectDisposedException)
                     {
                         log.DebugFormat("ObjectDisposedException detected, disposing timer...");
                         clientTimer.Dispose();

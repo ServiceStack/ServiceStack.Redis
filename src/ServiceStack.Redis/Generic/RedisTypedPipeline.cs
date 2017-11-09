@@ -53,13 +53,12 @@ namespace ServiceStack.Redis
         {
             foreach (var queuedCommand in QueuedCommands)
             {
-                var cmd = queuedCommand as QueuedRedisTypedCommand<T>;
-                if (cmd != null)
+                if (queuedCommand is QueuedRedisTypedCommand<T> cmd)
                     cmd.Execute(RedisClient);
             }
         }
 
-        public bool Replay()
+        public virtual bool Replay()
         {
             RedisClient.Pipeline = this;
             Execute();
@@ -72,7 +71,7 @@ namespace ServiceStack.Redis
             RedisClient.EndPipeline();
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             ClosePipeline();
         }

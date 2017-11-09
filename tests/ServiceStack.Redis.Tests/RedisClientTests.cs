@@ -396,7 +396,7 @@ namespace ServiceStack.Redis.Tests
                     }
                 }
             }
-            catch (TimeoutException tex)
+            catch (TimeoutException)
             {
                 var val = Redis.Get<int>(key);
                 Assert.That(val, Is.EqualTo(1));

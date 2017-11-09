@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using ServiceStack.Common;
-using ServiceStack.Common;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Examples.BestPractice

@@ -63,7 +63,6 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Convert_int()
         {
-            var test = 1234;
             Debug.WriteLine(BitConverter.ToString(1234.ToString().ToUtf8Bytes()));
         }
 

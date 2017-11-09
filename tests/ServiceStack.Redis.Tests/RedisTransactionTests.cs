@@ -53,7 +53,6 @@ namespace ServiceStack.Redis.Tests
         {
             Assert.That(Redis.GetValue(Key), Is.Null);
             const string value1 = "value1";
-            const string value2 = "value2";
             try
             {
                 Redis.Watch(Key);
@@ -66,7 +65,7 @@ namespace ServiceStack.Redis.Tests
                     Assert.AreEqual(value1, Redis.Get<string>(Key));
                 }
             }
-            catch (NotSupportedException ignore)
+            catch (NotSupportedException)
             {
                 Assert.That(Redis.GetValue(Key), Is.Null);
             }
@@ -84,7 +83,7 @@ namespace ServiceStack.Redis.Tests
                     throw new NotSupportedException();
                 }
             }
-            catch (NotSupportedException ignore)
+            catch (NotSupportedException)
             {
                 Assert.That(Redis.GetValue(Key), Is.Null);
             }

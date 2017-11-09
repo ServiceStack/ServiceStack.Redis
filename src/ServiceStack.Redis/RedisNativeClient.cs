@@ -2133,7 +2133,7 @@ namespace ServiceStack.Redis
             return ReadMultiData();
         }
 
-        public IRedisSubscription CreateSubscription()
+        public virtual IRedisSubscription CreateSubscription()
         {
             return new RedisSubscription(this);
         }

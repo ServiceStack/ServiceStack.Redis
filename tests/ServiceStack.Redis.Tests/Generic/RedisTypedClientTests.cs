@@ -28,20 +28,14 @@ namespace ServiceStack.Redis.Tests.Generic
             public string Data { get; set; }
         }
 
-        protected RedisClient Redis;
         protected IRedisTypedClient<CacheRecord> RedisTyped;
 
-        protected void Log(string fmt, params object[] args)
-        {
-            Debug.WriteLine("{0}", string.Format(fmt, args).Trim());
-        }
-
         [SetUp]
-        public virtual void OnBeforeEachTest()
+        public override void OnBeforeEachTest()
         {
             base.OnBeforeEachTest();
 
-            if (Redis != null) Redis.Dispose();
+            Redis?.Dispose();
             Redis = new RedisClient(TestConfig.SingleHost)
             {
                 NamespacePrefix = "RedisTypedClientTests:"

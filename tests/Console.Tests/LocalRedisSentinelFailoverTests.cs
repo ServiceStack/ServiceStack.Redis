@@ -120,7 +120,7 @@ namespace ConsoleTests
                 StartRedisServersAndSentinels();
         }
 
-        protected virtual void OnTearDown()
+        protected override void OnTearDown()
         {
             log.Debug("Press Enter to shutdown Redis Sentinels and Servers...");
             Console.ReadLine();

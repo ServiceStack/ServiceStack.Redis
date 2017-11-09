@@ -35,7 +35,6 @@ namespace ServiceStack.Redis.Tests
         private static void AssertAreEqual(List<string> actualList, Queue<string> expectedList)
         {
             Assert.That(actualList, Has.Count.EqualTo(expectedList.Count));
-            var i = 0;
             actualList.ForEach(x => Assert.That(x, Is.EqualTo(expectedList.Dequeue())));
         }
 

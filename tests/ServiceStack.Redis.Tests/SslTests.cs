@@ -133,7 +133,7 @@ namespace ServiceStack.Redis.Tests
             }
             else
             {
-                var ctor = typeof(SslStream).GetAllConstructors()
+                var ctor = typeof(SslStream).GetConstructors()
                     .First(x => x.GetParameters().Length == 5);
 
                 var policyType = AssemblyUtils.FindType("System.Net.Security.EncryptionPolicy");

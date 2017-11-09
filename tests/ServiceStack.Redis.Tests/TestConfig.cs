@@ -11,7 +11,7 @@ namespace ServiceStack.Redis.Tests
             LogManager.LogFactory = new InMemoryLogFactory();
         }
 
-        public const bool IgnoreLongTests = true;
+        public static bool IgnoreLongTests = true;
 
         public static string SingleHost => Environment.GetEnvironmentVariable("CI_REDIS") ?? "localhost";
 

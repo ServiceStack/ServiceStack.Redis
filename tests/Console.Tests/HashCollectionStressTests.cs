@@ -272,7 +272,7 @@ namespace ConsoleTests
                         return result;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                     if (i++ < 3)

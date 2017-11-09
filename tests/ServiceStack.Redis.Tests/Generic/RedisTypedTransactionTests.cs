@@ -72,7 +72,7 @@ namespace ServiceStack.Redis.Tests.Generic
                     throw new NotSupportedException();
                 }
             }
-            catch (NotSupportedException ignore)
+            catch (NotSupportedException)
             {
                 Assert.That(typedClient.GetValue(Key), Is.Null);
             }

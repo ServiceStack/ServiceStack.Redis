@@ -11,7 +11,7 @@ namespace ServiceStack.Redis.Tests.Sentinel
 {
     public abstract class RedisSentinelTestBase
     {
-        public const bool DisableLocalServers = false;
+        public static bool DisableLocalServers = false;
 
         public const string MasterName = "mymaster";
         public const string GCloudMasterName = "master";

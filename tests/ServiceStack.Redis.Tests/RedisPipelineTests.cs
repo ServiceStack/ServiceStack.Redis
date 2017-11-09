@@ -59,7 +59,7 @@ namespace ServiceStack.Redis.Tests
                     throw new NotSupportedException();
                 }
             }
-            catch (NotSupportedException ignore)
+            catch (NotSupportedException)
             {
                 Assert.That(Redis.GetValue(Key), Is.Null);
             }
