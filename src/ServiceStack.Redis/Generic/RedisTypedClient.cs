@@ -190,12 +190,6 @@ namespace ServiceStack.Redis.Generic
             client.RegisterTypeId(entity);
         }
 
-        [Obsolete("Use SetValue()")]
-        public void SetEntry(string key, T value)
-        {
-            SetValue(key, value);
-        }
-
         public void SetValue(string key, T entity, TimeSpan expireIn)
         {
             if (key == null)
@@ -205,23 +199,11 @@ namespace ServiceStack.Redis.Generic
             client.RegisterTypeId(entity);
         }
 
-        [Obsolete("Use SetValue()")]
-        public void SetEntry(string key, T value, TimeSpan expireIn)
-        {
-            SetValue(key, value, expireIn);
-        }
-
         public bool SetValueIfNotExists(string key, T entity)
         {
             var success = client.SetNX(key, SerializeValue(entity)) == RedisNativeClient.Success;
             if (success) client.RegisterTypeId(entity);
             return success;
-        }
-
-        [Obsolete("Use SetValueIfNotExists()")]
-        public bool SetEntryIfNotExists(string key, T value)
-        {
-            return SetValueIfNotExists(key, value);
         }
 
         public bool SetValueIfExists(string key, T entity)
@@ -525,8 +507,5 @@ namespace ServiceStack.Redis.Generic
         {
             client.EndPipeline();
         }
-
-        [Obsolete("Does nothing currently, RedisTypedClient will not be IDisposable in a future version")]
-        public void Dispose() { }
     }
 }

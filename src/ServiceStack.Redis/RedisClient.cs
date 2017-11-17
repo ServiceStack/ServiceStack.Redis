@@ -120,25 +120,6 @@ namespace ServiceStack.Redis
 
         public List<string> GetAllKeys() => SearchKeys("*");
 
-        [Obsolete("Use SetValue()")]
-        public void SetEntry(string key, string value) => SetValue(key, value);
-        [Obsolete("Use SetValue()")]
-        public void SetEntry(string key, string value, TimeSpan expireIn) => SetValue(key, value, expireIn);
-        [Obsolete("Use SetValueIfExists()")]
-        public bool SetEntryIfExists(string key, string value) => SetValueIfExists(key, value);
-        [Obsolete("Use SetValueIfNotExists()")]
-        public bool SetEntryIfNotExists(string key, string value) => SetValueIfNotExists(key, value);
-        [Obsolete("Use SetValueIfExists()")]
-        public bool SetEntryIfExists(string key, string value, TimeSpan expireIn) => SetValueIfExists(key, value, expireIn);
-        [Obsolete("Use SetValueIfNotExists()")]
-        public bool SetEntryIfNotExists(string key, string value, TimeSpan expireIn) => SetValueIfNotExists(key, value, expireIn);
-        [Obsolete("Use GetClientsInfo")]
-        public List<Dictionary<string, string>> GetClientList() => GetClientsInfo();
-        [Obsolete("Use GetValue()")]
-        public string GetEntry(string key) => GetValue(key);
-        [Obsolete("Use GetAndSetValue()")]
-        public string GetAndSetEntry(string key, string value) => GetAndSetValue(key, value);
-
         public void SetValue(string key, string value)
         {
             var bytesValue = value != null
