@@ -423,7 +423,7 @@ public interface IRedisPubSubServer : IDisposable
     IRedisPubSubServer Start();
     // Close active Connection and stop running background thread
     void Stop();
-    // Stop than Start
+    // Stop then Start
     void Restart();
 }
 ```
