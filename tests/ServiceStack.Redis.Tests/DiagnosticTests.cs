@@ -5,7 +5,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [Explicit("Diagnostic only Integration Test")]
+    [Ignore("Diagnostic only Integration Test")]
     [TestFixture]
     public class DiagnosticTests
     {

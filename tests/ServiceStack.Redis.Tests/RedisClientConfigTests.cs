@@ -9,7 +9,7 @@ namespace ServiceStack.Redis.Tests
     public class RedisClientConfigTests
         : RedisClientTestsBase
     {
-        [Explicit("Hurts MSOpenTech Redis Server")]
+        [Ignore("Hurts MSOpenTech Redis Server")]
         [Test]
         public void Can_Set_and_Get_Config()
         {

@@ -3,7 +3,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests
 {
-    [TestFixture, Explicit]
+    [TestFixture, Ignore("Integration")]
     public class TwemproxyTests
     {
         [Test]

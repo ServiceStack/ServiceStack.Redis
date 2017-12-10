@@ -8,7 +8,7 @@ using ServiceStack.Text.Support;
 
 namespace ServiceStack.Redis.Tests.Benchmarks
 {
-    [TestFixture, Explicit]
+    [TestFixture, Ignore("Benchmark")]
     public class DoubleSerializationBenchmarks
     {
         const int times = 100000;

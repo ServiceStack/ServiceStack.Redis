@@ -8,7 +8,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis.Tests.Examples
 {
-    [TestFixture, Explicit, Category("Integration")]
+    [TestFixture, Ignore("Integration"), Category("Integration")]
     public class SimpleExamples
     {
         readonly RedisClient redis = new RedisClient(TestConfig.SingleHost);

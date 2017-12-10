@@ -273,7 +273,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice
     #endregion
 
 
-    [TestFixture, Explicit, Category("Integration")]
+    [TestFixture, Ignore("Integration"), Category("Integration")]
     public class BlogPostBestPractice
     {
         readonly RedisClient redisClient = new RedisClient(TestConfig.SingleHost);

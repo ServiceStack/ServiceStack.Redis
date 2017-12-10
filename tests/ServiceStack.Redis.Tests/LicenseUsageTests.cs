@@ -47,7 +47,7 @@ namespace ServiceStack.Redis.Tests
             }
         }
 
-        [Test, Explicit("Takes too long - but works!")]
+        [Test, Ignore("Takes too long - but works!")]
         public void Allows_access_of_6000_operations()
         {
             using (var client = new RedisClient(TestConfig.SingleHost))
@@ -56,7 +56,7 @@ namespace ServiceStack.Redis.Tests
             }
         }
 
-        [Test, Explicit("Takes too long - but works!")]
+        [Test, Ignore("Takes too long - but works!")]
         public void Throws_on_access_of_6100_operations()
         {
             using (var client = new RedisClient(TestConfig.SingleHost))
@@ -88,7 +88,7 @@ namespace ServiceStack.Redis.Tests
             }
         }
 
-        [Test, Explicit("Takes too long - but works!")]
+        [Test, Ignore("Takes too long - but works!")]
         public void Allows_access_of_6100_operations()
         {
 #if NETCORE

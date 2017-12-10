@@ -6,7 +6,7 @@ using ServiceStack.Common;
 
 namespace ServiceStack.Redis.Tests.Examples
 {
-    [TestFixture, Explicit, Category("Integration")]
+    [TestFixture, Ignore("Integration"), Category("Integration")]
     public class SimplePubSub
     {
         const string ChannelName = "SimplePubSubCHANNEL";

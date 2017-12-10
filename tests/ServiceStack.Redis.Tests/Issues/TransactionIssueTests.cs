@@ -112,7 +112,7 @@ namespace ServiceStack.Redis.Tests.Issues
             Task.Factory.StartNew(CheckThisConnection);
         }
 
-        [Explicit, Test]
+        [Ignore("Integration"), Test]
         public void Can_queue_large_transaction()
         {
             var q = new System.Threading.Timer(CheckConnection, null, 30000, 2);

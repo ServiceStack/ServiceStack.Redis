@@ -6,7 +6,7 @@ namespace ServiceStack.Redis.Tests
     public class RedisPasswordTests
     {
 
-        [Explicit("Integration")]
+        [Ignore("Integration")]
         [Test]
         public void Can_connect_to_Slaves_and_Masters_with_Password()
         {

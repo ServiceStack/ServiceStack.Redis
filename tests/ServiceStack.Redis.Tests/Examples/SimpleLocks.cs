@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace ServiceStack.Redis.Tests.Examples
 {
-    [TestFixture, Explicit, Category("Integration")]
+    [TestFixture, Ignore("Integration"), Category("Integration")]
     public class SimpleLocks
     {
         [SetUp]

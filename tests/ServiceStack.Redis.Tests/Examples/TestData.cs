@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace ServiceStack.Redis.Tests.Examples
 {
-    [TestFixture, Explicit]
+    [TestFixture, Ignore("Integration")]
     public class TestData
         : RedisClientTestsBase
     {

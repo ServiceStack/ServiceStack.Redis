@@ -404,7 +404,7 @@ namespace ServiceStack.Redis.Tests
             }
         }
 
-        //[Explicit,Ignore("tempromental integration test")]
+        //[Ignore("tempromental integration test")]
         //[Test]
         //public void Can_support_64_threads_using_the_client_simultaneously()
         //{

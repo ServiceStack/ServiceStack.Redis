@@ -52,7 +52,7 @@ namespace ServiceStack.Redis.Tests.Examples.BestPractice.New
 
 namespace ServiceStack.Redis.Tests.Examples.BestPractice
 {
-    [TestFixture, Explicit, Category("Integration")]
+    [TestFixture, Ignore("Integration"), Category("Integration")]
     public class BlogPostMigrations
     {
         readonly RedisClient redisClient = new RedisClient(TestConfig.SingleHost);

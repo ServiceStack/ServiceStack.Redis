@@ -14,7 +14,7 @@ namespace ServiceStack.Redis.Tests
         }
 
         [Test]
-        [Explicit]
+        [Ignore("too long")]
         public void Batch_and_Pipeline_requests_only_counts_as_1_request()
         {
             var reqCount = RedisNativeClient.RequestsPerHour;

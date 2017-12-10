@@ -4,7 +4,7 @@ using ServiceStack.Text;
 namespace ServiceStack.Redis.Tests.Sentinel
 {
     [TestFixture, Category("Integration")]
-    [Explicit("Requires cloud setup")]
+    [Ignore("Requires cloud setup")]
     public class Redis3SentinelSetupTests
         : RedisSentinelTestBase
     {
