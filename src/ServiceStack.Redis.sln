@@ -1,10 +1,10 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{38F69F8F-9303-4BAF-B081-D28339163E07}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\build-core.proj = ..\build\build-core.proj
 		..\build\build.bat = ..\build\build.bat
 		..\build\build.proj = ..\build\build.proj
 		..\build\build.tasks = ..\build\build.tasks
@@ -79,5 +79,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EDB2082E-E2C1-4E9D-9A60-F937634254A6}
 	EndGlobalSection
 EndGlobal
