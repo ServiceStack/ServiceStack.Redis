@@ -39,6 +39,7 @@
 
   <Target Name="BeforeBuildSolutions">
     <Message Text="*****Before building solution*****" Importance="high"/>
+    <CallTarget Targets="UpdateVersion" />
   </Target>
 
   <Target Name="BuildSolutions">
