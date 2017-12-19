@@ -62,10 +62,10 @@ namespace ServiceStack.Redis
             { typeof(uint), true},
             { typeof(long), true},
             { typeof(ulong), true},
-			{ typeof(double), true},
-			{ typeof(float), true},
-			{ typeof(decimal), true}
-		};
+	        { typeof(double), true},
+	        { typeof(float), true},
+	        { typeof(decimal), true}
+        };
 
         private static byte[] ToBytes<T>(T value)
         {
