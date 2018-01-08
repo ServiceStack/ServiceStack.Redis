@@ -21,9 +21,9 @@ namespace ServiceStack.Redis
                         //This pattern is taken from the redis command for SETNX http://redis.io/commands/setnx
 
                         //Calculate a unix time for when the lock should expire
-                        TimeSpan realSpan = timeOut ?? new TimeSpan(365, 0, 0, 0); //if nothing is passed in the timeout hold for a year
-                        DateTime expireTime = DateTime.UtcNow.Add(realSpan);
-                        string lockString = (expireTime.ToUnixTimeMs() + 1).ToString();
+                        var realSpan = timeOut ?? new TimeSpan(365, 0, 0, 0); //if nothing is passed in the timeout hold for a year
+                        var expireTime = DateTime.UtcNow.Add(realSpan);
+                        var lockString = (expireTime.ToUnixTimeMs() + 1).ToString();
 
                         //Try to set the lock, if it does not exist this will succeed and the lock is obtained
                         var nx = redisClient.SetValueIfNotExists(key, lockString);
@@ -35,9 +35,8 @@ namespace ServiceStack.Redis
                         //Therefore we need to get the value of the lock to see when it should expire
 
                         redisClient.Watch(key);
-                        string lockExpireString = redisClient.Get<string>(key);
-                        long lockExpireTime;
-                        if (!long.TryParse(lockExpireString, out lockExpireTime))
+                        var lockExpireString = redisClient.Get<string>(key);
+                        if (!long.TryParse(lockExpireString, out var lockExpireTime))
                         {
                             redisClient.UnWatch();  // since the client is scoped externally
                             return false;

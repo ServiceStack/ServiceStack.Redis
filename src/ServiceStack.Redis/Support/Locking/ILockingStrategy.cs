@@ -6,9 +6,9 @@ namespace ServiceStack.Redis.Support.Locking
     /// Locking strategy interface
     /// </summary>
 	public interface ILockingStrategy
-	{
-		IDisposable ReadLock();
+    {
+        IDisposable ReadLock();
 
-		IDisposable WriteLock();
-	}
+        IDisposable WriteLock();
+    }
 }
