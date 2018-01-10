@@ -3,6 +3,34 @@ for updates, or [StackOverflow](http://stackoverflow.com/questions/ask) or the [
 
 # C#/.NET Client for Redis
 
+[ServiceStack's C# Redis Client](https://github.com/ServiceStack/ServiceStack.Redis) is a simple, high-performance and feature-rich C# Client for Redis with native support and [high-level abstractions](https://github.com/ServiceStack/ServiceStack.Redis/wiki/DesigningNoSqlDatabase) for serializing POCOs and Complex Types.
+ 
+There are a number of different APIs available with the `RedisClient` implementing the following interfaces:
+
+ * [ICacheClient](http://docs.servicestack.net/caching) - If you are using Redis solely as a cache, you should bind to the ServiceStack's common interface as there already are In-Memory an Memcached implementations available in ServiceStack, allowing you to easily switch providers
+ * [IRedisNativeClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisNativeClient.cs) - For those wanting a low-level raw byte access (where you can control your own serialization/deserialization) that map 1:1 with Redis operations of the same name.
+
+For most cases if you require access to Redis specific functionality you would want to bind to the interface below:
+
+  * [IRedisClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClient.cs) - Provides a friendlier, more descriptive API that lets you store values as strings (UTF8 encoding).
+  * [IRedisTypedClient](https://github.com/ServiceStack/ServiceStack/tree/master/src/ServiceStack.Interfaces/Redis/Generic) - created with `IRedisClient.As<T>()` - it returns a 'strongly-typed client' that provides a typed-interface for all redis value operations that works against any C#/.NET POCO type.
+
+The interfaces works cleanly with any IOC and allows your app logic to bind to implementation-free interfaces which can easily be mocked and substituted.
+
+An overview of class hierarchy for the C# Redis clients looks like:
+
+    RedisTypedClient (POCO) > RedisClient (string) > RedisNativeClient (raw byte[])
+
+With each client providing different layers of abstraction:
+  
+  * The RedisNativeClient exposes raw `byte[]` apis and does no marshalling and passes all values directly to redis.
+  * The RedisClient assumes `string` values and simply converts strings to UTF8 bytes before sending to Redis
+  * The RedisTypedClient provides a generic interface allowing you to add POCO values. The POCO types are serialized using [.NETs fastest JSON Serializer](http://www.servicestack.net/mythz_blog/?p=344) which is then converted to UTF8 bytes and sent to Redis.
+
+### API Overview
+
+[![Redis Client API](http://mono.servicestack.net/img/Redis-annotated-preview.png)](http://mono.servicestack.net/img/Redis-annotated.png)
+
 ## Redis Connection Strings
 
 Redis Connection strings have been expanded to support the more versatile URI format which is now able to capture most of Redis Client 
@@ -733,59 +761,19 @@ daysOfWeek.PrintDump(); //[Sunday, Monday, Tuesday, ...]
 More examples can be found in the [Redis Eval Lua tests](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/RedisClientEvalTests.cs
 )
 
-## Overview
+## Copying
 
-*The Redis client is an independent project and can be used with or without the ServiceStack webservices framework.*
-
-[Redis](http://code.google.com/p/redis/) is one of the fastest and most feature-rich key-value stores to come from the [NoSQL](http://en.wikipedia.org/wiki/NoSQL) movement.
-It is similar to memcached but the dataset is not volatile, and values can either be strings lists, sets, sorted sets or hashes.
-
-[ServiceStack's C# Redis Client](https://github.com/ServiceStack/ServiceStack.Redis) is an Open Source C# Redis client based on [Miguel de Icaza](http://twitter.com/migueldeicaza) previous efforts with [redis-sharp](http://github.com/migueldeicaza/redis-sharp).
- 
-There are a number of different APIs available which are all a friendly drop-in with your local IOC:
-The `ServiceStack.Redis.RedisClient` class below implements the following interfaces:
-
- * [ICacheClient](https://github.com/ServiceStack/ServiceStack/wiki/Caching) - If you are using Redis solely as a cache, you should bind to the [ServiceStack's common interface](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Caching) as there already are In-Memory an Memcached implementations available in ServiceStack, allowing you to easily switch providers in-future.
- * [IRedisNativeClient](https://github.com/ServiceStack/ServiceStack.Redis/wiki/IRedisNativeClient) - For those wanting a low-level raw byte access (where you can control your own serialization/deserialization) that map 1:1 with Redis operations of the same name.
-
-For most cases if you require access to Redis specific functionality you would want to bind to the interface below:
-
-  * [IRedisClient](https://github.com/ServiceStack/ServiceStack.Redis/wiki/IRedisClient) - Provides a friendlier, more descriptive API that lets you store values as strings (UTF8 encoding).
-  * [IRedisTypedClient](https://github.com/ServiceStack/ServiceStack.Redis/wiki/IRedisTypedClient) - created with `IRedisClient.As<T>()` - it returns a 'strongly-typed client' that provides a typed-interface for all redis value operations that works against any C#/.NET POCO type.
-
-The class hierarchy for the C# Redis clients effectively look like:
-
-    RedisTypedClient (POCO) > RedisClient (string) > RedisNativeClient (raw byte[])
-
-Each client provides a different layer of abstraction:
-  
-  * The RedisNativeClient exposes raw **byte[]** apis and does no marshalling and passes all values directly to redis.
-  * The RedisClient assumes **string** values and simply converts strings to UTF8 bytes before sending to Redis
-  * The RedisTypedClient provides a generic interface allowing you to add POCO values. The POCO types are serialized using [.NETs fastest JSON Serializer](http://www.servicestack.net/mythz_blog/?p=344) which is then converted to UTF8 bytes and sent to Redis.
-
-### Redis Client API Overview
-[![Redis Client API](http://mono.servicestack.net/img/Redis-annotated-preview.png)](http://mono.servicestack.net/img/Redis-annotated.png)
-
-### Thread-safe client managers
-For multi-threaded applications you can choose from our different client connection managers:
-
-  * BasicRedisClientManager - a load-balance (master-write and read-slaves) client manager that returns a new [IRedisClient](https://github.com/ServiceStack/ServiceStack.Redis/wiki/IRedisClient) connection with the defaults specified (faster when accessing a redis-server instance on the same host).
-  * PooledRedisClientManager - a load-balanced (master-write and read-slaves) client manager that utilizes a pool of redis client connections (faster when accessing a redis-server instance over the network).
+Since September 2013, ServiceStack source code is available under GNU Affero General Public License/FOSS License Exception, see license.txt in the source. Alternative commercial licensing is also available, see https://servicestack.net/pricing for details.
 
 ### [Docs and Downloads for older v3 BSD releases](https://github.com/ServiceStackV3/ServiceStackV3)
 
-## Copying
-
-Since September 2013, ServiceStack source code is available under GNU Affero General Public License/FOSS License Exception, see license.txt in the source. 
-Alternative commercial licensing is also available, see https://servicestack.net/pricing for details.
-
 ## Contributing
 
-Commits should be made to the **v3-fixes** branch so they can be merged into both **v3** and **master** (v4) release branches. 
 Contributors need to approve the [Contributor License Agreement](https://docs.google.com/forms/d/16Op0fmKaqYtxGL4sg7w_g-cXXyCoWjzppgkuqzOeKyk/viewform) before any code will be reviewed, see the [Contributing wiki](https://github.com/ServiceStack/ServiceStack/wiki/Contributing) for more details. 
 
 ### Redis Server builds for Windows
   
+  * [Redis on Windows](https://github.com/ServiceStack/redis-windows)
   * [MS Open Tech - Redis on Windows](https://github.com/MSOpenTech/Redis)
   * [Downloads for Cygwin 32bit Redis Server Windows builds](http://code.google.com/p/servicestack/wiki/RedisWindowsDownload).
   * [Project that lets you run Redis as a Windows Service](https://github.com/rgl/redis)
