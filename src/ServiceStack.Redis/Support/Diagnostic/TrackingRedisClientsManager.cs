@@ -1,4 +1,4 @@
-﻿#if !NETSTANDARD1_3
+﻿#if !NETSTANDARD2_0
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,12 +24,7 @@ namespace ServiceStack.Redis.Support.Diagnostic
 
         public TrackingRedisClientsManager(IRedisClientsManager redisClientsManager)
         {
-            if (redisClientsManager == null)
-            {
-                throw new ArgumentNullException("redisClientsManager");
-            }
-
-            this.redisClientsManager = redisClientsManager;
+            this.redisClientsManager = redisClientsManager ?? throw new ArgumentNullException(nameof(redisClientsManager));
             Logger.DebugFormat("Constructed");
 
             var timer = new Timer(state => this.DumpState());

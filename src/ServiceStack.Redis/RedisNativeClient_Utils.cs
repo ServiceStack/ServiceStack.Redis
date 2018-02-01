@@ -83,7 +83,7 @@ namespace ServiceStack.Redis
             };
             try
             {
-#if NETSTANDARD1_3
+#if NETSTANDARD2_0
                 var addresses = Dns.GetHostAddressesAsync(Host).Result;
                 socket.Connect(addresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork), Port);
 #else
@@ -120,7 +120,7 @@ namespace ServiceStack.Redis
                     }
                     else
                     {
-#if NETSTANDARD1_3
+#if NETSTANDARD2_0
                         sslStream = new SslStream(networkStream,
                             leaveInnerStreamOpen: false,
                             userCertificateValidationCallback: RedisConfig.CertificateValidationCallback,
@@ -143,7 +143,7 @@ namespace ServiceStack.Redis
 #endif                        
                     }
 
-#if NETSTANDARD1_3
+#if NETSTANDARD2_0
                     sslStream.AuthenticateAsClientAsync(Host).Wait();
 #else
                     sslStream.AuthenticateAsClient(Host);

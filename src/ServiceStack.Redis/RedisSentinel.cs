@@ -27,10 +27,7 @@ namespace ServiceStack.Redis
         private bool isDisposed = false;
 
         private readonly string masterName;
-        public string MasterName
-        {
-            get { return masterName; }
-        }
+        public string MasterName => masterName;
 
         private int failures = 0;
         private int sentinelIndex = -1;
@@ -285,8 +282,7 @@ namespace ServiceStack.Redis
             var hasRedisResolver = (IHasRedisResolver)redisManager;
             hasRedisResolver.RedisResolver = new RedisSentinelResolver(this, masters, slaves);
 
-            var canFailover = redisManager as IRedisFailover;
-            if (canFailover != null && this.OnFailover != null)
+            if (redisManager is IRedisFailover canFailover && this.OnFailover != null)
             {
                 canFailover.OnFailover.Add(this.OnFailover);
             }

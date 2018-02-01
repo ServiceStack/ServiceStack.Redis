@@ -50,20 +50,17 @@ namespace ServiceStack.Redis
         internal long deactivatedAtTicks;
         public DateTime? DeactivatedAt
         {
-            get
-            {
-                return deactivatedAtTicks != 0
-                    ? new DateTime(Interlocked.Read(ref deactivatedAtTicks), DateTimeKind.Utc)
-                    : (DateTime?)null;
-            }
+            get => deactivatedAtTicks != 0
+                ? new DateTime(Interlocked.Read(ref deactivatedAtTicks), DateTimeKind.Utc)
+                : (DateTime?)null;
             set
             {
-                var ticksValue = value == null ? 0 : value.Value.Ticks;
+                var ticksValue = value?.Ticks ?? 0;
                 Interlocked.Exchange(ref deactivatedAtTicks, ticksValue);
             }
         }
 
-        public bool HadExceptions { get { return deactivatedAtTicks > 0; } }
+        public bool HadExceptions => deactivatedAtTicks > 0;
 
         protected Socket socket;
         protected BufferedStream Bstream;
@@ -81,14 +78,8 @@ namespace ServiceStack.Redis
         private int active;
         internal bool Active
         {
-            get
-            {
-                return Interlocked.CompareExchange(ref active, 0, 0) == YES;
-            }
-            set
-            {
-                Interlocked.Exchange(ref active, value ? YES : NO);
-            }
+            get => Interlocked.CompareExchange(ref active, 0, 0) == YES;
+            set => Interlocked.Exchange(ref active, value ? YES : NO);
         }
 
         internal IHandleClientDispose ClientManager { get; set; }
@@ -109,8 +100,8 @@ namespace ServiceStack.Redis
         private TimeSpan retryTimeout;
         public int RetryTimeout
         {
-            get { return (int)retryTimeout.TotalMilliseconds; }
-            set { retryTimeout = TimeSpan.FromMilliseconds(value); }
+            get => (int)retryTimeout.TotalMilliseconds;
+            set => retryTimeout = TimeSpan.FromMilliseconds(value);
         }
         public int RetryCount { get; set; }
         public int SendTimeout { get; set; }
@@ -123,10 +114,7 @@ namespace ServiceStack.Redis
 
         internal IRedisTransactionBase Transaction
         {
-            get
-            {
-                return transaction;
-            }
+            get => transaction;
             set
             {
                 if (value != null)
@@ -137,10 +125,7 @@ namespace ServiceStack.Redis
 
         internal IRedisPipelineShared Pipeline
         {
-            get
-            {
-                return pipeline;
-            }
+            get => pipeline;
             set
             {
                 if (value != null)
@@ -205,10 +190,7 @@ namespace ServiceStack.Redis
         long db;
         public long Db
         {
-            get
-            {
-                return db;
-            }
+            get => db;
 
             set
             {
@@ -227,13 +209,7 @@ namespace ServiceStack.Redis
             SendExpectSuccess(Commands.Select, db.ToUtf8Bytes());
         }
 
-        public long DbSize
-        {
-            get
-            {
-                return SendExpectLong(Commands.DbSize);
-            }
-        }
+        public long DbSize => SendExpectLong(Commands.DbSize);
 
         public DateTime LastSave
         {
@@ -268,8 +244,7 @@ namespace ServiceStack.Redis
         {
             get
             {
-                string version;
-                this.Info.TryGetValue("redis_version", out version);
+                this.Info.TryGetValue("redis_version", out var version);
                 return version;
             }
         }
@@ -286,8 +261,7 @@ namespace ServiceStack.Redis
                     continue;
                 }
 
-                var bytes = arg as byte[];
-                if (bytes != null)
+                if (arg is byte[] bytes)
                 {
                     byteArgs.Add(bytes);
                 }
@@ -1436,8 +1410,7 @@ namespace ServiceStack.Redis
         {
             if (listIds == null)
                 throw new ArgumentNullException("listIds");
-            var args = new List<byte[]>();
-            args.Add(Commands.BLPop);
+            var args = new List<byte[]> { Commands.BLPop };
             args.AddRange(listIds.Select(listId => listId.ToUtf8Bytes()));
             args.Add(timeOutSecs.ToUtf8Bytes());
             return SendExpectMultiData(args.ToArray());
@@ -1471,8 +1444,7 @@ namespace ServiceStack.Redis
         {
             if (listIds == null)
                 throw new ArgumentNullException("listIds");
-            var args = new List<byte[]>();
-            args.Add(Commands.BRPop);
+            var args = new List<byte[]> { Commands.BRPop };
             args.AddRange(listIds.Select(listId => listId.ToUtf8Bytes()));
             args.Add(timeOutSecs.ToUtf8Bytes());
             return SendExpectMultiData(args.ToArray());
@@ -1497,9 +1469,9 @@ namespace ServiceStack.Redis
         public byte[] RPopLPush(string fromListId, string toListId)
         {
             if (fromListId == null)
-                throw new ArgumentNullException("fromListId");
+                throw new ArgumentNullException(nameof(fromListId));
             if (toListId == null)
-                throw new ArgumentNullException("toListId");
+                throw new ArgumentNullException(nameof(toListId));
 
             return SendExpectData(Commands.RPopLPush, fromListId.ToUtf8Bytes(), toListId.ToUtf8Bytes());
         }
@@ -1507,9 +1479,9 @@ namespace ServiceStack.Redis
         public byte[] BRPopLPush(string fromListId, string toListId, int timeOutSecs)
         {
             if (fromListId == null)
-                throw new ArgumentNullException("fromListId");
+                throw new ArgumentNullException(nameof(fromListId));
             if (toListId == null)
-                throw new ArgumentNullException("toListId");
+                throw new ArgumentNullException(nameof(toListId));
 
             byte[][] result = SendExpectMultiData(Commands.BRPopLPush, fromListId.ToUtf8Bytes(), toListId.ToUtf8Bytes(), timeOutSecs.ToUtf8Bytes());
             return result.Length == 0 ? null : result[1];
@@ -1981,9 +1953,9 @@ namespace ServiceStack.Redis
         private static void AssertHashIdAndKey(object hashId, byte[] key)
         {
             if (hashId == null)
-                throw new ArgumentNullException("hashId");
+                throw new ArgumentNullException(nameof(hashId));
             if (key == null)
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
         }
 
         public long HSet(string hashId, byte[] key, byte[] value)
@@ -2008,7 +1980,7 @@ namespace ServiceStack.Redis
         public void HMSet(string hashId, byte[][] keys, byte[][] values)
         {
             if (hashId == null)
-                throw new ArgumentNullException("hashId");
+                throw new ArgumentNullException(nameof(hashId));
 
             var cmdArgs = MergeCommandWithKeysAndValues(Commands.HMSet, hashId.ToUtf8Bytes(), keys, values);
 
@@ -2051,9 +2023,9 @@ namespace ServiceStack.Redis
         public byte[][] HMGet(string hashId, params byte[][] keys)
         {
             if (hashId == null)
-                throw new ArgumentNullException("hashId");
+                throw new ArgumentNullException(nameof(hashId));
             if (keys.Length == 0)
-                throw new ArgumentNullException("keys");
+                throw new ArgumentNullException(nameof(keys));
 
             var cmdArgs = MergeCommandWithArgs(Commands.HMGet, hashId.ToUtf8Bytes(), keys);
 
@@ -2075,11 +2047,11 @@ namespace ServiceStack.Redis
         public long HDel(string hashId, byte[][] keys)
         {
             if (hashId == null)
-                throw new ArgumentNullException("hashId");
+                throw new ArgumentNullException(nameof(hashId));
             if (keys == null)
-                throw new ArgumentNullException("keys");
+                throw new ArgumentNullException(nameof(keys));
             if (keys.Length == 0)
-                throw new ArgumentException("keys");
+                throw new ArgumentException(nameof(keys));
 
             var cmdWithArgs = MergeCommandWithArgs(Commands.HDel, hashId.ToUtf8Bytes(), keys);
             return SendExpectLong(cmdWithArgs);
@@ -2094,7 +2066,7 @@ namespace ServiceStack.Redis
         public long HLen(string hashId)
         {
             if (string.IsNullOrEmpty(hashId))
-                throw new ArgumentNullException("hashId");
+                throw new ArgumentNullException(nameof(hashId));
 
             return SendExpectLong(Commands.HLen, hashId.ToUtf8Bytes());
         }
@@ -2102,7 +2074,7 @@ namespace ServiceStack.Redis
         public byte[][] HKeys(string hashId)
         {
             if (hashId == null)
-                throw new ArgumentNullException("hashId");
+                throw new ArgumentNullException(nameof(hashId));
 
             return SendExpectMultiData(Commands.HKeys, hashId.ToUtf8Bytes());
         }
@@ -2110,7 +2082,7 @@ namespace ServiceStack.Redis
         public byte[][] HVals(string hashId)
         {
             if (hashId == null)
-                throw new ArgumentNullException("hashId");
+                throw new ArgumentNullException(nameof(hashId));
 
             return SendExpectMultiData(Commands.HVals, hashId.ToUtf8Bytes());
         }
@@ -2118,7 +2090,7 @@ namespace ServiceStack.Redis
         public byte[][] HGetAll(string hashId)
         {
             if (hashId == null)
-                throw new ArgumentNullException("hashId");
+                throw new ArgumentNullException(nameof(hashId));
 
             return SendExpectMultiData(Commands.HGetAll, hashId.ToUtf8Bytes());
         }
@@ -2141,7 +2113,7 @@ namespace ServiceStack.Redis
         public byte[][] Subscribe(params string[] toChannels)
         {
             if (toChannels.Length == 0)
-                throw new ArgumentNullException("toChannels");
+                throw new ArgumentNullException(nameof(toChannels));
 
             var cmdWithArgs = MergeCommandWithArgs(Commands.Subscribe, toChannels);
             return SendExpectMultiData(cmdWithArgs);
@@ -2156,7 +2128,7 @@ namespace ServiceStack.Redis
         public byte[][] PSubscribe(params string[] toChannelsMatchingPatterns)
         {
             if (toChannelsMatchingPatterns.Length == 0)
-                throw new ArgumentNullException("toChannelsMatchingPatterns");
+                throw new ArgumentNullException(nameof(toChannelsMatchingPatterns));
 
             var cmdWithArgs = MergeCommandWithArgs(Commands.PSubscribe, toChannelsMatchingPatterns);
             return SendExpectMultiData(cmdWithArgs);
@@ -2181,9 +2153,9 @@ namespace ServiceStack.Redis
         public long GeoAdd(string key, double longitude, double latitude, string member)
         {
             if (key == null)
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
             if (member == null)
-                throw new ArgumentNullException("member");
+                throw new ArgumentNullException(nameof(member));
 
             return SendExpectLong(Commands.GeoAdd, key.ToUtf8Bytes(), longitude.ToUtf8Bytes(), latitude.ToUtf8Bytes(), member.ToUtf8Bytes());
         }
@@ -2191,7 +2163,7 @@ namespace ServiceStack.Redis
         public long GeoAdd(string key, params RedisGeo[] geoPoints)
         {
             if (key == null)
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
 
             var members = new byte[geoPoints.Length * 3][];
             for (var i = 0; i < geoPoints.Length; i++)
@@ -2209,7 +2181,7 @@ namespace ServiceStack.Redis
         public double GeoDist(string key, string fromMember, string toMember, string unit = null)
         {
             if (key == null)
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
 
             return unit == null
                 ? SendExpectDouble(Commands.GeoDist, key.ToUtf8Bytes(), fromMember.ToUtf8Bytes(), toMember.ToUtf8Bytes())
@@ -2219,7 +2191,7 @@ namespace ServiceStack.Redis
         public string[] GeoHash(string key, params string[] members)
         {
             if (key == null)
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
 
             var cmdWithArgs = MergeCommandWithArgs(Commands.GeoHash, key.ToUtf8Bytes(), members.Map(x => x.ToUtf8Bytes()).ToArray());
             return SendExpectMultiData(cmdWithArgs).ToStringArray();
@@ -2228,7 +2200,7 @@ namespace ServiceStack.Redis
         public List<RedisGeo> GeoPos(string key, params string[] members)
         {
             if (key == null)
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
 
             var cmdWithArgs = MergeCommandWithArgs(Commands.GeoPos, key.ToUtf8Bytes(), members.Map(x => x.ToUtf8Bytes()).ToArray());
             var data = SendExpectComplexResponse(cmdWithArgs);
@@ -2260,7 +2232,7 @@ namespace ServiceStack.Redis
             bool withCoords = false, bool withDist = false, bool withHash = false, int? count = null, bool? asc = null)
         {
             if (key == null)
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
 
             var args = new List<byte[]>
             {
@@ -2331,7 +2303,7 @@ namespace ServiceStack.Redis
             bool withCoords = false, bool withDist = false, bool withHash = false, int? count = null, bool? asc = null)
         {
             if (key == null)
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
 
             var args = new List<byte[]>
             {
@@ -2401,10 +2373,7 @@ namespace ServiceStack.Redis
 
         internal bool IsDisposed { get; set; }
 
-        public bool IsManagedClient
-        {
-            get { return ClientManager != null; }
-        }
+        public bool IsManagedClient => ClientManager != null;
 
         public virtual void Dispose()
         {
@@ -2458,20 +2427,17 @@ namespace ServiceStack.Redis
             try
             {
                 // workaround for a .net bug: http://support.microsoft.com/kb/821625
-                if (Bstream != null)
-                    Bstream.Close();
+                Bstream?.Close();
             }
             catch { }
             try
             {
-                if (sslStream != null)
-                    sslStream.Close();
+                sslStream?.Close();
             }
             catch { }
             try
             {
-                if (socket != null)
-                    socket.Close();
+                socket?.Close();
             }
             catch { }
 

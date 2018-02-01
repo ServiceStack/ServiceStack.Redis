@@ -422,7 +422,7 @@ namespace ServiceStack.Redis
                 //give it a small chance to die gracefully
                 if (!bgThread.Join(500))
                 {
-#if !NETSTANDARD1_3                    
+#if !NETSTANDARD2_0                    
                     //Ideally we shouldn't get here, but lets try our hardest to clean it up
                     Log.Warn("Interrupting previous Background Thread: " + bgThread.Name);
                     bgThread.Interrupt();

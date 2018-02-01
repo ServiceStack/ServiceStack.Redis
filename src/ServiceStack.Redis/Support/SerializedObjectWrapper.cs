@@ -2,13 +2,11 @@ using System;
 
 namespace ServiceStack.Redis.Support
 {
-	/// <summary>
-	/// wraps a serialized representation of an object
-	/// </summary>
-	///
-#if !NETSTANDARD1_3 
-	[Serializable]
-#endif
+    /// <summary>
+    /// wraps a serialized representation of an object
+    /// </summary>
+    ///
+    [Serializable]
 	public struct SerializedObjectWrapper
 	{
 		private ArraySegment<byte> data;
@@ -30,8 +28,8 @@ namespace ServiceStack.Redis.Support
 		/// </summary>
 		public ArraySegment<byte> Data
 		{
-			get { return data; }
-			set { data = value; }
+			get => data;
+		    set => data = value;
 		}
 
 		/// <summary>
@@ -39,8 +37,8 @@ namespace ServiceStack.Redis.Support
 		/// </summary>
 		public ushort Flags
 		{
-			get { return flags; }
-			set { flags = value; }
+			get => flags;
+		    set => flags = value;
 		}
 	}
 }

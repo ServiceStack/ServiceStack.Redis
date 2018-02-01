@@ -106,11 +106,10 @@ namespace ServiceStack.Redis
             var ip = masterInfo[0];
             var port = masterInfo[1];
 
-            string aliasIp;
-            if (sentinel.IpAddressMap.TryGetValue(ip, out aliasIp))
+            if (sentinel.IpAddressMap.TryGetValue(ip, out var aliasIp))
                 ip = aliasIp;
 
-            return "{0}:{1}".Fmt(ip, port);
+            return $"{ip}:{port}";
         }
 
         internal List<string> GetSentinelHosts(string masterName)
@@ -125,25 +124,20 @@ namespace ServiceStack.Redis
 
         private List<string> SanitizeHostsConfig(IEnumerable<Dictionary<string, string>> slaves)
         {
-            string ip;
-            string port;
-            string flags;
-
             var servers = new List<string>();
             foreach (var slave in slaves)
             {
-                slave.TryGetValue("flags", out flags);
-                slave.TryGetValue("ip", out ip);
-                slave.TryGetValue("port", out port);
+                slave.TryGetValue("flags", out var flags);
+                slave.TryGetValue("ip", out var ip);
+                slave.TryGetValue("port", out var port);
 
-                string aliasIp;
-                if (sentinel.IpAddressMap.TryGetValue(ip, out aliasIp))
+                if (sentinel.IpAddressMap.TryGetValue(ip, out var aliasIp))
                     ip = aliasIp;
                 else if (ip == "127.0.0.1")
                     ip = this.sentinelClient.Host;
 
                 if (ip != null && port != null && !flags.Contains("s_down") && !flags.Contains("o_down"))
-                    servers.Add("{0}:{1}".Fmt(ip, port));
+                    servers.Add($"{ip}:{port}");
             }
             return servers;
         }

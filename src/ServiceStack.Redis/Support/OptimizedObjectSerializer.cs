@@ -122,7 +122,7 @@ namespace ServiceStack.Redis.Support
                     break;
 
                 default:
-#if NETSTANDARD1_3
+#if NETSTANDARD2_0
         		    data = new byte[0];
                     length = 0;
 #else
@@ -231,7 +231,7 @@ namespace ServiceStack.Redis.Support
                 case TypeCode.Object:
                     using (var ms = new MemoryStream(data, offset, count))
                     {
-#if NETSTANDARD1_3
+#if NETSTANDARD2_0
 	            		return null;
 #else
                         return bf.Deserialize(ms);
