@@ -162,7 +162,7 @@ namespace ServiceStack.Redis
                     var parts = SentinelHosts[i].SplitOnLast(':');
                     if (parts.Length == 1)
                     {
-                        SentinelHosts[i] = parts[0] + ":{0}".Fmt(RedisConfig.DefaultPortSentinel);
+                        SentinelHosts[i] = parts[0] + ":" + RedisConfig.DefaultPortSentinel;
                     }
                 }
 
