@@ -391,7 +391,8 @@ namespace ServiceStack.Redis
 
         public RedisKeyType GetEntryType(string key)
         {
-            switch (Type(key))
+            var type = Type(key);
+            switch (type)
             {
                 case "none":
                     return RedisKeyType.None;
@@ -406,7 +407,7 @@ namespace ServiceStack.Redis
                 case "hash":
                     return RedisKeyType.Hash;
             }
-            throw CreateResponseError("Invalid value");
+            throw CreateResponseError($"Invalid Type '{type}'");
         }
 
         public long StrLen(string key)
