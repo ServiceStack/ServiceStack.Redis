@@ -97,6 +97,11 @@
             <param name="type"></param>
             <returns>Namespace of type</returns>
         </member>
+        <member name="M:ServiceStack.ServerEventsClient.RemoveAllRegistrations">
+            <summary>
+            Removes all registered Handlers, Named Receivers and Listeners
+            </summary>
+        </member>
         <member name="T:ServiceStack.ServiceClientBase">
             Need to provide async request options
             http://msdn.microsoft.com/en-us/library/86wf6409(VS.71).aspx
