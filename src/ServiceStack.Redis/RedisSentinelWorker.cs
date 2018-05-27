@@ -9,6 +9,11 @@ namespace ServiceStack.Redis
     {
         protected static readonly ILog Log = LogManager.GetLogger(typeof(RedisSentinelWorker));
 
+        static int IdCounter = 0;
+        public int Id { get; }
+
+        private readonly object oLock = new object();
+
         private readonly RedisSentinel sentinel;
         private readonly RedisClient sentinelClient;
         private RedisPubSubServer sentinePubSub;
@@ -17,6 +22,7 @@ namespace ServiceStack.Redis
 
         public RedisSentinelWorker(RedisSentinel sentinel, RedisEndpoint sentinelEndpoint)
         {
+            this.Id = Interlocked.Increment(ref IdCounter);
             this.sentinel = sentinel;
             this.sentinelClient = new RedisClient(sentinelEndpoint) {
                 Db = 0, //Sentinel Servers doesn't support DB, reset to 0
@@ -95,7 +101,10 @@ namespace ServiceStack.Redis
 
         private string GetMasterHostInternal(string masterName)
         {
-            var masterInfo = sentinelClient.SentinelGetMasterAddrByName(masterName);
+            List<string> masterInfo;
+            lock (oLock)
+                masterInfo = sentinelClient.SentinelGetMasterAddrByName(masterName);
+
             return masterInfo.Count > 0
                 ? SanitizeMasterConfig(masterInfo)
                 : null;
@@ -114,12 +123,21 @@ namespace ServiceStack.Redis
 
         internal List<string> GetSentinelHosts(string masterName)
         {
-            return SanitizeHostsConfig(this.sentinelClient.SentinelSentinels(sentinel.MasterName));
+            List<Dictionary<string, string>> sentinelSentinels;
+            lock (oLock)
+                sentinelSentinels = this.sentinelClient.SentinelSentinels(sentinel.MasterName);
+
+            return SanitizeHostsConfig(sentinelSentinels);
         }
 
         internal List<string> GetSlaveHosts(string masterName)
         {
-            return SanitizeHostsConfig(this.sentinelClient.SentinelSlaves(sentinel.MasterName));
+            List<Dictionary<string, string>> sentinelSlaves;
+
+            lock (oLock)
+                sentinelSlaves = sentinelClient.SentinelSlaves(sentinel.MasterName);
+
+            return SanitizeHostsConfig(sentinelSlaves);
         }
 
         private List<string> SanitizeHostsConfig(IEnumerable<Dictionary<string, string>> slaves)
@@ -146,27 +164,30 @@ namespace ServiceStack.Redis
         {
             try
             {
-                if (this.sentinePubSub == null)
+                lock (oLock)
                 {
-                    var sentinelManager = new BasicRedisClientManager(sentinel.SentinelHosts, sentinel.SentinelHosts) 
+                    if (this.sentinePubSub == null)
                     {
-                        //Use BasicRedisResolver which doesn't validate non-Master Sentinel instances
-                        RedisResolver = new BasicRedisResolver(sentinel.SentinelEndpoints, sentinel.SentinelEndpoints)
-                    };
-                    this.sentinePubSub = new RedisPubSubServer(sentinelManager)
-                    {
-                        HeartbeatInterval = null,
-                        IsSentinelSubscription = true,
-                        ChannelsMatching = new[] { RedisPubSubServer.AllChannelsWildCard },
-                        OnMessage = SentinelMessageReceived
-                    };
+                        var sentinelManager = new BasicRedisClientManager(sentinel.SentinelHosts, sentinel.SentinelHosts)
+                        {
+                            //Use BasicRedisResolver which doesn't validate non-Master Sentinel instances
+                            RedisResolver = new BasicRedisResolver(sentinel.SentinelEndpoints, sentinel.SentinelEndpoints)
+                        };
+                        this.sentinePubSub = new RedisPubSubServer(sentinelManager)
+                        {
+                            HeartbeatInterval = null,
+                            IsSentinelSubscription = true,
+                            ChannelsMatching = new[] { RedisPubSubServer.AllChannelsWildCard },
+                            OnMessage = SentinelMessageReceived
+                        };
+                    }
                 }
+
                 this.sentinePubSub.Start();
             }
             catch (Exception ex)
             {
-                Log.Error("Error Subscribing to Redis Channel on {0}:{1}"
-                    .Fmt(this.sentinelClient.Host, this.sentinelClient.Port), ex);
+                Log.Error($"Error Subscribing to Redis Channel on {this.sentinelClient.Host}:{this.sentinelClient.Port}", ex);
 
                 if (OnSentinelError != null)
                     OnSentinelError(ex);
@@ -175,7 +196,8 @@ namespace ServiceStack.Redis
 
         public void ForceMasterFailover(string masterName)
         {
-            this.sentinelClient.SentinelFailover(masterName);
+            lock (oLock)
+                this.sentinelClient.SentinelFailover(masterName);
         }
 
         public void Dispose()

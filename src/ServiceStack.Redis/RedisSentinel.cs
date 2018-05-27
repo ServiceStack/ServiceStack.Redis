@@ -23,7 +23,7 @@ namespace ServiceStack.Redis
         public static string DefaultMasterName = "mymaster";
         public static string DefaultAddress = "127.0.0.1:26379";
 
-        private object oLock = new object();
+        private readonly object oLock = new object();
         private bool isDisposed = false;
 
         private readonly string masterName;
@@ -308,6 +308,7 @@ namespace ServiceStack.Redis
                 {
                     this.worker = GetNextSentinel();
                     GetRedisManager();
+
                     this.worker.BeginListeningForConfigurationChanges();
                     this.failures = 0; //reset
                     return this.worker;
@@ -332,29 +333,23 @@ namespace ServiceStack.Redis
         public RedisEndpoint GetMaster()
         {
             var sentinelWorker = GetValidSentinelWorker();
-            lock (sentinelWorker)
+            var host = sentinelWorker.GetMasterHost(masterName);
+
+            if (ScanForOtherSentinels && DateTime.UtcNow - lastSentinelsRefresh > RefreshSentinelHostsAfter)
             {
-                var host = sentinelWorker.GetMasterHost(masterName);
-
-                if (ScanForOtherSentinels && DateTime.UtcNow - lastSentinelsRefresh > RefreshSentinelHostsAfter)
-                {
-                    RefreshActiveSentinels();
-                }
-
-                return host != null
-                    ? (HostFilter != null ? HostFilter(host) : host).ToRedisEndpoint()
-                    : null;
+                RefreshActiveSentinels();
             }
+
+            return host != null
+                ? (HostFilter != null ? HostFilter(host) : host).ToRedisEndpoint()
+                : null;
         }
 
         public List<RedisEndpoint> GetSlaves()
         {
             var sentinelWorker = GetValidSentinelWorker();
-            lock (sentinelWorker)
-            {
-                var hosts = sentinelWorker.GetSlaveHosts(masterName);
-                return ConfigureHosts(hosts).Map(x => x.ToRedisEndpoint());
-            }
+            var hosts = sentinelWorker.GetSlaveHosts(masterName);
+            return ConfigureHosts(hosts).Map(x => x.ToRedisEndpoint());
         }
 
         /// <summary>
@@ -369,23 +364,32 @@ namespace ServiceStack.Redis
 
         private RedisSentinelWorker GetNextSentinel()
         {
-            lock (oLock)
+            RedisSentinelWorker disposeWorker = null;
+
+            try
             {
-                if (this.worker != null)
+                lock (oLock)
                 {
-                    this.worker.Dispose();
-                    this.worker = null;
+                    if (this.worker != null)
+                    {
+                        disposeWorker = this.worker;
+                        this.worker = null;
+                    }
+
+                    if (++sentinelIndex >= SentinelEndpoints.Length)
+                        sentinelIndex = 0;
+
+                    var sentinelWorker = new RedisSentinelWorker(this, SentinelEndpoints[sentinelIndex])
+                    {
+                        OnSentinelError = OnSentinelError
+                    };
+
+                    return sentinelWorker;
                 }
-
-                if (++sentinelIndex >= SentinelEndpoints.Length)
-                    sentinelIndex = 0;
-
-                var sentinelWorker = new RedisSentinelWorker(this, SentinelEndpoints[sentinelIndex])
-                {
-                    OnSentinelError = OnSentinelError
-                };
-
-                return sentinelWorker;
+            }
+            finally
+            {
+                disposeWorker?.Dispose();
             }
         }
 
@@ -406,19 +410,13 @@ namespace ServiceStack.Redis
         public void ForceMasterFailover()
         {
             var sentinelWorker = GetValidSentinelWorker();
-            lock (sentinelWorker)
-            {
-                sentinelWorker.ForceMasterFailover(masterName);
-            }
+            sentinelWorker.ForceMasterFailover(masterName);
         }
 
         public SentinelInfo GetSentinelInfo()
         {
             var sentinelWorker = GetValidSentinelWorker();
-            lock (sentinelWorker)
-            {
-                return sentinelWorker.GetSentinelInfo();
-            }
+            return sentinelWorker.GetSentinelInfo();
         }
 
         public void Dispose()
