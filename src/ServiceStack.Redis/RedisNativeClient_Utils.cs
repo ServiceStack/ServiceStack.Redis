@@ -33,10 +33,7 @@ namespace ServiceStack.Redis
         private static Timer UsageTimer;
 
         private static int __requestsPerHour = 0;
-        public static int RequestsPerHour
-        {
-            get { return __requestsPerHour; }
-        }
+        public static int RequestsPerHour => __requestsPerHour;
 
         private const int Unknown = -1;
         public static int ServerVersionNumber { get; set; }
@@ -193,8 +190,7 @@ namespace ServiceStack.Redis
                     return;
                 }
 
-                var ipEndpoint = socket.LocalEndPoint as IPEndPoint;
-                clientPort = ipEndpoint != null ? ipEndpoint.Port : -1;
+                clientPort = socket.LocalEndPoint is IPEndPoint ipEndpoint ? ipEndpoint.Port : -1;
                 lastCommand = null;
                 lastSocketException = null;
                 LastConnectedAtTimestamp = Stopwatch.GetTimestamp();
@@ -202,9 +198,7 @@ namespace ServiceStack.Redis
                 OnConnected();
 
                 if (ConnectionFilter != null)
-                {
                     ConnectionFilter(this);
-                }
             }
             catch (SocketException)
             {
@@ -235,10 +229,7 @@ namespace ServiceStack.Redis
             return StringBuilderCache.ReturnAndFree(sb);
         }
 
-        public bool HasConnected
-        {
-            get { return socket != null; }
-        }
+        public bool HasConnected => socket != null;
 
         public bool IsSocketConnected()
         {
@@ -261,8 +252,7 @@ namespace ServiceStack.Redis
             {
                 log.Error(ErrorConnect.Fmt(Host, Port));
 
-                if (socket != null)
-                    socket.Close();
+                socket?.Close();
 
                 socket = null;
 
@@ -317,7 +307,7 @@ namespace ServiceStack.Redis
                     : (lastCommand ?? "").Replace(Password, "");
 
                 if (!string.IsNullOrEmpty(safeLastCommand))
-                    error = string.Format("{0}, LastCommand:'{1}', srcPort:{2}", error, safeLastCommand, clientPort);
+                    error = $"{error}, LastCommand:'{safeLastCommand}', srcPort:{clientPort}";
             }
 
             var throwEx = new RedisResponseException(error);
@@ -335,9 +325,8 @@ namespace ServiceStack.Redis
         {
             string safeLastCommand = string.IsNullOrEmpty(Password) ? lastCommand : (lastCommand ?? "").Replace(Password, "");
 
-            var throwEx = new RedisRetryableException(string.Format("[{0}] {1}, sPort: {2}, LastCommand: {3}",
-                    DateTime.UtcNow.ToString("HH:mm:ss.fff"),
-                    error, clientPort, safeLastCommand));
+            var throwEx = new RedisRetryableException(
+                $"[{DateTime.UtcNow:HH:mm:ss.fff}] {error}, sPort: {clientPort}, LastCommand: {safeLastCommand}");
             log.Error(throwEx.Message);
             throw throwEx;
         }
@@ -345,10 +334,8 @@ namespace ServiceStack.Redis
         private RedisException CreateConnectionError(Exception originalEx)
         {
             DeactivatedAt = DateTime.UtcNow;
-            var throwEx = new RedisException(string.Format("[{0}] Unable to Connect: sPort: {1}{2}",
-                    DateTime.UtcNow.ToString("HH:mm:ss.fff"),
-                    clientPort,
-                    originalEx != null ? ", Error: " + originalEx.Message + "\n" + originalEx.StackTrace : ""),
+            var throwEx = new RedisException(
+                $"[{DateTime.UtcNow:HH:mm:ss.fff}] Unable to Connect: sPort: {clientPort}{(originalEx != null ? ", Error: " + originalEx.Message + "\n" + originalEx.StackTrace : "")}",
                 originalEx ?? lastSocketException);
             log.Error(throwEx.Message);
             throw throwEx;
@@ -625,8 +612,7 @@ namespace ServiceStack.Redis
             log.Error("SocketException in SendReceive, retrying...", socketEx);
             lastSocketException = socketEx;
 
-            if (socket != null)
-                socket.Close();
+            socket?.Close();
 
             socket = null;
             return socketEx;
@@ -807,7 +793,7 @@ namespace ServiceStack.Redis
                 throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
 
             if (s != word)
-                throw CreateResponseError(string.Format("Expected '{0}' got '{1}'", word, s));
+                throw CreateResponseError($"Expected '{word}' got '{s}'");
         }
 
         private string ExpectCode()
@@ -869,10 +855,7 @@ namespace ServiceStack.Redis
         public static double ParseDouble(byte[] doubleBytes)
         {
             var doubleString = Encoding.UTF8.GetString(doubleBytes);
-
-            double d;
-            double.TryParse(doubleString, NumberStyles.Any, CultureInfo.InvariantCulture.NumberFormat, out d);
-
+            double.TryParse(doubleString, NumberStyles.Any, CultureInfo.InvariantCulture.NumberFormat, out var d);
             return d;
         }
 
@@ -897,9 +880,8 @@ namespace ServiceStack.Redis
             {
                 if (r == "$-1")
                     return null;
-                int count;
 
-                if (int.TryParse(r.Substring(1), out count))
+                if (int.TryParse(r.Substring(1), out var count))
                 {
                     var retbuf = new byte[count];
 
@@ -952,8 +934,7 @@ namespace ServiceStack.Redis
                     throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
 
                 case '*':
-                    int count;
-                    if (int.TryParse(s, out count))
+                    if (int.TryParse(s, out var count))
                     {
                         if (count == -1)
                         {
@@ -999,8 +980,7 @@ namespace ServiceStack.Redis
                     throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
 
                 case '*':
-                    int count;
-                    if (int.TryParse(s, out count))
+                    if (int.TryParse(s, out var count))
                     {
                         var array = new object[count];
                         for (int i = 0; i < count; i++)
@@ -1041,8 +1021,7 @@ namespace ServiceStack.Redis
                     throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
 
                 case '*':
-                    int count;
-                    if (int.TryParse(s, out count))
+                    if (int.TryParse(s, out var count))
                     {
                         var ret = new RedisData { Children = new List<RedisData>() };
                         for (var i = 0; i < count; i++)
@@ -1074,8 +1053,7 @@ namespace ServiceStack.Redis
                 throw CreateResponseError(s.StartsWith("ERR") ? s.Substring(4) : s);
             if (c == '*')
             {
-                int count;
-                if (int.TryParse(s, out count))
+                if (int.TryParse(s, out var count))
                 {
                     return count;
                 }
@@ -1086,9 +1064,9 @@ namespace ServiceStack.Redis
         private static void AssertListIdAndValue(string listId, byte[] value)
         {
             if (listId == null)
-                throw new ArgumentNullException("listId");
+                throw new ArgumentNullException(nameof(listId));
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
         }
 
         private static byte[][] MergeCommandWithKeysAndValues(byte[] cmd, byte[][] keys, byte[][] values)
@@ -1107,13 +1085,13 @@ namespace ServiceStack.Redis
             byte[][] keys, byte[][] values)
         {
             if (keys == null || keys.Length == 0)
-                throw new ArgumentNullException("keys");
+                throw new ArgumentNullException(nameof(keys));
             if (values == null || values.Length == 0)
-                throw new ArgumentNullException("values");
+                throw new ArgumentNullException(nameof(values));
             if (keys.Length != values.Length)
                 throw new ArgumentException("The number of values must be equal to the number of keys");
 
-            var keyValueStartIndex = (firstParams != null) ? firstParams.Length : 0;
+            var keyValueStartIndex = firstParams?.Length ?? 0;
 
             var keysAndValuesLength = keys.Length * 2 + keyValueStartIndex;
             var keysAndValues = new byte[keysAndValuesLength][];
@@ -1193,7 +1171,7 @@ namespace ServiceStack.Redis
         public long EvalInt(string luaBody, int numberKeysInArgs, params byte[][] keys)
         {
             if (luaBody == null)
-                throw new ArgumentNullException("luaBody");
+                throw new ArgumentNullException(nameof(luaBody));
 
             var cmdArgs = MergeCommandWithArgs(Commands.Eval, luaBody.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
             return SendExpectLong(cmdArgs);
@@ -1202,7 +1180,7 @@ namespace ServiceStack.Redis
         public long EvalShaInt(string sha1, int numberKeysInArgs, params byte[][] keys)
         {
             if (sha1 == null)
-                throw new ArgumentNullException("sha1");
+                throw new ArgumentNullException(nameof(sha1));
 
             var cmdArgs = MergeCommandWithArgs(Commands.EvalSha, sha1.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
             return SendExpectLong(cmdArgs);
@@ -1211,7 +1189,7 @@ namespace ServiceStack.Redis
         public string EvalStr(string luaBody, int numberKeysInArgs, params byte[][] keys)
         {
             if (luaBody == null)
-                throw new ArgumentNullException("luaBody");
+                throw new ArgumentNullException(nameof(luaBody));
 
             var cmdArgs = MergeCommandWithArgs(Commands.Eval, luaBody.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
             return SendExpectData(cmdArgs).FromUtf8Bytes();
@@ -1220,7 +1198,7 @@ namespace ServiceStack.Redis
         public string EvalShaStr(string sha1, int numberKeysInArgs, params byte[][] keys)
         {
             if (sha1 == null)
-                throw new ArgumentNullException("sha1");
+                throw new ArgumentNullException(nameof(sha1));
 
             var cmdArgs = MergeCommandWithArgs(Commands.EvalSha, sha1.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
             return SendExpectData(cmdArgs).FromUtf8Bytes();
@@ -1229,7 +1207,7 @@ namespace ServiceStack.Redis
         public byte[][] Eval(string luaBody, int numberKeysInArgs, params byte[][] keys)
         {
             if (luaBody == null)
-                throw new ArgumentNullException("luaBody");
+                throw new ArgumentNullException(nameof(luaBody));
 
             var cmdArgs = MergeCommandWithArgs(Commands.Eval, luaBody.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
             return SendExpectMultiData(cmdArgs);
@@ -1238,7 +1216,7 @@ namespace ServiceStack.Redis
         public byte[][] EvalSha(string sha1, int numberKeysInArgs, params byte[][] keys)
         {
             if (sha1 == null)
-                throw new ArgumentNullException("sha1");
+                throw new ArgumentNullException(nameof(sha1));
 
             var cmdArgs = MergeCommandWithArgs(Commands.EvalSha, sha1.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
             return SendExpectMultiData(cmdArgs);
@@ -1247,7 +1225,7 @@ namespace ServiceStack.Redis
         public RedisData EvalCommand(string luaBody, int numberKeysInArgs, params byte[][] keys)
         {
             if (luaBody == null)
-                throw new ArgumentNullException("luaBody");
+                throw new ArgumentNullException(nameof(luaBody));
 
             var cmdArgs = MergeCommandWithArgs(Commands.Eval, luaBody.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
             return RawCommand(cmdArgs);
@@ -1256,7 +1234,7 @@ namespace ServiceStack.Redis
         public RedisData EvalShaCommand(string sha1, int numberKeysInArgs, params byte[][] keys)
         {
             if (sha1 == null)
-                throw new ArgumentNullException("sha1");
+                throw new ArgumentNullException(nameof(sha1));
 
             var cmdArgs = MergeCommandWithArgs(Commands.EvalSha, sha1.ToUtf8Bytes(), keys.PrependInt(numberKeysInArgs));
             return RawCommand(cmdArgs);
@@ -1265,7 +1243,7 @@ namespace ServiceStack.Redis
         public string CalculateSha1(string luaBody)
         {
             if (luaBody == null)
-                throw new ArgumentNullException("luaBody");
+                throw new ArgumentNullException(nameof(luaBody));
 
             byte[] buffer = Encoding.UTF8.GetBytes(luaBody);
             return BitConverter.ToString(buffer.ToSha1Hash()).Replace("-", "");
@@ -1274,7 +1252,7 @@ namespace ServiceStack.Redis
         public byte[] ScriptLoad(string luaBody)
         {
             if (luaBody == null)
-                throw new ArgumentNullException("luaBody");
+                throw new ArgumentNullException(nameof(luaBody));
 
             var cmdArgs = MergeCommandWithArgs(Commands.Script, Commands.Load, luaBody.ToUtf8Bytes());
             return SendExpectData(cmdArgs);

@@ -25,14 +25,8 @@ namespace ServiceStack.Redis
         private RedisEndpoint[] masters;
         private RedisEndpoint[] slaves;
 
-        public RedisEndpoint[] Masters
-        {
-            get { return masters; }
-        }
-        public RedisEndpoint[] Slaves
-        {
-            get { return slaves; }
-        }
+        public RedisEndpoint[] Masters => masters;
+        public RedisEndpoint[] Slaves => slaves;
 
         public RedisSentinelResolver(RedisSentinel sentinel)
             : this(sentinel, TypeConstants<RedisEndpoint>.EmptyArray, TypeConstants<RedisEndpoint>.EmptyArray) { }
@@ -113,8 +107,8 @@ namespace ServiceStack.Redis
  
         private DateTime lastValidMasterFromSentinelAt
         {
-            get { return new DateTime(Interlocked.Read(ref lastValidMasterTicks), DateTimeKind.Utc); }
-            set { Interlocked.Exchange(ref lastValidMasterTicks, value.Ticks); }
+            get => new DateTime(Interlocked.Read(ref lastValidMasterTicks), DateTimeKind.Utc);
+            set => Interlocked.Exchange(ref lastValidMasterTicks, value.Ticks);
         }
 
         public virtual RedisClient CreateRedisClient(RedisEndpoint config, bool master)

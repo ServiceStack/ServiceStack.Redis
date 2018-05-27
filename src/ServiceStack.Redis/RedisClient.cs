@@ -122,10 +122,7 @@ namespace ServiceStack.Redis
 
         public void SetValue(string key, string value)
         {
-            var bytesValue = value != null
-                ? value.ToUtf8Bytes()
-                : null;
-
+            var bytesValue = value?.ToUtf8Bytes();
             base.Set(key, bytesValue);
         }
 
@@ -145,9 +142,7 @@ namespace ServiceStack.Redis
 
         public void SetValue(string key, string value, TimeSpan expireIn)
         {
-            var bytesValue = value != null
-                ? value.ToUtf8Bytes()
-                : null;
+            var bytesValue = value?.ToUtf8Bytes();
 
             if (AssertServerVersionNumber() >= 2610)
             {
@@ -164,21 +159,19 @@ namespace ServiceStack.Redis
 
         public bool SetValueIfExists(string key, string value)
         {
-            var bytesValue = value != null ? value.ToUtf8Bytes() : null;
-
+            var bytesValue = value?.ToUtf8Bytes();
             return base.Set(key, bytesValue, exists: true);
         }
 
         public bool SetValueIfNotExists(string key, string value)
         {
-            var bytesValue = value != null ? value.ToUtf8Bytes() : null;
-
+            var bytesValue = value?.ToUtf8Bytes();
             return base.Set(key, bytesValue, exists: false);
         }
 
         public bool SetValueIfExists(string key, string value, TimeSpan expireIn)
         {
-            var bytesValue = value != null ? value.ToUtf8Bytes() : null;
+            var bytesValue = value?.ToUtf8Bytes();
 
             if (expireIn.Milliseconds > 0)
                 return base.Set(key, bytesValue, exists: true, expiryMs: (long)expireIn.TotalMilliseconds);
@@ -188,7 +181,7 @@ namespace ServiceStack.Redis
 
         public bool SetValueIfNotExists(string key, string value, TimeSpan expireIn)
         {
-            var bytesValue = value != null ? value.ToUtf8Bytes() : null;
+            var bytesValue = value?.ToUtf8Bytes();
 
             if (expireIn.Milliseconds > 0)
                 return base.Set(key, bytesValue, exists: false, expiryMs: (long)expireIn.TotalMilliseconds);
@@ -245,9 +238,7 @@ namespace ServiceStack.Redis
         public string GetValue(string key)
         {
             var bytes = Get(key);
-            return bytes == null
-                ? null
-                : bytes.FromUtf8Bytes();
+            return bytes?.FromUtf8Bytes();
         }
 
         public string GetAndSetValue(string key, string value)
@@ -426,7 +417,7 @@ namespace ServiceStack.Redis
 
         public List<string> GetValues(List<string> keys)
         {
-            if (keys == null) throw new ArgumentNullException("keys");
+            if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (keys.Count == 0) return new List<string>();
 
             var resultBytesArray = MGet(keys.ToArray());
@@ -445,7 +436,7 @@ namespace ServiceStack.Redis
 
         public List<T> GetValues<T>(List<string> keys)
         {
-            if (keys == null) throw new ArgumentNullException("keys");
+            if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (keys.Count == 0) return new List<T>();
 
             var resultBytesArray = MGet(keys.ToArray());
@@ -465,7 +456,7 @@ namespace ServiceStack.Redis
 
         public Dictionary<string, string> GetValuesMap(List<string> keys)
         {
-            if (keys == null) throw new ArgumentNullException("keys");
+            if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (keys.Count == 0) return new Dictionary<string, string>();
 
             var keysArray = keys.ToArray();
@@ -493,7 +484,7 @@ namespace ServiceStack.Redis
 
         public Dictionary<string, T> GetValuesMap<T>(List<string> keys)
         {
-            if (keys == null) throw new ArgumentNullException("keys");
+            if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (keys.Count == 0) return new Dictionary<string, T>();
 
             var keysArray = keys.ToArray();
@@ -532,13 +523,11 @@ namespace ServiceStack.Redis
 
         #region IBasicPersistenceProvider
 
-
         Dictionary<string, HashSet<string>> registeredTypeIdsWithinPipelineMap = new Dictionary<string, HashSet<string>>();
 
         internal HashSet<string> GetRegisteredTypeIdsWithinPipeline(string typeIdsSet)
         {
-            HashSet<string> registeredTypeIdsWithinPipeline;
-            if (!registeredTypeIdsWithinPipelineMap.TryGetValue(typeIdsSet, out registeredTypeIdsWithinPipeline))
+            if (!registeredTypeIdsWithinPipelineMap.TryGetValue(typeIdsSet, out var registeredTypeIdsWithinPipeline))
             {
                 registeredTypeIdsWithinPipeline = new HashSet<string>();
                 registeredTypeIdsWithinPipelineMap[typeIdsSet] = registeredTypeIdsWithinPipeline;
@@ -664,7 +653,7 @@ namespace ServiceStack.Redis
 
         public object StoreObject(object entity)
         {
-            if (entity == null) throw new ArgumentNullException("entity");
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
 
             var id = entity.GetObjectId();
             var entityType = entity.GetType();
@@ -799,7 +788,7 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         public string UrnKey<T>(T value)
         {
-            return String.Concat(NamespacePrefix, value.CreateUrn());
+            return string.Concat(NamespacePrefix, value.CreateUrn());
         }
 
         /// <summary>
@@ -809,7 +798,7 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         public string UrnKey<T>(object id)
         {
-            return String.Concat(NamespacePrefix, IdUtils.CreateUrn<T>(id));
+            return string.Concat(NamespacePrefix, IdUtils.CreateUrn<T>(id));
         }
 
         /// <summary>
@@ -820,7 +809,7 @@ namespace ServiceStack.Redis
         /// <returns></returns>
         public string UrnKey(Type type, object id)
         {
-            return String.Concat(NamespacePrefix, IdUtils.CreateUrn(type, id));
+            return string.Concat(NamespacePrefix, IdUtils.CreateUrn(type, id));
         }
 
 
@@ -833,8 +822,7 @@ namespace ServiceStack.Redis
 
         public T ExecCachedLua<T>(string scriptBody, Func<string, T> scriptSha1)
         {
-            string sha1;
-            if (!CachedLuaSha1Map.TryGetValue(scriptBody, out sha1))
+            if (!CachedLuaSha1Map.TryGetValue(scriptBody, out var sha1))
                 CachedLuaSha1Map[scriptBody] = sha1 = LoadLuaScript(scriptBody);
 
             try
@@ -1078,8 +1066,7 @@ namespace ServiceStack.Redis
                 return ToServerRole(roleName);
             }
 
-            string role;
-            this.Info.TryGetValue("role", out role);
+            this.Info.TryGetValue("role", out var role);
             return ToServerRole(role);
         }
 

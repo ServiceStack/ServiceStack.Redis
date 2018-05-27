@@ -128,9 +128,7 @@ namespace ServiceStack.Redis
 
         public RedisSentinel(IEnumerable<string> sentinelHosts, string masterName = null)
         {
-            this.SentinelHosts = sentinelHosts != null
-                ? sentinelHosts.ToList()
-                : null;
+            this.SentinelHosts = sentinelHosts?.ToList();
 
             if (SentinelHosts == null || SentinelHosts.Count == 0)
                 throw new ArgumentException("sentinels must have at least one entry");
@@ -256,14 +254,14 @@ namespace ServiceStack.Redis
             if (RedisManager == null)
             {
                 if (Log.IsDebugEnabled)
-                    Log.Debug("Configuring initial Redis Clients: {0}".Fmt(sentinelInfo));
+                    Log.Debug($"Configuring initial Redis Clients: {sentinelInfo}");
 
                 RedisManager = CreateRedisManager(sentinelInfo);
             }
             else
             {
                 if (Log.IsDebugEnabled)
-                    Log.Debug("Failing over to Redis Clients: {0}".Fmt(sentinelInfo));
+                    Log.Debug($"Failing over to Redis Clients: {sentinelInfo}");
 
                 ((IRedisFailover)RedisManager).FailoverTo(
                     ConfigureHosts(sentinelInfo.RedisMasters),
@@ -441,15 +439,12 @@ public class SentinelInfo
     public SentinelInfo(string masterName, IEnumerable<string> redisMasters, IEnumerable<string> redisSlaves)
     {
         MasterName = masterName;
-        RedisMasters = redisMasters != null ? redisMasters.ToArray() : TypeConstants.EmptyStringArray;
-        RedisSlaves = redisSlaves != null ? redisSlaves.ToArray() : TypeConstants.EmptyStringArray;
+        RedisMasters = redisMasters?.ToArray() ?? TypeConstants.EmptyStringArray;
+        RedisSlaves = redisSlaves?.ToArray() ?? TypeConstants.EmptyStringArray;
     }
 
     public override string ToString()
     {
-        return "{0} masters: {1}, slaves: {2}".Fmt(
-            MasterName,
-            string.Join(", ", RedisMasters),
-            string.Join(", ", RedisSlaves));
+        return $"{MasterName} masters: {string.Join(", ", RedisMasters)}, slaves: {string.Join(", ", RedisSlaves)}";
     }
 }
