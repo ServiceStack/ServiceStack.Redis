@@ -37,7 +37,7 @@ namespace ServiceStack.Redis
     /// Provides thread-safe pooling of redis client connections. All connections are treaded as read and write hosts.
     /// </summary>
     public partial class RedisManagerPool
-        : IRedisClientsManager, IRedisFailover, IHandleClientDispose, IHasRedisResolver
+        : IRedisClientsManager, IRedisFailover, IHandleClientDispose, IHasRedisResolver, IRedisClientCacheManager
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RedisManagerPool));
 
