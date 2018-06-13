@@ -966,9 +966,5 @@ type as well as serializing and de-serializing each record using Service Stack's
   - [Synchronizing Redis local caches for distributed multi-subscriber scenarios](http://toreaurstad.blogspot.no/2015/09/synchronizing-redis-local-caches-for.html) by [@Tore_Aurstad](https://twitter.com/Tore_Aurstad)
   - [Distributed Caching using Redis Server with .NET/C# Client](http://www.codeproject.com/Articles/636730/Distributed-Caching-using-Redis) by [Sem.Shekhovtsov](http://www.codeproject.com/script/Membership/View.aspx?mid=6495187)
   - [Fan Messaging with ServiceStack.Redis](http://cornishdev.wordpress.com/2013/04/04/fan-messaging-with-servicestack-redis/) by [miket](http://stackoverflow.com/users/1804544/miket)
-  - [Redis and VB.Net](http://blogs.lessthandot.com/index.php/DataMgmt/DBProgramming/redis-and-vb-net) by [@chrissie1](https://twitter.com/chrissie1)
-  - [Using ServiceStack.Redis Part 2: Sets and Hashes](http://michaelsarchet.com/using-servicestack-redis-part-2-sets-and-hashes/) by [@msarchet](http://twitter.com/msarchet)
-  - [Using the ServiceStack.Redis Client](http://michaelsarchet.com/using-the-servicestack-redis-client/) by [@msarchet](http://twitter.com/msarchet)
-  - [Implementing ServiceStack.Redis.RedisClient (.NET Client for Redis)](http://www.narizwallace.com/2012/10/implementing-servicestack-redis-redisclient-net-client-for-redis/) by [@NarizWallace](https://twitter.com/NarizWallace)
   - [Getting started with Redis in ASP.NET under Windows](http://maxivak.com/getting-started-with-redis-and-asp-net-mvc-under-windows/) by [@maxivak](https://twitter.com/maxivak)
   
