@@ -23,6 +23,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ServiceStack.Text;
+using ServiceStack.Text.Pools;
 
 namespace ServiceStack.Redis
 {
