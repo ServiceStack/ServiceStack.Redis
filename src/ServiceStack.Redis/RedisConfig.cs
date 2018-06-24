@@ -58,9 +58,9 @@ namespace ServiceStack.Redis
         public static int BackOffMultiplier = 10;
 
         /// <summary>
-        /// The Byte Buffer Size to combine Redis Operations within (default 1450 bytes)
+        /// The Byte Buffer Size to combine Redis Operations within (1450 bytes)
         /// </summary>
-        public static int BufferLength = 1450;
+        public static int BufferLength => ServiceStack.Text.Pools.BufferPool.BUFFER_LENGTH;
 
         /// <summary>
         /// The Byte Buffer Size for Operations to use a byte buffer pool (default 500kb)
@@ -111,7 +111,6 @@ namespace ServiceStack.Redis
             DefaultIdleTimeOutSecs = 240;
             DefaultMaxPoolSize = null;
             BackOffMultiplier = 10;
-            BufferLength = 1450;
             BufferPoolMaxSize = 500000;
             VerifyMasterConnections = true;
             HostLookupTimeoutMs = 200;
