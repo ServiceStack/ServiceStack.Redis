@@ -21,7 +21,6 @@ namespace ConsoleTests
             //RedisConfig.DefaultRetryTimeout = 15 * 1000;
             RedisConfig.DefaultIdleTimeOutSecs = 240;
             RedisConfig.BackOffMultiplier = 10;
-            RedisConfig.BufferLength = 1450;
             RedisConfig.BufferPoolMaxSize = 500000;
             RedisConfig.VerifyMasterConnections = true;
             RedisConfig.HostLookupTimeoutMs = 1000;
