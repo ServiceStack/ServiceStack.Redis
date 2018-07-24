@@ -16,6 +16,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using ServiceStack.Redis.Generic;
 using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
@@ -1087,7 +1088,30 @@ namespace ServiceStack.Redis
                     return RedisServerRole.Unknown;
             }
         }
+
+        internal RedisClient LimitAccessToThread(int originalThreadId, string originalStackTrace)
+        {            
+            TrackThread = new TrackThread(originalThreadId, originalStackTrace);
+            return this;
+        }        
+    }
+
+    internal struct TrackThread
+    {
+        public readonly int ThreadId;
+        public readonly string StackTrace;
         
+        public TrackThread(int threadId, string stackTrace)
+        {
+            ThreadId = threadId;
+            StackTrace = stackTrace;
+        }
+    }
+
+    public class InvalidAccessException : RedisException
+    {
+        public InvalidAccessException(int threadId, string stackTrace) 
+            : base($"The Current Thread #{Thread.CurrentThread.ManagedThreadId} is different to the original Thread #{threadId} that resolved this pooled client at: \n{stackTrace}") { }
     }
 
 }

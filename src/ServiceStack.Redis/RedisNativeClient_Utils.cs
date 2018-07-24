@@ -510,12 +510,20 @@ namespace ServiceStack.Redis
         {
             return Bstream.ReadByte();
         }
-
+        
+        internal TrackThread? TrackThread;
+        
         protected T SendReceive<T>(byte[][] cmdWithBinaryArgs,
             Func<T> fn,
             Action<Func<T>> completePipelineFn = null,
             bool sendWithoutRead = false)
         {
+            if (TrackThread != null)
+            {
+                if (TrackThread.Value.ThreadId != Thread.CurrentThread.ManagedThreadId)
+                    throw new InvalidAccessException(TrackThread.Value.ThreadId, TrackThread.Value.StackTrace);
+            }
+            
             var i = 0;
             Exception originalEx = null;
 

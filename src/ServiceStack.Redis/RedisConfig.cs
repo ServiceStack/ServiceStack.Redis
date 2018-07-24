@@ -98,6 +98,12 @@ namespace ServiceStack.Redis
         public static RemoteCertificateValidationCallback CertificateValidationCallback { get; set; }
 
         /// <summary>
+        /// Assert all access using pooled RedisClient instance should be limited to same thread.
+        /// Captures StackTrace so is very slow, use only for debugging connection issues.
+        /// </summary>
+        public static bool AssertAccessOnlyOnSameThread = false;
+
+        /// <summary>
         /// Resets Redis Config and Redis Stats back to default values
         /// </summary>
         public static void Reset()
@@ -119,6 +125,7 @@ namespace ServiceStack.Redis
             DisableVerboseLogging = false;
             CertificateSelectionCallback = null;
             CertificateValidationCallback = null;
+            AssertAccessOnlyOnSameThread = false;
         }
     }
 }
