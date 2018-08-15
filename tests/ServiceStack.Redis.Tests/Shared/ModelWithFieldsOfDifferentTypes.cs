@@ -160,29 +160,22 @@ namespace ServiceStack.Common.Tests.Models
 
         public static void AssertIsEqual(ModelWithFieldsOfDifferentTypes actual, ModelWithFieldsOfDifferentTypes expected)
         {
-            Assert.That(actual.Id, Is.EqualTo(expected.Id));
-            Assert.That(actual.Name, Is.EqualTo(expected.Name));
-            Assert.That(actual.Guid, Is.EqualTo(expected.Guid));
-            Assert.That(actual.LongId, Is.EqualTo(expected.LongId));
-            Assert.That(actual.Bool, Is.EqualTo(expected.Bool));
-            try
-            {
-                Assert.That(actual.DateTime, Is.EqualTo(expected.DateTime));
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Trouble with DateTime precisions, trying Assert again with rounding to seconds", ex);
-                Assert.That(actual.DateTime.RoundToSecond(), Is.EqualTo(expected.DateTime.RoundToSecond()));
-            }
-            try
-            {
-                Assert.That(actual.Double, Is.EqualTo(expected.Double));
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Trouble with double precisions, trying Assert again with rounding to 10 decimals", ex);
-                Assert.That(Math.Round(actual.Double, 10), Is.EqualTo(Math.Round(actual.Double, 10)));
-            }
+            if (actual.Id != expected.Id)
+                throw new Exception($"{actual.Id} != {expected.Id}");
+            if (actual.Name != expected.Name)
+                throw new Exception($"{actual.Name} != {expected.Name}");
+            if (actual.Guid != expected.Guid)
+                throw new Exception($"{actual.Guid} != {expected.Guid}");
+            if (actual.LongId != expected.LongId)
+                throw new Exception($"{actual.LongId} != {expected.LongId}");
+            if (actual.Bool != expected.Bool)
+                throw new Exception($"{actual.Bool} != {expected.Bool}");
+            
+            if (actual.DateTime.RoundToSecond() != expected.DateTime.RoundToSecond())
+                throw new Exception($"{actual.DateTime.RoundToSecond()} != {expected.DateTime.RoundToSecond()}");
+            
+            if (Math.Abs(actual.Double - expected.Double) > 1)
+                throw new Exception($"{actual.Double} != {expected.Double}");
         }
     }
 }
