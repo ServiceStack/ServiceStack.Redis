@@ -18,7 +18,7 @@
     <copyright>ServiceStack and contributors</copyright>
     <dependencies>
       <group targetFramework=".netstandard2.0">
-        <dependency id="System.Net.Security" version="[4.3.1, )" />
+        <dependency id="System.Net.Security" version="[4.3.2, )" />
         <dependency id="System.Collections.Specialized" version="[4.3.0, )" />
         <dependency id="System.Collections.NonGeneric" version="[4.3.0, )" />
         <dependency id="System.Net.NameResolution" version="[4.3.0, )" />
