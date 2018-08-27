@@ -251,6 +251,51 @@
             APIs returning HttpWebResponse must be explicitly Disposed, e.g using (var res = client.Get(url)) { ... }
             </summary>
         </member>
+        <member name="M:ServiceStack.ServiceClientBase.Delete(System.Object)">
+            <summary>
+            APIs returning HttpWebResponse must be explicitly Disposed, e.g using (var res = client.Delete(url)) { ... }
+            </summary>
+        </member>
+        <member name="M:ServiceStack.ServiceClientBase.Delete(System.String)">
+            <summary>
+            APIs returning HttpWebResponse must be explicitly Disposed, e.g using (var res = client.Delete(url)) { ... }
+            </summary>
+        </member>
+        <member name="M:ServiceStack.ServiceClientBase.Post(System.Object)">
+            <summary>
+            APIs returning HttpWebResponse must be explicitly Disposed, e.g using (var res = client.Post(url)) { ... }
+            </summary>
+        </member>
+        <member name="M:ServiceStack.ServiceClientBase.Put(System.Object)">
+            <summary>
+            APIs returning HttpWebResponse must be explicitly Disposed, e.g using (var res = client.Put(url)) { ... }
+            </summary>
+        </member>
+        <member name="M:ServiceStack.ServiceClientBase.CustomMethod(System.String,System.Object)">
+            <summary>
+            APIs returning HttpWebResponse must be explicitly Disposed, e.g using (var res = client.CustomMethod(method,dto)) { ... }
+            </summary>
+        </member>
+        <member name="M:ServiceStack.ServiceClientBase.CustomMethod(System.String,System.String,System.Object)">
+            <summary>
+            APIs returning HttpWebResponse must be explicitly Disposed, e.g using (var res = client.CustomMethod(method,dto)) { ... }
+            </summary>
+        </member>
+        <member name="M:ServiceStack.ServiceClientBase.Head(ServiceStack.IReturn)">
+            <summary>
+            APIs returning HttpWebResponse must be explicitly Disposed, e.g using (var res = client.Head(request)) { ... }
+            </summary>
+        </member>
+        <member name="M:ServiceStack.ServiceClientBase.Head(System.Object)">
+            <summary>
+            APIs returning HttpWebResponse must be explicitly Disposed, e.g using (var res = client.Head(request)) { ... }
+            </summary>
+        </member>
+        <member name="M:ServiceStack.ServiceClientBase.Head(System.String)">
+            <summary>
+            APIs returning HttpWebResponse must be explicitly Disposed, e.g using (var res = client.Head(request)) { ... }
+            </summary>
+        </member>
         <member name="M:ServiceStack.StreamExt.Compress(System.String,System.String)">
             <summary>
             Compresses the specified text using the default compression method: Deflate

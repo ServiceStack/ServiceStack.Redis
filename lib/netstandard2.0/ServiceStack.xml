@@ -59,6 +59,12 @@
             Should UserName or Emails be saved in AuthRepository in LowerCase
             </summary>
         </member>
+        <member name="M:ServiceStack.AuthFeature.RegisterAuthProvider(ServiceStack.Auth.IAuthProvider)">
+            <summary>
+            Use a plugin to register authProvider dynamically. Your plugin can implement `IPreInitPlugin` interface
+            to call `appHost.GetPlugin&lt;AuthFeature&gt;().RegisterAuthProvider()` before the AuthFeature is registered.
+            </summary>
+        </member>
         <member name="T:ServiceStack.Auth.IManageApiKeys">
             <summary>
             The Interface Auth Repositories need to implement to support API Keys
@@ -247,6 +253,21 @@
         <member name="M:ServiceStack.Auth.IAuthProvider.IsAuthorized(ServiceStack.Auth.IAuthSession,ServiceStack.Auth.IAuthTokens,ServiceStack.Authenticate)">
             <summary>
             Determine if the current session is already authenticated with this AuthProvider
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.IAuthSession.OnRegistered(ServiceStack.Web.IRequest,ServiceStack.Auth.IAuthSession,ServiceStack.IServiceBase)">
+            <summary>
+            Called when the user is registered or on the first OAuth login 
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.IAuthSession.OnAuthenticated(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession,ServiceStack.Auth.IAuthTokens,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Called after the user has successfully authenticated 
+            </summary>
+        </member>
+        <member name="M:ServiceStack.Auth.IAuthSession.OnLogout(ServiceStack.IServiceBase)">
+            <summary>
+            Fired before the session is removed after the /auth/logout Service is called
             </summary>
         </member>
         <member name="M:ServiceStack.Auth.IAuthSession.OnCreated(ServiceStack.Web.IRequest)">
@@ -5276,6 +5297,11 @@
             Provide a catch-all handler that doesn't match any routes
             </summary>
         </member>
+        <member name="P:ServiceStack.IAppHost.FallbackHandlers">
+            <summary>
+            Provide a fallback handler for not found requests (last filter in Request Pipeline)
+            </summary>
+        </member>
         <member name="P:ServiceStack.IAppHost.GlobalHtmlErrorHttpHandler">
             <summary>
             Use a fall-back Error Handler for handling global errors
@@ -5411,6 +5437,15 @@
             </summary>
             <typeparam name="T"></typeparam>
             <returns></returns>
+        </member>
+        <member name="T:ServiceStack.TemplateMarkdownBlock">
+             <summary>
+             Converts markdown contents to HTML using the configured MarkdownConfig.Transformer.
+             If a variable name is specified the HTML output is captured and saved instead. 
+            
+             Usages: {{#markdown}} ## The Heading {{/markdown}}
+                     {{#markdown content}} ## The Heading {{/markdown}} HTML: {{content}}
+             </summary>
         </member>
         <member name="P:ServiceStack.Messaging.BackgroundMqService.RetryCount">
             <summary>
@@ -5859,6 +5894,11 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="P:ServiceStack.ServerEventsHandler.RemoveExpiredSubscriptionsEvery">
+            <summary>
+            Call IServerEvents.RemoveExpiredSubscriptions() after every count
+            </summary>
+        </member>
         <member name="T:ServiceStack.Service">
             <summary>
             Generic + Useful IService base class
@@ -6111,6 +6151,11 @@
             return null if Session is invalid to create new Session.
             </summary>
         </member>
+        <member name="M:ServiceStack.ServiceStackHost.SetCookieFilter(ServiceStack.Web.IRequest,System.Net.Cookie)">
+            <summary>
+            Override built-in Cookies, return false to prevent the Cookie from being set.
+            </summary>
+        </member>
         <member name="M:ServiceStack.ServiceStackHost.GetDbConnection(ServiceStack.Web.IRequest)">
             <summary>
             Gets IDbConnection Checks if DbInfo is seat in RequestContext.
@@ -6184,6 +6229,12 @@
             Create both Permanent and Session Id cookies and return the active sessionId
             </summary>
             <returns></returns>
+        </member>
+        <member name="P:ServiceStack.TemplatePagesFeature.TemplatesAdminRole">
+            <summary>
+            Role Required to call Templates Admin Service (/templates/admin), Default is Admin.
+            If null Templates Admin Service will not be registered.
+            </summary>
         </member>
         <member name="T:ServiceStack.Templates.HtmlTemplates">
             <summary>
