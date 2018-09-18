@@ -5794,6 +5794,11 @@
             Access Service Controller for ServiceStack
             </summary>
         </member>
+        <member name="M:ServiceStack.IAppHost.PublishMessage``1(ServiceStack.Messaging.IMessageProducer,``0)">
+            <summary>
+            Publish Message to be processed by AppHost
+            </summary>
+        </member>
         <member name="T:ServiceStack.IRepository">
             <summary>
             A convenient repository base class you can inherit from to reduce the boilerplate 
@@ -6353,8 +6358,8 @@
         <member name="M:ServiceStack.Service.Dispose">
             <summary>
             Disposes all created disposable properties of this service
-            and executes disposing of all request <see cref="!:IDposable"></see>s 
-            (warning, manualy triggering this might lead to unwanted disposing of all request related objects and services.)
+            and executes disposing of all request <see cref="T:System.IDisposable"></see>s 
+            (warning, manually triggering this might lead to unwanted disposing of all request related objects and services.)
             </summary>
         </member>
         <member name="M:ServiceStack.ServiceRoutesExtensions.AddFromAssembly(ServiceStack.Web.IServiceRoutes,System.Reflection.Assembly[])">
