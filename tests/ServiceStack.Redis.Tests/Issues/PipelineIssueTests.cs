@@ -39,5 +39,44 @@ namespace ServiceStack.Redis.Tests.Issues
                 Assert.AreEqual("v3", client.Get<string>("k3"));
             }
         }
+
+        [Test]
+        public void Can_Set_with_DateTime_in_Pipeline()
+        {
+            using (var clientsManager = new RedisManagerPool(TestConfig.SingleHost))
+            {
+                bool result;
+                int value = 111;
+                string key = $"key:{value}";
+
+                // Set key with pipeline (batching many requests)
+                using (var redis = clientsManager.GetClient())
+                {
+                    using (var pipeline = redis.CreatePipeline())
+                    {
+                        //Only atomic operations can be called within a Transaction or Pipeline
+                        Assert.Throws<NotSupportedException>(() =>
+                            pipeline.QueueCommand(r => r.Set(key, value, DateTime.Now.AddMinutes(1)), r => result = r));
+                    }
+
+                    using (var pipeline = redis.CreatePipeline())
+                    {
+
+                        pipeline.QueueCommand(r => r.Set(key, value), r => result = r);
+                        pipeline.QueueCommand(r => r.ExpireEntryAt(key, DateTime.Now.AddMinutes(1)));
+                        
+                        pipeline.Flush();
+                    }
+                }
+
+                // Get key
+                using (var redis = clientsManager.GetClient())
+                {
+                    var res = redis.Get<int>(key);                    
+                    Assert.That(res, Is.EqualTo(value));
+                }
+            }
+            
+        }
     }
 }
