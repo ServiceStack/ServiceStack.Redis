@@ -61,7 +61,6 @@ namespace ServiceStack.Redis.Tests.Issues
 
                     using (var pipeline = redis.CreatePipeline())
                     {
-
                         pipeline.QueueCommand(r => r.Set(key, value), r => result = r);
                         pipeline.QueueCommand(r => r.ExpireEntryAt(key, DateTime.Now.AddMinutes(1)));
                         

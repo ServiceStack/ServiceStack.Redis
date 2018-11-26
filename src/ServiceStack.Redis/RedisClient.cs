@@ -401,7 +401,7 @@ namespace ServiceStack.Redis
 
         public void AssertNotInTransaction()
         {
-            if (Transaction != null)
+            if (Transaction != null || Pipeline != null)
                 throw new NotSupportedException("Only atomic redis-server operations are supported in a transaction");
         }
 
