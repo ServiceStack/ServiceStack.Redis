@@ -294,19 +294,18 @@ RedisConfig.DefaultRetryTimeout = 10000;
 RedisConfig.BackOffMultiplier = 10;
 ```
 
-## [ServiceStack.Redis SSL Support](https://github.com/ServiceStack/ServiceStack/wiki/Secure-SSL-Redis-connections-to-Azure-Redis)
+## [ServiceStack.Redis SSL Support](http://docs.servicestack.net/ssl-redis-azure)
 
 ServiceStack.Redis now supporting **SSL connections** making it suitable for accessing remote Redis server instances over a 
 **secure SSL connection**.
 
 ![Azure Redis Cache](https://github.com/ServiceStack/Assets/raw/master/img/wikis/redis/azure-redis-instance.png)
 
-### [Connecting to Azure Redis](https://github.com/ServiceStack/ServiceStack/wiki/Secure-SSL-Redis-connections-to-Azure-Redis)
+### [Connecting to Azure Redis](http://docs.servicestack.net/ssl-redis-azure)
 
 As connecting to [Azure Redis Cache](http://azure.microsoft.com/en-us/services/cache/) via SSL was the primary use-case for this feature, 
 we've added a new 
-[Getting connected to Azure Redis via SSL](https://github.com/ServiceStack/ServiceStack/wiki/Secure-SSL-Redis-connections-to-Azure-Redis) 
-to help you get started.
+[Getting connected to Azure Redis via SSL](http://docs.servicestack.net/ssl-redis-azure) to help you get started.
 
 ## [Redis GEO](https://github.com/ServiceStackApps/redis-geo)
 
