@@ -24,7 +24,7 @@ namespace ServiceStack.Redis
     {
         public T Exec<T>(Func<RedisClient, T> action)
         {
-            using (JsConfig.With(excludeTypeInfo: false))
+            using (JsConfig.With(new Text.Config { ExcludeTypeInfo = false }))
             {
                 return action(this);
             }
@@ -32,7 +32,7 @@ namespace ServiceStack.Redis
 
         public void Exec(Action<RedisClient> action)
         {
-            using (JsConfig.With(excludeTypeInfo: false))
+            using (JsConfig.With(new Text.Config { ExcludeTypeInfo = false }))
             {
                 action(this);
             }
