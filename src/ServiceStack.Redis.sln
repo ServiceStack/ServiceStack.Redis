@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{38F69F8F
 		..\README.md = ..\README.md
 		..\NuGet\ServiceStack.Redis.Core\servicestack.redis.core.nuspec = ..\NuGet\ServiceStack.Redis.Core\servicestack.redis.core.nuspec
 		..\NuGet\ServiceStack.Redis\servicestack.redis.nuspec = ..\NuGet\ServiceStack.Redis\servicestack.redis.nuspec
+		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Redis", "ServiceStack.Redis\ServiceStack.Redis.csproj", "{AF99F19B-4C04-4F58-81EF-B092F1FCC540}"

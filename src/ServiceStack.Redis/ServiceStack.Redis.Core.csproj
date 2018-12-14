@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <PackageId>ServiceStack.Redis</PackageId>
+    <PackageId>ServiceStack.Redis.Core</PackageId>
     <AssemblyName>ServiceStack.Redis</AssemblyName>
-    <Title>C# Redis client for the Redis NoSQL DB</Title>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <Title>ServiceStack.Redis .NET Standard 2.0</Title>
     <PackageDescription>
       C# Redis Client for the worlds fastest distributed NoSQL datastore.
       Byte[], String and POCO Typed clients.
@@ -16,7 +16,7 @@
     <Reference Include="..\..\lib\net45\ServiceStack.Interfaces.dll" />
     <Reference Include="..\..\lib\net45\ServiceStack.Text.dll" />
     <Reference Include="..\..\lib\net45\ServiceStack.Common.dll" />
-    <PackageReference Include="ServiceStack.Common" Version="$(Version)" />
+    <PackageReference Include="ServiceStack.Common" Version="5.0.0" ExcludeAssets="all" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="System.Net.Security" Version="4.3.2" />
@@ -28,7 +28,6 @@
     <Reference Include="..\..\lib\netstandard2.0\ServiceStack.Interfaces.dll" />
     <Reference Include="..\..\lib\netstandard2.0\ServiceStack.Text.dll" />
     <Reference Include="..\..\lib\netstandard2.0\ServiceStack.Common.dll" />
-    <PackageReference Include="ServiceStack.Common" Version="$(Version)" />
+    <PackageReference Include="ServiceStack.Common" Version="5.0.0" ExcludeAssets="all" />
   </ItemGroup>
-  
 </Project>
