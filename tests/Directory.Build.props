@@ -1,0 +1,13 @@
+<Project>
+
+  <PropertyGroup>
+    <Version>5.4.1</Version>
+    <LangVersion>latest</LangVersion>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DefineConstants>DEBUG</DefineConstants>
+  </PropertyGroup>
+
+</Project>

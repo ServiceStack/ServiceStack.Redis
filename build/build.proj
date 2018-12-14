@@ -52,7 +52,7 @@
   <Target Name="UpdateVersion">
     <!-- Update Version -->
     <ItemGroup>
-      <RegexTransform Include="$(BuildSolutionDir)/src/Directory.Build.props">
+      <RegexTransform Include="$(BuildSolutionDir)/src/Directory.Build.props;$(BuildSolutionDir)/tests/Directory.Build.props">
         <Find>&lt;Version&gt;[^&lt;]*</Find>
         <ReplaceWith>&lt;Version&gt;$(PackageVersion)</ReplaceWith>
       </RegexTransform>
