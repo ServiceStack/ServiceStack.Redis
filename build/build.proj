@@ -74,11 +74,14 @@
     <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis/ServiceStack.Redis.Core.csproj"
              Targets="Build;Pack"
              Properties="Configuration=$(Configuration)" />
-
+    
     <ItemGroup>
       <NugetPackagesToMove Include="$(BuildSolutionDir)/src/**/bin/$(Configuration)/*.nupkg"/>
     </ItemGroup>
     <Move SourceFiles="@(NugetPackagesToMove)" DestinationFolder="$(NuGetPackageDir)" />
+
+    <!-- leave .sln in optimal state then NuGet restore .sln to build -->
+    <CallTarget Targets="ClearNuGetRestoreCaches" />
 
   </Target>
 </Project>
