@@ -12,9 +12,6 @@
   <ItemGroup>
     <PackageReference Include="ServiceStack.Common" Version="$(Version)" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System.Net" />
-  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="System.Net.Security" Version="4.3.2" />
     <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
