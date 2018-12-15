@@ -8,7 +8,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{38F69F8F
 		..\build\build.bat = ..\build\build.bat
 		..\build\build.proj = ..\build\build.proj
 		..\build\build.tasks = ..\build\build.tasks
-		..\build\copy.bat = ..\build\copy.bat
 		..\README.md = ..\README.md
 		Directory.Build.props = Directory.Build.props
 		ServiceStack.Redis\ServiceStack.Redis.Core.csproj = ServiceStack.Redis\ServiceStack.Redis.Core.csproj
