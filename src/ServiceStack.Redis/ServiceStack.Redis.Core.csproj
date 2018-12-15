@@ -5,9 +5,7 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Title>ServiceStack.Redis .NET Standard 2.0</Title>
     <PackageDescription>
-      C# Redis Client for the worlds fastest distributed NoSQL datastore.
-      Byte[], String and POCO Typed clients.
-      Thread-Safe Basic and Pooled client managers included.
+      .NET Standard 2.0 version of ServiceStack.Redis
     </PackageDescription>
     <PackageTags>Redis;NoSQL;Client;Distributed;Cache;PubSub;Messaging;Transactions</PackageTags>
   </PropertyGroup>
