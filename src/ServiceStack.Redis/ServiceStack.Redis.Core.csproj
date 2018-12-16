@@ -10,7 +10,7 @@
     <PackageTags>Redis;NoSQL;Client;Distributed;Cache;PubSub;Messaging;Transactions</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ServiceStack.Common" Version="$(Version)" />
+    <PackageReference Include="ServiceStack.Common.Core" Version="$(Version)" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="System.Net.Security" Version="4.3.2" />
