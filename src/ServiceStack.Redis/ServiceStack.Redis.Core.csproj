@@ -1,21 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <PackageId>ServiceStack.Redis</PackageId>
+    <PackageId>ServiceStack.Redis.Core</PackageId>
     <AssemblyName>ServiceStack.Redis</AssemblyName>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
-    <Title>C# Redis client for the Redis NoSQL DB</Title>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <Title>ServiceStack.Redis .NET Standard 2.0</Title>
     <PackageDescription>
-      C# Redis Client for the worlds fastest distributed NoSQL datastore.
-      Byte[], String and POCO Typed clients.
-      Thread-Safe Basic and Pooled client managers included.
+      .NET Standard 2.0 version of ServiceStack.Redis
     </PackageDescription>
     <PackageTags>Redis;NoSQL;Client;Distributed;Cache;PubSub;Messaging;Transactions</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ServiceStack.Common" Version="$(Version)" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System.Net" />
+    <PackageReference Include="ServiceStack.Common.Core" Version="$(Version)" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="System.Net.Security" Version="4.3.2" />
@@ -25,5 +20,5 @@
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
   </ItemGroup>
-  
+
 </Project>

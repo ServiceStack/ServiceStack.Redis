@@ -30,10 +30,11 @@
   </Target>
 
   <Target Name="BuildSolutions">
+    <ItemGroup>
+      <NugetPackageFilesToDelete Include="$(NuGetPackageDir)/*.nupkg"/>
+    </ItemGroup>
+    <Delete Files="@(NugetPackageFilesToDelete)" />
     <CallTarget Targets="ClearNuGetRestoreCaches" />
-    <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis.sln" Targets="Restore" />
-    <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis.sln" Targets="Build"
-             Properties="Configuration=$(Configuration)" />
   </Target>
 
   <!-- need to remove old caches from nuget restore from .Core csproj's -->
@@ -55,8 +56,9 @@
 
   <Target Name="Default" DependsOnTargets="$(DoBuildSolutionsDependsOn)">
 
-    <!-- ServiceStack.Redis -->
-    <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis/ServiceStack.Redis.csproj"
+    <!-- ServiceStack.Redis.Core -->
+    <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis/ServiceStack.Redis.Core.csproj" Targets="Restore" />
+    <MSBuild Projects="$(BuildSolutionDir)/src/ServiceStack.Redis/ServiceStack.Redis.Core.csproj"
              Targets="Build;Pack"
              Properties="Configuration=$(Configuration)" />
 
