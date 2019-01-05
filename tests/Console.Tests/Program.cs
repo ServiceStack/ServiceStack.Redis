@@ -36,7 +36,9 @@
 
             //new BlockingPop().Execute();
 
-            new MasterFailoverWithPassword().Execute();
+            //new MasterFailoverWithPassword().Execute();
+            
+            new BrPopAfterReconnection().Execute();
         }
     }
 }

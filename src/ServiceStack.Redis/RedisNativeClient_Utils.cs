@@ -265,8 +265,9 @@ namespace ServiceStack.Redis
             }
         }
 
-        private void TryConnectIfNeeded()
+        private bool TryConnectIfNeeded()
         {
+            bool didConnect = false;
             if (LastConnectedAtTimestamp > 0)
             {
                 var now = Stopwatch.GetTimestamp();
@@ -275,6 +276,7 @@ namespace ServiceStack.Redis
                 if (socket == null || (elapsedSecs > IdleTimeOutSecs && !socket.IsConnected()))
                 {
                     Reconnect();
+                    didConnect = true;
                 }
                 LastConnectedAtTimestamp = now;
             }
@@ -282,17 +284,16 @@ namespace ServiceStack.Redis
             if (socket == null)
             {
                 Connect();
+                didConnect = true;
             }
+
+            return didConnect;
         }
 
         private bool Reconnect()
         {
-            var previousDb = db;
-
             SafeConnectionClose();
-            Connect(); //sets db to 0
-
-            if (previousDb != RedisConfig.DefaultDb) this.Db = previousDb;
+            Connect(); //sets db 
 
             return socket != null;
         }
@@ -360,7 +361,7 @@ namespace ServiceStack.Redis
         }
 
         /// <summary>
-        /// Command to set multuple binary safe arguments
+        /// Command to set multiple binary safe arguments
         /// </summary>
         /// <param name="cmdWithBinaryArgs"></param>
         /// <returns></returns>
