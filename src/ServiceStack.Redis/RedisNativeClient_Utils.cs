@@ -526,6 +526,7 @@ namespace ServiceStack.Redis
             }
             
             var i = 0;
+            var didWriteToBuffer = false;
             Exception originalEx = null;
 
             var firstAttempt = DateTime.UtcNow;
@@ -539,8 +540,11 @@ namespace ServiceStack.Redis
                     if (socket == null)
                         throw new RedisRetryableException("Socket is not connected");
 
-                    if (i == 0) //only write to buffer once
+                    if (!didWriteToBuffer) //only write to buffer once
+                    {
                         WriteCommandToSendBuffer(cmdWithBinaryArgs);
+                        didWriteToBuffer = true;
+                    }
 
                     if (Pipeline == null) //pipeline will handle flush if in pipeline
                     {

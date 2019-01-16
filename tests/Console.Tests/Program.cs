@@ -38,7 +38,7 @@
 
             //new MasterFailoverWithPassword().Execute();
             
-            new BrPopAfterReconnection().Execute();
+            new BlockingRemoveAfterReconnection().Execute();
         }
     }
 }

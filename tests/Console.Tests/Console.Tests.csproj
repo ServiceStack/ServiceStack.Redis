@@ -81,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlockingPop.cs" />
+    <Compile Include="BlockingRemoveAfterReconnection.cs" />
     <Compile Include="BrPopAfterReconnection.cs" />
     <Compile Include="ForceFailover.cs" />
     <Compile Include="MasterFailoverWithPassword.cs" />
