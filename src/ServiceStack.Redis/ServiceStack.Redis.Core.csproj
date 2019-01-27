@@ -2,6 +2,7 @@
   <PropertyGroup>
     <PackageId>ServiceStack.Redis.Core</PackageId>
     <AssemblyName>ServiceStack.Redis</AssemblyName>
+    <RootNamespace>ServiceStack.Redis</RootNamespace>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Title>ServiceStack.Redis .NET Standard 2.0</Title>
     <PackageDescription>
