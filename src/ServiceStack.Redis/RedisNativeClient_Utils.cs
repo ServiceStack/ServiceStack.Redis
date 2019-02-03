@@ -568,7 +568,8 @@ namespace ServiceStack.Redis
             {
                 try
                 {
-                    TryConnectIfNeeded();
+                    if (TryConnectIfNeeded())
+                        didWriteToBuffer = false;
 
                     if (socket == null)
                         throw new RedisRetryableException("Socket is not connected");
