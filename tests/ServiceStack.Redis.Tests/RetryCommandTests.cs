@@ -14,7 +14,8 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Does_retry_failed_commands()
         {
-            //LogManager.LogFactory = new ConsoleLogFactory(debugEnabled: true);
+//            LogManager.LogFactory = new ConsoleLogFactory(debugEnabled: true);
+//            RedisConfig.EnableVerboseLogging = true;
 
             RedisStats.Reset();
 
@@ -37,7 +38,7 @@ namespace ServiceStack.Redis.Tests
             };
 
             Assert.That(redis.IncrementValue("retryCounter"), Is.EqualTo(2));
-            Assert.That(redis.Get<int>("retryCounter"), Is.EqualTo(2));
+            Assert.That(redis.Get<int>("retryCounter"), Is.EqualTo(3));
 
             Assert.That(RedisStats.TotalRetryCount, Is.EqualTo(1));
             Assert.That(RedisStats.TotalRetrySuccess, Is.EqualTo(1));
@@ -61,7 +62,7 @@ namespace ServiceStack.Redis.Tests
             };
 
             Assert.That(redis.IncrementValue("retryCounter"), Is.EqualTo(2));
-            Assert.That(redis.Get<int>("retryCounter"), Is.EqualTo(2));
+            Assert.That(redis.Get<int>("retryCounter"), Is.EqualTo(3));
 
             Assert.That(RedisStats.TotalRetryCount, Is.EqualTo(1));
             Assert.That(RedisStats.TotalRetrySuccess, Is.EqualTo(1));
