@@ -302,7 +302,7 @@ namespace ServiceStack.Redis
         {
             DeactivatedAt = DateTime.UtcNow;
 
-            if (!RedisConfig.DisableVerboseLogging)
+            if (RedisConfig.EnableVerboseLogging)
             {
                 var safeLastCommand = string.IsNullOrEmpty(Password)
                     ? lastCommand
@@ -374,7 +374,7 @@ namespace ServiceStack.Redis
                     LicenseUtils.AssertValidUsage(LicenseFeature.Redis, QuotaType.RequestsPerHour, __requestsPerHour);
             }
 
-            if (log.IsDebugEnabled && !RedisConfig.DisableVerboseLogging)
+            if (log.IsDebugEnabled && RedisConfig.EnableVerboseLogging)
                 CmdLog(cmdWithBinaryArgs);
 
             //Total command lines count
@@ -476,7 +476,7 @@ namespace ServiceStack.Redis
                 }
                 else
                 {
-                    //Sendling IList<ArraySegment> Throws 'Message to Large' SocketException in Mono
+                    //Sending IList<ArraySegment> Throws 'Message to Large' SocketException in Mono
                     foreach (var segment in cmdBuffer)
                     {
                         var buffer = segment.Array;
@@ -739,7 +739,7 @@ namespace ServiceStack.Redis
 
         protected void Log(string fmt, params object[] args)
         {
-            if (RedisConfig.DisableVerboseLogging)
+            if (RedisConfig.EnableVerboseLogging)
                 return;
 
             log.DebugFormat("{0}", string.Format(fmt, args).Trim());

@@ -83,15 +83,22 @@ namespace ServiceStack.Redis
         public static int? AssumeServerVersion;
 
         /// <summary>
-        /// How long to hold deactivated clients for before disposing their connection (default 10 seconds)
+        /// How long to hold deactivated clients for before disposing their connection (default 0 seconds)
         /// Dispose of deactivated Clients immediately with TimeSpan.Zero
         /// </summary>
-        public static TimeSpan DeactivatedClientsExpiry = TimeSpan.FromSeconds(10);
+        public static TimeSpan DeactivatedClientsExpiry = TimeSpan.Zero;
 
         /// <summary>
-        /// Whether Debug Logging should log detailed Redis operations (default false)
+        /// Whether Debug Logging should log detailed Redis operations (default true)
         /// </summary>
-        public static bool DisableVerboseLogging = false;
+        public static bool EnableVerboseLogging = false;
+
+        [Obsolete("Use EnableVerboseLogging")]
+        public static bool DisableVerboseLogging
+        {
+            get => !EnableVerboseLogging;
+            set => EnableVerboseLogging = !value;
+        }
 
         //Example at: http://msdn.microsoft.com/en-us/library/office/dd633677(v=exchg.80).aspx 
         public static LocalCertificateSelectionCallback CertificateSelectionCallback { get; set; }
@@ -121,8 +128,8 @@ namespace ServiceStack.Redis
             VerifyMasterConnections = true;
             HostLookupTimeoutMs = 200;
             AssumeServerVersion = null;
-            DeactivatedClientsExpiry = TimeSpan.FromSeconds(10);
-            DisableVerboseLogging = false;
+            DeactivatedClientsExpiry = TimeSpan.Zero;
+            EnableVerboseLogging = false;
             CertificateSelectionCallback = null;
             CertificateValidationCallback = null;
             AssertAccessOnlyOnSameThread = false;

@@ -23,7 +23,7 @@ namespace ConsoleTests
 
         public void Execute()
         {
-            RedisConfig.DisableVerboseLogging = true;
+            RedisConfig.EnableVerboseLogging = false;
             LogManager.LogFactory = new ConsoleLogFactory(debugEnabled: true);
             log = LogManager.GetLogger(GetType());
 

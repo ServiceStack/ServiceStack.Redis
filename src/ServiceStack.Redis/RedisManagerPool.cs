@@ -182,7 +182,7 @@ namespace ServiceStack.Redis
                         if (inactivePoolIndex == -1 || !stillReserved)
                         {
                             if (Log.IsDebugEnabled)
-                                Log.Debug("clients[inactivePoolIndex] != existingClient: {0}".Fmt(!stillReserved ? "!stillReserved" : "-1"));
+                                Log.Debug($"POOL clients[inactivePoolIndex] != existingClient: {(!stillReserved ? "!stillReserved" : "-1")}");
 
                             Interlocked.Increment(ref RedisState.TotalClientsCreatedOutsidePool);
 

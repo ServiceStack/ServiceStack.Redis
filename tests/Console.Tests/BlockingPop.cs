@@ -25,7 +25,7 @@ namespace ConsoleTests
             RedisConfig.VerifyMasterConnections = true;
             RedisConfig.HostLookupTimeoutMs = 1000;
             RedisConfig.DeactivatedClientsExpiry = TimeSpan.FromSeconds(15);
-            RedisConfig.DisableVerboseLogging = false;
+            RedisConfig.EnableVerboseLogging = true;
 
             var redisManager = new RedisManagerPool("localhost?connectTimeout=1000");
 
