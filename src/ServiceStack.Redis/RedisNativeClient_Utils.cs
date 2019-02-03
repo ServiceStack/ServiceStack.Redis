@@ -39,6 +39,14 @@ namespace ServiceStack.Redis
         private const int Unknown = -1;
         public static int ServerVersionNumber { get; set; }
 
+        private static long IdCounter = 0;
+        public long ClientId { get; } = Interlocked.Increment(ref IdCounter);
+
+        private string LogPrefix = string.Empty;
+        private void logDebug(object message) => log.Debug(LogPrefix + message);
+        private void logError(object message) => log.Error(LogPrefix + message);
+        private void logError(object message, Exception ex) => log.Error(LogPrefix + message, ex);
+
         public int AssertServerVersionNumber()
         {
             if (ServerVersionNumber == 0)
@@ -98,11 +106,17 @@ namespace ServiceStack.Redis
 
                 if (!socket.Connected)
                 {
+                    if (log.IsDebugEnabled)
+                        logDebug("Socket Connect failed");
+
                     socket.Close();
                     socket = null;
                     DeactivatedAt = DateTime.UtcNow;
                     return;
                 }
+
+                if (log.IsDebugEnabled)
+                    logDebug("Socket Connected");
 
                 Stream networkStream = new NetworkStream(socket);
 
@@ -203,7 +217,7 @@ namespace ServiceStack.Redis
             }
             catch (SocketException)
             {
-                log.Error(ErrorConnect.Fmt(Host, Port));
+                logError(ErrorConnect.Fmt(Host, Port));
                 throw;
             }
         }
@@ -251,7 +265,7 @@ namespace ServiceStack.Redis
             }
             catch (SocketException ex)
             {
-                log.Error(ErrorConnect.Fmt(Host, Port));
+                logError(ErrorConnect.Fmt(Host, Port));
 
                 socket?.Close();
 
@@ -260,7 +274,7 @@ namespace ServiceStack.Redis
                 DeactivatedAt = DateTime.UtcNow;
                 var message = Host + ":" + Port;
                 var throwEx = new RedisException(message, ex);
-                log.Error(throwEx.Message, ex);
+                logError(throwEx.Message, ex);
                 throw throwEx;
             }
         }
@@ -313,7 +327,7 @@ namespace ServiceStack.Redis
             }
 
             var throwEx = new RedisResponseException(error);
-            log.Error(error);
+            logError(error);
             return throwEx;
         }
 
@@ -329,7 +343,7 @@ namespace ServiceStack.Redis
 
             var throwEx = new RedisRetryableException(
                 $"[{DateTime.UtcNow:HH:mm:ss.fff}] {error}, sPort: {clientPort}, LastCommand: {safeLastCommand}");
-            log.Error(throwEx.Message);
+            logError(throwEx.Message);
             throw throwEx;
         }
 
@@ -339,7 +353,7 @@ namespace ServiceStack.Redis
             var throwEx = new RedisException(
                 $"[{DateTime.UtcNow:HH:mm:ss.fff}] Unable to Connect: sPort: {clientPort}{(originalEx != null ? ", Error: " + originalEx.Message + "\n" + originalEx.StackTrace : "")}",
                 originalEx ?? lastSocketException);
-            log.Error(throwEx.Message);
+            logError(throwEx.Message);
             throw throwEx;
         }
 
@@ -393,6 +407,9 @@ namespace ServiceStack.Redis
             {
                 bytes = bytes.Combine(GetCmdBytes('$', safeBinaryValue.Length), safeBinaryValue, endData);
             }
+            
+            if (log.IsDebugEnabled && RedisConfig.EnableVerboseLogging)
+                logDebug(Encoding.UTF8.GetString(bytes, 0, Math.Min(bytes.Length, 50)).Replace("\r\n"," ").SafeSubstring(0,50));
 
             Bstream.Write(bytes, 0, bytes.Length);
 
@@ -472,6 +489,19 @@ namespace ServiceStack.Redis
 
                 if (!Env.IsMono && sslStream == null)
                 {
+                    if (log.IsDebugEnabled && RedisConfig.EnableVerboseLogging)
+                    {
+                        var sb = StringBuilderCache.Allocate();
+                        foreach (var cmd in cmdBuffer)
+                        {
+                            if (sb.Length > 50)
+                                break;
+                            
+                            sb.Append(Encoding.UTF8.GetString(cmd.Array, cmd.Offset, cmd.Count));
+                        }
+                        logDebug("socket.Send: " + StringBuilderCache.ReturnAndFree(sb.Replace("\r\n", " ")).SafeSubstring(0,50));
+                    }
+                    
                     socket.Send(cmdBuffer); //Optimized for Windows
                 }
                 else
@@ -507,11 +537,14 @@ namespace ServiceStack.Redis
             }
         }
 
-        private int SafeReadByte()
+        private int SafeReadByte(string name)
         {
+            if (log.IsDebugEnabled && RedisConfig.EnableVerboseLogging)
+                logDebug(name + "()");
+        
             return Bstream.ReadByte();
         }
-        
+
         internal TrackThread? TrackThread;
         
         protected T SendReceive<T>(byte[][] cmdWithBinaryArgs,
@@ -575,6 +608,9 @@ namespace ServiceStack.Redis
                 }
                 catch (Exception outerEx)
                 {
+                    if (log.IsDebugEnabled)
+                        logDebug("SendReceive Exception: " + outerEx.Message);
+                    
                     var retryableEx = outerEx as RedisRetryableException;
                     if (retryableEx == null && outerEx is RedisException
                         || outerEx is LicenseException)
@@ -610,7 +646,7 @@ namespace ServiceStack.Redis
         {
             DeactivatedAt = DateTime.UtcNow;
             var message = "Exceeded timeout of {0}".Fmt(retryTimeout);
-            log.Error(message);
+            logError(message);
             return new RedisException(message, originalEx);
         }
 
@@ -623,7 +659,7 @@ namespace ServiceStack.Redis
             if (socketEx == null)
                 return null;
 
-            log.Error("SocketException in SendReceive, retrying...", socketEx);
+            logError("SocketException in SendReceive, retrying...", socketEx);
             lastSocketException = socketEx;
 
             socket?.Close();
@@ -742,7 +778,7 @@ namespace ServiceStack.Redis
             if (RedisConfig.EnableVerboseLogging)
                 return;
 
-            log.DebugFormat("{0}", string.Format(fmt, args).Trim());
+            log.DebugFormat(LogPrefix + "{0}", string.Format(fmt, args).Trim());
         }
 
         protected void CmdLog(byte[][] args)
@@ -767,7 +803,7 @@ namespace ServiceStack.Redis
                 this.lastCommand = this.lastCommand.Substring(0, 100) + "...";
             }
 
-            log.Debug("S: " + this.lastCommand);
+            logDebug("S: " + this.lastCommand);
         }
 
         //Turn Action into Func Hack
@@ -779,7 +815,7 @@ namespace ServiceStack.Redis
 
         protected void ExpectSuccess()
         {
-            int c = SafeReadByte();
+            int c = SafeReadByte(nameof(ExpectSuccess));
             if (c == -1)
                 throw CreateNoMoreDataError();
 
@@ -794,7 +830,7 @@ namespace ServiceStack.Redis
 
         private void ExpectWord(string word)
         {
-            int c = SafeReadByte();
+            int c = SafeReadByte(nameof(ExpectWord));
             if (c == -1)
                 throw CreateNoMoreDataError();
 
@@ -812,7 +848,7 @@ namespace ServiceStack.Redis
 
         private string ExpectCode()
         {
-            int c = SafeReadByte();
+            int c = SafeReadByte(nameof(ExpectCode));
             if (c == -1)
                 throw CreateNoMoreDataError();
 
@@ -839,7 +875,7 @@ namespace ServiceStack.Redis
 
         public long ReadLong()
         {
-            int c = SafeReadByte();
+            int c = SafeReadByte(nameof(ReadLong));
             if (c == -1)
                 throw CreateNoMoreDataError();
 
@@ -928,7 +964,7 @@ namespace ServiceStack.Redis
 
         private byte[][] ReadMultiData()
         {
-            int c = SafeReadByte();
+            int c = SafeReadByte(nameof(ReadMultiData));
             if (c == -1)
                 throw CreateNoMoreDataError();
 
@@ -977,7 +1013,7 @@ namespace ServiceStack.Redis
 
         private object ReadDeeplyNestedMultiDataItem()
         {
-            int c = SafeReadByte();
+            int c = SafeReadByte(nameof(ReadDeeplyNestedMultiDataItem));
             if (c == -1)
                 throw CreateNoMoreDataError();
 
@@ -1015,7 +1051,7 @@ namespace ServiceStack.Redis
 
         internal RedisData ReadComplexResponse()
         {
-            int c = SafeReadByte();
+            int c = SafeReadByte(nameof(ReadComplexResponse));
             if (c == -1)
                 throw CreateNoMoreDataError();
 
@@ -1056,7 +1092,7 @@ namespace ServiceStack.Redis
 
         internal int ReadMultiDataResultCount()
         {
-            int c = SafeReadByte();
+            int c = SafeReadByte(nameof(ReadMultiDataResultCount));
             if (c == -1)
                 throw CreateNoMoreDataError();
 

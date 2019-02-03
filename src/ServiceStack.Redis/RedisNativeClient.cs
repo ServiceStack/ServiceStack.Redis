@@ -179,6 +179,7 @@ namespace ServiceStack.Redis
             Ssl = config.Ssl;
             IdleTimeOutSecs = config.IdleTimeOutSecs;
             ServerVersionNumber = RedisConfig.AssumeServerVersion.GetValueOrDefault();
+            LogPrefix = "#" + ClientId + " ";
             JsConfig.InitStatics();
         }
 
