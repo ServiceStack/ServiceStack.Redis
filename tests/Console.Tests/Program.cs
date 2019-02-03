@@ -38,7 +38,9 @@
 
             //new MasterFailoverWithPassword().Execute();
             
-            new BlockingRemoveAfterReconnection().Execute();
+            //new BlockingRemoveAfterReconnection().Execute();
+            
+            new MultiBlockingRemoveAfterReconnection().Execute();
         }
     }
 }
