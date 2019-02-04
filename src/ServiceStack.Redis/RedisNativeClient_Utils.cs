@@ -409,7 +409,7 @@ namespace ServiceStack.Redis
             }
             
             if (log.IsDebugEnabled && RedisConfig.EnableVerboseLogging)
-                logDebug(Encoding.UTF8.GetString(bytes, 0, Math.Min(bytes.Length, 50)).Replace("\r\n"," ").SafeSubstring(0,50));
+                logDebug("stream.Write: " + Encoding.UTF8.GetString(bytes, 0, Math.Min(bytes.Length, 50)).Replace("\r\n"," ").SafeSubstring(0,50));
 
             Bstream.Write(bytes, 0, bytes.Length);
 
