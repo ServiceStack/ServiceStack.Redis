@@ -36,15 +36,9 @@ namespace ServiceStack.Redis.Generic
         readonly ITypeSerializer<T> serializer = new JsonSerializer<T>();
         private readonly RedisClient client;
 
-        public IRedisClient RedisClient
-        {
-            get { return client; }
-        }
+        public IRedisClient RedisClient => client;
 
-        public IRedisNativeClient NativeClient
-        {
-            get { return client; }
-        }
+        public IRedisNativeClient NativeClient => client;
 
         /// <summary>
         /// Use this to share the same redis connection with another
@@ -88,26 +82,14 @@ namespace ServiceStack.Redis.Generic
 
         public IRedisTransactionBase Transaction
         {
-            get
-            {
-                return client.Transaction;
-            }
-            set
-            {
-                client.Transaction = value;
-            }
+            get => client.Transaction;
+            set => client.Transaction = value;
         }
 
         public IRedisPipelineShared Pipeline
         {
-            get
-            {
-                return client.Pipeline;
-            }
-            set
-            {
-                client.Pipeline = value;
-            }
+            get => client.Pipeline;
+            set => client.Pipeline = value;
         }
 
         public void Watch(params string[] keys)
@@ -155,18 +137,12 @@ namespace ServiceStack.Redis.Generic
             return client.UrnKey(entity);
         }
 
-        public IRedisSet TypeIdsSet
-        {
-            get
-            {
-                return new RedisClientSet(client, client.GetTypeIdsSetKey<T>());
-            }
-        }
+        public IRedisSet TypeIdsSet => new RedisClientSet(client, client.GetTypeIdsSetKey<T>());
 
         public T this[string key]
         {
-            get { return GetValue(key); }
-            set { SetValue(key, value); }
+            get => GetValue(key);
+            set => SetValue(key, value);
         }
 
         public byte[] SerializeValue(T value)
@@ -184,7 +160,7 @@ namespace ServiceStack.Redis.Generic
         public void SetValue(string key, T entity)
         {
             if (key == null)
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
 
             client.Set(key, SerializeValue(entity));
             client.RegisterTypeId(entity);
@@ -193,7 +169,7 @@ namespace ServiceStack.Redis.Generic
         public void SetValue(string key, T entity, TimeSpan expireIn)
         {
             if (key == null)
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key));
 
             client.Set(key, SerializeValue(entity), expireIn);
             client.RegisterTypeId(entity);

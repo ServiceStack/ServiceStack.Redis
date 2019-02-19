@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using NUnit.Framework;
-using ServiceStack.Common;
 using ServiceStack.Redis.Generic;
 
 namespace ServiceStack.Redis.Tests.Generic
@@ -229,5 +228,34 @@ namespace ServiceStack.Redis.Tests.Generic
             Assert.That(expectedAnswers.EquivalentTo(earliest3Answers));
         }
 
+        [Test]
+        public void Can_save_quoted_strings()
+        {
+            var str = "string \"with\" \"quotes\"";
+            var cacheKey = "quotetest";
+
+            Redis.As<string>().SetValue(cacheKey, str);
+            var fromRedis = Redis.As<string>().GetValue(cacheKey);
+            Assert.That(fromRedis, Is.EqualTo(str));
+
+            Redis.Set(cacheKey, str);
+            fromRedis = Redis.Get<string>(cacheKey);
+            Assert.That(fromRedis, Is.EqualTo(str));
+
+            Redis.SetValue(cacheKey, str);
+            fromRedis = Redis.GetValue(cacheKey);
+            Assert.That(fromRedis, Is.EqualTo(str));
+
+            Redis.SetValue(cacheKey, str.ToJson());
+            fromRedis = Redis.GetValue(cacheKey).FromJson<string>();
+            Assert.That(fromRedis, Is.EqualTo(str));
+        }
+
+        [Test]
+        public void Does_return_non_existent_keys_as_defaultValue()
+        {
+            Assert.That(Redis.Get<string>("notexists"), Is.Null);
+            Assert.That(Redis.Get<int>("notexists"), Is.EqualTo(0));
+        }
     }
 }
