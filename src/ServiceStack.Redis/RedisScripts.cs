@@ -2,8 +2,7 @@
 using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
-using ServiceStack.Configuration;
-using ServiceStack.Templates;
+using ServiceStack.Script;
 
 namespace ServiceStack.Redis
 {
@@ -21,7 +20,10 @@ namespace ServiceStack.Redis
         public long Size { get; set; }
     }
 
-    public class TemplateRedisFilters : TemplateFilter
+    [Obsolete("Use RedisScripts")]
+    public class TemplateRedisFilters : RedisScripts {}
+    
+    public class RedisScripts : ScriptMethods
     {
         private IRedisClientsManager redisManager;
         public IRedisClientsManager RedisManager
@@ -30,7 +32,7 @@ namespace ServiceStack.Redis
             set => redisManager = value;
         }
 
-        T exec<T>(Func<IRedisClient, T> fn, TemplateScopeContext scope, object options)
+        T exec<T>(Func<IRedisClient, T> fn, ScriptScopeContext scope, object options)
         {
             try
             {
@@ -94,8 +96,8 @@ namespace ServiceStack.Redis
             return r.Text;
         }
 
-        public object redisCall(TemplateScopeContext scope, object redisCommand) => redisCall(scope, redisCommand, null);
-        public object redisCall(TemplateScopeContext scope, object redisCommand, object options)
+        public object redisCall(ScriptScopeContext scope, object redisCommand) => redisCall(scope, redisCommand, null);
+        public object redisCall(ScriptScopeContext scope, object redisCommand, object options)
         {
             if (redisCommand == null)
                 return null;
@@ -126,8 +128,8 @@ namespace ServiceStack.Redis
             return result;
         }
 
-        public List<RedisSearchResult> redisSearchKeys(TemplateScopeContext scope, string query) => redisSearchKeys(scope, query, null);
-        public List<RedisSearchResult> redisSearchKeys(TemplateScopeContext scope, string query, object options)
+        public List<RedisSearchResult> redisSearchKeys(ScriptScopeContext scope, string query) => redisSearchKeys(scope, query, null);
+        public List<RedisSearchResult> redisSearchKeys(ScriptScopeContext scope, string query, object options)
         {
             var json = redisSearchKeysAsJson(scope, query, options);
             const string noResult = "{\"cursor\":0,\"results\":{}}";
@@ -138,20 +140,20 @@ namespace ServiceStack.Redis
             return searchResults.Results;
         }
 
-        public Dictionary<string, string> redisInfo(TemplateScopeContext scope) => redisInfo(scope, null);
-        public Dictionary<string, string> redisInfo(TemplateScopeContext scope, object options) => exec(r => r.Info, scope, options);
+        public Dictionary<string, string> redisInfo(ScriptScopeContext scope) => redisInfo(scope, null);
+        public Dictionary<string, string> redisInfo(ScriptScopeContext scope, object options) => exec(r => r.Info, scope, options);
 
-        public string redisConnectionString(TemplateScopeContext scope) => exec(r => $"{r.Host}:{r.Port}?db={r.Db}", scope, null);
+        public string redisConnectionString(ScriptScopeContext scope) => exec(r => $"{r.Host}:{r.Port}?db={r.Db}", scope, null);
 
-        public Dictionary<string, object> redisConnection(TemplateScopeContext scope) => exec(r => new Dictionary<string, object>
+        public Dictionary<string, object> redisConnection(ScriptScopeContext scope) => exec(r => new Dictionary<string, object>
         {
             { "host", r.Host },
             { "port", r.Port },
             { "db", r.Db },
         }, scope, null);
 
-        public string redisToConnectionString(TemplateScopeContext scope, object connectionInfo) => redisToConnectionString(scope, connectionInfo, null);
-        public string redisToConnectionString(TemplateScopeContext scope, object connectionInfo, object options)
+        public string redisToConnectionString(ScriptScopeContext scope, object connectionInfo) => redisToConnectionString(scope, connectionInfo, null);
+        public string redisToConnectionString(ScriptScopeContext scope, object connectionInfo, object options)
         {
             var connectionString = connectionInfo as string;
             if (connectionString != null)
@@ -172,8 +174,8 @@ namespace ServiceStack.Redis
             return connectionString;
         }
 
-        public string redisChangeConnection(TemplateScopeContext scope, object newConnection) => redisChangeConnection(scope, newConnection, null);
-        public string redisChangeConnection(TemplateScopeContext scope, object newConnection, object options)
+        public string redisChangeConnection(ScriptScopeContext scope, object newConnection) => redisChangeConnection(scope, newConnection, null);
+        public string redisChangeConnection(ScriptScopeContext scope, object newConnection, object options)
         {
             try
             {
@@ -196,7 +198,7 @@ namespace ServiceStack.Redis
             }
         }
 
-        public string redisSearchKeysAsJson(TemplateScopeContext scope, string query, object options)
+        public string redisSearchKeysAsJson(ScriptScopeContext scope, string query, object options)
         {
             if (string.IsNullOrEmpty(query))
                 return null;
