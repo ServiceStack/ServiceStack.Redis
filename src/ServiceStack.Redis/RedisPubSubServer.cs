@@ -30,6 +30,7 @@ namespace ServiceStack.Redis
         /// Callback fired on each message received, handle with (channel, msg) => ... 
         /// </summary>
         public Action<string, string> OnMessage { get; set; }
+        public Action<string, byte[]> OnMessageBytes { get; set; }
 
         public Action<string> OnControlCommand { get; set; }
         public Action<string> OnUnSubscribe { get; set; }
@@ -55,8 +56,8 @@ namespace ServiceStack.Redis
         private int autoRestart = YES;
         public bool AutoRestart
         {
-            get { return Interlocked.CompareExchange(ref autoRestart, 0, 0) == YES; }
-            set { Interlocked.CompareExchange(ref autoRestart, value ? YES : NO, autoRestart); }
+            get => Interlocked.CompareExchange(ref autoRestart, 0, 0) == YES;
+            set => Interlocked.CompareExchange(ref autoRestart, value ? YES : NO, autoRestart);
         }
 
         public DateTime CurrentServerTime => new DateTime(serverTimeAtStart.Ticks + startedAt.ElapsedTicks, DateTimeKind.Utc);
@@ -231,18 +232,35 @@ namespace ServiceStack.Redis
                         {
                             subscription.OnUnSubscribe = HandleUnSubscribe;
 
+                            if (OnMessageBytes != null)
+                            {
+                                bool IsCtrlMessage(byte[] msg)
+                                {
+                                    if (msg.Length < 4)
+                                        return false;
+                                    return msg[0] == 'C' && msg[1] == 'T' && msg[0] == 'R' && msg[0] == 'L';
+                                }
+                                
+                                ((RedisSubscription)subscription).OnMessageBytes = (channel, msg) => {
+                                    if (IsCtrlMessage(msg))
+                                        return;
+
+                                    OnMessageBytes(channel, msg);
+                                };
+                            }
+
                             subscription.OnMessage = (channel, msg) =>
                             {
                                 if (string.IsNullOrEmpty(msg)) 
                                     return;
 
-                                var ctrlMsg = msg.SplitOnFirst(':');
-                                if (ctrlMsg[0] == ControlCommand.Control)
+                                var ctrlMsg = msg.LeftPart(':');
+                                if (ctrlMsg == ControlCommand.Control)
                                 {
                                     var op = Interlocked.CompareExchange(ref doOperation, Operation.NoOp, doOperation);
                                     
-                                    var msgType = ctrlMsg.Length > 1
-                                        ? ctrlMsg[1]
+                                    var msgType = msg.IndexOf(':') >= 0
+                                        ? msg.RightPart(':')
                                         : null;
 
                                     OnControlCommand?.Invoke(msgType ?? Operation.GetName(op));

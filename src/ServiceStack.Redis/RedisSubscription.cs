@@ -30,6 +30,7 @@ namespace ServiceStack.Redis
 
         public Action<string> OnSubscribe { get; set; }
         public Action<string, string> OnMessage { get; set; }
+        public Action<string, byte[]> OnMessageBytes { get; set; }
         public Action<string> OnUnSubscribe { get; set; }
 
         public void SubscribeToChannels(params string[] channels)
@@ -91,8 +92,13 @@ namespace ServiceStack.Redis
                 }
                 else if (MessageWord.AreEqual(messageType))
                 {
-                    var message = multiBytes[i + MsgIndex].FromUtf8Bytes();
-
+                    var msgBytes = multiBytes[i + MsgIndex];
+                    if (this.OnMessageBytes != null)
+                    {
+                        this.OnMessageBytes(channel, msgBytes);
+                    }
+                    
+                    var message = msgBytes.FromUtf8Bytes();
                     if (this.OnMessage != null)
                     {
                         this.OnMessage(channel, message);
@@ -100,8 +106,14 @@ namespace ServiceStack.Redis
                 }
                 else if (PMessageWord.AreEqual(messageType))
                 {
-                    var message = multiBytes[i + MsgIndex + 1].FromUtf8Bytes();
                     channel = multiBytes[i + 2].FromUtf8Bytes();
+                    var msgBytes = multiBytes[i + MsgIndex + 1];
+                    if (this.OnMessageBytes != null)
+                    {
+                        this.OnMessageBytes(channel, msgBytes);
+                    }
+                    
+                    var message = msgBytes.FromUtf8Bytes();
                     if (this.OnMessage != null)
                     {
                         this.OnMessage(channel, message);
