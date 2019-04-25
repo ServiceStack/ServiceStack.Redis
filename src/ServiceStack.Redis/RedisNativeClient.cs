@@ -21,6 +21,7 @@ using System.Threading;
 using ServiceStack.Logging;
 using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
+using System.Security.Authentication;
 
 namespace ServiceStack.Redis
 {
@@ -91,6 +92,7 @@ namespace ServiceStack.Redis
         public string Host { get; private set; }
         public int Port { get; private set; }
         public bool Ssl { get; private set; }
+        public SslProtocols? SslProtocol { get; private set; }
 
         /// <summary>
         /// Gets or sets object key prefix.
@@ -177,6 +179,7 @@ namespace ServiceStack.Redis
             Client = config.Client;
             Db = config.Db;
             Ssl = config.Ssl;
+            SslProtocol = config.SslProtocol;
             IdleTimeOutSecs = config.IdleTimeOutSecs;
             ServerVersionNumber = RedisConfig.AssumeServerVersion.GetValueOrDefault();
             LogPrefix = "#" + ClientId + " ";
