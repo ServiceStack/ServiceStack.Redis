@@ -77,10 +77,11 @@ namespace ServiceStack.Redis
                             if (useDefaultPort)
                                 endpoint.Port = RedisConfig.DefaultPortSsl;
                             break;
-                        case "sslProtocols":
+                        case "sslprotocols":
                             SslProtocols protocols;
+                            value = value?.Replace("|", ",");
                             if (!Enum.TryParse(value, true, out protocols)) throw new ArgumentOutOfRangeException("Keyword '" + name + "' requires an SslProtocol value (multiple values separated by '|').");
-                            endpoint.SslProtocol = protocols;
+                            endpoint.SslProtocols = protocols;
                             break;
                         case "client":
                             endpoint.Client = value;

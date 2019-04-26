@@ -169,7 +169,14 @@ namespace ServiceStack.Redis
 #if NETSTANDARD2_0
                     sslStream.AuthenticateAsClientAsync(Host).Wait();
 #else
-                    sslStream.AuthenticateAsClient(Host, new X509CertificateCollection(), SslProtocol ?? SslProtocols.Default, checkCertificateRevocation: true);
+                    if (SslProtocols != null)
+                    {
+                        sslStream.AuthenticateAsClient(Host, new X509CertificateCollection(), SslProtocols ?? System.Security.Authentication.SslProtocols.Default, checkCertificateRevocation: true);
+                    } else
+                    {
+                        sslStream.AuthenticateAsClient(Host);
+                    }
+                    
 #endif
 
                     if (!sslStream.IsEncrypted)

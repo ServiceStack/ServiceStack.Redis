@@ -35,7 +35,7 @@ namespace ServiceStack.Redis
         public string Host { get; set; }
         public int Port { get; set; }
         public bool Ssl { get; set; }
-        public SslProtocols? SslProtocol {get; set;}
+        public SslProtocols? SslProtocols {get; set;}
         public int ConnectTimeout { get; set; }
         public int SendTimeout { get; set; }
         public int ReceiveTimeout { get; set; }
@@ -61,8 +61,8 @@ namespace ServiceStack.Redis
                 args.Add("Db=" + Db);
             if (Ssl)
                 args.Add("Ssl=true");
-            if (SslProtocol != null)
-                args.Add("SslProtocols=" + SslProtocol.ToString());
+            if (SslProtocols != null)
+                args.Add("SslProtocols=" + SslProtocols.ToString());
             if (ConnectTimeout != RedisConfig.DefaultConnectTimeout)
                 args.Add("ConnectTimeout=" + ConnectTimeout);
             if (SendTimeout != RedisConfig.DefaultSendTimeout)
@@ -87,7 +87,7 @@ namespace ServiceStack.Redis
             return string.Equals(Host, other.Host) 
                 && Port == other.Port 
                 && Ssl.Equals(other.Ssl) 
-                && SslProtocol.Equals(other.SslProtocol)
+                && SslProtocols.Equals(other.SslProtocols)
                 && ConnectTimeout == other.ConnectTimeout 
                 && SendTimeout == other.SendTimeout 
                 && ReceiveTimeout == other.ReceiveTimeout 
@@ -114,7 +114,7 @@ namespace ServiceStack.Redis
                 var hashCode = (Host != null ? Host.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ Port;
                 hashCode = (hashCode * 397) ^ Ssl.GetHashCode();
-                hashCode = (hashCode * 397) ^ SslProtocol.GetHashCode();
+                hashCode = (hashCode * 397) ^ SslProtocols.GetHashCode();
                 hashCode = (hashCode * 397) ^ ConnectTimeout;
                 hashCode = (hashCode * 397) ^ SendTimeout;
                 hashCode = (hashCode * 397) ^ ReceiveTimeout;

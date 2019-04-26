@@ -92,7 +92,7 @@ namespace ServiceStack.Redis
         public string Host { get; private set; }
         public int Port { get; private set; }
         public bool Ssl { get; private set; }
-        public SslProtocols? SslProtocol { get; private set; }
+        public SslProtocols? SslProtocols { get; private set; }
 
         /// <summary>
         /// Gets or sets object key prefix.
@@ -179,7 +179,7 @@ namespace ServiceStack.Redis
             Client = config.Client;
             Db = config.Db;
             Ssl = config.Ssl;
-            SslProtocol = config.SslProtocol;
+            SslProtocols = config.SslProtocols;
             IdleTimeOutSecs = config.IdleTimeOutSecs;
             ServerVersionNumber = RedisConfig.AssumeServerVersion.GetValueOrDefault();
             LogPrefix = "#" + ClientId + " ";
