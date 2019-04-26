@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Sockets;
+using System.Security.Authentication;
 using ServiceStack.Model;
 using ServiceStack.Text;
 
@@ -75,6 +76,12 @@ namespace ServiceStack.Redis
                             endpoint.Ssl = bool.Parse(value);
                             if (useDefaultPort)
                                 endpoint.Port = RedisConfig.DefaultPortSsl;
+                            break;
+                        case "sslprotocols":
+                            SslProtocols protocols;
+                            value = value?.Replace("|", ",");
+                            if (!Enum.TryParse(value, true, out protocols)) throw new ArgumentOutOfRangeException("Keyword '" + name + "' requires an SslProtocol value (multiple values separated by '|').");
+                            endpoint.SslProtocols = protocols;
                             break;
                         case "client":
                             endpoint.Client = value;

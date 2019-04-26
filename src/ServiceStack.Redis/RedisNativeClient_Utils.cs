@@ -18,7 +18,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -167,7 +169,14 @@ namespace ServiceStack.Redis
 #if NETSTANDARD2_0
                     sslStream.AuthenticateAsClientAsync(Host).Wait();
 #else
-                    sslStream.AuthenticateAsClient(Host);
+                    if (SslProtocols != null)
+                    {
+                        sslStream.AuthenticateAsClient(Host, new X509CertificateCollection(), SslProtocols ?? System.Security.Authentication.SslProtocols.Default, checkCertificateRevocation: true);
+                    } else
+                    {
+                        sslStream.AuthenticateAsClient(Host);
+                    }
+                    
 #endif
 
                     if (!sslStream.IsEncrypted)

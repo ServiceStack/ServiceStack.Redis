@@ -27,11 +27,14 @@ namespace ServiceStack.Redis.Tests
         [TestCase("host:1?password=pass&client=nunit", "{Host:host,Port:1,Client:nunit,Password:pass}")]
         [TestCase("host:1?db=2", "{Host:host,Port:1,Db:2}")]
         [TestCase("host?ssl=true", "{Host:host,Port:6380,Ssl:True}")]
+        [TestCase("host:6380?ssl=true&password=pass&sslprotocols=Tls12", "{Host:host,Port:6380,Ssl:True,Password:pass,SslProtocols:Tls12}")]
         [TestCase("host:1?ssl=true", "{Host:host,Port:1,Ssl:True}")]
         [TestCase("host:1?connectTimeout=1&sendtimeout=2&receiveTimeout=3&idletimeoutsecs=4",
             "{Host:host,Port:1,ConnectTimeout:1,SendTimeout:2,ReceiveTimeout:3,IdleTimeOutSecs:4}")]
         [TestCase("redis://nunit:pass@host:1?ssl=true&db=1&connectTimeout=2&sendtimeout=3&receiveTimeout=4&retryTimeout=5&idletimeoutsecs=5&NamespacePrefix=prefix.",
             "{Host:host,Port:1,Ssl:True,Client:nunit,Password:pass,Db:1,ConnectTimeout:2,SendTimeout:3,ReceiveTimeout:4,RetryTimeout:5,IdleTimeOutSecs:5,NamespacePrefix:prefix.}")]
+        [TestCase("redis://nunit:pass@host:1?ssl=true&sslprotocols=Tls12&db=1&connectTimeout=2&sendtimeout=3&receiveTimeout=4&retryTimeout=5&idletimeoutsecs=5&NamespacePrefix=prefix.",
+            "{Host:host,Port:1,Ssl:True,Client:nunit,Password:pass,SslProtocols:Tls12,Db:1,ConnectTimeout:2,SendTimeout:3,ReceiveTimeout:4,RetryTimeout:5,IdleTimeOutSecs:5,NamespacePrefix:prefix.}")]
         public void Does_handle_different_connection_strings_settings(string connString, string expectedJsv)
         {
             var actual = connString.ToRedisEndpoint();
@@ -55,6 +58,7 @@ namespace ServiceStack.Redis.Tests
             "host:1?ConnectTimeout=1&SendTimeout=2&ReceiveTimeout=3&IdleTimeOutSecs=4")]
         [TestCase("redis://nunit:pass@host:1?ssl=true&db=1&connectTimeout=2&sendtimeout=3&receiveTimeout=4&idletimeoutsecs=5&NamespacePrefix=prefix.",
             "host:1?Client=nunit&Password=pass&Db=1&Ssl=true&ConnectTimeout=2&SendTimeout=3&ReceiveTimeout=4&IdleTimeOutSecs=5&NamespacePrefix=prefix.")]
+        [TestCase("password@host:6380?ssl=true&sslprotocols=Tls12", "host:6380?Password=password&Ssl=true&SslProtocols=Tls12")]
         public void Does_Serialize_RedisEndpoint(string connString, string expectedString)
         {
             var actual = connString.ToRedisEndpoint();
@@ -64,8 +68,8 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Does_set_all_properties_on_Client_using_ClientsManagers()
         {
-            var connStr = "redis://nunit:pass@host:1?ssl=true&db=0&connectTimeout=2&sendtimeout=3&receiveTimeout=4&idletimeoutsecs=5&NamespacePrefix=prefix.";
-            var expected = "{Host:host,Port:1,Ssl:True,Client:nunit,Password:pass,Db:0,ConnectTimeout:2,SendTimeout:3,ReceiveTimeout:4,IdleTimeOutSecs:5,NamespacePrefix:prefix.}"
+            var connStr = "redis://nunit:pass@host:1?ssl=true&sslprotocols=Tls12&db=0&connectTimeout=2&sendtimeout=3&receiveTimeout=4&idletimeoutsecs=5&NamespacePrefix=prefix.";
+            var expected = "{Host:host,Port:1,Ssl:True,SslProtocols:Tls12,Client:nunit,Password:pass,Db:0,ConnectTimeout:2,SendTimeout:3,ReceiveTimeout:4,IdleTimeOutSecs:5,NamespacePrefix:prefix.}"
                 .FromJsv<RedisEndpoint>();
 
             using (var pooledManager = new RedisManagerPool(connStr))
@@ -122,6 +126,7 @@ namespace ServiceStack.Redis.Tests
             Assert.That(redis.Host, Is.EqualTo(expected.Host));
             Assert.That(redis.Port, Is.EqualTo(expected.Port));
             Assert.That(redis.Ssl, Is.EqualTo(expected.Ssl));
+            Assert.That(redis.SslProtocols, Is.EqualTo(expected.SslProtocols));
             Assert.That(redis.Client, Is.EqualTo(expected.Client));
             Assert.That(redis.Password, Is.EqualTo(expected.Password));
             Assert.That(redis.Db, Is.EqualTo(expected.Db));
