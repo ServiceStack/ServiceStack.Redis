@@ -74,6 +74,7 @@ namespace ServiceStack.Redis
         {
             this.ClientsManager = clientsManager;
             this.Channels = channels;
+            startedAt = Stopwatch.StartNew();
 
             var failoverHost = clientsManager as IRedisFailover;
             failoverHost?.OnFailover.Add(HandleFailover);
