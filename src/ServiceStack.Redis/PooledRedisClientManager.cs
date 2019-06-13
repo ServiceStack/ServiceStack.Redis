@@ -160,6 +160,11 @@ namespace ServiceStack.Redis
         {
             Interlocked.Increment(ref RedisState.TotalFailovers);
 
+            var masters = readWriteHosts.ToList();
+            var replicas = readOnlyHosts.ToList();
+
+            Log.Info($"FailoverTo: {string.Join(",", masters)} : {string.Join(",", replicas)} Total: {RedisState.TotalFailovers}");
+
             lock (readClients)
             {
                 for (var i = 0; i < readClients.Length; i++)
@@ -170,7 +175,7 @@ namespace ServiceStack.Redis
 
                     readClients[i] = null;
                 }
-                RedisResolver.ResetSlaves(readOnlyHosts);
+                RedisResolver.ResetSlaves(replicas);
             }
 
             lock (writeClients)
@@ -183,7 +188,7 @@ namespace ServiceStack.Redis
 
                     writeClients[i] = null;
                 }
-                RedisResolver.ResetMasters(readWriteHosts);
+                RedisResolver.ResetMasters(masters);
             }
 
             if (this.OnFailover != null)

@@ -12,18 +12,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using ServiceStack.Logging;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
     /// <summary>
-    /// Provides thread-safe retrievel of redis clients since each client is a new one.
+    /// Provides thread-safe retrieval of redis clients since each client is a new one.
     /// Allows the configuration of different ReadWrite and ReadOnly hosts
     /// </summary>
     public partial class BasicRedisClientManager
         : IRedisClientsManager, IRedisFailover, IHasRedisResolver
     {
+        public static ILog Log = LogManager.GetLogger(typeof(BasicRedisClientManager));
+        
         public int? ConnectTimeout { get; set; }
         public int? SocketSendTimeout { get; set; }
         public int? SocketReceiveTimeout { get; set; }
@@ -154,10 +158,15 @@ namespace ServiceStack.Redis
         {
             Interlocked.Increment(ref RedisState.TotalFailovers);
 
+            var masters = readWriteHosts.ToList();
+            var replicas = readOnlyHosts.ToList();
+
+            Log.Info($"FailoverTo: {string.Join(",", masters)} : {string.Join(",", replicas)} Total: {RedisState.TotalFailovers}");
+            
             lock (this)
             {
-                RedisResolver.ResetMasters(readWriteHosts);
-                RedisResolver.ResetSlaves(readOnlyHosts);
+                RedisResolver.ResetMasters(masters);
+                RedisResolver.ResetSlaves(replicas);
             }
 
             Start();

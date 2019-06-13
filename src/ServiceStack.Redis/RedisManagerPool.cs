@@ -94,6 +94,8 @@ namespace ServiceStack.Redis
         {
             Interlocked.Increment(ref RedisState.TotalFailovers);
 
+            Log.Info($"FailoverTo: {string.Join(",", readWriteHosts)} Total: {RedisState.TotalFailovers}");
+            
             lock (clients)
             {
                 for (var i = 0; i < clients.Length; i++)
