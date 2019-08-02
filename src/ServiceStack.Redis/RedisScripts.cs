@@ -25,6 +25,8 @@ namespace ServiceStack.Redis
     
     public class RedisScripts : ScriptMethods
     {
+        private const string RedisConnection = "__redisConnection";
+        
         private IRedisClientsManager redisManager;
         public IRedisClientsManager RedisManager
         {
@@ -36,6 +38,15 @@ namespace ServiceStack.Redis
         {
             try
             {
+                if ((options is Dictionary<string, object> obj && obj.TryGetValue("connectionString", out var oRedisConn))
+                    || scope.PageResult.Args.TryGetValue(RedisConnection, out oRedisConn))
+                {
+                    using (var redis = new RedisClient((string)oRedisConn))
+                    {
+                        return fn(redis);
+                    }
+                }
+                
                 using (var redis = RedisManager.GetClient())
                 {
                     return fn(redis);
@@ -45,6 +56,12 @@ namespace ServiceStack.Redis
             {
                 throw new StopFilterExecutionException(scope, options, ex);
             }
+        }
+
+        public IgnoreResult useRedis(ScriptScopeContext scope, string redisConnection)
+        {
+            scope.PageResult.Args[RedisConnection] = redisConnection;
+            return IgnoreResult.Value;
         }
 
         static readonly Dictionary<string, int> cmdArgCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase) {
