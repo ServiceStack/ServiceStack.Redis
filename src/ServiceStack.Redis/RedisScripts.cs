@@ -60,7 +60,11 @@ namespace ServiceStack.Redis
 
         public IgnoreResult useRedis(ScriptScopeContext scope, string redisConnection)
         {
-            scope.PageResult.Args[RedisConnection] = redisConnection;
+            if (redisConnection == null)
+                scope.PageResult.Args.Remove(RedisConnection);
+            else
+                scope.PageResult.Args[RedisConnection] = redisConnection;
+
             return IgnoreResult.Value;
         }
 
