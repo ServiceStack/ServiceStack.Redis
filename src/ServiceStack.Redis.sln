@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{38F69F8F
 		Directory.Build.props = Directory.Build.props
 		ServiceStack.Redis\ServiceStack.Redis.Core.csproj = ServiceStack.Redis\ServiceStack.Redis.Core.csproj
 		..\build\build-core.proj = ..\build\build-core.proj
+		..\tests\Directory.Build.props = ..\tests\Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Redis", "ServiceStack.Redis\ServiceStack.Redis.csproj", "{AF99F19B-4C04-4F58-81EF-B092F1FCC540}"
