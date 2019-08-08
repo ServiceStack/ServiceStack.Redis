@@ -412,8 +412,8 @@ namespace ServiceStack.Redis
 
         public List<string> SearchKeys(string pattern)
         {
-            var multiDataList = Keys(pattern);
-            return multiDataList.ToStringList();
+            var multiDataList = ScanAllKeys(pattern);
+            return multiDataList.ToList();
         }
 
         public List<string> GetValues(List<string> keys)
@@ -961,7 +961,7 @@ namespace ServiceStack.Redis
 
         public void RemoveByPattern(string pattern)
         {
-            var keys = Keys(pattern).ToStringArray();
+            var keys = ScanAllKeys(pattern).ToArray();
             if (keys.Length > 0)
                 Del(keys);
         }

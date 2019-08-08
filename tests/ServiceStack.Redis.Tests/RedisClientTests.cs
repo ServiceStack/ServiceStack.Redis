@@ -311,6 +311,9 @@ namespace ServiceStack.Redis.Tests
 
             var keys = Redis.Keys("k1:*");
             Assert.That(keys.Length, Is.EqualTo(5));
+
+            var scanKeys = Redis.ScanAllKeys("k1:*").ToArray();
+            Assert.That(scanKeys.Length, Is.EqualTo(5));
         }
 
         [Test]

@@ -181,8 +181,7 @@ namespace ServiceStack.Redis
         {
             using (var client = GetClient())
             {
-                var redisClient = client as IRemoveByPattern;
-                if (redisClient != null)
+                if (client is IRemoveByPattern redisClient)
                 {
                     redisClient.RemoveByPattern(pattern);
                 }
@@ -193,8 +192,7 @@ namespace ServiceStack.Redis
         {
             using (var client = GetClient())
             {
-                var redisClient = client as IRemoveByPattern;
-                if (redisClient != null)
+                if (client is IRemoveByPattern redisClient)
                 {
                     redisClient.RemoveByRegex(pattern);
                 }
@@ -205,8 +203,7 @@ namespace ServiceStack.Redis
         {
             using (var client = GetClient())
             {
-                var redisClient = client as ICacheClientExtended;
-                if (redisClient != null)
+                if (client is ICacheClientExtended redisClient)
                 {
                     return redisClient.GetTimeToLive(key);
                 }
