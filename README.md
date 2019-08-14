@@ -158,7 +158,7 @@ The `PooledRedisClientManager` imposes a maximum connection limit and when its m
 
 ### BasicRedisClientManager
 
-If don't want to use connection pooling (i.e. your accessing a local redis-server instance) you can use a basic (non-pooled) Clients Manager which creates a new `RedisClient` instance each time:
+If don't want to use connection pooling (i.e. you're accessing a local redis-server instance) you can use a basic (non-pooled) Clients Manager which creates a new `RedisClient` instance each time:
 
 ```csharp
 container.Register<IRedisClientsManager>(c => 
