@@ -237,7 +237,7 @@ namespace ServiceStack.Redis
                     var p = line.IndexOf(':');
                     if (p == -1) continue;
 
-                    info.Add(line.Substring(0, p), line.Substring(p + 1));
+                    info[line.Substring(0, p)] = line.Substring(p + 1);
                 }
 
                 return info;
