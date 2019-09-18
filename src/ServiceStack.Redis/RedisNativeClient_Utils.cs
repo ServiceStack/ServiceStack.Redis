@@ -18,6 +18,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -248,6 +249,8 @@ namespace ServiceStack.Redis
 
         protected string ReadLine()
         {
+            AssertNotDisposed();
+
             var sb = StringBuilderCache.Allocate();
 
             int c;
@@ -555,8 +558,17 @@ namespace ServiceStack.Redis
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        void AssertNotDisposed()
+        {
+            if (Bstream == null)
+                throw new ObjectDisposedException($"Redis Client {ClientId} is Disposed");
+        }
+
         private int SafeReadByte(string name)
         {
+            AssertNotDisposed();
+            
             if (log.IsDebugEnabled && RedisConfig.EnableVerboseLogging)
                 logDebug(name + "()");
         
