@@ -806,7 +806,7 @@ namespace ServiceStack.Redis
 
         protected void Log(string fmt, params object[] args)
         {
-            if (RedisConfig.EnableVerboseLogging)
+            if (!RedisConfig.EnableVerboseLogging)
                 return;
 
             log.DebugFormat(LogPrefix + "{0}", string.Format(fmt, args).Trim());
