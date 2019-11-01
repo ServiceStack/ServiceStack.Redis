@@ -92,17 +92,6 @@ namespace ServiceStack.Redis
             };
             try
             {
-#if NETSTANDARD2_0
-                if (IPAddress.TryParse(Host, out var ip))
-                {
-                    socket.Connect(ip, Port);
-                }
-                else
-                {
-                    var addresses = Dns.GetHostAddressesAsync(Host).Result;
-                    socket.Connect(addresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork), Port);
-                }
-#else
                 if (ConnectTimeout <= 0)
                 {
                     socket.Connect(Host, Port);
@@ -114,7 +103,6 @@ namespace ServiceStack.Redis
                         : socket.BeginConnect(Host, Port, null, null);
                     connectResult.AsyncWaitHandle.WaitOne(ConnectTimeout, true);
                 }
-#endif
 
                 if (!socket.Connected)
                 {
