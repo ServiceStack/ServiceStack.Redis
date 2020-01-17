@@ -24,11 +24,11 @@ With each client providing different layers of abstraction:
   
   * The RedisNativeClient exposes raw `byte[]` apis and does no marshalling and passes all values directly to redis.
   * The RedisClient assumes `string` values and simply converts strings to UTF8 bytes before sending to Redis
-  * The RedisTypedClient provides a generic interface allowing you to add POCO values. The POCO types are serialized using [.NETs fastest JSON Serializer](http://www.servicestack.net/mythz_blog/?p=344) which is then converted to UTF8 bytes and sent to Redis.
+  * The RedisTypedClient provides a generic interface allowing you to add POCO values. The POCO types are serialized using [.NETs fastest JSON Serializer](https://github.com/ServiceStackV3/mythz_blog/blob/master/pages/344.md) which is then converted to UTF8 bytes and sent to Redis.
 
 ### API Overview
 
-[![Redis Client API](http://mono.servicestack.net/img/Redis-annotated-preview.png)](http://mono.servicestack.net/img/Redis-annotated.png)
+[![Redis Client API](https://servicestack.net/img/redis-annotated-preview.png)](https://servicestack.net/img/redis-annotated.png)
 
 ## Redis Connection Strings
 
