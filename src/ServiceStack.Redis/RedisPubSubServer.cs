@@ -97,10 +97,24 @@ namespace ServiceStack.Redis
             //Only 1 thread allowed past
             if (Interlocked.CompareExchange(ref status, Status.Starting, Status.Stopped) == Status.Stopped) //Should only be 1 thread past this point
             {
+                var initErrors = 0;
+                bool hasInit = false;
+                while (!hasInit)
+                {
+                    try
+                    {
+                        Init();
+                        hasInit = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        OnError?.Invoke(ex);
+                        SleepBackOffMultiplier(initErrors++);
+                    }
+                }
+
                 try
                 {
-                    Init();
-
                     SleepBackOffMultiplier(Interlocked.CompareExchange(ref noOfContinuousErrors, 0, 0));
 
                     OnStart?.Invoke();
@@ -137,19 +151,12 @@ namespace ServiceStack.Redis
 
         private void Init()
         {
-            try
+            using (var redis = ClientsManager.GetReadOnlyClient())
             {
-                using (var redis = ClientsManager.GetReadOnlyClient())
-                {
-                    startedAt = Stopwatch.StartNew();
-                    serverTimeAtStart = IsSentinelSubscription
-                        ? DateTime.UtcNow
-                        : redis.GetServerTime();
-                }
-            }
-            catch (Exception ex)
-            {
-                OnError?.Invoke(ex);
+                startedAt = Stopwatch.StartNew();
+                serverTimeAtStart = IsSentinelSubscription
+                    ? DateTime.UtcNow
+                    : redis.GetServerTime();
             }
 
             DisposeHeartbeatTimer();
