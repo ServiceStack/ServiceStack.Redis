@@ -369,6 +369,11 @@ namespace ServiceStack.Redis
             return TimeSpan.FromSeconds(ttlSecs);
         }
 
+        public void RemoveExpiredEntries()
+        {
+            //Redis automatically removed expired Cache Entries
+        }
+
         public IRedisTypedClient<T> As<T>()
         {
             try

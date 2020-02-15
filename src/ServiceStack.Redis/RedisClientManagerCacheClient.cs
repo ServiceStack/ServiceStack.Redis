@@ -218,5 +218,10 @@ namespace ServiceStack.Redis
                 return client.GetKeysByPattern(pattern).ToList();
             }
         }
+
+        public void RemoveExpiredEntries()
+        {
+            //Redis automatically removed expired Cache Entries
+        }
     }
 }
