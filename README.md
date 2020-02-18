@@ -295,10 +295,23 @@ RedisConfig.BackOffMultiplier = 10;
 
 ## [ServiceStack.Redis SSL Support](http://docs.servicestack.net/ssl-redis-azure)
 
-ServiceStack.Redis now supporting **SSL connections** making it suitable for accessing remote Redis server instances over a 
+ServiceStack.Redis supports **SSL connections** making it suitable for accessing remote Redis server instances over a 
 **secure SSL connection**.
 
 ![Azure Redis Cache](https://github.com/ServiceStack/Assets/raw/master/img/wikis/redis/azure-redis-instance.png)
+
+#### Specify SSL Protocol
+
+Support for changing the Ssl Protocols used for encrypted SSL connections can be set on the connection string using the `sslprotocols` modifier, e.g:
+
+```csharp
+var connString = $"redis://{Host}?ssl=true&sslprotocols=Tls12&password={Password.UrlEncode()}";
+var redisManager = new RedisManagerPool(connString);
+using (var client = redisManager.GetClient())
+{
+    //...
+}
+```
 
 ### [Connecting to Azure Redis](http://docs.servicestack.net/ssl-redis-azure)
 
