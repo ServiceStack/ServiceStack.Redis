@@ -796,6 +796,16 @@ This captures the Thread's StackTrace each time the client is resolved from the 
 
 If it does detect the client is being accessed from a different thread it will throw a `InvalidAccessException` with the message containing the different **Thread Ids** and the **original StackTrace** where the client was resolved from the pool. You can compare this with the StackTrace of the Exception to hopefully identify where the client is being improperly used.
 
+#### Avoiding Concurrent Usage issues
+
+What to look out for in your code-base to prevent against multiple concurrent usage of a `IRedisClient` instance:
+
+ - Use `IRedisClient` redis instance client within a `using` statement
+ - Never use a client instance after it has been disposed
+ - Never use (or return) a "server collection" (e.g. [Redis.Lists](#simple-example-using-redis-lists)) after the client has been disposed
+ - Never keep a Singleton or `static` instance to a redis client (just the `IRedisClientsManager` factory)
+ - Never use the same redis client in multiple threads, i.e. have each thread resolve their own client from the factory
+
 ## Copying
 
 Since September 2013, ServiceStack source code is available under GNU Affero General Public License/FOSS License Exception, see license.txt in the source. Alternative commercial licensing is also available, see https://servicestack.net/pricing for details.
