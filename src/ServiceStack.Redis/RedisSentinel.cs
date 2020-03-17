@@ -123,6 +123,8 @@ namespace ServiceStack.Redis
         /// </summary>
         public bool ResetWhenObjectivelyDown { get; set; }
 
+        internal string DebugId => $"";
+
         public RedisSentinel(string sentinelHost = null, string masterName = null)
             : this(new[] { sentinelHost ?? DefaultAddress }, masterName ?? DefaultMasterName) { }
 
@@ -287,10 +289,8 @@ namespace ServiceStack.Redis
             return redisManager;
         }
 
-        public IRedisClientsManager GetRedisManager()
-        {
-            return RedisManager ?? (RedisManager = CreateRedisManager(GetSentinelInfo()));
-        }
+        public IRedisClientsManager GetRedisManager() => 
+            RedisManager ??= CreateRedisManager(GetSentinelInfo());
 
         private RedisSentinelWorker GetValidSentinelWorker()
         {
@@ -304,17 +304,30 @@ namespace ServiceStack.Redis
 
             while (this.worker == null && ShouldRetry())
             {
+                var step = 0;
                 try
                 {
                     this.worker = GetNextSentinel();
+                    step = 1;
                     GetRedisManager();
 
+                    step = 2;
                     this.worker.BeginListeningForConfigurationChanges();
                     this.failures = 0; //reset
                     return this.worker;
                 }
                 catch (RedisException ex)
                 {
+                    if (Log.IsDebugEnabled)
+                    {
+                        var name = step switch {
+                            0 => "GetNextSentinel()",
+                            1 => "GetRedisManager()",
+                            2 => "BeginListeningForConfigurationChanges()",
+                        };
+                        Log.Debug($"Failed to {name}: {ex.Message}");
+                    }
+                    
                     if (OnWorkerError != null)
                         OnWorkerError(ex);
 
@@ -378,6 +391,9 @@ namespace ServiceStack.Redis
 
                     if (++sentinelIndex >= SentinelEndpoints.Length)
                         sentinelIndex = 0;
+                    
+                    if (Log.IsDebugEnabled)
+                        Log.Debug($"Attempt to connect to next sentinel '{SentinelEndpoints[sentinelIndex]}'...");
 
                     var sentinelWorker = new RedisSentinelWorker(this, SentinelEndpoints[sentinelIndex])
                     {
@@ -443,6 +459,6 @@ public class SentinelInfo
 
     public override string ToString()
     {
-        return $"{MasterName} masters: {string.Join(", ", RedisMasters)}, slaves: {string.Join(", ", RedisSlaves)}";
+        return $"{MasterName} primary: {string.Join(", ", RedisMasters)}, replicas: {string.Join(", ", RedisSlaves)}";
     }
 }

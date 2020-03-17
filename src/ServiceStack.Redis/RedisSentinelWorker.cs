@@ -173,6 +173,10 @@ namespace ServiceStack.Redis
                             //Use BasicRedisResolver which doesn't validate non-Master Sentinel instances
                             RedisResolver = new BasicRedisResolver(sentinel.SentinelEndpoints, sentinel.SentinelEndpoints)
                         };
+                        
+                        if (Log.IsDebugEnabled)
+                            Log.Debug($"Starting subscription to {sentinel.SentinelHosts.ToArray()}, replicas: {sentinel.SentinelHosts.ToArray()}...");
+                        
                         this.sentinePubSub = new RedisPubSubServer(sentinelManager)
                         {
                             HeartbeatInterval = null,
@@ -187,7 +191,7 @@ namespace ServiceStack.Redis
             }
             catch (Exception ex)
             {
-                Log.Error($"Error Subscribing to Redis Channel on {this.sentinelClient.Host}:{this.sentinelClient.Port}", ex);
+                Log.Error($"Error Subscribing to Redis Channel on {sentinelClient.Host}:{sentinelClient.Port}", ex);
 
                 if (OnSentinelError != null)
                     OnSentinelError(ex);

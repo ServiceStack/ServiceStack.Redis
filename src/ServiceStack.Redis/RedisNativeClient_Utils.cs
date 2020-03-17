@@ -92,6 +92,12 @@ namespace ServiceStack.Redis
             };
             try
             {
+                if (log.IsDebugEnabled)
+                {
+                    var type = ConnectTimeout <= 0 ? "sync" : "async";
+                    logDebug($"Attempting {type} connection to '{Host}:{Port}' (SEND {SendTimeout}, RECV {ReceiveTimeout} Timeouts)...");
+                }
+                
                 if (ConnectTimeout <= 0)
                 {
                     socket.Connect(Host, Port);
@@ -107,7 +113,7 @@ namespace ServiceStack.Redis
                 if (!socket.Connected)
                 {
                     if (log.IsDebugEnabled)
-                        logDebug("Socket Connect failed");
+                        logDebug($"Socket failed connect to '{Host}:{Port}' (ConnectTimeout {ConnectTimeout})");
 
                     socket.Close();
                     socket = null;
@@ -116,7 +122,7 @@ namespace ServiceStack.Redis
                 }
 
                 if (log.IsDebugEnabled)
-                    logDebug("Socket Connected");
+                    logDebug($"Socket connected to '{Host}:{Port}'");
 
                 Stream networkStream = new NetworkStream(socket);
 
@@ -169,7 +175,7 @@ namespace ServiceStack.Redis
 #endif
 
                     if (!sslStream.IsEncrypted)
-                        throw new Exception("Could not establish an encrypted connection to " + Host);
+                        throw new Exception($"Could not establish an encrypted connection to '{Host}:{Port}'");
 
                     networkStream = sslStream;
                 }
