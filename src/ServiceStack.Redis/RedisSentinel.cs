@@ -74,54 +74,54 @@ namespace ServiceStack.Redis
         /// <summary>
         /// Whether to routinely scan for other sentinel hosts (default true)
         /// </summary>
-        public bool ScanForOtherSentinels { get; set; }
+        public bool ScanForOtherSentinels { get; set; } = true;
 
         /// <summary>
         /// What interval to scan for other sentinel hosts (default 10 mins)
         /// </summary>
-        public TimeSpan RefreshSentinelHostsAfter { get; set; }
+        public TimeSpan RefreshSentinelHostsAfter { get; set; } = TimeSpan.FromMinutes(10);
         private DateTime lastSentinelsRefresh;
 
         /// <summary>
         /// How long to wait after failing before connecting to next redis instance (default 250ms)
         /// </summary>
-        public TimeSpan WaitBetweenFailedHosts { get; set; }
+        public TimeSpan WaitBetweenFailedHosts { get; set; } = TimeSpan.FromMilliseconds(250);
 
         /// <summary>
         /// How long to retry connecting to hosts before throwing (default 60 secs)
         /// </summary>
-        public TimeSpan MaxWaitBetweenFailedHosts { get; set; }
+        public TimeSpan MaxWaitBetweenFailedHosts { get; set; } = TimeSpan.FromSeconds(60);
 
         /// <summary>
         /// How long to wait after consecutive failed connection attempts to master before forcing 
         /// a Sentinel to failover the current master (default 60 secs)
         /// </summary>
-        public TimeSpan WaitBeforeForcingMasterFailover { get; set; }
+        public TimeSpan WaitBeforeForcingMasterFailover { get; set; } = TimeSpan.FromSeconds(60);
 
         /// <summary>
-        /// The Max Connection time for Sentinel Worker (default 100ms)
+        /// The Max Connection time for Sentinel Worker (default 250ms)
         /// </summary>
-        public int SentinelWorkerConnectTimeoutMs { get; set; }
+        public int SentinelWorkerConnectTimeoutMs { get; set; } = 250;
 
         /// <summary>
-        /// The Max TCP Socket Receive time for Sentinel Worker (default 100ms)
+        /// The Max TCP Socket Receive time for Sentinel Worker (default 250ms)
         /// </summary>
-        public int SentinelWorkerReceiveTimeoutMs { get; set; }
+        public int SentinelWorkerReceiveTimeoutMs { get; set; } = 250;
 
         /// <summary>
-        /// The Max TCP Socket Send time for Sentinel Worker (default 100ms)
+        /// The Max TCP Socket Send time for Sentinel Worker (default 250ms)
         /// </summary>
-        public int SentinelWorkerSendTimeoutMs { get; set; }
+        public int SentinelWorkerSendTimeoutMs { get; set; } = 250;
 
         /// <summary>
         /// Reset client connections when Sentinel reports redis instance is subjectively down (default true)
         /// </summary>
-        public bool ResetWhenSubjectivelyDown { get; set; }
+        public bool ResetWhenSubjectivelyDown { get; set; } = true;
 
         /// <summary>
         /// Reset client connections when Sentinel reports redis instance is objectively down (default true)
         /// </summary>
-        public bool ResetWhenObjectivelyDown { get; set; }
+        public bool ResetWhenObjectivelyDown { get; set; } = true;
 
         internal string DebugId => $"";
 
@@ -138,16 +138,6 @@ namespace ServiceStack.Redis
             this.masterName = masterName ?? DefaultMasterName;
             IpAddressMap = new Dictionary<string, string>();
             RedisManagerFactory = (masters, slaves) => new PooledRedisClientManager(masters, slaves);
-            ScanForOtherSentinels = true;
-            RefreshSentinelHostsAfter = TimeSpan.FromMinutes(10);
-            ResetWhenObjectivelyDown = true;
-            ResetWhenSubjectivelyDown = true;
-            SentinelWorkerConnectTimeoutMs = 100;
-            SentinelWorkerReceiveTimeoutMs = 100;
-            SentinelWorkerSendTimeoutMs = 100;
-            WaitBetweenFailedHosts = TimeSpan.FromMilliseconds(250);
-            MaxWaitBetweenFailedHosts = TimeSpan.FromSeconds(60);
-            WaitBeforeForcingMasterFailover = TimeSpan.FromSeconds(60);
         }
 
         /// <summary>
