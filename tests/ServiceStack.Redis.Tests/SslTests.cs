@@ -292,7 +292,7 @@ namespace ServiceStack.Redis.Tests
             const int noOfConcurrentClients = 64; //WaitHandle.WaitAll limit is <= 64
 
             var clientAsyncResults = new List<IAsyncResult>();
-            using (var manager = new PooledRedisClientManager(TestConfig.MasterHosts, TestConfig.SlaveHosts))
+            using (var manager = new PooledRedisClientManager(TestConfig.MasterHosts, TestConfig.ReplicaHosts))
             {
                 manager.GetClient().Run(x => x.FlushAll());
 

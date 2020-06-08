@@ -88,8 +88,8 @@ namespace ServiceStack.Redis.Tests
             Assert.That(Redis.GetServerRole(), Is.EqualTo(RedisServerRole.Master));
 
             //needs redis-server v3.0
-            //var slave = new RedisClient("10.0.0.9:6380");
-            //result = slave.Role();
+            //var replica = new RedisClient("10.0.0.9:6380");
+            //result = replica.Role();
             //result.PrintDump();
         }
 
@@ -97,8 +97,8 @@ namespace ServiceStack.Redis.Tests
         public void Can_PauseAllClients()
         {
             //needs redis-server v3.0
-            //var slave = new RedisClient("10.0.0.9:6380");
-            //slave.PauseAllClients(TimeSpan.FromSeconds(2));
+            //var replica = new RedisClient("10.0.0.9:6380");
+            //replica.PauseAllClients(TimeSpan.FromSeconds(2));
         }
     }
 }

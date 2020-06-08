@@ -67,12 +67,12 @@ namespace ServiceStack.Redis.Tests.Sentinel
         }
 
         [Test]
-        public void Can_Get_Sentinel_Slaves()
+        public void Can_Get_Sentinel_Replicas()
         {
-            var slaves = RedisSentinel.SentinelSlaves(MasterName);
-            slaves.PrintDump();
+            var replicas = RedisSentinel.SentinelSlaves(MasterName);
+            replicas.PrintDump();
 
-            Assert.That(slaves.Count, Is.GreaterThan(0));
+            Assert.That(replicas.Count, Is.GreaterThan(0));
         }
 
         [Test]
@@ -100,63 +100,47 @@ namespace ServiceStack.Redis.Tests.Sentinel
         [Test]
         public void Does_scan_for_other_active_sentinels()
         {
-            using (var sentinel = new RedisSentinel(SentinelHosts[0]) {
+            using var sentinel = new RedisSentinel(SentinelHosts[0]) {
                 ScanForOtherSentinels = true
-            })
-            {
-                var clientsManager = sentinel.Start();
+            };
+            var clientsManager = sentinel.Start();
 
-                Assert.That(sentinel.SentinelHosts, Is.EquivalentTo(SentinelHosts));
+            Assert.That(sentinel.SentinelHosts, Is.EquivalentTo(SentinelHosts));
 
-                using (var client = clientsManager.GetClient())
-                {
-                    Assert.That(client.GetHostString(), Is.EqualTo(MasterHosts[0]));
-                }
-            }
+            using var client = clientsManager.GetClient();
+            Assert.That(client.GetHostString(), Is.EqualTo(MasterHosts[0]));
         }
 
         [Test]
         public void Can_Get_Redis_ClientsManager()
         {
-            using (var sentinel = CreateSentinel())
-            {
-                var clientsManager = sentinel.Start();
-                using (var client = clientsManager.GetClient())
-                {
-                    Assert.That(client.GetHostString(), Is.EqualTo(MasterHosts[0]));
-                }
-            }
+            using var sentinel = CreateSentinel();
+            var clientsManager = sentinel.Start();
+            using var client = clientsManager.GetClient();
+            Assert.That(client.GetHostString(), Is.EqualTo(MasterHosts[0]));
         }
 
         [Test]
         public void Can_specify_Timeout_on_RedisManager()
         {
-            using (var sentinel = CreateSentinel())
-            {
-                sentinel.RedisManagerFactory = (masters, slaves) => new PooledRedisClientManager(masters, slaves) { IdleTimeOutSecs = 20 };
+            using var sentinel = CreateSentinel();
+            sentinel.RedisManagerFactory = (masters, replicas) => new PooledRedisClientManager(masters, replicas) { IdleTimeOutSecs = 20 };
 
-                using (var clientsManager = (PooledRedisClientManager)sentinel.Start())
-                using (var client = clientsManager.GetClient())
-                {
-                    Assert.That(clientsManager.IdleTimeOutSecs, Is.EqualTo(20));
-                    Assert.That(((RedisNativeClient)client).IdleTimeOutSecs, Is.EqualTo(20));
-                }
-            }
+            using var clientsManager = (PooledRedisClientManager)sentinel.Start();
+            using var client = clientsManager.GetClient();
+            Assert.That(clientsManager.IdleTimeOutSecs, Is.EqualTo(20));
+            Assert.That(((RedisNativeClient)client).IdleTimeOutSecs, Is.EqualTo(20));
         }
 
         [Test]
         public void Can_specify_db_on_RedisSentinel()
         {
-            using (var sentinel = CreateSentinel())
-            {
-                sentinel.HostFilter = host => "{0}?db=1".Fmt(host);
- 
-                using (var clientsManager = sentinel.Start())
-                using (var client = clientsManager.GetClient())
-                {
-                    Assert.That(client.Db, Is.EqualTo(1));
-                }
-            }
+            using var sentinel = CreateSentinel();
+            sentinel.HostFilter = host => "{0}?db=1".Fmt(host);
+
+            using var clientsManager = sentinel.Start();
+            using var client = clientsManager.GetClient();
+            Assert.That(client.Db, Is.EqualTo(1));
         }
 
         [Test]

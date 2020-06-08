@@ -79,7 +79,7 @@ namespace ServiceStack.Redis
             var sentinelInfo = new SentinelInfo(
                 sentinel.MasterName,
                 new[] { masterHost },
-                GetSlaveHosts(sentinel.MasterName));
+                GetReplicaHosts(sentinel.MasterName));
 
             return sentinelInfo;
         }
@@ -130,24 +130,24 @@ namespace ServiceStack.Redis
             return SanitizeHostsConfig(sentinelSentinels);
         }
 
-        internal List<string> GetSlaveHosts(string masterName)
+        internal List<string> GetReplicaHosts(string masterName)
         {
-            List<Dictionary<string, string>> sentinelSlaves;
+            List<Dictionary<string, string>> sentinelReplicas;
 
             lock (oLock)
-                sentinelSlaves = sentinelClient.SentinelSlaves(sentinel.MasterName);
+                sentinelReplicas = sentinelClient.SentinelSlaves(sentinel.MasterName);
 
-            return SanitizeHostsConfig(sentinelSlaves);
+            return SanitizeHostsConfig(sentinelReplicas);
         }
 
-        private List<string> SanitizeHostsConfig(IEnumerable<Dictionary<string, string>> slaves)
+        private List<string> SanitizeHostsConfig(IEnumerable<Dictionary<string, string>> replicas)
         {
             var servers = new List<string>();
-            foreach (var slave in slaves)
+            foreach (var replica in replicas)
             {
-                slave.TryGetValue("flags", out var flags);
-                slave.TryGetValue("ip", out var ip);
-                slave.TryGetValue("port", out var port);
+                replica.TryGetValue("flags", out var flags);
+                replica.TryGetValue("ip", out var ip);
+                replica.TryGetValue("port", out var port);
 
                 if (sentinel.IpAddressMap.TryGetValue(ip, out var aliasIp))
                     ip = aliasIp;

@@ -141,7 +141,7 @@ Any connections required after the maximum Pool size has been reached will be cr
 ### PooledRedisClientManager
 
 If you prefer to define options on the Client Manager itself or you want to provide separate Read/Write and ReadOnly 
-(i.e. Master and Slave) redis-servers, use the `PooledRedisClientManager` instead:
+(i.e. Master and Replica) redis-servers, use the `PooledRedisClientManager` instead:
 
 ```csharp
 container.Register<IRedisClientsManager>(c => 
@@ -248,7 +248,7 @@ By default RedisSentinel uses a `PooledRedisClientManager`, this can be changed 
 newer `RedisManagerPool` with:
 
 ```csharp
-sentinel.RedisManagerFactory = (master,slaves) => new RedisManagerPool(master);
+sentinel.RedisManagerFactory = (master,replicas) => new RedisManagerPool(master);
 ```
 
 ### Start monitoring Sentinels

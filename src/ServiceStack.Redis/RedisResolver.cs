@@ -19,28 +19,22 @@ namespace ServiceStack.Redis
         HashSet<RedisEndpoint> allHosts = new HashSet<RedisEndpoint>();
 
         private RedisEndpoint[] masters;
-        private RedisEndpoint[] slaves;
+        private RedisEndpoint[] replicas;
 
-        public RedisEndpoint[] Masters
-        {
-            get { return masters; }
-        }
+        public RedisEndpoint[] Masters => masters;
 
-        public RedisEndpoint[] Slaves
-        {
-            get { return slaves; }
-        }
+        public RedisEndpoint[] Slaves => replicas;
 
         public RedisResolver()
             : this(TypeConstants<RedisEndpoint>.EmptyArray, TypeConstants<RedisEndpoint>.EmptyArray) {}
 
-        public RedisResolver(IEnumerable<string> masters, IEnumerable<string> slaves)
-            : this(masters.ToRedisEndPoints(), slaves.ToRedisEndPoints()){}
+        public RedisResolver(IEnumerable<string> masters, IEnumerable<string> replicas)
+            : this(masters.ToRedisEndPoints(), replicas.ToRedisEndPoints()){}
 
-        public RedisResolver(IEnumerable<RedisEndpoint> masters, IEnumerable<RedisEndpoint> slaves)
+        public RedisResolver(IEnumerable<RedisEndpoint> masters, IEnumerable<RedisEndpoint> replicas)
         {
             ResetMasters(masters.ToList());
-            ResetSlaves(slaves.ToList());
+            ResetSlaves(replicas.ToList());
             ClientFactory = RedisConfig.ClientFactory;
         }
 
@@ -67,14 +61,14 @@ namespace ServiceStack.Redis
             ResetSlaves(hosts.ToRedisEndPoints());
         }
 
-        public virtual void ResetSlaves(List<RedisEndpoint> newSlaves)
+        public virtual void ResetSlaves(List<RedisEndpoint> newReplicas)
         {
-            slaves = (newSlaves ?? new List<RedisEndpoint>()).ToArray();
-            ReadOnlyHostsCount = slaves.Length;
-            newSlaves.Each(x => allHosts.Add(x));
+            replicas = (newReplicas ?? new List<RedisEndpoint>()).ToArray();
+            ReadOnlyHostsCount = replicas.Length;
+            newReplicas.Each(x => allHosts.Add(x));
 
             if (log.IsDebugEnabled)
-                log.Debug("New Redis Slaves: " + string.Join(", ", slaves.Map(x => x.GetHostString())));
+                log.Debug("New Redis Replicas: " + string.Join(", ", replicas.Map(x => x.GetHostString())));
         }
 
         public virtual RedisClient CreateRedisClient(RedisEndpoint config, bool master)
@@ -89,7 +83,7 @@ namespace ServiceStack.Redis
                     Interlocked.Increment(ref RedisState.TotalInvalidMasters);
                     log.Error("Redis Master Host '{0}' is {1}. Resetting allHosts...".Fmt(config.GetHostString(), role));
                     var newMasters = new List<RedisEndpoint>();
-                    var newSlaves = new List<RedisEndpoint>();
+                    var newReplicas = new List<RedisEndpoint>();
                     RedisClient masterClient = null;
                     foreach (var hostConfig in allHosts)
                     {
@@ -106,7 +100,7 @@ namespace ServiceStack.Redis
                                         masterClient = testClient;
                                     break;
                                 case RedisServerRole.Slave:
-                                    newSlaves.Add(hostConfig);
+                                    newReplicas.Add(hostConfig);
                                     break;
                             }
 
@@ -123,7 +117,7 @@ namespace ServiceStack.Redis
                     }
 
                     ResetMasters(newMasters);
-                    ResetSlaves(newSlaves);
+                    ResetSlaves(newReplicas);
                     return masterClient;
                 }
             }
@@ -139,7 +133,7 @@ namespace ServiceStack.Redis
         public RedisEndpoint GetReadOnlyHost(int desiredIndex)
         {
             return ReadOnlyHostsCount > 0
-                       ? slaves[desiredIndex % slaves.Length]
+                       ? replicas[desiredIndex % replicas.Length]
                        : GetReadWriteHost(desiredIndex);
         }
 

@@ -23,8 +23,8 @@ namespace ServiceStack.Redis
 {
     /// <summary>
     /// Provides thread-safe pooling of redis client connections.
-    /// Allows load-balancing of master-write and read-slave hosts, ideal for
-    /// 1 master and multiple replicated read slaves.
+    /// Allows load-balancing of master-write and read-replica hosts, ideal for
+    /// 1 master and multiple replicated read replicas.
     /// </summary>
     public partial class PooledRedisClientManager
         : IRedisClientsManager, IRedisFailover, IHandleClientDispose, IHasRedisResolver
@@ -122,16 +122,16 @@ namespace ServiceStack.Redis
                 : initalDb;
 
             var masters = (readWriteHosts ?? TypeConstants.EmptyStringArray).ToArray();
-            var slaves = (readOnlyHosts ?? TypeConstants.EmptyStringArray).ToArray();
+            var replicas = (readOnlyHosts ?? TypeConstants.EmptyStringArray).ToArray();
 
-            RedisResolver = new RedisResolver(masters, slaves);
+            RedisResolver = new RedisResolver(masters, replicas);
 
             this.PoolSizeMultiplier = poolSizeMultiplier ?? 20;
 
             this.Config = config ?? new RedisClientManagerConfig
             {
                 MaxWritePoolSize = RedisConfig.DefaultMaxPoolSize ?? masters.Length * PoolSizeMultiplier,
-                MaxReadPoolSize = RedisConfig.DefaultMaxPoolSize ?? slaves.Length * PoolSizeMultiplier,
+                MaxReadPoolSize = RedisConfig.DefaultMaxPoolSize ?? replicas.Length * PoolSizeMultiplier,
             };
 
             this.OnFailover = new List<Action<IRedisClientsManager>>();

@@ -2,7 +2,7 @@
 // Redis Sentinel will connect to a Redis Sentinel Instance and create an IRedisClientsManager based off of the first sentinel that returns data
 //
 // Upon failure of a sentinel, other sentinels will be attempted to be connected to
-// Upon a s_down event, the RedisClientsManager will be failed over to the new set of slaves/masters
+// Upon a s_down event, the RedisClientsManager will be failed over to the new set of masters/replicas
 //
 
 using System;
@@ -137,7 +137,7 @@ namespace ServiceStack.Redis
 
             this.masterName = masterName ?? DefaultMasterName;
             IpAddressMap = new Dictionary<string, string>();
-            RedisManagerFactory = (masters, slaves) => new PooledRedisClientManager(masters, slaves);
+            RedisManagerFactory = (masters, replicas) => new PooledRedisClientManager(masters, replicas);
         }
 
         /// <summary>
@@ -266,11 +266,11 @@ namespace ServiceStack.Redis
         private IRedisClientsManager CreateRedisManager(SentinelInfo sentinelInfo)
         {
             var masters = ConfigureHosts(sentinelInfo.RedisMasters);
-            var slaves = ConfigureHosts(sentinelInfo.RedisSlaves);
-            var redisManager = RedisManagerFactory(masters, slaves);
+            var replicas = ConfigureHosts(sentinelInfo.RedisSlaves);
+            var redisManager = RedisManagerFactory(masters, replicas);
 
             var hasRedisResolver = (IHasRedisResolver)redisManager;
-            hasRedisResolver.RedisResolver = new RedisSentinelResolver(this, masters, slaves);
+            hasRedisResolver.RedisResolver = new RedisSentinelResolver(this, masters, replicas);
 
             if (redisManager is IRedisFailover canFailover && this.OnFailover != null)
             {
@@ -351,7 +351,7 @@ namespace ServiceStack.Redis
         public List<RedisEndpoint> GetSlaves()
         {
             var sentinelWorker = GetValidSentinelWorker();
-            var hosts = sentinelWorker.GetSlaveHosts(masterName);
+            var hosts = sentinelWorker.GetReplicaHosts(masterName);
             return ConfigureHosts(hosts).Map(x => x.ToRedisEndpoint());
         }
 
@@ -440,11 +440,11 @@ public class SentinelInfo
     public string[] RedisMasters { get; set; }
     public string[] RedisSlaves { get; set; }
 
-    public SentinelInfo(string masterName, IEnumerable<string> redisMasters, IEnumerable<string> redisSlaves)
+    public SentinelInfo(string masterName, IEnumerable<string> redisMasters, IEnumerable<string> redisReplicas)
     {
         MasterName = masterName;
         RedisMasters = redisMasters?.ToArray() ?? TypeConstants.EmptyStringArray;
-        RedisSlaves = redisSlaves?.ToArray() ?? TypeConstants.EmptyStringArray;
+        RedisSlaves = redisReplicas?.ToArray() ?? TypeConstants.EmptyStringArray;
     }
 
     public override string ToString()

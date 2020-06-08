@@ -390,7 +390,7 @@ namespace ServiceStack.Redis.Tests
                     Assert.That(ex.Message, Does.StartWith("Redis Timeout expired."));
                 }
 
-                var slaves = 4.Times(i => manager.GetReadOnlyClient());
+                var replicas = 4.Times(i => manager.GetReadOnlyClient());
 
                 try
                 {
@@ -431,8 +431,8 @@ namespace ServiceStack.Redis.Tests
         //    var hostCount = 0;
         //    foreach (var entry in clientUsageMap)
         //    {
-        //        Assert.That(entry.Value, Is.GreaterThanOrEqualTo(2), "Host has unproportianate distribution: " + entry.Value);
-        //        Assert.That(entry.Value, Is.LessThanOrEqualTo(30), "Host has unproportianate distribution: " + entry.Value);
+        //        Assert.That(entry.Value, Is.GreaterThanOrEqualTo(2), "Host has unproportionate distribution: " + entry.Value);
+        //        Assert.That(entry.Value, Is.LessThanOrEqualTo(30), "Host has unproportionate distribution: " + entry.Value);
         //        hostCount += entry.Value;
         //    }
 

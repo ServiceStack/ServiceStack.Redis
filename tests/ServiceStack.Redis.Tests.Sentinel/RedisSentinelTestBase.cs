@@ -21,7 +21,7 @@ namespace ServiceStack.Redis.Tests.Sentinel
             "127.0.0.1:6380",
         };
 
-        public static string[] SlaveHosts = new[]
+        public static string[] ReplicaHosts = new[]
         {
             "127.0.0.1:6381",
             "127.0.0.1:6382",

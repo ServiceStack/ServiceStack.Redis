@@ -59,7 +59,7 @@ namespace ServiceStack.Redis.Tests.Integration
 #else
             var clientAsyncResults = new List<IAsyncResult>();
 #endif             
-            using (var manager = clientManagerFactory(TestConfig.MasterHosts, TestConfig.SlaveHosts))
+            using (var manager = clientManagerFactory(TestConfig.MasterHosts, TestConfig.ReplicaHosts))
             {
                 for (var i = 0; i < noOfConcurrentClients; i++)
                 {
@@ -79,25 +79,25 @@ namespace ServiceStack.Redis.Tests.Integration
             WaitHandle.WaitAll(clientAsyncResults.ConvertAll(x => x.AsyncWaitHandle).ToArray());
 #endif
 
-            Debug.WriteLine(String.Format("Time Taken: {0}", (Stopwatch.GetTimestamp() - before) / 1000));
+            Debug.WriteLine($"Time Taken: {(Stopwatch.GetTimestamp() - before) / 1000}");
         }
 
         protected static void CheckHostCountMap(Dictionary<string, int> hostCountMap)
         {
             Debug.WriteLine(TypeSerializer.SerializeToString(hostCountMap));
 
-            if (TestConfig.SlaveHosts.Length <= 1) return;
+            if (TestConfig.ReplicaHosts.Length <= 1) return;
 
             var hostCount = 0;
             foreach (var entry in hostCountMap)
             {
                 if (entry.Value < 5)
                 {
-                    Debug.WriteLine("ERROR: Host has unproportianate distrobution: " + entry.Value);
+                    Debug.WriteLine("ERROR: Host has unproportionate distribution: " + entry.Value);
                 }
                 if (entry.Value > 60)
                 {
-                    Debug.WriteLine("ERROR: Host has unproportianate distrobution: " + entry.Value);
+                    Debug.WriteLine("ERROR: Host has unproportionate distribution: " + entry.Value);
                 }
                 hostCount += entry.Value;
             }

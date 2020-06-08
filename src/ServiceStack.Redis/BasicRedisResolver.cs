@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using ServiceStack.Logging;
-using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
@@ -16,21 +15,15 @@ namespace ServiceStack.Redis
         public int ReadOnlyHostsCount { get; private set; }
 
         private RedisEndpoint[] masters;
-        private RedisEndpoint[] slaves;
+        private RedisEndpoint[] replicas;
 
-        public RedisEndpoint[] Masters
-        {
-            get { return masters; }
-        }
-        public RedisEndpoint[] Slaves
-        {
-            get { return slaves; }
-        }
+        public RedisEndpoint[] Masters => masters;
+        public RedisEndpoint[] Replicas => replicas;
 
-        public BasicRedisResolver(IEnumerable<RedisEndpoint> masters, IEnumerable<RedisEndpoint> slaves)
+        public BasicRedisResolver(IEnumerable<RedisEndpoint> masters, IEnumerable<RedisEndpoint> replicas)
         {
             ResetMasters(masters.ToList());
-            ResetSlaves(slaves.ToList());
+            ResetSlaves(replicas.ToList());
             ClientFactory = RedisConfig.ClientFactory;
         }
 
@@ -56,13 +49,13 @@ namespace ServiceStack.Redis
             ResetSlaves(hosts.ToRedisEndPoints());
         }
 
-        public virtual void ResetSlaves(List<RedisEndpoint> newSlaves)
+        public virtual void ResetSlaves(List<RedisEndpoint> newReplicas)
         {
-            slaves = (newSlaves ?? TypeConstants<RedisEndpoint>.EmptyList).ToArray();
-            ReadOnlyHostsCount = slaves.Length;
+            replicas = (newReplicas ?? TypeConstants<RedisEndpoint>.EmptyList).ToArray();
+            ReadOnlyHostsCount = replicas.Length;
 
             if (log.IsDebugEnabled)
-                log.Debug("New Redis Slaves: " + string.Join(", ", slaves.Map(x => x.GetHostString())));
+                log.Debug("New Redis Replicas: " + string.Join(", ", replicas.Map(x => x.GetHostString())));
         }
 
         public RedisClient CreateRedisClient(RedisEndpoint config, bool master)
@@ -78,7 +71,7 @@ namespace ServiceStack.Redis
         public RedisEndpoint GetReadOnlyHost(int desiredIndex)
         {
             return ReadOnlyHostsCount > 0
-                ? slaves[desiredIndex % slaves.Length]
+                ? replicas[desiredIndex % replicas.Length]
                 : GetReadWriteHost(desiredIndex);
         }
 

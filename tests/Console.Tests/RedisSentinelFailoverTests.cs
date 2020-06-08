@@ -35,7 +35,7 @@ namespace ConsoleTests
             {
                 if (UseRedisManagerPool)
                 {
-                    sentinel.RedisManagerFactory = (masters, slaves) =>
+                    sentinel.RedisManagerFactory = (masters, replicas) =>
                         new RedisManagerPool(masters);
                 }
 

@@ -19,13 +19,13 @@ namespace ServiceStack.Redis
 	/// <summary>
 	/// BasicRedisClientManager for ICacheClient
 	/// 
-	/// For more interoperabilty I'm also implementing the ICacheClient on
+	/// For more interoperability I'm also implementing the ICacheClient on
 	/// this cache client manager which has the affect of calling 
 	/// GetCacheClient() for all write operations and GetReadOnlyCacheClient() 
 	/// for the read ones.
 	/// 
-	/// This works well for master-slave replication scenarios where you have 
-	/// 1 master that replicates to multiple read slaves.
+	/// This works well for master-replica replication scenarios where you have 
+	/// 1 master that replicates to multiple read replicas.
 	/// </summary>
 	public partial class BasicRedisClientManager
 		: ICacheClient
