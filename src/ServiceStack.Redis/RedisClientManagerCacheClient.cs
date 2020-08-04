@@ -31,18 +31,14 @@ namespace ServiceStack.Redis
 
         public T Get<T>(string key)
         {
-            using (var client = redisManager.GetReadOnlyClient())
-            {
-                return client.Get<T>(key);
-            }
+            using var client = redisManager.GetReadOnlyClient();
+            return client.Get<T>(key);
         }
 
         public IDictionary<string, T> GetAll<T>(IEnumerable<string> keys)
         {
-            using (var client = redisManager.GetReadOnlyClient())
-            {
-                return client.GetAll<T>(keys);
-            }
+            using var client = redisManager.GetReadOnlyClient();
+            return client.GetAll<T>(keys);
         }
 
         private void AssertNotReadOnly()
@@ -59,164 +55,127 @@ namespace ServiceStack.Redis
 
         public bool Remove(string key)
         {
-            using (var client = GetClient())
-            {
-                return client.Remove(key);
-            }
+            using var client = GetClient();
+            return client.Remove(key);
         }
 
         public void RemoveAll(IEnumerable<string> keys)
         {
-            using (var client = GetClient())
-            {
-                client.RemoveAll(keys);
-            }
+            using var client = GetClient();
+            client.RemoveAll(keys);
         }
 
         public long Increment(string key, uint amount)
         {
-            using (var client = GetClient())
-            {
-                return client.Increment(key, amount);
-            }
+            using var client = GetClient();
+            return client.Increment(key, amount);
         }
 
         public long Decrement(string key, uint amount)
         {
-            using (var client = GetClient())
-            {
-                return client.Decrement(key, amount);
-            }
+            using var client = GetClient();
+            return client.Decrement(key, amount);
         }
 
         public bool Add<T>(string key, T value)
         {
-            using (var client = GetClient())
-            {
-                return client.Add(key, value);
-            }
+            using var client = GetClient();
+            return client.Add(key, value);
         }
 
         public bool Set<T>(string key, T value)
         {
-            using (var client = GetClient())
-            {
-                return client.Set(key, value);
-            }
+            using var client = GetClient();
+            return client.Set(key, value);
         }
 
         public bool Replace<T>(string key, T value)
         {
-            using (var client = GetClient())
-            {
-                return client.Replace(key, value);
-            }
+            using var client = GetClient();
+            return client.Replace(key, value);
         }
 
         public bool Add<T>(string key, T value, DateTime expiresAt)
         {
-            using (var client = GetClient())
-            {
-                return client.Add(key, value, expiresAt);
-            }
+            using var client = GetClient();
+            return client.Add(key, value, expiresAt);
         }
 
         public bool Set<T>(string key, T value, DateTime expiresAt)
         {
-            using (var client = GetClient())
-            {
-                return client.Set(key, value, expiresAt);
-            }
+            using var client = GetClient();
+            return client.Set(key, value, expiresAt);
         }
 
         public bool Replace<T>(string key, T value, DateTime expiresAt)
         {
-            using (var client = GetClient())
-            {
-                return client.Replace(key, value, expiresAt);
-            }
+            using var client = GetClient();
+            return client.Replace(key, value, expiresAt);
         }
 
         public bool Add<T>(string key, T value, TimeSpan expiresIn)
         {
-            using (var client = GetClient())
-            {
-                return client.Set(key, value, expiresIn);
-            }
+            using var client = GetClient();
+            return client.Set(key, value, expiresIn);
         }
 
         public bool Set<T>(string key, T value, TimeSpan expiresIn)
         {
-            using (var client = GetClient())
-            {
-                return client.Set(key, value, expiresIn);
-            }
+            using var client = GetClient();
+            return client.Set(key, value, expiresIn);
         }
 
         public bool Replace<T>(string key, T value, TimeSpan expiresIn)
         {
-            using (var client = GetClient())
-            {
-                return client.Replace(key, value, expiresIn);
-            }
+            using var client = GetClient();
+            return client.Replace(key, value, expiresIn);
         }
 
         public void FlushAll()
         {
-            using (var client = GetClient())
-            {
-                client.FlushAll();
-            }
+            using var client = GetClient();
+            client.FlushAll();
         }
 
         public void SetAll<T>(IDictionary<string, T> values)
         {
-            using (var client = GetClient())
-            {
-                client.SetAll(values);
-            }
+            using var client = GetClient();
+            client.SetAll(values);
         }
 
         public void RemoveByPattern(string pattern)
         {
-            using (var client = GetClient())
+            using var client = GetClient();
+            if (client is IRemoveByPattern redisClient)
             {
-                if (client is IRemoveByPattern redisClient)
-                {
-                    redisClient.RemoveByPattern(pattern);
-                }
+                redisClient.RemoveByPattern(pattern);
             }
         }
 
         public void RemoveByRegex(string pattern)
         {
-            using (var client = GetClient())
+            using var client = GetClient();
+            if (client is IRemoveByPattern redisClient)
             {
-                if (client is IRemoveByPattern redisClient)
-                {
-                    redisClient.RemoveByRegex(pattern);
-                }
+                redisClient.RemoveByRegex(pattern);
             }
         }
 
         public TimeSpan? GetTimeToLive(string key)
         {
-            using (var client = GetClient())
+            using var client = GetClient();
+            if (client is ICacheClientExtended redisClient)
             {
-                if (client is ICacheClientExtended redisClient)
-                {
-                    return redisClient.GetTimeToLive(key);
-                }
+                return redisClient.GetTimeToLive(key);
             }
+
             return null;
         }
 
         public IEnumerable<string> GetKeysByPattern(string pattern)
         {
-            using (var client = (ICacheClientExtended)GetClient())
-            {
-                return client.GetKeysByPattern(pattern).ToList();
-            }
+            using var client = (ICacheClientExtended)GetClient();
+            return client.GetKeysByPattern(pattern).ToList();
         }
 
         public void RemoveExpiredEntries()
