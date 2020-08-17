@@ -60,7 +60,7 @@ namespace ServiceStack.Redis
             set => Interlocked.CompareExchange(ref autoRestart, value ? YES : NO, autoRestart);
         }
 
-        public DateTime CurrentServerTime => new DateTime(serverTimeAtStart.Ticks + startedAt.ElapsedTicks, DateTimeKind.Utc);
+        public DateTime CurrentServerTime => new DateTime(serverTimeAtStart.Ticks + startedAt.Elapsed.Ticks, DateTimeKind.Utc);
 
         public long BgThreadCount => Interlocked.CompareExchange(ref bgThreadCount, 0, 0);
 
