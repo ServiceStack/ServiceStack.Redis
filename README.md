@@ -802,7 +802,7 @@ What to look out for in your code-base to prevent against multiple concurrent us
 
  - Use `IRedisClient` redis instance client within a `using` statement
  - Never use a client instance after it has been disposed
- - Never use (or return) a "server collection" (e.g. [Redis.Lists](#simple-example-using-redis-lists)) after the client has been disposed
+ - Never use (or return) a "server collection or lock" (e.g. [Redis.Lists](#simple-example-using-redis-lists)) after the client has been disposed
  - Never keep a Singleton or `static` instance to a redis client (just the `IRedisClientsManager` factory)
  - Never use the same redis client in multiple threads, i.e. have each thread resolve their own client from the factory
 
