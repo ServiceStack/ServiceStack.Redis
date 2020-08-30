@@ -175,7 +175,7 @@ namespace ServiceStack.Redis.Tests
             if (!sslStream.IsEncrypted)
                 throw new Exception("Could not establish an encrypted connection to " + Host);
 
-            var bstream = new BufferedStream(sslStream, 16 * 1024);
+            var bstream = new System.IO.BufferedStream(sslStream, 16 * 1024);
 
             SendAuth(bstream);
         }

@@ -13,7 +13,7 @@ namespace ServiceStack.Redis
     /// This works well for master-replica replication scenarios where you have 
     /// 1 master that replicates to multiple read replicas.
     /// </summary>
-    public class RedisClientManagerCacheClient : ICacheClient, IRemoveByPattern, ICacheClientExtended
+    public partial class RedisClientManagerCacheClient : ICacheClient, IRemoveByPattern, ICacheClientExtended
     {
         private readonly IRedisClientsManager redisManager;
 

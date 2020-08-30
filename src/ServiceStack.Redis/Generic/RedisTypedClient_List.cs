@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using ServiceStack.Model;
 
 namespace ServiceStack.Redis.Generic
@@ -24,7 +25,7 @@ namespace ServiceStack.Redis.Generic
 
         public IHasNamed<IRedisList<T>> Lists { get; set; }
 
-        internal class RedisClientLists
+        internal partial class RedisClientLists
             : IHasNamed<IRedisList<T>>
         {
             private readonly RedisTypedClient<T> client;

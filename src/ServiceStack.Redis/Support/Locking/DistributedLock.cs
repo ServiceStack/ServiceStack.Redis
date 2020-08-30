@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace ServiceStack.Redis.Support.Locking
 {
-    public class DistributedLock : IDistributedLock
+    public partial class DistributedLock : IDistributedLock
     {
         public const int LOCK_NOT_ACQUIRED = 0;
         public const int LOCK_ACQUIRED = 1;

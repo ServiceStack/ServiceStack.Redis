@@ -18,12 +18,20 @@ namespace ServiceStack.Redis
     /// <summary>
     /// Adds support for Redis Transactions (i.e. MULTI/EXEC/DISCARD operations).
     /// </summary>
-    public class RedisTransaction
+    public partial class RedisTransaction
         : RedisAllPurposePipeline, IRedisTransaction, IRedisQueueCompletableOperation
     {
         private int numCommands = 0;
         public RedisTransaction(RedisClient redisClient)
-            : base(redisClient) {}
+            : this(redisClient, false) {}
+
+        internal RedisTransaction(RedisClient redisClient, bool isAsync)
+            : base(redisClient)
+        {
+            // if someone casts between sync/async: the sync-over-async or
+            // async-over-sync is entirely self-inflicted; I can't fix stupid
+            _isAsync = isAsync;
+        }
 
         protected override void Init()
         {
@@ -161,10 +169,19 @@ namespace ServiceStack.Redis
             Rollback();
         }
 
+        private readonly bool _isAsync;
         protected override void AddCurrentQueuedOperation()
         {
             base.AddCurrentQueuedOperation();
-            QueueExpectQueued();
+            if (_isAsync)
+            {
+                QueueExpectQueuedAsync();
+            }
+            else
+            {
+                QueueExpectQueued();
+            }
         }
+        partial void QueueExpectQueuedAsync();
     }
 }

@@ -1,6 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net46;netcoreapp2.1</TargetFrameworks>
+	<!--
+	TFM choice reasons:
+	- net46 is .NET Framework without async
+	- net472 is .NET Framework with async
+	- netcoreapp2.1 is .NET Core with async, but without some features like memory/stream APIs
+	- netcoreapp3.1 is .NET Core with all the bells and whistles
+	-->
+    <TargetFrameworks>net46;net472;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
     <DebugType>portable</DebugType>
     <AssemblyName>ServiceStack.Redis.Tests</AssemblyName>
     <OutputType>Library</OutputType>
@@ -24,6 +31,13 @@
   </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='net46'">
+    <Compile Remove="**/*.Async.cs" />
+    <None Include="**/*.Async.cs" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1' or '$(TargetFramework)' == 'netcoreapp3.1'">
+    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System.Configuration" />

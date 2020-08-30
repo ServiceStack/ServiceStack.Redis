@@ -7,7 +7,7 @@ namespace ServiceStack.Redis
 	/// <summary>
 	/// Useful wrapper IRedisClientsManager to cut down the boiler plate of most IRedisClient access
 	/// </summary>
-	public static class RedisClientsManagerExtensions
+	public static partial class RedisClientsManagerExtensions
 	{
         /// <summary>
         /// Creates a PubSubServer that uses a background thread to listen and process for

@@ -1,14 +1,14 @@
-﻿using System;
+﻿using ServiceStack.Redis.Pipeline;
+using System;
 using System.Collections.Generic;
-using ServiceStack.Redis.Generic;
-using ServiceStack.Redis.Pipeline;
+using System.Threading.Tasks;
 
 namespace ServiceStack.Redis.Generic
 {
     /// <summary>
     /// A complete redis command, with method to send command, receive response, and run callback on success or failure
     /// </summary>
-    internal class QueuedRedisTypedCommand<T> : QueuedRedisOperation
+    internal partial class QueuedRedisTypedCommand<T> : QueuedRedisOperation
     {
 
         public Action<IRedisTypedClient<T>> VoidReturnCommand { get; set; }
@@ -74,5 +74,7 @@ namespace ServiceStack.Redis.Generic
             }
         }
 
+        private void ExecuteThrowIfAsync() => OnExecuteThrowIfAsync();
+        partial void OnExecuteThrowIfAsync();
     }
 }

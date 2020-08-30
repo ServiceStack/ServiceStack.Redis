@@ -5,6 +5,11 @@ using System.Net.Sockets;
 
 namespace ServiceStack.Redis
 {
+    // recommendation: mark this obsolete as it is incomplete, and no longer used;
+    // I've marked it obsolete in DEBUG to be sure
+#if DEBUG
+    [Obsolete("Prefer System.IO.BufferedStream")]
+#endif
     public sealed class BufferedStream : Stream
     {
         Stream networkStream;

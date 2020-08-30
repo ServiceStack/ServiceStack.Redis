@@ -63,7 +63,7 @@ namespace ServiceStack.Redis.Generic
 
         public IRedisTypedTransaction<T> CreateTransaction()
         {
-            return new RedisTypedTransaction<T>(this);
+            return new RedisTypedTransaction<T>(this, false);
         }
 
         public IRedisTypedPipeline<T> CreatePipeline()
@@ -137,7 +137,9 @@ namespace ServiceStack.Redis.Generic
             return client.UrnKey(entity);
         }
 
-        public IRedisSet TypeIdsSet => new RedisClientSet(client, client.GetTypeIdsSetKey<T>());
+        public IRedisSet TypeIdsSet => TypeIdsSetRaw;
+
+        private RedisClientSet TypeIdsSetRaw => new RedisClientSet(client, client.GetTypeIdsSetKey<T>());
 
         public T this[string key]
         {
@@ -319,6 +321,10 @@ namespace ServiceStack.Redis.Generic
         public T[] SearchKeys(string pattern)
         {
             var strKeys = client.SearchKeys(pattern);
+            return SearchKeysParse(strKeys);
+        }
+        private T[] SearchKeysParse(List<string> strKeys)
+        {
             var keysCount = strKeys.Count;
 
             var keys = new T[keysCount];
@@ -334,7 +340,10 @@ namespace ServiceStack.Redis.Generic
             if (keys.IsNullOrEmpty()) return new List<T>();
 
             var resultBytesArray = client.MGet(keys.ToArray());
-
+            return ProcessGetValues(resultBytesArray);
+        }
+        private List<T> ProcessGetValues(byte[][] resultBytesArray)
+        {
             var results = new List<T>();
             foreach (var resultBytes in resultBytesArray)
             {
@@ -400,22 +409,34 @@ namespace ServiceStack.Redis.Generic
 
         public void StoreAll(IEnumerable<T> entities)
         {
-            if (entities == null) return;
+            if (PrepareStoreAll(entities, out var keys, out var values, out var entitiesList))
+            {
+                client.MSet(keys, values);
+                client.RegisterTypeIds(entitiesList);
+            }
+        }
 
-            var entitiesList = entities.ToList();
+        private bool PrepareStoreAll(IEnumerable<T> entities, out byte[][] keys, out byte[][] values, out List<T> entitiesList)
+        {
+            if (entities == null)
+            {
+                keys = values = default;
+                entitiesList = default;
+                return false;
+            }
+
+            entitiesList = entities.ToList();
             var len = entitiesList.Count;
 
-            var keys = new byte[len][];
-            var values = new byte[len][];
+            keys = new byte[len][];
+            values = new byte[len][];
 
             for (var i = 0; i < len; i++)
             {
                 keys[i] = client.UrnKey(entitiesList[i]).ToUtf8Bytes();
                 values[i] = Redis.RedisClient.SerializeToUtf8Bytes(entitiesList[i]);
             }
-
-            client.MSet(keys, values);
-            client.RegisterTypeIds(entitiesList);
+            return true;
         }
 
         public void Delete(T entity)

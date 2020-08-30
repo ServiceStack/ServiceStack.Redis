@@ -4,7 +4,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Redis
 {
-    public class RedisSubscription
+    public partial class RedisSubscription
         : IRedisSubscription
     {
         private readonly IRedisNativeClient redisClient;
@@ -73,10 +73,7 @@ namespace ServiceStack.Redis
 
                     activeChannels.Add(channel);
 
-                    if (this.OnSubscribe != null)
-                    {
-                        this.OnSubscribe(channel);
-                    }
+                    this.OnSubscribe?.Invoke(channel);
                 }
                 else if (UnSubscribeWord.AreEqual(messageType)
                     || PUnSubscribeWord.AreEqual(messageType))
@@ -85,39 +82,24 @@ namespace ServiceStack.Redis
 
                     activeChannels.Remove(channel);
 
-                    if (this.OnUnSubscribe != null)
-                    {
-                        this.OnUnSubscribe(channel);
-                    }
+                    this.OnUnSubscribe?.Invoke(channel);
                 }
                 else if (MessageWord.AreEqual(messageType))
                 {
                     var msgBytes = multiBytes[i + MsgIndex];
-                    if (this.OnMessageBytes != null)
-                    {
-                        this.OnMessageBytes(channel, msgBytes);
-                    }
-                    
+                    this.OnMessageBytes?.Invoke(channel, msgBytes);
+
                     var message = msgBytes.FromUtf8Bytes();
-                    if (this.OnMessage != null)
-                    {
-                        this.OnMessage(channel, message);
-                    }
+                    this.OnMessage?.Invoke(channel, message);
                 }
                 else if (PMessageWord.AreEqual(messageType))
                 {
                     channel = multiBytes[i + 2].FromUtf8Bytes();
                     var msgBytes = multiBytes[i + MsgIndex + 1];
-                    if (this.OnMessageBytes != null)
-                    {
-                        this.OnMessageBytes(channel, msgBytes);
-                    }
-                    
+                    this.OnMessageBytes?.Invoke(channel, msgBytes);
+
                     var message = msgBytes.FromUtf8Bytes();
-                    if (this.OnMessage != null)
-                    {
-                        this.OnMessage(channel, message);
-                    }
+                    this.OnMessage?.Invoke(channel, message);
                 }
                 else
                 {

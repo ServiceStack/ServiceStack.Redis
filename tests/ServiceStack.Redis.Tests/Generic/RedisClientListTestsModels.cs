@@ -5,6 +5,7 @@ using ServiceStack.Redis.Tests.Support;
 
 namespace ServiceStack.Redis.Tests.Generic
 {
+    // TODO: error, missing fixture?
     public class RedisClientListTestsModelWithFieldsOfDifferentTypes
         : RedisClientListTestsBase<ModelWithFieldsOfDifferentTypes>
     {

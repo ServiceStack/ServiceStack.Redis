@@ -1,6 +1,6 @@
 ﻿namespace ServiceStack.Redis
 {
-    public static class RedisClientExtensions
+    public static partial class RedisClientExtensions
     {
         public static string GetHostString(this IRedisClient redis)
         {

@@ -29,7 +29,8 @@ namespace ServiceStack.Redis.Tests
             }
             catch (RedisResponseException ex)
             {
-                if (ex.Message.StartsWith("Rewriting config file: Permission denied"))
+                if (ex.Message.StartsWith("Rewriting config file: Permission denied")
+                    || ex.Message.StartsWith("The server is running without a config file"))
                     return;
                 throw;
             }

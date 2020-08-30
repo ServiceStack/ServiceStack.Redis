@@ -17,7 +17,7 @@ using System.Text;
 
 namespace ServiceStack.Redis.Generic
 {
-    internal class RedisClientList<T>
+    internal partial class RedisClientList<T>
         : IRedisList<T>
     {
         private readonly RedisTypedClient<T> client;

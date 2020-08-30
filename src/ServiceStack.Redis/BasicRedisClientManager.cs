@@ -99,7 +99,8 @@ namespace ServiceStack.Redis
         /// Returns a Read/Write client (The default) using the hosts defined in ReadWriteHosts
         /// </summary>
         /// <returns></returns>
-        public IRedisClient GetClient()
+        public IRedisClient GetClient() => GetClientImpl();
+        private RedisClient GetClientImpl()
         {
             var client = InitNewClient(RedisResolver.CreateMasterClient(readWriteHostsIndex++));
             return client;
@@ -109,7 +110,8 @@ namespace ServiceStack.Redis
         /// Returns a ReadOnly client using the hosts defined in ReadOnlyHosts.
         /// </summary>
         /// <returns></returns>
-        public virtual IRedisClient GetReadOnlyClient()
+        public virtual IRedisClient GetReadOnlyClient() => GetReadOnlyClientImpl();
+        private RedisClient GetReadOnlyClientImpl()
         {
             var client = InitNewClient(RedisResolver.CreateSlaveClient(readOnlyHostsIndex++));
             return client;

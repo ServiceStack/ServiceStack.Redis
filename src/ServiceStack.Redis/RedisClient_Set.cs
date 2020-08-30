@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using ServiceStack.Common;
 using ServiceStack.Model;
 using ServiceStack.Redis.Generic;
@@ -26,7 +27,7 @@ namespace ServiceStack.Redis
     {
         public IHasNamed<IRedisSet> Sets { get; set; }
 
-        internal class RedisClientSets
+        internal partial class RedisClientSets
             : IHasNamed<IRedisSet>
         {
             private readonly RedisClient client;
@@ -96,6 +97,11 @@ namespace ServiceStack.Redis
         public string[] FindGeoMembersInRadius(string key, double longitude, double latitude, double radius, string unit)
         {
             var results = base.GeoRadius(key, longitude, latitude, radius, unit);
+            return ParseFindGeoMembersResult(results);
+        }
+
+        private static string[] ParseFindGeoMembersResult(List<RedisGeoResult> results)
+        {
             var to = new string[results.Count];
             for (var i = 0; i < results.Count; i++)
             {
@@ -113,12 +119,7 @@ namespace ServiceStack.Redis
         public string[] FindGeoMembersInRadius(string key, string member, double radius, string unit)
         {
             var results = base.GeoRadiusByMember(key, member, radius, unit);
-            var to = new string[results.Count];
-            for (var i = 0; i < results.Count; i++)
-            {
-                to[i] = results[i].Member;
-            }
-            return to;
+            return ParseFindGeoMembersResult(results);
         }
 
         public List<RedisGeoResult> FindGeoResultsInRadius(string key, string member, double radius, string unit, int? count = null, bool? sortByNearest = null)
@@ -139,12 +140,29 @@ namespace ServiceStack.Redis
 
         public void AddRangeToSet(string setId, List<string> items)
         {
+            if (AddRangeToSetNeedsSend(setId, items))
+            {
+                var uSetId = setId.ToUtf8Bytes();
+                var pipeline = CreatePipelineCommand();
+                foreach (var item in items)
+                {
+                    pipeline.WriteCommand(Commands.SAdd, uSetId, item.ToUtf8Bytes());
+                }
+                pipeline.Flush();
+
+                //the number of items after
+                _ = pipeline.ReadAllAsInts();
+            }
+        }
+
+        bool AddRangeToSetNeedsSend(string setId, List<string> items)
+        {
             if (setId.IsNullOrEmpty())
                 throw new ArgumentNullException("setId");
             if (items == null)
                 throw new ArgumentNullException("items");
             if (items.Count == 0)
-                return;
+                return false;
 
             if (this.Transaction != null || this.Pipeline != null)
             {
@@ -163,19 +181,11 @@ namespace ServiceStack.Redis
                     var item = items[i];
                     queueable.QueueCommand(c => c.AddItemToSet(setId, item));
                 }
+                return false;
             }
             else 
             {
-                var uSetId = setId.ToUtf8Bytes();
-                var pipeline = CreatePipelineCommand();
-                foreach (var item in items)
-                {
-                    pipeline.WriteCommand(Commands.SAdd, uSetId, item.ToUtf8Bytes());
-                }
-                pipeline.Flush();
-
-                //the number of items after 
-                var intResults = pipeline.ReadAllAsInts();
+                return true;
             }
         }
 

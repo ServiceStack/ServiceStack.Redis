@@ -14,9 +14,10 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Does_retry_failed_commands()
         {
-//            LogManager.LogFactory = new ConsoleLogFactory(debugEnabled: true);
-//            RedisConfig.EnableVerboseLogging = true;
+            // warning: this test looks brittle; is often failing "Expected: 3 But was:  2" (on main branch);
 
+            // LogManager.LogFactory = new ConsoleLogFactory(debugEnabled: true);
+            // RedisConfig.EnableVerboseLogging = true;
             RedisStats.Reset();
 
             var redisCtrl = new RedisClient(RedisConfig.DefaultHost);

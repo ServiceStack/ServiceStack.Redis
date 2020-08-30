@@ -197,32 +197,54 @@ namespace ServiceStack.Redis
 
         public void SetAll(IEnumerable<string> keys, IEnumerable<string> values)
         {
-            if (keys == null || values == null) return;
+            if (GetSetAllBytes(keys, values, out var keyBytes, out var valBytes))
+            {
+                base.MSet(keyBytes, valBytes);
+            }
+        }
+
+        bool GetSetAllBytes(IEnumerable<string> keys, IEnumerable<string> values, out byte[][] keyBytes, out byte[][] valBytes)
+        {
+            keyBytes = valBytes = default;
+            if (keys == null || values == null) return false;
             var keyArray = keys.ToArray();
             var valueArray = values.ToArray();
 
             if (keyArray.Length != valueArray.Length)
                 throw new Exception("Key length != Value Length. {0}/{1}".Fmt(keyArray.Length, valueArray.Length));
 
-            if (keyArray.Length == 0) return;
+            if (keyArray.Length == 0) return false;
 
-            var keyBytes = new byte[keyArray.Length][];
-            var valBytes = new byte[keyArray.Length][];
+            keyBytes = new byte[keyArray.Length][];
+            valBytes = new byte[keyArray.Length][];
             for (int i = 0; i < keyArray.Length; i++)
             {
                 keyBytes[i] = keyArray[i].ToUtf8Bytes();
                 valBytes[i] = valueArray[i].ToUtf8Bytes();
             }
 
-            base.MSet(keyBytes, valBytes);
+            return true;
         }
 
         public void SetAll(Dictionary<string, string> map)
         {
-            if (map == null || map.Count == 0) return;
+            if (GetSetAllBytes(map, out var keyBytes, out var valBytes))
+            {
+                base.MSet(keyBytes, valBytes);
+            }
+        }
 
-            var keyBytes = new byte[map.Count][];
-            var valBytes = new byte[map.Count][];
+        private static bool GetSetAllBytes(IDictionary<string, string> map, out byte[][] keyBytes, out byte[][] valBytes)
+        {
+            if (map == null || map.Count == 0)
+            {
+                keyBytes = null;
+                valBytes = null;
+                return false;
+            }
+
+            keyBytes = new byte[map.Count][];
+            valBytes = new byte[map.Count][];
 
             var i = 0;
             foreach (var key in map.Keys)
@@ -232,8 +254,7 @@ namespace ServiceStack.Redis
                 valBytes[i] = val.ToUtf8Bytes();
                 i++;
             }
-
-            base.MSet(keyBytes, valBytes);
+            return true;
         }
 
         public string GetValue(string key)
@@ -321,25 +342,23 @@ namespace ServiceStack.Redis
 
         public bool ExpireEntryIn(string key, TimeSpan expireIn)
         {
-            if (AssertServerVersionNumber() >= 2600)
+            if (UseMillisecondExpiration(expireIn))
             {
-                if (expireIn.Milliseconds > 0)
-                {
-                    return PExpire(key, (long)expireIn.TotalMilliseconds);
-                }
+                return PExpire(key, (long)expireIn.TotalMilliseconds);
             }
 
             return Expire(key, (int)expireIn.TotalSeconds);
         }
 
+        private bool UseMillisecondExpiration(TimeSpan value)
+
+            => AssertServerVersionNumber() >= 2600 && value.Milliseconds > 0;
+
         public bool ExpireEntryIn(byte[] key, TimeSpan expireIn)
         {
-            if (AssertServerVersionNumber() >= 2600)
+            if (UseMillisecondExpiration(expireIn))
             {
-                if (expireIn.Milliseconds > 0)
-                {
-                    return PExpire(key, (long)expireIn.TotalMilliseconds);
-                }
+                return PExpire(key, (long)expireIn.TotalMilliseconds);
             }
 
             return Expire(key, (int)expireIn.TotalSeconds);
@@ -358,8 +377,10 @@ namespace ServiceStack.Redis
         }
 
         public TimeSpan? GetTimeToLive(string key)
+            => ParseTimeToLiveResult(Ttl(key));
+
+        private static TimeSpan? ParseTimeToLiveResult(long ttlSecs)
         {
-            var ttlSecs = Ttl(key);
             if (ttlSecs == -1)
                 return TimeSpan.MaxValue; //no expiry set
 
@@ -401,7 +422,7 @@ namespace ServiceStack.Redis
         public IRedisTransaction CreateTransaction()
         {
             AssertServerVersionNumber(); // pre-fetch call to INFO before transaction if needed
-            return new RedisTransaction(this);
+            return new RedisTransaction(this, false);
         }
 
         public void AssertNotInTransaction()
@@ -426,9 +447,11 @@ namespace ServiceStack.Redis
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (keys.Count == 0) return new List<string>();
 
-            var resultBytesArray = MGet(keys.ToArray());
-
-            var results = new List<string>();
+            return ParseGetValuesResult(MGet(keys.ToArray()));
+        }
+        private static List<string> ParseGetValuesResult(byte[][] resultBytesArray)
+        {
+            var results = new List<string>(resultBytesArray.Length);
             foreach (var resultBytes in resultBytesArray)
             {
                 if (resultBytes == null) continue;
@@ -445,9 +468,12 @@ namespace ServiceStack.Redis
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (keys.Count == 0) return new List<T>();
 
-            var resultBytesArray = MGet(keys.ToArray());
+            return ParseGetValuesResult<T>(MGet(keys.ToArray()));
+        }
 
-            var results = new List<T>();
+        private static List<T> ParseGetValuesResult<T>(byte[][] resultBytesArray)
+        {
+            var results = new List<T>(resultBytesArray.Length);
             foreach (var resultBytes in resultBytesArray)
             {
                 if (resultBytes == null) continue;
@@ -468,6 +494,11 @@ namespace ServiceStack.Redis
             var keysArray = keys.ToArray();
             var resultBytesArray = MGet(keysArray);
 
+            return ParseGetValuesMapResult(keysArray, resultBytesArray);
+        }
+
+        private static Dictionary<string, string> ParseGetValuesMapResult(string[] keysArray, byte[][] resultBytesArray)
+        {
             var results = new Dictionary<string, string>();
             for (var i = 0; i < resultBytesArray.Length; i++)
             {
@@ -496,6 +527,11 @@ namespace ServiceStack.Redis
             var keysArray = keys.ToArray();
             var resultBytesArray = MGet(keysArray);
 
+            return ParseGetValuesMapResult<T>(keysArray, resultBytesArray);
+        }
+
+        private static Dictionary<string, T> ParseGetValuesMapResult<T>(string[] keysArray, byte[][] resultBytesArray)
+        {
             var results = new Dictionary<string, T>();
             for (var i = 0; i < resultBytesArray.Length; i++)
             {
@@ -699,42 +735,69 @@ namespace ServiceStack.Redis
         //Without the Generic Constraints
         internal void _StoreAll<TEntity>(IEnumerable<TEntity> entities)
         {
-            if (entities == null) return;
+            if (PrepareStoreAll(entities, out var keys, out var values, out var entitiesList))
+            {
+                base.MSet(keys, values);
+                RegisterTypeIds(entitiesList);
+            }
+        }
 
-            var entitiesList = entities.ToList();
+        private bool PrepareStoreAll<TEntity>(IEnumerable<TEntity> entities, out byte[][] keys, out byte[][] values, out List<TEntity> entitiesList)
+        {
+            if (entities == null)
+            {
+                entitiesList = default;
+                keys = values = default;
+                return false;
+            }
+
+            entitiesList = entities.ToList();
             var len = entitiesList.Count;
-            if (len == 0) return;
+            if (len == 0)
+            {
+                keys = values = default;
+                return false;
+            }
 
-            var keys = new byte[len][];
-            var values = new byte[len][];
+            keys = new byte[len][];
+            values = new byte[len][];
 
             for (var i = 0; i < len; i++)
             {
                 keys[i] = UrnKey(entitiesList[i]).ToUtf8Bytes();
                 values[i] = SerializeToUtf8Bytes(entitiesList[i]);
             }
-
-            base.MSet(keys, values);
-            RegisterTypeIds(entitiesList);
+            return true;
         }
 
         public void WriteAll<TEntity>(IEnumerable<TEntity> entities)
         {
-            if (entities == null) return;
+            if (PrepareWriteAll(entities, out var keys, out var values))
+            {
+                base.MSet(keys, values);
+            }
+        }
+
+        private bool PrepareWriteAll<TEntity>(IEnumerable<TEntity> entities, out byte[][] keys, out byte[][] values)
+        {
+            if (entities == null)
+            {
+                keys = values = default;
+                return false;
+            }
 
             var entitiesList = entities.ToList();
             var len = entitiesList.Count;
 
-            var keys = new byte[len][];
-            var values = new byte[len][];
+            keys = new byte[len][];
+            values = new byte[len][];
 
             for (var i = 0; i < len; i++)
             {
                 keys[i] = UrnKey(entitiesList[i]).ToUtf8Bytes();
                 values[i] = SerializeToUtf8Bytes(entitiesList[i]);
             }
-
-            base.MSet(keys, values);
+            return true;
         }
 
         public static byte[] SerializeToUtf8Bytes<T>(T value)
@@ -938,6 +1001,10 @@ namespace ServiceStack.Redis
         public Dictionary<string, bool> WhichLuaScriptsExists(params string[] sha1Refs)
         {
             var intFlags = base.ScriptExists(sha1Refs.ToMultiByteArray());
+            return WhichLuaScriptsExistsParseResult(sha1Refs, intFlags);
+        }
+        static Dictionary<string, bool> WhichLuaScriptsExistsParseResult(string[] sha1Refs, byte[][] intFlags)
+        {
             var map = new Dictionary<string, bool>();
             for (int i = 0; i < sha1Refs.Length; i++)
             {
@@ -973,8 +1040,11 @@ namespace ServiceStack.Redis
 
         public void RemoveByRegex(string pattern)
         {
-            RemoveByPattern(pattern.Replace(".*", "*").Replace(".+", "?"));
+            RemoveByPattern(RegexToGlob(pattern));
         }
+        
+        private static string RegexToGlob(string regex)
+            => regex.Replace(".*", "*").Replace(".+", "?");
 
         public IEnumerable<string> ScanAllKeys(string pattern = null, int pageSize = 1000)
         {

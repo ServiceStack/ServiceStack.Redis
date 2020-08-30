@@ -345,7 +345,7 @@ namespace ServiceStack.Redis.Tests
                     Thread.Sleep(delay + TimeSpan.FromSeconds(0.5));
                     client3.Dispose();
                 };
-#if NETCORE                
+#if NETCORE
                 Task.Run(func);
 #else
                 func.BeginInvoke(null, null);

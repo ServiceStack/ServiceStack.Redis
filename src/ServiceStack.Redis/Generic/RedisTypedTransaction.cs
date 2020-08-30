@@ -19,14 +19,17 @@ namespace ServiceStack.Redis.Generic
     /// <summary>
     /// Adds support for Redis Transactions (i.e. MULTI/EXEC/DISCARD operations).
     /// </summary>
-    internal class RedisTypedTransaction<T>
+    internal partial class RedisTypedTransaction<T>
         : RedisTypedPipeline<T>, IRedisTypedTransaction<T>, IRedisTransactionBase
     {
         private int _numCommands = 0;
-        internal RedisTypedTransaction(RedisTypedClient<T> redisClient)
+        private readonly bool _isAsync;
+        internal RedisTypedTransaction(RedisTypedClient<T> redisClient, bool isAsync)
             : base(redisClient)
         {
-
+            // if someone casts between sync/async: the sync-over-async or
+            // async-over-sync is entirely self-inflicted; I can't fix stupid
+            _isAsync = isAsync;
         }
 
         protected override void Init()
@@ -59,7 +62,6 @@ namespace ServiceStack.Redis.Generic
         {
             RedisClient.Exec();
             RedisClient.FlushSendBuffer();
-
         }
 
         public bool Commit()
@@ -75,7 +77,6 @@ namespace ServiceStack.Redis.Generic
                     VoidReturnCommand = r => Init(),
                     VoidReadCommand = RedisClient.ExpectOk,
                 });
-
 
                 //the first half of the responses will be "QUEUED",
                 // so insert reading of multiline after these responses
@@ -174,8 +175,16 @@ namespace ServiceStack.Redis.Generic
         protected override void AddCurrentQueuedOperation()
         {
             base.AddCurrentQueuedOperation();
-            QueueExpectQueued();
+            if (_isAsync)
+            {
+                QueueExpectQueuedAsync();
+            }
+            else
+            {
+                QueueExpectQueued();
+            }
         }
         #endregion
+        partial void QueueExpectQueuedAsync();
     }
 }

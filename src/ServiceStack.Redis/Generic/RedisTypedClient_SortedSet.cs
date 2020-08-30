@@ -21,7 +21,7 @@ namespace ServiceStack.Redis.Generic
     {
         public IHasNamed<IRedisSortedSet<T>> SortedSets { get; set; }
 
-        internal class RedisClientSortedSets
+        internal partial class RedisClientSortedSets
             : IHasNamed<IRedisSortedSet<T>>
         {
             private readonly RedisTypedClient<T> client;

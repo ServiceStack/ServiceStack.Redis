@@ -6,7 +6,7 @@ namespace ServiceStack.Redis.Pipeline
     /// <summary>
     /// A complete redis command, with method to send command, receive response, and run callback on success or failure
     /// </summary>
-    internal class QueuedRedisCommand : RedisCommand
+    internal partial class QueuedRedisCommand : RedisCommand
     {
         public override void Execute(IRedisClient client)
         {
@@ -50,7 +50,10 @@ namespace ServiceStack.Redis.Pipeline
                 else if (MultiStringReturnCommand != null)
                 {
                     MultiStringReturnCommand(client);
-
+                }
+                else
+                {
+                    ExecuteThrowIfAsync();
                 }
             }
             catch (Exception ex)
@@ -58,7 +61,6 @@ namespace ServiceStack.Redis.Pipeline
                 Log.Error(ex);
                 throw;
             }
-
         }
     }
 }
