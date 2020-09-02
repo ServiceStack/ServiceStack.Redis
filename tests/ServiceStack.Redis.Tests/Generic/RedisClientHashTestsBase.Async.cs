@@ -5,6 +5,7 @@ using ServiceStack.Common.Tests.Models;
 using ServiceStack.Redis.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace ServiceStack.Redis.Tests.Generic
 {
@@ -22,9 +23,9 @@ namespace ServiceStack.Redis.Tests.Generic
         [SetUp]
         public async Task SetUp()
         {
-            if (client != null)
+            if (client is IAsyncDisposable d)
             {
-                await client.DisposeAsync();
+                await d.DisposeAsync();
                 client = null;
             }
             client = new RedisClient(TestConfig.SingleHost);

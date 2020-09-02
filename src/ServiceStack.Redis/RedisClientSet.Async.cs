@@ -28,7 +28,7 @@ namespace ServiceStack.Redis
             => AsyncClient.AddItemToSetAsync(setId, item, cancellationToken);
 
         ValueTask IRedisSetAsync.ClearAsync(CancellationToken cancellationToken)
-            => AsyncClient.RemoveAsync(setId, cancellationToken).Await();
+            => new ValueTask(AsyncClient.RemoveAsync(setId, cancellationToken));
 
         ValueTask<bool> IRedisSetAsync.ContainsAsync(string item, CancellationToken cancellationToken)
             => AsyncClient.SetContainsItemAsync(setId, item, cancellationToken);

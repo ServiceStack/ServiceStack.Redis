@@ -10,13 +10,13 @@ namespace ServiceStack.Redis.Tests
     [Category("Async")]
     public class RedisCacheClientTestsAsync
     {
-        private ICacheClientExtendedAsync cacheClient;
+        private ICacheClientAsync cacheClient;
 
         [SetUp]
         public async Task OnBeforeEachTest()
         {
-            if (cacheClient != null)
-                await cacheClient.DisposeAsync();
+            if (cacheClient is IAsyncDisposable d)
+                await d.DisposeAsync();
 
             cacheClient = new RedisClient(TestConfig.SingleHost);
             await cacheClient.FlushAllAsync();
@@ -129,7 +129,8 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public async Task Can_increment_and_reset_values()
         {
-            await using (var client = await new RedisManagerPool(TestConfig.SingleHost).GetCacheClientAsync())
+            var client = await new RedisManagerPool(TestConfig.SingleHost).GetCacheClientAsync();
+            await using (client as IAsyncDisposable)
             {
                 Assert.That(await client.IncrementAsync("incr:counter", 10), Is.EqualTo(10));
                 await client.SetAsync("incr:counter", 0);

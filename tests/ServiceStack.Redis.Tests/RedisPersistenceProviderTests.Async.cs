@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using ServiceStack.Common.Tests.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +13,8 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public async Task Can_Store_and_GetById_ModelWithIdAndName()
         {
-            await using (IRedisClientAsync redis = new RedisClient(TestConfig.SingleHost))
+            IRedisClientAsync redis = new RedisClient(TestConfig.SingleHost);
+            await using (redis as IAsyncDisposable)
             {
                 const int modelId = 1;
                 var to = ModelWithIdAndName.Create(modelId);
@@ -27,7 +29,8 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public async Task Can_StoreAll_and_GetByIds_ModelWithIdAndName()
         {
-            await using (IRedisClientAsync redis = new RedisClient(TestConfig.SingleHost))
+            IRedisClientAsync redis = new RedisClient(TestConfig.SingleHost);
+            await using (redis as IAsyncDisposable)
             {
                 var ids = new[] { 1, 2, 3, 4, 5 };
                 var tos = ids.Map(ModelWithIdAndName.Create);
@@ -44,7 +47,8 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public async Task Can_Delete_ModelWithIdAndName()
         {
-            await using (IRedisClientAsync redis = new RedisClient(TestConfig.SingleHost))
+            IRedisClientAsync redis = new RedisClient(TestConfig.SingleHost);
+            await using (redis as IAsyncDisposable)
             {
                 var ids = new List<int> { 1, 2, 3, 4, 5 };
                 var tos = ids.ConvertAll(ModelWithIdAndName.Create);

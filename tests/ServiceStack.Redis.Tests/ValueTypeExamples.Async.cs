@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using ServiceStack.Redis.Generic;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,7 +12,8 @@ namespace ServiceStack.Redis.Tests
         [SetUp]
         public async Task SetUp()
         {
-            await using (var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly())
+            var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
+            await using (redisClient as IAsyncDisposable)
             {
                 await redisClient.FlushAllAsync();
             }
@@ -24,7 +26,8 @@ namespace ServiceStack.Redis.Tests
             const int intValue = 1;
 
             //STORING AN INT USING THE BASIC CLIENT
-            await using (var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly())
+            var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
+            await using (redisClient as IAsyncDisposable)
             {
                 await redisClient.SetValueAsync(intKey, intValue.ToString());
                 string strGetIntValue = await redisClient.GetValueAsync(intKey);
@@ -34,7 +37,8 @@ namespace ServiceStack.Redis.Tests
             }
 
             //STORING AN INT USING THE GENERIC CLIENT
-            await using (var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly())
+            redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
+            await using (redisClient as IAsyncDisposable)
             {
                 //Create a generic client that treats all values as ints:
                 IRedisTypedClientAsync<int> intRedis = redisClient.As<int>();
@@ -53,7 +57,8 @@ namespace ServiceStack.Redis.Tests
             var intValues = new List<int> { 2, 4, 6, 8 };
 
             //STORING INTS INTO A LIST USING THE BASIC CLIENT
-            await using (var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly())
+            var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
+            await using (redisClient as IAsyncDisposable)
             {
                 IRedisListAsync strList = redisClient.Lists[intListKey];
 
@@ -73,7 +78,8 @@ namespace ServiceStack.Redis.Tests
             }
 
             //STORING INTS INTO A LIST USING THE GENERIC CLIENT
-            await using (var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly())
+            redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
+            await using (redisClient as IAsyncDisposable)
             {
                 //Create a generic client that treats all values as ints:
                 IRedisTypedClientAsync<int> intRedis = redisClient.As<int>();
@@ -98,7 +104,8 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public async Task Working_with_Generic_types()
         {
-            await using (var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly())
+            var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
+            await using (redisClient as IAsyncDisposable)
             {
                 //Create a typed Redis client that treats all values as IntAndString:
                 var typedRedis = redisClient.As<IntAndString>();

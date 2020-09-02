@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Threading.Tasks;
 
 namespace ServiceStack.Redis.Tests
@@ -9,7 +10,8 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public async Task Search_Test()
         {
-            await using (var client = new RedisClient(TestConfig.SingleHost).ForAsyncOnly())
+            var client = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
+            await using (client as IAsyncDisposable)
             {
                 const string cacheKey = "urn+metadata:All:SearchProProfiles?SwanShinichi Osawa /0/8,0,0,0";
                 const long value = 1L;

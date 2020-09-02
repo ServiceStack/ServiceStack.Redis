@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ServiceStack.Redis
 {
-    partial class RedisClientManagerCacheClient : ICacheClientAsync, IRemoveByPatternAsync, ICacheClientExtendedAsync
+    partial class RedisClientManagerCacheClient : ICacheClientAsync, IRemoveByPatternAsync, IAsyncDisposable
     {
         ValueTask IAsyncDisposable.DisposeAsync()
         {
@@ -21,153 +21,205 @@ namespace ServiceStack.Redis
             return redisManager.GetClientAsync(cancellationToken);
         }
 
-        async ValueTask<T> ICacheClientAsync.GetAsync<T>(string key, CancellationToken cancellationToken)
+        async Task<T> ICacheClientAsync.GetAsync<T>(string key, CancellationToken cancellationToken)
         {
-            await using var client = await redisManager.GetReadOnlyCacheClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.GetAsync<T>(key).ConfigureAwait(false);
-        }
-
-        async ValueTask<bool> ICacheClientAsync.SetAsync<T>(string key, T value, CancellationToken cancellationToken)
-        {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.SetAsync<T>(key, value, cancellationToken).ConfigureAwait(false);
-        }
-
-        async ValueTask<bool> ICacheClientAsync.SetAsync<T>(string key, T value, DateTime expiresAt, CancellationToken cancellationToken)
-        {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.SetAsync<T>(key, value, expiresAt, cancellationToken).ConfigureAwait(false);
-        }
-
-        async ValueTask<bool> ICacheClientAsync.SetAsync<T>(string key, T value, TimeSpan expiresIn, CancellationToken cancellationToken)
-        {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.SetAsync<T>(key, value, expiresIn, cancellationToken).ConfigureAwait(false);
-        }
-
-        async ValueTask ICacheClientAsync.FlushAllAsync(CancellationToken cancellationToken)
-        {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            await client.FlushAllAsync(cancellationToken).ConfigureAwait(false);
-        }
-
-        async ValueTask<IDictionary<string, T>> ICacheClientAsync.GetAllAsync<T>(IEnumerable<string> keys, CancellationToken cancellationToken)
-        {
-            await using var client = await redisManager.GetReadOnlyCacheClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.GetAllAsync<T>(keys, cancellationToken).ConfigureAwait(false);
-        }
-
-        async ValueTask ICacheClientAsync.SetAllAsync<T>(IDictionary<string, T> values, CancellationToken cancellationToken)
-        {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            await client.SetAllAsync<T>(values, cancellationToken).ConfigureAwait(false);
-        }
-
-        async ValueTask<bool> ICacheClientAsync.RemoveAsync(string key, CancellationToken cancellationToken)
-        {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.RemoveAsync(key, cancellationToken).ConfigureAwait(false);
-        }
-
-        async ValueTask<TimeSpan?> ICacheClientExtendedAsync.GetTimeToLiveAsync(string key, CancellationToken cancellationToken)
-        {
-            await using var client = await redisManager.GetReadOnlyCacheClientAsync(cancellationToken).ConfigureAwait(false);
-            if (client is ICacheClientExtendedAsync extended)
+            var client = await redisManager.GetReadOnlyCacheClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
             {
-                return await extended.GetTimeToLiveAsync(key, cancellationToken).ConfigureAwait(false);
+                return await client.GetAsync<T>(key, cancellationToken).ConfigureAwait(false);
             }
-            return null;
-            
         }
 
-        async IAsyncEnumerable<string> ICacheClientExtendedAsync.GetKeysByPatternAsync(string pattern, [EnumeratorCancellation] CancellationToken cancellationToken)
+        async Task<bool> ICacheClientAsync.SetAsync<T>(string key, T value, CancellationToken cancellationToken)
         {
-            await using var client = await redisManager.GetReadOnlyCacheClientAsync(cancellationToken).ConfigureAwait(false);
-            if (client is ICacheClientExtendedAsync extended)
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
             {
-                await foreach (var key in extended.GetKeysByPatternAsync(pattern).WithCancellation(cancellationToken).ConfigureAwait(false))
+                return await client.SetAsync<T>(key, value, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        async Task<bool> ICacheClientAsync.SetAsync<T>(string key, T value, DateTime expiresAt, CancellationToken cancellationToken)
+        {
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.SetAsync<T>(key, value, expiresAt, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        async Task<bool> ICacheClientAsync.SetAsync<T>(string key, T value, TimeSpan expiresIn, CancellationToken cancellationToken)
+        {
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.SetAsync<T>(key, value, expiresIn, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        async Task ICacheClientAsync.FlushAllAsync(CancellationToken cancellationToken)
+        {
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                await client.FlushAllAsync(cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        async Task<IDictionary<string, T>> ICacheClientAsync.GetAllAsync<T>(IEnumerable<string> keys, CancellationToken cancellationToken)
+        {
+            var client = await redisManager.GetReadOnlyCacheClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.GetAllAsync<T>(keys, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        async Task ICacheClientAsync.SetAllAsync<T>(IDictionary<string, T> values, CancellationToken cancellationToken)
+        {
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                await client.SetAllAsync<T>(values, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        async Task<bool> ICacheClientAsync.RemoveAsync(string key, CancellationToken cancellationToken)
+        {
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.RemoveAsync(key, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        async Task<TimeSpan?> ICacheClientAsync.GetTimeToLiveAsync(string key, CancellationToken cancellationToken)
+        {
+            var client = await redisManager.GetReadOnlyCacheClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.GetTimeToLiveAsync(key, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        async Task<IEnumerable<string>> ICacheClientAsync.GetKeysByPatternAsync(string pattern, CancellationToken cancellationToken)
+        {
+            var client = await redisManager.GetReadOnlyCacheClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.GetKeysByPatternAsync(pattern, cancellationToken);
+            }
+        }
+
+        Task ICacheClientAsync.RemoveExpiredEntriesAsync(CancellationToken cancellationToken)
+        {
+            //Redis automatically removed expired Cache Entries
+            return Task.CompletedTask;
+        }
+
+        async Task IRemoveByPatternAsync.RemoveByPatternAsync(string pattern, CancellationToken cancellationToken)
+        {
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                if (client is IRemoveByPatternAsync redisClient)
                 {
-                    yield return key;
+                    await redisClient.RemoveByPatternAsync(pattern, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
 
-        ValueTask ICacheClientExtendedAsync.RemoveExpiredEntriesAsync(CancellationToken cancellationToken)
+        async Task IRemoveByPatternAsync.RemoveByRegexAsync(string regex, CancellationToken cancellationToken)
         {
-            //Redis automatically removed expired Cache Entries
-            return default;
-        }
-
-        async ValueTask IRemoveByPatternAsync.RemoveByPatternAsync(string pattern, CancellationToken cancellationToken)
-        {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            if (client is IRemoveByPatternAsync redisClient)
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
             {
-                await redisClient.RemoveByPatternAsync(pattern).ConfigureAwait(false);
+                if (client is IRemoveByPatternAsync redisClient)
+                {
+                    await redisClient.RemoveByRegexAsync(regex, cancellationToken).ConfigureAwait(false);
+                }
             }
         }
 
-        async ValueTask IRemoveByPatternAsync.RemoveByRegexAsync(string regex, CancellationToken cancellationToken)
+        async Task ICacheClientAsync.RemoveAllAsync(IEnumerable<string> keys, CancellationToken cancellationToken)
         {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            if (client is IRemoveByPatternAsync redisClient)
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
             {
-                await redisClient.RemoveByRegexAsync(regex).ConfigureAwait(false);
+                await client.RemoveAllAsync(keys, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        async ValueTask ICacheClientAsync.RemoveAllAsync(IEnumerable<string> keys, CancellationToken cancellationToken)
+        async Task<long> ICacheClientAsync.IncrementAsync(string key, uint amount, CancellationToken cancellationToken)
         {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            await client.RemoveAllAsync(keys, cancellationToken).ConfigureAwait(false);
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.IncrementAsync(key, amount, cancellationToken).ConfigureAwait(false);
+            }
         }
 
-        async ValueTask<long> ICacheClientAsync.IncrementAsync(string key, uint amount, CancellationToken cancellationToken)
+        async Task<long> ICacheClientAsync.DecrementAsync(string key, uint amount, CancellationToken cancellationToken)
         {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.IncrementAsync(key, amount, cancellationToken).ConfigureAwait(false);
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.DecrementAsync(key, amount, cancellationToken).ConfigureAwait(false);
+            }
         }
 
-        async ValueTask<long> ICacheClientAsync.DecrementAsync(string key, uint amount, CancellationToken cancellationToken)
+        async Task<bool> ICacheClientAsync.AddAsync<T>(string key, T value, CancellationToken cancellationToken)
         {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.DecrementAsync(key, amount, cancellationToken).ConfigureAwait(false);
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.AddAsync<T>(key, value, cancellationToken).ConfigureAwait(false);
+            }
         }
 
-        async ValueTask<bool> ICacheClientAsync.AddAsync<T>(string key, T value, CancellationToken cancellationToken)
+        async Task<bool> ICacheClientAsync.ReplaceAsync<T>(string key, T value, CancellationToken cancellationToken)
         {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.AddAsync<T>(key, value, cancellationToken).ConfigureAwait(false);
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.ReplaceAsync<T>(key, value, cancellationToken).ConfigureAwait(false);
+            }
         }
 
-        async ValueTask<bool> ICacheClientAsync.ReplaceAsync<T>(string key, T value, CancellationToken cancellationToken)
+        async Task<bool> ICacheClientAsync.AddAsync<T>(string key, T value, DateTime expiresAt, CancellationToken cancellationToken)
         {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.ReplaceAsync<T>(key, value, cancellationToken).ConfigureAwait(false);
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.AddAsync<T>(key, value, expiresAt, cancellationToken).ConfigureAwait(false);
+            }
         }
 
-        async ValueTask<bool> ICacheClientAsync.AddAsync<T>(string key, T value, DateTime expiresAt, CancellationToken cancellationToken)
+        async Task<bool> ICacheClientAsync.ReplaceAsync<T>(string key, T value, DateTime expiresAt, CancellationToken cancellationToken)
         {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.AddAsync<T>(key, value, expiresAt, cancellationToken).ConfigureAwait(false);
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.ReplaceAsync<T>(key, value, expiresAt, cancellationToken).ConfigureAwait(false);
+            }
         }
 
-        async ValueTask<bool> ICacheClientAsync.ReplaceAsync<T>(string key, T value, DateTime expiresAt, CancellationToken cancellationToken)
+        async Task<bool> ICacheClientAsync.AddAsync<T>(string key, T value, TimeSpan expiresIn, CancellationToken cancellationToken)
         {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.ReplaceAsync<T>(key, value, expiresAt, cancellationToken).ConfigureAwait(false);
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.AddAsync<T>(key, value, expiresIn, cancellationToken).ConfigureAwait(false);
+            }
         }
 
-        async ValueTask<bool> ICacheClientAsync.AddAsync<T>(string key, T value, TimeSpan expiresIn, CancellationToken cancellationToken)
+        async Task<bool> ICacheClientAsync.ReplaceAsync<T>(string key, T value, TimeSpan expiresIn, CancellationToken cancellationToken)
         {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.AddAsync<T>(key, value, expiresIn, cancellationToken).ConfigureAwait(false);
-        }
-
-        async ValueTask<bool> ICacheClientAsync.ReplaceAsync<T>(string key, T value, TimeSpan expiresIn, CancellationToken cancellationToken)
-        {
-            await using var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
-            return await client.ReplaceAsync<T>(key, value, expiresIn, cancellationToken).ConfigureAwait(false);
+            var client = await GetClientAsync(cancellationToken).ConfigureAwait(false);
+            await using (client as IAsyncDisposable)
+            {
+                return await client.ReplaceAsync<T>(key, value, expiresIn, cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 }

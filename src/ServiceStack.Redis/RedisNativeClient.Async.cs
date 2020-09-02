@@ -240,7 +240,7 @@ namespace ServiceStack.Redis
 
         private static ValueTask<bool> IsString(ValueTask<string> pending, string expected)
         {
-            return pending.IsCompletedSuccessfully ? (pending.Result == expected).AsValueTask()
+            return pending.IsCompletedSuccessfully ? (pending.Result == expected).AsValueTaskResult()
                 : Awaited(pending, expected);
 
             static async ValueTask<bool> Awaited(ValueTask<string> pending, string expected)
@@ -481,7 +481,7 @@ namespace ServiceStack.Redis
             AssertNotNull(luaBody, nameof(luaBody));
 
             byte[] buffer = Encoding.UTF8.GetBytes(luaBody);
-            return BitConverter.ToString(buffer.ToSha1Hash()).Replace("-", "").AsValueTask();
+            return BitConverter.ToString(buffer.ToSha1Hash()).Replace("-", "").AsValueTaskResult();
         }
 
         ValueTask<byte[][]> IRedisNativeClientAsync.ScriptExistsAsync(byte[][] sha1Refs, CancellationToken cancellationToken)
@@ -1377,7 +1377,7 @@ namespace ServiceStack.Redis
             => ReadMultiDataAsync(cancellationToken);
 
         ValueTask<IRedisSubscriptionAsync> IRedisNativeClientAsync.CreateSubscriptionAsync(CancellationToken cancellationToken)
-            => new RedisSubscription(this).AsValueTask<IRedisSubscriptionAsync>();
+            => new RedisSubscription(this).AsValueTaskResult<IRedisSubscriptionAsync>();
 
         ValueTask<long> IRedisNativeClientAsync.BitCountAsync(string key, CancellationToken cancellationToken)
         {

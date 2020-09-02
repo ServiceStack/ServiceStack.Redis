@@ -56,10 +56,10 @@ namespace ServiceStack.Redis.Generic
             await client.RegisterTypeIdAsync(entity, cancellationToken).ConfigureAwait(false);
         }
 
-        ValueTask<T> IEntityStoreAsync<T>.GetByIdAsync(object id, CancellationToken cancellationToken)
+        Task<T> IEntityStoreAsync<T>.GetByIdAsync(object id, CancellationToken cancellationToken)
         {
             var key = client.UrnKey<T>(id);
-            return AsAsync().GetValueAsync(key, cancellationToken);
+            return AsAsync().GetValueAsync(key, cancellationToken).AsTask();
         }
 
         internal ValueTask FlushSendBufferAsync(CancellationToken cancellationToken)
@@ -68,7 +68,7 @@ namespace ServiceStack.Redis.Generic
         internal ValueTask AddTypeIdsRegisteredDuringPipelineAsync(CancellationToken cancellationToken)
             => client.AddTypeIdsRegisteredDuringPipelineAsync(cancellationToken);
 
-        async ValueTask<IList<T>> IEntityStoreAsync<T>.GetByIdsAsync(IEnumerable ids, CancellationToken cancellationToken)
+        async Task<IList<T>> IEntityStoreAsync<T>.GetByIdsAsync(IEnumerable ids, CancellationToken cancellationToken)
         {
             if (ids != null)
             {
@@ -80,20 +80,20 @@ namespace ServiceStack.Redis.Generic
             return new List<T>();
         }
 
-        async ValueTask<IList<T>> IEntityStoreAsync<T>.GetAllAsync(CancellationToken cancellationToken)
+        async Task<IList<T>> IEntityStoreAsync<T>.GetAllAsync(CancellationToken cancellationToken)
         {
             var allKeys = await AsyncClient.GetAllItemsFromSetAsync(this.TypeIdsSetKey, cancellationToken).ConfigureAwait(false);
             return await AsAsync().GetByIdsAsync(allKeys.ToArray(), cancellationToken).ConfigureAwait(false);
         }
 
-        async ValueTask<T> IEntityStoreAsync<T>.StoreAsync(T entity, CancellationToken cancellationToken)
+        async Task<T> IEntityStoreAsync<T>.StoreAsync(T entity, CancellationToken cancellationToken)
         {
             var urnKey = client.UrnKey(entity);
             await AsAsync().SetValueAsync(urnKey, entity, cancellationToken).ConfigureAwait(false);
             return entity;
         }
 
-        async ValueTask IEntityStoreAsync<T>.StoreAllAsync(IEnumerable<T> entities, CancellationToken cancellationToken)
+        async Task IEntityStoreAsync<T>.StoreAllAsync(IEnumerable<T> entities, CancellationToken cancellationToken)
         {
             if (PrepareStoreAll(entities, out var keys, out var values, out var entitiesList))
             {
@@ -102,14 +102,14 @@ namespace ServiceStack.Redis.Generic
             }
         }
 
-        async ValueTask IEntityStoreAsync<T>.DeleteAsync(T entity, CancellationToken cancellationToken)
+        async Task IEntityStoreAsync<T>.DeleteAsync(T entity, CancellationToken cancellationToken)
         {
             var urnKey = client.UrnKey(entity);
             await AsyncClient.RemoveEntryAsync(new[] { urnKey }, cancellationToken).ConfigureAwait(false);
             await client.RemoveTypeIdsAsync(new[] { entity }, cancellationToken).ConfigureAwait(false);
         }
 
-        async ValueTask IEntityStoreAsync<T>.DeleteByIdAsync(object id, CancellationToken cancellationToken)
+        async Task IEntityStoreAsync<T>.DeleteByIdAsync(object id, CancellationToken cancellationToken)
         {
             var urnKey = client.UrnKey<T>(id);
 
@@ -117,7 +117,7 @@ namespace ServiceStack.Redis.Generic
             await client.RemoveTypeIdsAsync<T>(new[] { id.ToString() }, cancellationToken).ConfigureAwait(false);
         }
 
-        async ValueTask IEntityStoreAsync<T>.DeleteByIdsAsync(IEnumerable ids, CancellationToken cancellationToken)
+        async Task IEntityStoreAsync<T>.DeleteByIdsAsync(IEnumerable ids, CancellationToken cancellationToken)
         {
             if (ids == null) return;
 
@@ -129,7 +129,7 @@ namespace ServiceStack.Redis.Generic
             }
         }
 
-        async ValueTask IEntityStoreAsync<T>.DeleteAllAsync(CancellationToken cancellationToken)
+        async Task IEntityStoreAsync<T>.DeleteAllAsync(CancellationToken cancellationToken)
         {
             var ids = await AsyncClient.GetAllItemsFromSetAsync(this.TypeIdsSetKey, cancellationToken).ConfigureAwait(false);
             var urnKeys = ids.Map(t => client.UrnKey<T>(t));
@@ -151,7 +151,7 @@ namespace ServiceStack.Redis.Generic
         ValueTask<IRedisTypedTransactionAsync<T>> IRedisTypedClientAsync<T>.CreateTransactionAsync(CancellationToken cancellationToken)
         {
             IRedisTypedTransactionAsync<T> obj = new RedisTypedTransaction<T>(this, true);
-            return obj.AsValueTask();
+            return obj.AsValueTaskResult();
         }
 
         IRedisTypedPipelineAsync<T> IRedisTypedClientAsync<T>.CreatePipeline()
@@ -288,7 +288,7 @@ namespace ServiceStack.Redis.Generic
             => AsyncClient.FlushDbAsync(cancellationToken);
 
         ValueTask IRedisTypedClientAsync<T>.FlushAllAsync(CancellationToken cancellationToken)
-            => AsyncClient.FlushAllAsync(cancellationToken);
+            => new ValueTask(AsyncClient.FlushAllAsync(cancellationToken));
 
         async ValueTask<T[]> IRedisTypedClientAsync<T>.SearchKeysAsync(string pattern, CancellationToken cancellationToken)
         {
@@ -298,34 +298,34 @@ namespace ServiceStack.Redis.Generic
 
         private ValueTask<List<T>> CreateList(ValueTask<byte[][]> pending)
         {
-            return pending.IsCompletedSuccessfully ? CreateList(pending.Result).AsValueTask() : Awaited(this, pending);
+            return pending.IsCompletedSuccessfully ? CreateList(pending.Result).AsValueTaskResult() : Awaited(this, pending);
             static async ValueTask<List<T>> Awaited(RedisTypedClient<T> obj, ValueTask<byte[][]> pending)
                 => obj.CreateList(await pending.ConfigureAwait(false));
         }
         private ValueTask<T> DeserializeValueAsync(ValueTask<byte[]> pending)
         {
-            return pending.IsCompletedSuccessfully ? DeserializeValue(pending.Result).AsValueTask() : Awaited(this, pending);
+            return pending.IsCompletedSuccessfully ? DeserializeValue(pending.Result).AsValueTaskResult() : Awaited(this, pending);
             static async ValueTask<T> Awaited(RedisTypedClient<T> obj, ValueTask<byte[]> pending)
                 => obj.DeserializeValue(await pending.ConfigureAwait(false));
         }
 
         private static ValueTask<T> DeserializeFromStringAsync(ValueTask<string> pending)
         {
-            return pending.IsCompletedSuccessfully ? DeserializeFromString(pending.Result).AsValueTask() : Awaited(pending);
+            return pending.IsCompletedSuccessfully ? DeserializeFromString(pending.Result).AsValueTaskResult() : Awaited(pending);
             static async ValueTask<T> Awaited(ValueTask<string> pending)
                 => DeserializeFromString(await pending.ConfigureAwait(false));
         }
 
         private static ValueTask<IDictionary<T, double>> CreateGenericMapAsync(ValueTask<IDictionary<string, double>> pending)
         {
-            return pending.IsCompletedSuccessfully ? CreateGenericMap(pending.Result).AsValueTask() : Awaited(pending);
+            return pending.IsCompletedSuccessfully ? CreateGenericMap(pending.Result).AsValueTaskResult() : Awaited(pending);
             static async ValueTask<IDictionary<T, double>> Awaited(ValueTask<IDictionary<string, double>> pending)
                 => CreateGenericMap(await pending.ConfigureAwait(false));
         }
 
         private static ValueTask<Dictionary<TKey, TValue>> ConvertEachToAsync<TKey, TValue>(ValueTask<Dictionary<string, string>> pending)
         {
-            return pending.IsCompletedSuccessfully ? ConvertEachTo<TKey, TValue>(pending.Result).AsValueTask() : Awaited(pending);
+            return pending.IsCompletedSuccessfully ? ConvertEachTo<TKey, TValue>(pending.Result).AsValueTaskResult() : Awaited(pending);
             static async ValueTask<Dictionary<TKey, TValue>> Awaited(ValueTask<Dictionary<string, string>> pending)
                 => ConvertEachTo<TKey, TValue>(await pending.ConfigureAwait(false));
         }
@@ -673,7 +673,7 @@ namespace ServiceStack.Redis.Generic
         ValueTask IRedisTypedClientAsync<T>.DeleteRelatedEntitiesAsync<TChild>(object parentId, CancellationToken cancellationToken)
         {
             var childRefKey = GetChildReferenceSetKey<TChild>(parentId);
-            return AsyncClient.RemoveAsync(childRefKey, cancellationToken).Await();
+            return new ValueTask(AsyncClient.RemoveAsync(childRefKey, cancellationToken));
         }
 
         ValueTask IRedisTypedClientAsync<T>.DeleteRelatedEntityAsync<TChild>(object parentId, object childId, CancellationToken cancellationToken)

@@ -49,7 +49,8 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public async Task Shippers_UseCase()
         {
-            await using (var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly())
+            var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
+            await using (redisClient as IAsyncDisposable)
             {
                 //Create a 'strongly-typed' API that makes all Redis Value operations to apply against Shippers
                 IRedisTypedClientAsync<Shipper> redis = redisClient.As<Shipper>();

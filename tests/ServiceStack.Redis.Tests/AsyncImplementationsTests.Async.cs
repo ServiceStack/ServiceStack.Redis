@@ -39,7 +39,6 @@ namespace ServiceStack.Redis.Tests
         }
 
         [TestCase(typeof(ICacheClient), typeof(ICacheClientAsync))]
-        [TestCase(typeof(ICacheClientExtended), typeof(ICacheClientExtendedAsync))]
         [TestCase(typeof(IEntityStore), typeof(IEntityStoreAsync))]
         [TestCase(typeof(IEntityStore<>), typeof(IEntityStoreAsync<>))]
         [TestCase(typeof(IRedisClient), typeof(IRedisClientAsync))]
@@ -127,7 +126,7 @@ namespace ServiceStack.Redis.Tests
             }
             else if (asyncInterface == typeof(IRedisHashAsync<,>))
             {
-                AddFrom(typeof(ICollection<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(asyncInterface.GetGenericArguments())), nameof(IDictionary<string,string>.Add));
+                AddFrom(typeof(ICollection<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(asyncInterface.GetGenericArguments())), nameof(IDictionary<string, string>.Add));
                 AddFrom(typeof(IDictionary<,>), nameof(IDictionary<string, string>.Add));
                 AddFrom(typeof(ICollection<>), nameof(IDictionary<string, string>.Clear));
                 AddFrom(typeof(IDictionary<,>), nameof(IDictionary<string, string>.ContainsKey));
@@ -137,7 +136,7 @@ namespace ServiceStack.Redis.Tests
             else if (asyncInterface == typeof(IRedisHashAsync))
             {
                 AddFrom(typeof(ICollection<KeyValuePair<string, string>>), nameof(IDictionary<string, string>.Add));
-                AddFrom(typeof(IDictionary<string,string>), nameof(IDictionary<string, string>.Add));
+                AddFrom(typeof(IDictionary<string, string>), nameof(IDictionary<string, string>.Add));
                 AddFrom(typeof(ICollection<string>), nameof(IDictionary<string, string>.Clear));
                 AddFrom(typeof(IDictionary<string, string>), nameof(IDictionary<string, string>.ContainsKey));
                 AddFrom(typeof(IDictionary<string, string>), nameof(IDictionary<string, string>.Remove));
@@ -157,6 +156,12 @@ namespace ServiceStack.Redis.Tests
             {
                 expected.Add("ValueTask<SlowlogItem[]> GetSlowlogAsync(int? numberOfRecords = default, CancellationToken cancellationToken = default)");
                 expected.Add("ValueTask SlowlogResetAsync(CancellationToken cancellationToken = default)");
+            }
+            else if (asyncInterface == typeof(ICacheClientAsync))
+            {
+                AddFrom(typeof(ICacheClientExtended), nameof(ICacheClientExtended.GetKeysByPattern));
+                AddFrom(typeof(ICacheClientExtended), nameof(ICacheClientExtended.GetTimeToLive));
+                AddFrom(typeof(ICacheClientExtended), nameof(ICacheClientExtended.RemoveExpiredEntries));
             }
 
             void AddFrom(Type syncInterface, string name, bool fromPropertyToMethod = false)
@@ -788,7 +793,7 @@ namespace ServiceStack.Redis.Tests
         }
 
         [TestCase(typeof(ICacheClient), typeof(ICacheClientAsync))]
-        [TestCase(typeof(ICacheClientExtended), typeof(ICacheClientExtendedAsync))]
+        [TestCase(typeof(ICacheClientExtended), typeof(ICacheClientAsync))] // duplicate not an error; APIs are coalesced
         [TestCase(typeof(IEntityStore), typeof(IEntityStoreAsync))]
         [TestCase(typeof(IEntityStore<>), typeof(IEntityStoreAsync<>))]
         [TestCase(typeof(IRedisClient), typeof(IRedisClientAsync))]

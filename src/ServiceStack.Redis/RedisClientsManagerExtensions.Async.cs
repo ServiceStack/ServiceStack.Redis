@@ -44,41 +44,47 @@ namespace ServiceStack.Redis
 		{
 			return redisManager is IRedisClientsManagerAsync asyncManager
 				? asyncManager.GetClientAsync(cancellationToken)
-				: (redisManager.GetClient() as IRedisClientAsync ?? InvalidAsyncClient<IRedisClientAsync>(redisManager, nameof(redisManager.GetClient))).AsValueTask();
+				: (redisManager.GetClient() as IRedisClientAsync ?? InvalidAsyncClient<IRedisClientAsync>(redisManager, nameof(redisManager.GetClient))).AsValueTaskResult();
 		}
 
 		public static ValueTask<IRedisClientAsync> GetReadOnlyClientAsync(this IRedisClientsManager redisManager, CancellationToken cancellationToken = default)
 		{
 			return redisManager is IRedisClientsManagerAsync asyncManager
 				? asyncManager.GetReadOnlyClientAsync(cancellationToken)
-				: (redisManager.GetReadOnlyClient() as IRedisClientAsync ?? InvalidAsyncClient<IRedisClientAsync>(redisManager, nameof(redisManager.GetReadOnlyClient))).AsValueTask();
+				: (redisManager.GetReadOnlyClient() as IRedisClientAsync ?? InvalidAsyncClient<IRedisClientAsync>(redisManager, nameof(redisManager.GetReadOnlyClient))).AsValueTaskResult();
 		}
 
 		public static ValueTask<ICacheClientAsync> GetCacheClientAsync(this IRedisClientsManager redisManager, CancellationToken cancellationToken = default)
 		{
 			return redisManager is IRedisClientsManagerAsync asyncManager
 				? asyncManager.GetCacheClientAsync(cancellationToken)
-				: (redisManager.GetCacheClient() as ICacheClientAsync ?? InvalidAsyncClient<ICacheClientAsync>(redisManager, nameof(redisManager.GetCacheClient))).AsValueTask();
+				: (redisManager.GetCacheClient() as ICacheClientAsync ?? InvalidAsyncClient<ICacheClientAsync>(redisManager, nameof(redisManager.GetCacheClient))).AsValueTaskResult();
 		}
 
 		public static ValueTask<ICacheClientAsync> GetReadOnlyCacheClientAsync(this IRedisClientsManager redisManager, CancellationToken cancellationToken = default)
 		{
 			return redisManager is IRedisClientsManagerAsync asyncManager
 				? asyncManager.GetReadOnlyCacheClientAsync(cancellationToken)
-				: (redisManager.GetReadOnlyCacheClient() as ICacheClientAsync ?? InvalidAsyncClient<ICacheClientAsync>(redisManager, nameof(redisManager.GetCacheClient))).AsValueTask();
+				: (redisManager.GetReadOnlyCacheClient() as ICacheClientAsync ?? InvalidAsyncClient<ICacheClientAsync>(redisManager, nameof(redisManager.GetCacheClient))).AsValueTaskResult();
 		}
 
 
 		public static async ValueTask ExecAsync(this IRedisClientsManager redisManager, Func<IRedisClientAsync, ValueTask> lambda)
 		{
-            await using var redis = await redisManager.GetClientAsync().ConfigureAwait(false);
-            await lambda(redis).ConfigureAwait(false);
+			var redis = await redisManager.GetClientAsync().ConfigureAwait(false);
+			await using (redis as IAsyncDisposable)
+			{
+				await lambda(redis).ConfigureAwait(false);
+			}
         }
 
 		public static async ValueTask<T> ExecAsync<T>(this IRedisClientsManager redisManager, Func<IRedisClientAsync, ValueTask<T>> lambda)
 		{
-            await using var redis = await redisManager.GetClientAsync().ConfigureAwait(false);
-            return await lambda(redis).ConfigureAwait(false);
+            var redis = await redisManager.GetClientAsync().ConfigureAwait(false);
+			await using (redis as IAsyncDisposable)
+			{
+				return await lambda(redis).ConfigureAwait(false);
+			}
         }
 
 		//public static void ExecTrans(this IRedisClientsManager redisManager, Action<IRedisTransaction> lambda)
@@ -94,26 +100,38 @@ namespace ServiceStack.Redis
 
 		public static async ValueTask ExecAsAsync<T>(this IRedisClientsManager redisManager, Func<IRedisTypedClientAsync<T>, ValueTask> lambda)
 		{
-            await using var redis = await redisManager.GetClientAsync().ConfigureAwait(false);
-            await lambda(redis.As<T>()).ConfigureAwait(false);
+            var redis = await redisManager.GetClientAsync().ConfigureAwait(false);
+			await using (redis as IAsyncDisposable)
+			{
+				await lambda(redis.As<T>()).ConfigureAwait(false);
+			}
         }
 
 		public static async ValueTask<T> ExecAsAsync<T>(this IRedisClientsManager redisManager, Func<IRedisTypedClientAsync<T>, ValueTask<T>> lambda)
 		{
-            await using var redis = await redisManager.GetClientAsync().ConfigureAwait(false);
-            return await lambda(redis.As<T>()).ConfigureAwait(false);
+            var redis = await redisManager.GetClientAsync().ConfigureAwait(false);
+			await using (redis as IAsyncDisposable)
+			{
+				return await lambda(redis.As<T>()).ConfigureAwait(false);
+			}
         }
 
 		public static async ValueTask<IList<T>> ExecAsAsync<T>(this IRedisClientsManager redisManager, Func<IRedisTypedClientAsync<T>, ValueTask<IList<T>>> lambda)
 		{
-            await using var redis = await redisManager.GetClientAsync().ConfigureAwait(false);
-            return await lambda(redis.As<T>()).ConfigureAwait(false);
+            var redis = await redisManager.GetClientAsync().ConfigureAwait(false);
+			await using (redis as IAsyncDisposable)
+			{
+				return await lambda(redis.As<T>()).ConfigureAwait(false);
+			}
         }
 
 		public static async ValueTask<List<T>> ExecAsAsync<T>(this IRedisClientsManager redisManager, Func<IRedisTypedClientAsync<T>, ValueTask<List<T>>> lambda)
 		{
-            await using var redis = await redisManager.GetClientAsync().ConfigureAwait(false);
-            return await lambda(redis.As<T>()).ConfigureAwait(false);
+            var redis = await redisManager.GetClientAsync().ConfigureAwait(false);
+			await using (redis as IAsyncDisposable)
+			{
+				return await lambda(redis.As<T>()).ConfigureAwait(false);
+			}
         }
 	}
 

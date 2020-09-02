@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using ServiceStack.Text;
+using System;
 using System.Threading.Tasks;
 
 namespace ServiceStack.Redis.Tests
@@ -18,7 +18,10 @@ namespace ServiceStack.Redis.Tests
         [OneTimeTearDown]
         public async Task OneTimeTearDown()
         {
-            await redis.DisposeAsync();
+            if (redis is IAsyncDisposable d)
+            {
+                await d.DisposeAsync();
+            }
         }
 
         [Test]

@@ -88,6 +88,6 @@ namespace ServiceStack.Redis
         }
 
         ValueTask IAsyncDisposable.DisposeAsync()
-            => ((IRedisClientAsync)untypedClient).RemoveAsync(key).Await();
+            => new ValueTask(((IRedisClientAsync)untypedClient).RemoveAsync(key));
     }
 }

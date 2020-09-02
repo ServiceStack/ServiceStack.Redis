@@ -35,7 +35,7 @@ namespace ServiceStack.Redis
             => AsyncClient.SetRangeInHashAsync(hashId, items, cancellationToken);
 
         ValueTask IRedisHashAsync.ClearAsync(CancellationToken cancellationToken)
-            => AsyncClient.RemoveAsync(hashId, cancellationToken).Await();
+            => new ValueTask(AsyncClient.RemoveAsync(hashId, cancellationToken));
 
         ValueTask<bool> IRedisHashAsync.ContainsKeyAsync(string key, CancellationToken cancellationToken)
             => AsyncClient.HashContainsEntryAsync(hashId, key, cancellationToken);
