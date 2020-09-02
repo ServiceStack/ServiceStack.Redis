@@ -402,13 +402,10 @@ namespace ServiceStack.Redis.Tests
 
             try
             {
-                var client = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
-                await using (client as IAsyncDisposable)
+                await using var client = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
+                await using (await client.AcquireLockAsync(lockKey, waitFor))
                 {
-                    await using (await client.AcquireLockAsync(lockKey, waitFor))
-                    {
-                        await client.IncrementValueAsync(key); //2
-                    }
+                    await client.IncrementValueAsync(key); //2
                 }
             }
             catch (TimeoutException)
@@ -531,14 +528,11 @@ namespace ServiceStack.Redis.Tests
             var map = new Dictionary<string, string>();
             keys.ForEach(x => map[x] = "val" + x);
 
-            var client = RedisClient.New().ForAsyncOnly();
-            await using (client as IAsyncDisposable)
-            {
-                await client.SetAllAsync(map);
+            await using var client = RedisClient.New().ForAsyncOnly();
+            await client.SetAllAsync(map);
 
-                var all = await client.GetValuesMapAsync(keys);
-                Assert.AreEqual(map, all);
-            }
+            var all = await client.GetValuesMapAsync(keys);
+            Assert.AreEqual(map, all);
         }
 
         [Test]
@@ -550,14 +544,12 @@ namespace ServiceStack.Redis.Tests
                 ["key_b"] = null
             };
 
-            var client = RedisClient.New().ForAsyncOnly();
-            await using (client as IAsyncDisposable)
-            {
-                await client.SetAllAsync(map);
+            await using var client = RedisClient.New().ForAsyncOnly();
+            
+            await client.SetAllAsync(map);
 
-                Assert.That(await client.GetAsync<string>("key_a"), Is.EqualTo("123"));
-                Assert.That(await client.GetValueAsync("key_b"), Is.EqualTo(""));
-            }
+            Assert.That(await client.GetAsync<string>("key_a"), Is.EqualTo("123"));
+            Assert.That(await client.GetValueAsync("key_b"), Is.EqualTo(""));
         }
 
 
@@ -570,41 +562,34 @@ namespace ServiceStack.Redis.Tests
                 ["key_b"] = null
             };
 
-            var client = RedisClient.New().ForAsyncOnly();
-            await using (client as IAsyncDisposable)
-            {
-                await client.SetAllAsync(map);
+            await using var client = RedisClient.New().ForAsyncOnly();
 
-                Assert.That(await client.GetAsync<string>("key_a"), Is.EqualTo("123"));
-                Assert.That(await client.GetValueAsync("key_b"), Is.EqualTo(""));
-            }
+            await client.SetAllAsync(map);
+
+            Assert.That(await client.GetAsync<string>("key_a"), Is.EqualTo("123"));
+            Assert.That(await client.GetValueAsync("key_b"), Is.EqualTo(""));
         }
 
         [Test]
         public async Task Should_reset_slowlog()
         {
-            var client = RedisClient.New().ForAsyncOnly();
-            await using (client as IAsyncDisposable)
-            {
-                await client.SlowlogResetAsync();
-            }
+            await using var client = RedisClient.New().ForAsyncOnly();
+            await client.SlowlogResetAsync();
         }
 
         [Test]
         public async Task Can_get_slowlog()
         {
-            var client = RedisClient.New().ForAsyncOnly();
-            await using (client as IAsyncDisposable)
-            {
-                var log = await client.GetSlowlogAsync(10);
+            await using var client = RedisClient.New().ForAsyncOnly();
+            
+            var log = await client.GetSlowlogAsync(10);
 
-                foreach (var t in log)
-                {
-                    Console.WriteLine(t.Id);
-                    Console.WriteLine(t.Duration);
-                    Console.WriteLine(t.Timestamp);
-                    Console.WriteLine(string.Join(":", t.Arguments));
-                }
+            foreach (var t in log)
+            {
+                Console.WriteLine(t.Id);
+                Console.WriteLine(t.Duration);
+                Console.WriteLine(t.Timestamp);
+                Console.WriteLine(string.Join(":", t.Arguments));
             }
         }
 
@@ -612,25 +597,23 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public async Task Can_change_db_at_runtime()
         {
-            var redis = new RedisClient(TestConfig.SingleHost, TestConfig.RedisPort, db: 1).ForAsyncOnly();
-            await using (redis as IAsyncDisposable)
+            await using var redis = new RedisClient(TestConfig.SingleHost, TestConfig.RedisPort, db: 1).ForAsyncOnly();
+            
+            var val = Environment.TickCount;
+            var key = "test" + val;
+            try
             {
-                var val = Environment.TickCount;
-                var key = "test" + val;
-                try
-                {
-                    await redis.SetAsync(key, val);
-                    await redis.SelectAsync(2);
-                    Assert.That(await redis.GetAsync<int>(key), Is.EqualTo(0));
-                    await redis.SelectAsync(1);
-                    Assert.That(await redis.GetAsync<int>(key), Is.EqualTo(val));
-                    await redis.TryDisposeAsync();
-                }
-                finally
-                {
-                    await redis.SelectAsync(1);
-                    await redis.RemoveAsync(key);
-                }
+                await redis.SetAsync(key, val);
+                await redis.SelectAsync(2);
+                Assert.That(await redis.GetAsync<int>(key), Is.EqualTo(0));
+                await redis.SelectAsync(1);
+                Assert.That(await redis.GetAsync<int>(key), Is.EqualTo(val));
+                await redis.DisposeAsync();
+            }
+            finally
+            {
+                await redis.SelectAsync(1);
+                await redis.RemoveAsync(key);
             }
         }
 

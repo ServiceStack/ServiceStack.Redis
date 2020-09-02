@@ -51,12 +51,9 @@ namespace ServiceStack.Redis.Tests
                 ThreadPool.QueueUserWorkItem(async x =>
                 {
                     await Task.Delay(100); // to be sure that we have subscribers
-                    var redisClient = CreateRedisClient().ForAsyncOnly();
-                    await using (redisClient as IAsyncDisposable)
-                    {
-                        Log("Publishing '{0}' to '{1}'", message, channelName);
-                        await redisClient.PublishMessageAsync(channelName, message);
-                    }
+                    await using var redisClient = CreateRedisClient().ForAsyncOnly();
+                    Log("Publishing '{0}' to '{1}'", message, channelName);
+                    await redisClient.PublishMessageAsync(channelName, message);
                 });
 
                 Log("Start Listening On " + channelName);
@@ -103,12 +100,9 @@ namespace ServiceStack.Redis.Tests
                 ThreadPool.QueueUserWorkItem(async x =>
                 {
                     await Task.Delay(100); // to be sure that we have subscribers
-                    var redisClient = CreateRedisClient().ForAsyncOnly();
-                    await using (redisClient as IAsyncDisposable)
-                    {
-                        Log("Publishing '{0}' to '{1}'", message, channelName);
-                        await redisClient.PublishMessageAsync(channelName, message);
-                    }
+                    await using var redisClient = CreateRedisClient().ForAsyncOnly();
+                    Log("Publishing '{0}' to '{1}'", message, channelName);
+                    await redisClient.PublishMessageAsync(channelName, message);
                 });
 
                 Log("Start Listening On " + channelName);
@@ -161,15 +155,12 @@ namespace ServiceStack.Redis.Tests
                 {
                     await Task.Delay(100); // to be sure that we have subscribers
 
-                    var redisClient = CreateRedisClient().ForAsyncOnly();
-                    await using (redisClient as IAsyncDisposable)
+                    await using var redisClient = CreateRedisClient().ForAsyncOnly();
+                    for (var i = 0; i < publishMessageCount; i++)
                     {
-                        for (var i = 0; i < publishMessageCount; i++)
-                        {
-                            var message = messagePrefix + i;
-                            Log("Publishing '{0}' to '{1}'", message, channelName);
-                            await redisClient.PublishMessageAsync(channelName, message);
-                        }
+                        var message = messagePrefix + i;
+                        Log("Publishing '{0}' to '{1}'", message, channelName);
+                        await redisClient.PublishMessageAsync(channelName, message);
                     }
                 });
 
@@ -228,14 +219,11 @@ namespace ServiceStack.Redis.Tests
                 {
                     await Task.Delay(100); // to be sure that we have subscribers
 
-                    var redisClient = CreateRedisClient().ForAsyncOnly();
-                    await using (redisClient as IAsyncDisposable)
+                    await using var redisClient = CreateRedisClient().ForAsyncOnly();
+                    foreach (var channel in channels)
                     {
-                        foreach (var channel in channels)
-                        {
-                            Log("Publishing '{0}' to '{1}'", message, channel);
-                            await redisClient.PublishMessageAsync(channel, message);
-                        }
+                        Log("Publishing '{0}' to '{1}'", message, channel);
+                        await redisClient.PublishMessageAsync(channel, message);
                     }
                 });
 
@@ -267,12 +255,9 @@ namespace ServiceStack.Redis.Tests
             {
                 await Task.Delay(100); // to be sure that we have subscribers
 
-                var redisClient = CreateRedisClient().ForAsyncOnly();
-                await using (redisClient as IAsyncDisposable)
-                {
-                    Log("Publishing msg...");
-                    await redisClient.PublishMessageAsync(PrefixedKey("CHANNEL4:TITLE1"), "hello"); // .ToUtf8Bytes()
-                }
+                await using var redisClient = CreateRedisClient().ForAsyncOnly();
+                Log("Publishing msg...");
+                await redisClient.PublishMessageAsync(PrefixedKey("CHANNEL4:TITLE1"), "hello"); // .ToUtf8Bytes()
             });
 
             Log("Start Listening On");
@@ -295,12 +280,9 @@ namespace ServiceStack.Redis.Tests
             {
                 await Task.Delay(100); // to be sure that we have subscribers
 
-                var redisClient = CreateRedisClient().ForAsyncOnly();
-                await using (redisClient as IAsyncDisposable)
-                {
-                    Log("Publishing msg...");
-                    await redisClient.PublishMessageAsync(PrefixedKey("CHANNEL5:BODY"), "hello"); // .ToUtf8Bytes()
-                }
+                await using var redisClient = CreateRedisClient().ForAsyncOnly();
+                Log("Publishing msg...");
+                await redisClient.PublishMessageAsync(PrefixedKey("CHANNEL5:BODY"), "hello"); // .ToUtf8Bytes()
             });
 
             Log("Start Listening On");

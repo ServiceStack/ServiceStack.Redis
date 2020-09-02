@@ -25,9 +25,9 @@ namespace ServiceStack.Redis.Tests.Generic
         [SetUp]
         public async Task SetUp()
         {
-            if (client is IAsyncDisposable d)
+            if (client is object)
             {
-                await d.DisposeAsync();
+                await client.DisposeAsync();
                 client = null;
             }
             client = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();

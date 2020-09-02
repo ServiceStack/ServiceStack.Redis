@@ -439,21 +439,13 @@ namespace ServiceStack.Redis
         Task<bool> ICacheClientAsync.RemoveAsync(string key, CancellationToken cancellationToken)
             => NativeAsync.DelAsync(key, cancellationToken).IsSuccessTaskAsync();
 
-        async Task<IEnumerable<string>> ICacheClientAsync.GetKeysByPatternAsync(string pattern, CancellationToken cancellationToken)
-        {
-            // buffer to match shape
-            var list = new List<string>();
-            await foreach (var key in AsAsync().ScanAllKeysAsync(pattern, cancellationToken: cancellationToken).ConfigureAwait(false).WithCancellation(cancellationToken))
-            {
-                list.Add(key);
-            }
-            return list;
-        }
+        IAsyncEnumerable<string> ICacheClientAsync.GetKeysByPatternAsync(string pattern, CancellationToken cancellationToken)
+            => AsAsync().ScanAllKeysAsync(pattern, cancellationToken: cancellationToken);
 
         Task ICacheClientAsync.RemoveExpiredEntriesAsync(CancellationToken cancellationToken)
         {
             //Redis automatically removed expired Cache Entries
-            return default;
+            return Task.CompletedTask;
         }
 
         async Task IRemoveByPatternAsync.RemoveByPatternAsync(string pattern, CancellationToken cancellationToken)

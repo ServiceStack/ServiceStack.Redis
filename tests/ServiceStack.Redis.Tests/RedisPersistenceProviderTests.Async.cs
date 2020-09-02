@@ -13,59 +13,51 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public async Task Can_Store_and_GetById_ModelWithIdAndName()
         {
-            IRedisClientAsync redis = new RedisClient(TestConfig.SingleHost);
-            await using (redis as IAsyncDisposable)
-            {
-                const int modelId = 1;
-                var to = ModelWithIdAndName.Create(modelId);
-                await redis.StoreAsync(to);
+            await using IRedisClientAsync redis = new RedisClient(TestConfig.SingleHost);
+            const int modelId = 1;
+            var to = ModelWithIdAndName.Create(modelId);
+            await redis.StoreAsync(to);
 
-                var from = await redis.GetByIdAsync<ModelWithIdAndName>(modelId);
+            var from = await redis.GetByIdAsync<ModelWithIdAndName>(modelId);
 
-                ModelWithIdAndName.AssertIsEqual(to, from);
-            }
+            ModelWithIdAndName.AssertIsEqual(to, from);
         }
 
         [Test]
         public async Task Can_StoreAll_and_GetByIds_ModelWithIdAndName()
         {
-            IRedisClientAsync redis = new RedisClient(TestConfig.SingleHost);
-            await using (redis as IAsyncDisposable)
-            {
-                var ids = new[] { 1, 2, 3, 4, 5 };
-                var tos = ids.Map(ModelWithIdAndName.Create);
+            await using IRedisClientAsync redis = new RedisClient(TestConfig.SingleHost);
+            
+            var ids = new[] { 1, 2, 3, 4, 5 };
+            var tos = ids.Map(ModelWithIdAndName.Create);
 
-                await redis.StoreAllAsync(tos);
+            await redis.StoreAllAsync(tos);
 
-                var froms = await redis.GetByIdsAsync<ModelWithIdAndName>(ids);
-                var fromIds = froms.Map(x => x.Id);
+            var froms = await redis.GetByIdsAsync<ModelWithIdAndName>(ids);
+            var fromIds = froms.Map(x => x.Id);
 
-                Assert.That(fromIds, Is.EquivalentTo(ids));
-            }
+            Assert.That(fromIds, Is.EquivalentTo(ids));
         }
 
         [Test]
         public async Task Can_Delete_ModelWithIdAndName()
         {
-            IRedisClientAsync redis = new RedisClient(TestConfig.SingleHost);
-            await using (redis as IAsyncDisposable)
-            {
-                var ids = new List<int> { 1, 2, 3, 4, 5 };
-                var tos = ids.ConvertAll(ModelWithIdAndName.Create);
+            await using IRedisClientAsync redis = new RedisClient(TestConfig.SingleHost);
+            var ids = new List<int> { 1, 2, 3, 4, 5 };
+            var tos = ids.ConvertAll(ModelWithIdAndName.Create);
 
-                await redis.StoreAllAsync(tos);
+            await redis.StoreAllAsync(tos);
 
-                var deleteIds = new List<int> { 2, 4 };
+            var deleteIds = new List<int> { 2, 4 };
 
-                await redis.DeleteByIdsAsync<ModelWithIdAndName>(deleteIds);
+            await redis.DeleteByIdsAsync<ModelWithIdAndName>(deleteIds);
 
-                var froms = await redis.GetByIdsAsync<ModelWithIdAndName>(ids);
-                var fromIds = froms.Map(x => x.Id);
+            var froms = await redis.GetByIdsAsync<ModelWithIdAndName>(ids);
+            var fromIds = froms.Map(x => x.Id);
 
-                var expectedIds = ids.Where(x => !deleteIds.Contains(x)).ToList();
+            var expectedIds = ids.Where(x => !deleteIds.Contains(x)).ToList();
 
-                Assert.That(fromIds, Is.EquivalentTo(expectedIds));
-            }
+            Assert.That(fromIds, Is.EquivalentTo(expectedIds));
         }
 
     }

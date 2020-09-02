@@ -12,11 +12,8 @@ namespace ServiceStack.Redis.Tests
         [SetUp]
         public async Task SetUp()
         {
-            var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
-            await using (redisClient as IAsyncDisposable)
-            {
-                await redisClient.FlushAllAsync();
-            }
+            await using var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
+            await redisClient.FlushAllAsync();
         }
 
         [Test]
@@ -26,8 +23,7 @@ namespace ServiceStack.Redis.Tests
             const int intValue = 1;
 
             //STORING AN INT USING THE BASIC CLIENT
-            var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
-            await using (redisClient as IAsyncDisposable)
+            await using (var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly())
             {
                 await redisClient.SetValueAsync(intKey, intValue.ToString());
                 string strGetIntValue = await redisClient.GetValueAsync(intKey);
@@ -37,8 +33,7 @@ namespace ServiceStack.Redis.Tests
             }
 
             //STORING AN INT USING THE GENERIC CLIENT
-            redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
-            await using (redisClient as IAsyncDisposable)
+            await using (var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly())
             {
                 //Create a generic client that treats all values as ints:
                 IRedisTypedClientAsync<int> intRedis = redisClient.As<int>();
@@ -57,8 +52,7 @@ namespace ServiceStack.Redis.Tests
             var intValues = new List<int> { 2, 4, 6, 8 };
 
             //STORING INTS INTO A LIST USING THE BASIC CLIENT
-            var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
-            await using (redisClient as IAsyncDisposable)
+            await using (var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly())
             {
                 IRedisListAsync strList = redisClient.Lists[intListKey];
 
@@ -78,8 +72,7 @@ namespace ServiceStack.Redis.Tests
             }
 
             //STORING INTS INTO A LIST USING THE GENERIC CLIENT
-            redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
-            await using (redisClient as IAsyncDisposable)
+            await using (var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly())
             {
                 //Create a generic client that treats all values as ints:
                 IRedisTypedClientAsync<int> intRedis = redisClient.As<int>();
@@ -104,40 +97,37 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public async Task Working_with_Generic_types()
         {
-            var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
-            await using (redisClient as IAsyncDisposable)
+            await using var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
+            //Create a typed Redis client that treats all values as IntAndString:
+            var typedRedis = redisClient.As<IntAndString>();
+
+            var pocoValue = new IntAndString { Id = 1, Letter = "A" };
+            await typedRedis.SetValueAsync("pocoKey", pocoValue);
+            IntAndString toPocoValue = await typedRedis.GetValueAsync("pocoKey");
+
+            Assert.That(toPocoValue.Id, Is.EqualTo(pocoValue.Id));
+            Assert.That(toPocoValue.Letter, Is.EqualTo(pocoValue.Letter));
+
+            var pocoListValues = new List<IntAndString> {
+                new IntAndString {Id = 2, Letter = "B"},
+                new IntAndString {Id = 3, Letter = "C"},
+                new IntAndString {Id = 4, Letter = "D"},
+                new IntAndString {Id = 5, Letter = "E"},
+            };
+
+            IRedisListAsync<IntAndString> pocoList = typedRedis.Lists["pocoListKey"];
+
+            //Adding all IntAndString objects into the redis list 'pocoListKey'
+            await pocoListValues.ForEachAsync(async x => await pocoList.AddAsync(x));
+
+            List<IntAndString> toPocoListValues = await pocoList.ToListAsync();
+
+            for (var i = 0; i < pocoListValues.Count; i++)
             {
-                //Create a typed Redis client that treats all values as IntAndString:
-                var typedRedis = redisClient.As<IntAndString>();
-
-                var pocoValue = new IntAndString { Id = 1, Letter = "A" };
-                await typedRedis.SetValueAsync("pocoKey", pocoValue);
-                IntAndString toPocoValue = await typedRedis.GetValueAsync("pocoKey");
-
+                pocoValue = pocoListValues[i];
+                toPocoValue = toPocoListValues[i];
                 Assert.That(toPocoValue.Id, Is.EqualTo(pocoValue.Id));
                 Assert.That(toPocoValue.Letter, Is.EqualTo(pocoValue.Letter));
-
-                var pocoListValues = new List<IntAndString> {
-                    new IntAndString {Id = 2, Letter = "B"},
-                    new IntAndString {Id = 3, Letter = "C"},
-                    new IntAndString {Id = 4, Letter = "D"},
-                    new IntAndString {Id = 5, Letter = "E"},
-                };
-
-                IRedisListAsync<IntAndString> pocoList = typedRedis.Lists["pocoListKey"];
-
-                //Adding all IntAndString objects into the redis list 'pocoListKey'
-                await pocoListValues.ForEachAsync(async x => await pocoList.AddAsync(x));
-
-                List<IntAndString> toPocoListValues = await pocoList.ToListAsync();
-
-                for (var i = 0; i < pocoListValues.Count; i++)
-                {
-                    pocoValue = pocoListValues[i];
-                    toPocoValue = toPocoListValues[i];
-                    Assert.That(toPocoValue.Id, Is.EqualTo(pocoValue.Id));
-                    Assert.That(toPocoValue.Letter, Is.EqualTo(pocoValue.Letter));
-                }
             }
         }
 

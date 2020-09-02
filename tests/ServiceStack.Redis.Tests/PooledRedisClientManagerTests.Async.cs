@@ -188,7 +188,7 @@ namespace ServiceStack.Redis.Tests
         {
             await using var manager = CreateAndStartManager();
             var client1 = await manager.GetClientAsync();
-            await client1.TryDisposeAsync();
+            await client1.DisposeAsync();
             var client2 = await manager.GetClientAsync();
             var client3 = await manager.GetClientAsync();
             var client4 = await manager.GetClientAsync();
@@ -206,9 +206,9 @@ namespace ServiceStack.Redis.Tests
         {
             await using var manager = CreateAndStartManager();
             var client1 = await manager.GetReadOnlyClientAsync();
-            await client1.TryDisposeAsync();
+            await client1.DisposeAsync();
             var client2 = await manager.GetReadOnlyClientAsync();
-            await client2.TryDisposeAsync();
+            await client2.DisposeAsync();
             var client3 = await manager.GetReadOnlyClientAsync();
             var client4 = await manager.GetReadOnlyClientAsync();
             var client5 = await manager.GetReadOnlyClientAsync();
@@ -237,35 +237,35 @@ namespace ServiceStack.Redis.Tests
                     }
                 );
             //A poolsize of 4 will not block getting 4 clients
-            await using (var client1 = (await manager.GetClientAsync()).WrapForDispose())
-            await using (var client2 = (await manager.GetClientAsync()).WrapForDispose())
-            await using (var client3 = (await manager.GetClientAsync()).WrapForDispose())
-            await using (var client4 = (await manager.GetClientAsync()).WrapForDispose())
+            await using (var client1 = await manager.GetClientAsync())
+            await using (var client2 = await manager.GetClientAsync())
+            await using (var client3 = await manager.GetClientAsync())
+            await using (var client4 = await manager.GetClientAsync())
             {
-                AssertClientHasHost(client1.Value, writeHosts[0]);
-                AssertClientHasHost(client2.Value, writeHosts[0]);
-                AssertClientHasHost(client3.Value, writeHosts[0]);
-                AssertClientHasHost(client4.Value, writeHosts[0]);
+                AssertClientHasHost(client1, writeHosts[0]);
+                AssertClientHasHost(client2, writeHosts[0]);
+                AssertClientHasHost(client3, writeHosts[0]);
+                AssertClientHasHost(client4, writeHosts[0]);
             }
 
             //A poolsize of 8 will not block getting 8 clients
-            await using (var client1 = (await manager.GetReadOnlyClientAsync()).WrapForDispose())
-            await using (var client2 = (await manager.GetReadOnlyClientAsync()).WrapForDispose())
-            await using (var client3 = (await manager.GetReadOnlyClientAsync()).WrapForDispose())
-            await using (var client4 = (await manager.GetReadOnlyClientAsync()).WrapForDispose())
-            await using (var client5 = (await manager.GetReadOnlyClientAsync()).WrapForDispose())
-            await using (var client6 = (await manager.GetReadOnlyClientAsync()).WrapForDispose())
-            await using (var client7 = (await manager.GetReadOnlyClientAsync()).WrapForDispose())
-            await using (var client8 = (await manager.GetReadOnlyClientAsync()).WrapForDispose())
+            await using (var client1 = await manager.GetReadOnlyClientAsync())
+            await using (var client2 = await manager.GetReadOnlyClientAsync())
+            await using (var client3 = await manager.GetReadOnlyClientAsync())
+            await using (var client4 = await manager.GetReadOnlyClientAsync())
+            await using (var client5 = await manager.GetReadOnlyClientAsync())
+            await using (var client6 = await manager.GetReadOnlyClientAsync())
+            await using (var client7 = await manager.GetReadOnlyClientAsync())
+            await using (var client8 = await manager.GetReadOnlyClientAsync())
             {
-                AssertClientHasHost(client1.Value, readHosts[0]);
-                AssertClientHasHost(client2.Value, readHosts[1]);
-                AssertClientHasHost(client3.Value, readHosts[0]);
-                AssertClientHasHost(client4.Value, readHosts[1]);
-                AssertClientHasHost(client5.Value, readHosts[0]);
-                AssertClientHasHost(client6.Value, readHosts[1]);
-                AssertClientHasHost(client7.Value, readHosts[0]);
-                AssertClientHasHost(client8.Value, readHosts[1]);
+                AssertClientHasHost(client1, readHosts[0]);
+                AssertClientHasHost(client2, readHosts[1]);
+                AssertClientHasHost(client3, readHosts[0]);
+                AssertClientHasHost(client4, readHosts[1]);
+                AssertClientHasHost(client5, readHosts[0]);
+                AssertClientHasHost(client6, readHosts[1]);
+                AssertClientHasHost(client7, readHosts[0]);
+                AssertClientHasHost(client8, readHosts[1]);
             }
         }
 
@@ -284,7 +284,7 @@ namespace ServiceStack.Redis.Tests
 #pragma warning restore IDE0039 // Use local function
             {
                 await Task.Delay(delay + TimeSpan.FromSeconds(0.5));
-                await client4.TryDisposeAsync();
+                await client4.DisposeAsync();
             };
 
 #if NETCORE
@@ -321,7 +321,7 @@ namespace ServiceStack.Redis.Tests
 #pragma warning restore IDE0039 // Use local function
             {
                 await Task.Delay(delay + TimeSpan.FromSeconds(0.5));
-                await client3.TryDisposeAsync();
+                await client3.DisposeAsync();
             };
 #if NETCORE
             _ =Task.Run(func);

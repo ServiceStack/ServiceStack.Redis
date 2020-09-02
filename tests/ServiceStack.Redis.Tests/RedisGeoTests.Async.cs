@@ -18,9 +18,9 @@ namespace ServiceStack.Redis.Tests
         [OneTimeTearDown]
         public async Task OneTimeTearDown()
         {
-            if (redis is IAsyncDisposable d)
+            if (redis is object)
             {
-                await d.DisposeAsync();
+                await redis.DisposeAsync();
             }
         }
 

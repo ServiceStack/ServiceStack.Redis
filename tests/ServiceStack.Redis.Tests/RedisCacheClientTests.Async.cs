@@ -15,8 +15,8 @@ namespace ServiceStack.Redis.Tests
         [SetUp]
         public async Task OnBeforeEachTest()
         {
-            if (cacheClient is IAsyncDisposable d)
-                await d.DisposeAsync();
+            if (cacheClient is object)
+                await cacheClient.DisposeAsync();
 
             cacheClient = new RedisClient(TestConfig.SingleHost);
             await cacheClient.FlushAllAsync();
@@ -129,13 +129,11 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public async Task Can_increment_and_reset_values()
         {
-            var client = await new RedisManagerPool(TestConfig.SingleHost).GetCacheClientAsync();
-            await using (client as IAsyncDisposable)
-            {
-                Assert.That(await client.IncrementAsync("incr:counter", 10), Is.EqualTo(10));
-                await client.SetAsync("incr:counter", 0);
-                Assert.That(await client.IncrementAsync("incr:counter", 10), Is.EqualTo(10));
-            }
+            await using var client = await new RedisManagerPool(TestConfig.SingleHost).GetCacheClientAsync();
+            
+            Assert.That(await client.IncrementAsync("incr:counter", 10), Is.EqualTo(10));
+            await client.SetAsync("incr:counter", 0);
+            Assert.That(await client.IncrementAsync("incr:counter", 10), Is.EqualTo(10));
         }
     }
 }

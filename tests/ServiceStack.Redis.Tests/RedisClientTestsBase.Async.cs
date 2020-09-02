@@ -41,23 +41,6 @@ namespace ServiceStack.Redis.Tests
             return count;
         }
 
-        public static ValueTask TryDisposeAsync(this object obj)
-        {
-            if (obj is IAsyncDisposable d) return d.DisposeAsync();
-            return default;
-        }
-
-        public static WrappedDisposable<T> WrapForDispose<T>(this T value) where T : class
-            => new WrappedDisposable<T>(value);
-
-        public readonly struct WrappedDisposable<T> : IAsyncDisposable where T : class
-        {
-            public readonly T Value;
-            public ValueTask DisposeAsync() => TryDisposeAsync(Value);
-            public WrappedDisposable(T value) => Value = value;
-            public static implicit operator T (in WrappedDisposable<T> value) => value.Value;
-        }
-
         public static IRedisClientAsync ForAsyncOnly(this RedisClient client)
         {
 #if DEBUG

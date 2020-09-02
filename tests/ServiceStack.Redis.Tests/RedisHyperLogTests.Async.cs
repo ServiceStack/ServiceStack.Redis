@@ -13,27 +13,24 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public async Task Can_Add_to_Hyperlog()
         {
-            var redis = Connect();
-            await using (redis as IAsyncDisposable)
-            {
+            await using var redis = Connect();
 
-                await redis.FlushAllAsync();
+            await redis.FlushAllAsync();
 
-                await redis.AddToHyperLogAsync("hyperlog", new[] { "a", "b", "c" });
-                await redis.AddToHyperLogAsync("hyperlog", new[] { "c", "d" });
+            await redis.AddToHyperLogAsync("hyperlog", new[] { "a", "b", "c" });
+            await redis.AddToHyperLogAsync("hyperlog", new[] { "c", "d" });
 
-                var count = await redis.CountHyperLogAsync("hyperlog");
+            var count = await redis.CountHyperLogAsync("hyperlog");
 
-                Assert.That(count, Is.EqualTo(4));
+            Assert.That(count, Is.EqualTo(4));
 
-                await redis.AddToHyperLogAsync("hyperlog2", new[] { "c", "d", "e", "f" });
+            await redis.AddToHyperLogAsync("hyperlog2", new[] { "c", "d", "e", "f" });
 
-                await redis.MergeHyperLogsAsync("hypermerge", new[] { "hyperlog", "hyperlog2" });
+            await redis.MergeHyperLogsAsync("hypermerge", new[] { "hyperlog", "hyperlog2" });
 
-                var mergeCount = await redis.CountHyperLogAsync("hypermerge");
+            var mergeCount = await redis.CountHyperLogAsync("hypermerge");
 
-                Assert.That(mergeCount, Is.EqualTo(6));
-            }
+            Assert.That(mergeCount, Is.EqualTo(6));
         }
     }
 }

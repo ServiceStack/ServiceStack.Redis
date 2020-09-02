@@ -49,79 +49,76 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public async Task Shippers_UseCase()
         {
-            var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
-            await using (redisClient as IAsyncDisposable)
-            {
-                //Create a 'strongly-typed' API that makes all Redis Value operations to apply against Shippers
-                IRedisTypedClientAsync<Shipper> redis = redisClient.As<Shipper>();
+            await using var redisClient = new RedisClient(TestConfig.SingleHost).ForAsyncOnly();
+            //Create a 'strongly-typed' API that makes all Redis Value operations to apply against Shippers
+            IRedisTypedClientAsync<Shipper> redis = redisClient.As<Shipper>();
 
-                //Redis lists implement IList<T> while Redis sets implement ICollection<T>
-                var currentShippers = redis.Lists["urn:shippers:current"];
-                var prospectiveShippers = redis.Lists["urn:shippers:prospective"];
+            //Redis lists implement IList<T> while Redis sets implement ICollection<T>
+            var currentShippers = redis.Lists["urn:shippers:current"];
+            var prospectiveShippers = redis.Lists["urn:shippers:prospective"];
 
-                await currentShippers.AddAsync(
-                    new Shipper
-                    {
-                        Id = await redis.GetNextSequenceAsync(),
-                        CompanyName = "Trains R Us",
-                        DateCreated = DateTime.UtcNow,
-                        ShipperType = ShipperType.Trains,
-                        UniqueRef = Guid.NewGuid()
-                    });
-
-                await currentShippers.AddAsync(
-                    new Shipper
-                    {
-                        Id = await redis.GetNextSequenceAsync(),
-                        CompanyName = "Planes R Us",
-                        DateCreated = DateTime.UtcNow,
-                        ShipperType = ShipperType.Planes,
-                        UniqueRef = Guid.NewGuid()
-                    });
-
-                var lameShipper = new Shipper
+            await currentShippers.AddAsync(
+                new Shipper
                 {
                     Id = await redis.GetNextSequenceAsync(),
-                    CompanyName = "We do everything!",
+                    CompanyName = "Trains R Us",
                     DateCreated = DateTime.UtcNow,
-                    ShipperType = ShipperType.All,
+                    ShipperType = ShipperType.Trains,
                     UniqueRef = Guid.NewGuid()
-                };
+                });
 
-                await currentShippers.AddAsync(lameShipper);
+            await currentShippers.AddAsync(
+                new Shipper
+                {
+                    Id = await redis.GetNextSequenceAsync(),
+                    CompanyName = "Planes R Us",
+                    DateCreated = DateTime.UtcNow,
+                    ShipperType = ShipperType.Planes,
+                    UniqueRef = Guid.NewGuid()
+                });
 
-                Dump("ADDED 3 SHIPPERS:", await currentShippers.ToListAsync());
+            var lameShipper = new Shipper
+            {
+                Id = await redis.GetNextSequenceAsync(),
+                CompanyName = "We do everything!",
+                DateCreated = DateTime.UtcNow,
+                ShipperType = ShipperType.All,
+                UniqueRef = Guid.NewGuid()
+            };
 
-                await currentShippers.RemoveAsync(lameShipper);
+            await currentShippers.AddAsync(lameShipper);
 
-                Dump("REMOVED 1:", await currentShippers.ToListAsync());
+            Dump("ADDED 3 SHIPPERS:", await currentShippers.ToListAsync());
 
-                await prospectiveShippers.AddAsync(
-                    new Shipper
-                    {
-                        Id = await redis.GetNextSequenceAsync(),
-                        CompanyName = "Trucks R Us",
-                        DateCreated = DateTime.UtcNow,
-                        ShipperType = ShipperType.Automobiles,
-                        UniqueRef = Guid.NewGuid()
-                    });
+            await currentShippers.RemoveAsync(lameShipper);
 
-                Dump("ADDED A PROSPECTIVE SHIPPER:", await prospectiveShippers.ToListAsync());
+            Dump("REMOVED 1:", await currentShippers.ToListAsync());
 
-                await redis.PopAndPushItemBetweenListsAsync(prospectiveShippers, currentShippers);
+            await prospectiveShippers.AddAsync(
+                new Shipper
+                {
+                    Id = await redis.GetNextSequenceAsync(),
+                    CompanyName = "Trucks R Us",
+                    DateCreated = DateTime.UtcNow,
+                    ShipperType = ShipperType.Automobiles,
+                    UniqueRef = Guid.NewGuid()
+                });
 
-                Dump("CURRENT SHIPPERS AFTER POP n' PUSH:", await currentShippers.ToListAsync());
-                Dump("PROSPECTIVE SHIPPERS AFTER POP n' PUSH:", await prospectiveShippers.ToListAsync());
+            Dump("ADDED A PROSPECTIVE SHIPPER:", await prospectiveShippers.ToListAsync());
 
-                var poppedShipper = await redis.PopItemFromListAsync(currentShippers);
-                Dump("POPPED a SHIPPER:", poppedShipper);
-                Dump("CURRENT SHIPPERS AFTER POP:", await currentShippers.ToListAsync());
+            await redis.PopAndPushItemBetweenListsAsync(prospectiveShippers, currentShippers);
 
-                //reset sequence and delete all lists
-                await redis.SetSequenceAsync(0);
-                await redis.RemoveEntryAsync(new[] { currentShippers, prospectiveShippers });
-                Dump("DELETING CURRENT AND PROSPECTIVE SHIPPERS:", await currentShippers.ToListAsync());
-            }
+            Dump("CURRENT SHIPPERS AFTER POP n' PUSH:", await currentShippers.ToListAsync());
+            Dump("PROSPECTIVE SHIPPERS AFTER POP n' PUSH:", await prospectiveShippers.ToListAsync());
+
+            var poppedShipper = await redis.PopItemFromListAsync(currentShippers);
+            Dump("POPPED a SHIPPER:", poppedShipper);
+            Dump("CURRENT SHIPPERS AFTER POP:", await currentShippers.ToListAsync());
+
+            //reset sequence and delete all lists
+            await redis.SetSequenceAsync(0);
+            await redis.RemoveEntryAsync(new[] { currentShippers, prospectiveShippers });
+            Dump("DELETING CURRENT AND PROSPECTIVE SHIPPERS:", await currentShippers.ToListAsync());
 
         }
 
