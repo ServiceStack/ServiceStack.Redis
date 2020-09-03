@@ -218,12 +218,16 @@ namespace ServiceStack.Redis.Tests
             }.Init();
 
             var type = typeof(TestModel).FullName;
+#if DEBUG            
             RedisRaw.DebugAllowSync = true; // not reasonable to allow async from Lisp
+#endif
             context.EvaluateCode($"redis.call('DeleteAll<{type}>') |> return");
             context.EvaluateCode($"redis.call('As<{type}>').call('DeleteAll') |> return");
             context.RenderLisp($"(call redis \"DeleteAll<{type}>\")");
             context.RenderLisp($"(call (call redis \"As<{type}>\") \"DeleteAll\")");
+#if DEBUG            
             RedisRaw.DebugAllowSync = false;
+#endif
 
             var allModels = await RedisAsync.As<TestModel>().GetAllAsync();
             Assert.That(allModels, Is.Empty);
