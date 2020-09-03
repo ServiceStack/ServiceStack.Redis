@@ -19,7 +19,7 @@ namespace ServiceStack.Redis
 	/// <summary>
 	/// Wrap the common redis list operations under a IList[string] interface.
 	/// </summary>
-	internal class RedisClientList
+	internal partial class RedisClientList
 		: IRedisList
 	{
 		private readonly RedisClient client;

@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ServiceStack.Model;
+using ServiceStack.Redis.Pipeline;
 using ServiceStack.Text;
 
 namespace ServiceStack.Redis
@@ -26,7 +27,7 @@ namespace ServiceStack.Redis
 
         public IHasNamed<IRedisList> Lists { get; set; }
 
-        internal class RedisClientLists
+        internal partial class RedisClientLists
             : IHasNamed<IRedisList>
         {
             private readonly RedisClient client;
@@ -82,6 +83,15 @@ namespace ServiceStack.Redis
 
         public void AddRangeToList(string listId, List<string> values)
         {
+            var pipeline = AddRangeToListPrepareNonFlushed(listId, values);
+            pipeline.Flush();
+
+            //the number of items after
+            var intResults = pipeline.ReadAllAsInts();
+        }
+
+        private RedisPipelineCommand AddRangeToListPrepareNonFlushed(string listId, List<string> values)
+        {
             var uListId = listId.ToUtf8Bytes();
 
             var pipeline = CreatePipelineCommand();
@@ -89,10 +99,7 @@ namespace ServiceStack.Redis
             {
                 pipeline.WriteCommand(Commands.RPush, uListId, value.ToUtf8Bytes());
             }
-            pipeline.Flush();
-
-            //the number of items after 
-            var intResults = pipeline.ReadAllAsInts();
+            return pipeline;
         }
 
         public void PrependItemToList(string listId, string value)
@@ -101,6 +108,15 @@ namespace ServiceStack.Redis
         }
 
         public void PrependRangeToList(string listId, List<string> values)
+        {
+            var pipeline = PrependRangeToListPrepareNonFlushed(listId, values);
+            pipeline.Flush();
+
+            //the number of items after
+            var intResults = pipeline.ReadAllAsInts();
+        }
+
+        private RedisPipelineCommand PrependRangeToListPrepareNonFlushed(string listId, List<string> values)
         {
             var uListId = listId.ToUtf8Bytes();
 
@@ -111,10 +127,7 @@ namespace ServiceStack.Redis
                 var value = values[i];
                 pipeline.WriteCommand(Commands.LPush, uListId, value.ToUtf8Bytes());
             }
-            pipeline.Flush();
-
-            //the number of items after 
-            var intResults = pipeline.ReadAllAsInts();
+            return pipeline;
         }
 
         public void RemoveAllFromList(string listId)

@@ -314,6 +314,7 @@ namespace ServiceStack.Redis
                             0 => "GetNextSentinel()",
                             1 => "GetRedisManager()",
                             2 => "BeginListeningForConfigurationChanges()",
+                            _ => $"Step {step}",
                         };
                         Log.Debug($"Failed to {name}: {ex.Message}");
                     }

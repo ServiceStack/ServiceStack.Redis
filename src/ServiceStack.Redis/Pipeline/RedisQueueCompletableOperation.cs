@@ -7,7 +7,7 @@ namespace ServiceStack.Redis
     /// <summary>
     /// Redis operation (transaction/pipeline) that allows queued commands to be completed
     /// </summary>
-    public class RedisQueueCompletableOperation
+    public partial class RedisQueueCompletableOperation
     {
         internal readonly List<QueuedRedisOperation> QueuedCommands = new List<QueuedRedisOperation>();
 

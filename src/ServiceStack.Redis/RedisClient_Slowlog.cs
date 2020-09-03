@@ -24,6 +24,11 @@ namespace ServiceStack.Redis
         public IEnumerable<SlowlogItem> GetSlowlog(int? numberOfRecords = null)
         {
             var data = Slowlog(numberOfRecords);
+            return ParseSlowlog(data);
+        }
+
+        private static SlowlogItem[] ParseSlowlog(object[] data)
+        {
             var list = new SlowlogItem[data.Length];
             for (int i = 0; i < data.Length; i++)
             {
@@ -46,21 +51,5 @@ namespace ServiceStack.Redis
         }
 
 
-    }
-
-    public class SlowlogItem
-    {
-        public SlowlogItem(int id, DateTime timeStamp, int duration, string[] arguments)
-        {
-            Id = id;
-            Timestamp = timeStamp;
-            Duration = duration;
-            Arguments = arguments;
-        }
-
-        public int Id { get; private set; }
-        public int Duration { get; private set; }
-        public DateTime Timestamp { get; private set; }
-        public string[] Arguments { get; private set; }
     }
 }

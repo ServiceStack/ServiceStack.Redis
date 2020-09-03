@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace ServiceStack.Redis.Pipeline
 {
-    public class RedisPipelineCommand
+    public partial class RedisPipelineCommand
     {
         private readonly RedisNativeClient client;
         private int cmdCount;

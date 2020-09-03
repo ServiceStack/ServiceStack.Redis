@@ -5,7 +5,7 @@ using ServiceStack.Logging;
 
 namespace ServiceStack.Redis.Pipeline
 {
-    internal class QueuedRedisOperation
+    internal partial class QueuedRedisOperation
     {
         protected static readonly ILog Log = LogManager.GetLogger(typeof(QueuedRedisOperation));
 
@@ -51,60 +51,28 @@ namespace ServiceStack.Redis.Pipeline
                 if (VoidReadCommand != null)
                 {
                     VoidReadCommand();
-                    if (OnSuccessVoidCallback != null)
-                    {
-                        OnSuccessVoidCallback();
-                    }
+                    OnSuccessVoidCallback?.Invoke();
                 }
                 else if (IntReadCommand != null)
                 {
                     var result = IntReadCommand();
-                    if (OnSuccessIntCallback != null)
-                    {
-                        OnSuccessIntCallback(result);
-                    }
-                    if (OnSuccessLongCallback != null)
-                    {
-                        OnSuccessLongCallback(result);
-                    }
-                    if (OnSuccessBoolCallback != null)
-                    {
-                        var success = result == RedisNativeClient.Success;
-                        OnSuccessBoolCallback(success);
-                    }
-                    if (OnSuccessVoidCallback != null)
-                    {
-                        OnSuccessVoidCallback();
-                    }
+                    OnSuccessIntCallback?.Invoke(result);
+                    OnSuccessLongCallback?.Invoke(result);
+                    OnSuccessBoolCallback?.Invoke(result == RedisNativeClient.Success);
+                    OnSuccessVoidCallback?.Invoke();
                 }
                 else if (LongReadCommand != null)
                 {
                     var result = LongReadCommand();
-                    if (OnSuccessIntCallback != null)
-                    {
-                        OnSuccessIntCallback((int)result);
-                    }
-                    if (OnSuccessLongCallback != null)
-                    {
-                        OnSuccessLongCallback(result);
-                    }
-                    if (OnSuccessBoolCallback != null)
-                    {
-                        var success = result == RedisNativeClient.Success;
-                        OnSuccessBoolCallback(success);
-                    }
-                    if (OnSuccessVoidCallback != null)
-                    {
-                        OnSuccessVoidCallback();
-                    }
+                    OnSuccessIntCallback?.Invoke((int)result);
+                    OnSuccessLongCallback?.Invoke(result);
+                    OnSuccessBoolCallback?.Invoke(result == RedisNativeClient.Success);
+                    OnSuccessVoidCallback?.Invoke();
                 }
                 else if (DoubleReadCommand != null)
                 {
                     var result = DoubleReadCommand();
-                    if (OnSuccessDoubleCallback != null)
-                    {
-                        OnSuccessDoubleCallback(result);
-                    }
+                    OnSuccessDoubleCallback?.Invoke(result);
                 }
                 else if (BytesReadCommand != null)
                 {
@@ -112,78 +80,50 @@ namespace ServiceStack.Redis.Pipeline
                     if (result != null && result.Length == 0)
                         result = null;
 
-                    if (OnSuccessBytesCallback != null)
-                    {
-                        OnSuccessBytesCallback(result);
-                    }
-                    if (OnSuccessStringCallback != null)
-                    {
-                        OnSuccessStringCallback(result != null ? Encoding.UTF8.GetString(result) : null);
-                    }
-                    if (OnSuccessTypeCallback != null)
-                    {
-                        OnSuccessTypeCallback(result != null ? Encoding.UTF8.GetString(result) : null);
-                    }
-                    if (OnSuccessIntCallback != null)
-                    {
-                        OnSuccessIntCallback(result != null ? int.Parse(Encoding.UTF8.GetString(result)) : 0);
-                    }
-                    if (OnSuccessBoolCallback != null)
-                    {
-                        OnSuccessBoolCallback(result != null && Encoding.UTF8.GetString(result) == "OK");
-                    }
+                    OnSuccessBytesCallback?.Invoke(result);
+                    OnSuccessStringCallback?.Invoke(result != null ? Encoding.UTF8.GetString(result) : null);
+                    OnSuccessTypeCallback?.Invoke(result != null ? Encoding.UTF8.GetString(result) : null);
+                    OnSuccessIntCallback?.Invoke(result != null ? int.Parse(Encoding.UTF8.GetString(result)) : 0);
+                    OnSuccessBoolCallback?.Invoke(result != null && Encoding.UTF8.GetString(result) == "OK");
                 }
                 else if (StringReadCommand != null)
                 {
                     var result = StringReadCommand();
-                    if (OnSuccessStringCallback != null)
-                    {
-                        OnSuccessStringCallback(result);
-                    }
-                    if (OnSuccessTypeCallback != null)
-                    {
-                        OnSuccessTypeCallback(result);
-                    }
+                    OnSuccessStringCallback?.Invoke(result);
+                    OnSuccessTypeCallback?.Invoke(result);
                 }
                 else if (MultiBytesReadCommand != null)
                 {
                     var result = MultiBytesReadCommand();
-                    if (OnSuccessMultiBytesCallback != null)
-                    {
-                        OnSuccessMultiBytesCallback(result);
-                    }
-                    if (OnSuccessMultiStringCallback != null)
-                    {
-                        OnSuccessMultiStringCallback(result != null ? result.ToStringList() : null);
-                    }
-                    if (OnSuccessMultiTypeCallback != null)
-                    {
-                        OnSuccessMultiTypeCallback(result.ToStringList());
-                    }
-                    if (OnSuccessDictionaryStringCallback != null)
-                    {
-                        OnSuccessDictionaryStringCallback(result.ToStringDictionary());
-                    }
+                    OnSuccessMultiBytesCallback?.Invoke(result);
+                    OnSuccessMultiStringCallback?.Invoke(result != null ? result.ToStringList() : null);
+                    OnSuccessMultiTypeCallback?.Invoke(result.ToStringList());
+                    OnSuccessDictionaryStringCallback?.Invoke(result.ToStringDictionary());
                 }
                 else if (MultiStringReadCommand != null)
                 {
                     var result = MultiStringReadCommand();
-                    if (OnSuccessMultiStringCallback != null)
-                    {
-                        OnSuccessMultiStringCallback(result);
-                    }
+                    OnSuccessMultiStringCallback?.Invoke(result);
                 }
                 else if (RedisDataReadCommand != null)
                 {
                     var data = RedisDataReadCommand();
-                    if (OnSuccessRedisTextCallback != null)
-                    {
-                        OnSuccessRedisTextCallback(data.ToRedisText());
-                    }
-                    if (OnSuccessRedisDataCallback != null)
-                    {
-                        OnSuccessRedisDataCallback(data);
-                    }
+                    OnSuccessRedisTextCallback?.Invoke(data.ToRedisText());
+                    OnSuccessRedisDataCallback?.Invoke(data);
+                }
+                else if (BoolReadCommand != null)
+                {
+                    var result = BoolReadCommand();
+                    OnSuccessBoolCallback?.Invoke(result);
+                }
+                else if (DictionaryStringReadCommand != null)
+                {
+                    var result = DictionaryStringReadCommand();
+                    OnSuccessDictionaryStringCallback?.Invoke(result);
+                }
+                else
+                {
+                    ProcessResultThrowIfAsync();
                 }
             }
             catch (Exception ex)
@@ -201,5 +141,7 @@ namespace ServiceStack.Redis.Pipeline
             }
         }
 
+        protected void ProcessResultThrowIfAsync() => OnProcessResultThrowIfAsync();
+        partial void OnProcessResultThrowIfAsync();
     }
 }

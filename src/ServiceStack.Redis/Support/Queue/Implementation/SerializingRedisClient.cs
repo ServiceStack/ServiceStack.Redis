@@ -61,10 +61,10 @@ namespace ServiceStack.Redis.Support.Queue.Implementation
             return serializer.Deserialize(someBytes);
         }
 
+        /// <summary>
         /// deserialize an array of byte arrays
         /// </summary>
         /// <param name="byteArray"></param>
-        /// <returns></returns>
         public IList Deserialize(byte[][] byteArray)
         {
             IList rc = new ArrayList();

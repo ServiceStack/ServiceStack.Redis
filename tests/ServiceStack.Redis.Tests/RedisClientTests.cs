@@ -256,7 +256,8 @@ namespace ServiceStack.Redis.Tests
                 // if exception has that message then it still proves that BgSave works as expected.
                 if (e.Message.StartsWith("Can't BGSAVE while AOF log rewriting is in progress")
                     || e.Message.StartsWith("An AOF log rewriting in progress: can't BGSAVE right now")
-                    || e.Message.StartsWith("Background save already in progress"))
+                    || e.Message.StartsWith("Background save already in progress")
+                    || e.Message.StartsWith("Another child process is active (AOF?): can't BGSAVE right now"))
                     return;
 
                 throw;
@@ -275,7 +276,8 @@ namespace ServiceStack.Redis.Tests
                 // if exception has that message then it still proves that BgSave works as expected.
                 if (e.Message.StartsWith("Can't BGSAVE while AOF log rewriting is in progress")
                     || e.Message.StartsWith("An AOF log rewriting in progress: can't BGSAVE right now")
-                    || e.Message.StartsWith("Background save already in progress"))
+                    || e.Message.StartsWith("Background save already in progress")
+                    || e.Message.StartsWith("Another child process is active (AOF?): can't BGSAVE right now"))
                     return;
 
                 throw;
@@ -351,8 +353,9 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_AcquireLock()
         {
-            var key = PrefixedKey("AcquireLockKey");
-            var lockKey = PrefixedKey("Can_AcquireLock");
+            // guid here is to prevent competition between concurrent runtime tests
+            var key = PrefixedKey("AcquireLockKeyTimeOut:" + Guid.NewGuid());
+            var lockKey = PrefixedKey("Can_AcquireLock_TimeOut:" + Guid.NewGuid());
             Redis.IncrementValue(key); //1
 
             var asyncResults = 5.TimesAsync(i =>
@@ -382,8 +385,9 @@ namespace ServiceStack.Redis.Tests
         [Test]
         public void Can_AcquireLock_TimeOut()
         {
-            var key = PrefixedKey("AcquireLockKeyTimeOut");
-            var lockKey = PrefixedKey("Can_AcquireLock_TimeOut");
+            // guid here is to prevent competition between concurrent runtime tests
+            var key = PrefixedKey("AcquireLockKeyTimeOut:" + Guid.NewGuid());
+            var lockKey = PrefixedKey("Can_AcquireLock_TimeOut:" + Guid.NewGuid());
             Redis.IncrementValue(key); //1
             var acquiredLock = Redis.AcquireLock(lockKey);
             var waitFor = TimeSpan.FromMilliseconds(1000);
@@ -408,6 +412,11 @@ namespace ServiceStack.Redis.Tests
                 Assert.That(timeTaken.TotalMilliseconds > waitFor.TotalMilliseconds, Is.True);
                 Assert.That(timeTaken.TotalMilliseconds < waitFor.TotalMilliseconds + 1000, Is.True);
                 return;
+            }
+            finally
+            {
+                Redis.Remove(key);
+                Redis.Remove(lockKey);
             }
             Assert.Fail("should have Timed out");
         }
@@ -564,7 +573,7 @@ namespace ServiceStack.Redis.Tests
         }
 
         [Test]
-        public void Can_get_showlog()
+        public void Can_get_slowlog()
         {
             using (var redis = RedisClient.New())
             {

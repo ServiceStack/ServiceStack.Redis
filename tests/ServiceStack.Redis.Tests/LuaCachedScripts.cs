@@ -71,6 +71,8 @@ return results
         {
             using (var redis = new RedisClient())
             {
+                AddTestKeys(redis, 20);
+
                 var r = redis.ExecCachedLua(LuaScript, sha1 =>
                     redis.ExecLuaSha(sha1, "key:*", "10"));
                 Assert.That(r.Children.Count, Is.EqualTo(10));

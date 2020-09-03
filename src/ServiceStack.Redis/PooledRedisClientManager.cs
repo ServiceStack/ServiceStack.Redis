@@ -216,7 +216,9 @@ namespace ServiceStack.Redis
         /// Returns a Read/Write client (The default) using the hosts defined in ReadWriteHosts
         /// </summary>
         /// <returns></returns>
-        public IRedisClient GetClient()
+        public IRedisClient GetClient() => GetClient(false);
+
+        private RedisClient GetClient(bool forAsync)
         {
             try
             {
@@ -252,7 +254,7 @@ namespace ServiceStack.Redis
 
                         InitClient(inActiveClient);
 
-                        return !AssertAccessOnlyOnSameThread 
+                        return (!AssertAccessOnlyOnSameThread || forAsync)
                             ? inActiveClient
                             : inActiveClient.LimitAccessToThread(Thread.CurrentThread.ManagedThreadId, Environment.StackTrace);
                     }
@@ -288,7 +290,7 @@ namespace ServiceStack.Redis
                         WritePoolIndex++;
                         writeClients[inactivePoolIndex] = newClient;
 
-                        return !AssertAccessOnlyOnSameThread 
+                        return (!AssertAccessOnlyOnSameThread || forAsync)
                             ? newClient
                             : newClient.LimitAccessToThread(Thread.CurrentThread.ManagedThreadId, Environment.StackTrace);
                     }
@@ -364,7 +366,9 @@ namespace ServiceStack.Redis
         /// Returns a ReadOnly client using the hosts defined in ReadOnlyHosts.
         /// </summary>
         /// <returns></returns>
-        public virtual IRedisClient GetReadOnlyClient()
+        public virtual IRedisClient GetReadOnlyClient() => GetReadOnlyClient(false);
+
+        private RedisClient GetReadOnlyClient(bool forAsync)
         {
             try
             {

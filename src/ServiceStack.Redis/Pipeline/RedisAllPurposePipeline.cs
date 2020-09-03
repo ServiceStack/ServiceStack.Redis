@@ -1,10 +1,10 @@
-using System;
 using ServiceStack.Redis.Pipeline;
+using System;
 
 namespace ServiceStack.Redis
 {
 
-    public class RedisAllPurposePipeline : RedisCommandQueue, IRedisPipeline
+    public partial class RedisAllPurposePipeline : RedisCommandQueue, IRedisPipeline
     {
         /// <summary>
         /// General purpose pipeline

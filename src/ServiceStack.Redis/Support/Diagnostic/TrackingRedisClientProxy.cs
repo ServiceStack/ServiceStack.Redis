@@ -1,4 +1,4 @@
-#if !NETSTANDARD2_0
+#if !(NETSTANDARD2_0 || NETSTANDARD2_1)
 using System;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
@@ -7,7 +7,7 @@ using ServiceStack.Logging;
 namespace ServiceStack.Redis.Support.Diagnostic
 {
     /// <summary>
-    /// Dynamically proxies access to the IRedisClient providing events for before & after each method invocation 
+    /// Dynamically proxies access to the IRedisClient providing events for before &amp; after each method invocation 
     /// </summary>
     public class TrackingRedisClientProxy : System.Runtime.Remoting.Proxies.RealProxy
     {

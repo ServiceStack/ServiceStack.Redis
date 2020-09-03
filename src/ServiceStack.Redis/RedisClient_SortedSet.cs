@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using ServiceStack.Model;
+using ServiceStack.Redis.Pipeline;
 using ServiceStack.Redis.Support;
 using ServiceStack.Text;
 
@@ -24,7 +25,7 @@ namespace ServiceStack.Redis
     {
         public IHasNamed<IRedisSortedSet> SortedSets { get; set; }
 
-        internal class RedisClientSortedSets
+        internal partial class RedisClientSortedSets
             : IHasNamed<IRedisSortedSet>
         {
             private readonly RedisClient client;
@@ -87,36 +88,29 @@ namespace ServiceStack.Redis
 
         public bool AddRangeToSortedSet(string setId, List<string> values, double score)
         {
-            var pipeline = CreatePipelineCommand();
-            var uSetId = setId.ToUtf8Bytes();
-            var uScore = score.ToFastUtf8Bytes();
-
-            foreach (var value in values)
-            {
-                pipeline.WriteCommand(Commands.ZAdd, uSetId, uScore, value.ToUtf8Bytes());
-            }
-
+            var pipeline = AddRangeToSortedSetPrepareNonFlushed(setId, values, score.ToFastUtf8Bytes());
             pipeline.Flush();
 
-            var success = pipeline.ReadAllAsIntsHaveSuccess();
-            return success;
+            return pipeline.ReadAllAsIntsHaveSuccess();
         }
 
         public bool AddRangeToSortedSet(string setId, List<string> values, long score)
         {
+            var pipeline = AddRangeToSortedSetPrepareNonFlushed(setId, values, score.ToUtf8Bytes());
+            pipeline.Flush();
+
+            return pipeline.ReadAllAsIntsHaveSuccess();
+        }
+        RedisPipelineCommand AddRangeToSortedSetPrepareNonFlushed(string setId, List<string> values, byte[] uScore)
+        {
             var pipeline = CreatePipelineCommand();
             var uSetId = setId.ToUtf8Bytes();
-            var uScore = score.ToUtf8Bytes();
 
             foreach (var value in values)
             {
                 pipeline.WriteCommand(Commands.ZAdd, uSetId, uScore, value.ToUtf8Bytes());
             }
-
-            pipeline.Flush();
-
-            var success = pipeline.ReadAllAsIntsHaveSuccess();
-            return success;
+            return pipeline;
         }
 
         public bool RemoveItemFromSortedSet(string setId, string value)

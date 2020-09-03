@@ -19,7 +19,7 @@ namespace ServiceStack.Redis.Generic
     /// <summary>
     /// Wrap the common redis set operations under a ICollection[string] interface.
     /// </summary>
-    internal class RedisClientSortedSet<T>
+    internal partial class RedisClientSortedSet<T>
         : IRedisSortedSet<T>
     {
         private readonly RedisTypedClient<T> client;

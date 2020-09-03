@@ -20,7 +20,7 @@ namespace ServiceStack.Redis
 	/// <summary>
 	/// Wrap the common redis set operations under a ICollection[string] interface.
 	/// </summary>
-	internal class RedisClientHash
+	internal partial class RedisClientHash
 		: IRedisHash
 	{
 		private readonly RedisClient client;

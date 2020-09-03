@@ -27,7 +27,7 @@ namespace ServiceStack.Redis.Generic
             set { client.Db = value; }
         }
 
-        internal class RedisClientSets
+        internal partial class RedisClientSets
             : IHasNamed<IRedisSet<T>>
         {
             private readonly RedisTypedClient<T> client;

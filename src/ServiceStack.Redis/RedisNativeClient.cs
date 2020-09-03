@@ -64,8 +64,11 @@ namespace ServiceStack.Redis
         public bool HadExceptions => deactivatedAtTicks > 0;
 
         protected Socket socket;
+        [Obsolete("The direct stream is no longer directly available", true)] // API BREAKING CHANGE since exposed
         protected BufferedStream Bstream;
         protected SslStream sslStream;
+
+        private BufferedReader bufferedReader;
 
         private IRedisTransactionBase transaction;
         private IRedisPipelineShared pipeline;
@@ -207,6 +210,7 @@ namespace ServiceStack.Redis
             }
         }
 
+
         public void ChangeDb(long db)
         {
             this.db = db;
@@ -226,22 +230,23 @@ namespace ServiceStack.Redis
 
         public Dictionary<string, string> Info
         {
-            get
+            get => ParseInfoResult(SendExpectString(Commands.Info));
+        }
+
+        private static Dictionary<string, string> ParseInfoResult(string lines)
+        {
+            var info = new Dictionary<string, string>();
+
+            foreach (var line in lines
+                .Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries))
             {
-                var lines = SendExpectString(Commands.Info);
-                var info = new Dictionary<string, string>();
+                var p = line.IndexOf(':');
+                if (p == -1) continue;
 
-                foreach (var line in lines
-                    .Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    var p = line.IndexOf(':');
-                    if (p == -1) continue;
-
-                    info[line.Substring(0, p)] = line.Substring(p + 1);
-                }
-
-                return info;
+                info[line.Substring(0, p)] = line.Substring(p + 1);
             }
+
+            return info;
         }
 
         public string ServerVersion
@@ -254,6 +259,11 @@ namespace ServiceStack.Redis
         }
 
         public RedisData RawCommand(params object[] cmdWithArgs)
+        {
+            return SendExpectComplexResponse(PrepareRawCommand(cmdWithArgs));
+        }
+
+        private static byte[][] PrepareRawCommand(object[] cmdWithArgs)
         {
             var byteArgs = new List<byte[]>();
 
@@ -280,9 +290,7 @@ namespace ServiceStack.Redis
                     byteArgs.Add(str.ToUtf8Bytes());
                 }
             }
-
-            var data = SendExpectComplexResponse(byteArgs.ToArray());
-            return data;
+            return byteArgs.ToArray();
         }
 
         public RedisData RawCommand(params byte[][] cmdWithBinaryArgs)
@@ -394,8 +402,10 @@ namespace ServiceStack.Redis
         }
 
         public RedisKeyType GetEntryType(string key)
+            => ParseEntryType(Type(key));
+
+        private protected RedisKeyType ParseEntryType(string type)
         {
-            var type = Type(key);
             switch (type)
             {
                 case "none":
@@ -574,6 +584,12 @@ namespace ServiceStack.Redis
 
         public byte[] GetSet(string key, byte[] value)
         {
+            GetSetAssertArgs(key, ref value);
+            return SendExpectData(Commands.GetSet, key.ToUtf8Bytes(), value);
+        }
+
+        private static void GetSetAssertArgs(string key, ref byte[] value)
+        {
             if (key == null)
                 throw new ArgumentNullException("key");
 
@@ -581,8 +597,6 @@ namespace ServiceStack.Redis
 
             if (value.Length > OneGb)
                 throw new ArgumentException("value exceeds 1G", "value");
-
-            return SendExpectData(Commands.GetSet, key.ToUtf8Bytes(), value);
         }
 
         public long Exists(string key)
@@ -720,21 +734,21 @@ namespace ServiceStack.Redis
 
         public void Rename(string oldKeyname, string newKeyname)
         {
-            if (oldKeyname == null)
-                throw new ArgumentNullException("oldKeyname");
-            if (newKeyname == null)
-                throw new ArgumentNullException("newKeyname");
-
+            CheckRenameKeys(oldKeyname, newKeyname);
             SendExpectSuccess(Commands.Rename, oldKeyname.ToUtf8Bytes(), newKeyname.ToUtf8Bytes());
         }
 
-        public bool RenameNx(string oldKeyname, string newKeyname)
+        private protected static void CheckRenameKeys(string oldKeyname, string newKeyname)
         {
             if (oldKeyname == null)
                 throw new ArgumentNullException("oldKeyname");
             if (newKeyname == null)
                 throw new ArgumentNullException("newKeyname");
+        }
 
+        public bool RenameNx(string oldKeyname, string newKeyname)
+        {
+            CheckRenameKeys(oldKeyname, newKeyname);
             return SendExpectLong(Commands.RenameNx, oldKeyname.ToUtf8Bytes(), newKeyname.ToUtf8Bytes()) == Success;
         }
 
@@ -853,13 +867,17 @@ namespace ServiceStack.Redis
 
         public void ClientSetName(string name)
         {
+            ClientValidateName(name);
+            SendExpectSuccess(Commands.Client, Commands.SetName, name.ToUtf8Bytes());
+        }
+
+        private static void ClientValidateName(string name)
+        {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentException("Name cannot be null or empty");
 
             if (name.Contains(" "))
                 throw new ArgumentException("Name cannot contain spaces");
-
-            SendExpectSuccess(Commands.Client, Commands.SetName, name.ToUtf8Bytes());
         }
 
         public void ClientPause(int timeOutMs)
@@ -878,6 +896,11 @@ namespace ServiceStack.Redis
         }
 
         public long ClientKill(string addr = null, string id = null, string type = null, string skipMe = null)
+        {
+            return SendExpectLong(ClientKillPerpareArgs(addr, id, type, skipMe));
+        }
+
+        static byte[][] ClientKillPerpareArgs(string addr, string id, string type, string skipMe)
         {
             var cmdWithArgs = new List<byte[]>
                {
@@ -907,8 +930,7 @@ namespace ServiceStack.Redis
                 cmdWithArgs.Add(Commands.SkipMe);
                 cmdWithArgs.Add(skipMe.ToUtf8Bytes());
             }
-
-            return SendExpectLong(cmdWithArgs.ToArray());
+            return cmdWithArgs.ToArray();
         }
 
         public byte[][] Keys(string pattern)
@@ -921,14 +943,17 @@ namespace ServiceStack.Redis
 
         public byte[][] MGet(params byte[][] keys)
         {
+            return SendExpectMultiData(MGetPrepareArgs(keys));
+        }
+
+        private static byte[][] MGetPrepareArgs(byte[][] keys)
+        {
             if (keys == null)
                 throw new ArgumentNullException("keys");
             if (keys.Length == 0)
                 throw new ArgumentException("keys");
 
-            var cmdWithArgs = MergeCommandWithArgs(Commands.MGet, keys);
-
-            return SendExpectMultiData(cmdWithArgs);
+            return MergeCommandWithArgs(Commands.MGet, keys);
         }
 
         public byte[][] MGet(params string[] keys)
@@ -1038,6 +1063,10 @@ namespace ServiceStack.Redis
         {
             var cmdWithArgs = MergeCommandWithArgs(cmd, args);
             var multiData = SendExpectDeeplyNestedMultiData(cmdWithArgs);
+            return ParseScanResult(multiData);
+        }
+        internal static ScanResult ParseScanResult(object[] multiData)
+        {
             var counterBytes = (byte[])multiData[0];
 
             var ret = new ScanResult
@@ -1240,10 +1269,15 @@ namespace ServiceStack.Redis
 
         public byte[][] Sort(string listOrSetId, SortOptions sortOptions)
         {
+            return SendExpectMultiData(SortPrepareArgs(listOrSetId, sortOptions));
+        }
+
+        private static byte[][] SortPrepareArgs(string listOrSetId, SortOptions sortOptions)
+        {
             var cmdWithArgs = new List<byte[]>
-               {
-                   Commands.Sort, listOrSetId.ToUtf8Bytes()
-               };
+            {
+                Commands.Sort, listOrSetId.ToUtf8Bytes()
+            };
 
             if (sortOptions.SortPattern != null)
             {
@@ -1279,8 +1313,7 @@ namespace ServiceStack.Redis
                 cmdWithArgs.Add(Commands.Store);
                 cmdWithArgs.Add(sortOptions.StoreAtKey.ToUtf8Bytes());
             }
-
-            return SendExpectMultiData(cmdWithArgs.ToArray());
+            return cmdWithArgs.ToArray();
         }
 
         public long RPush(string listId, byte[] value)
@@ -1679,6 +1712,12 @@ namespace ServiceStack.Redis
 
         private byte[][] GetRange(byte[] commandBytes, string setId, int min, int max, bool withScores)
         {
+            var args = GetRangeArgs(commandBytes, setId, min, max, withScores);
+            return SendExpectMultiData(args);
+        }
+
+        private static byte[][] GetRangeArgs(byte[] commandBytes, string setId, int min, int max, bool withScores)
+        {
             if (string.IsNullOrEmpty(setId))
                 throw new ArgumentNullException("setId");
 
@@ -1691,8 +1730,7 @@ namespace ServiceStack.Redis
             {
                 cmdWithArgs.Add(Commands.WithScores);
             }
-
-            return SendExpectMultiData(cmdWithArgs.ToArray());
+            return cmdWithArgs.ToArray();
         }
 
         public byte[][] ZRange(string setId, int min, int max)
@@ -1718,6 +1756,13 @@ namespace ServiceStack.Redis
         private byte[][] GetRangeByScore(byte[] commandBytes,
             string setId, double min, double max, int? skip, int? take, bool withScores)
         {
+            var args = GetRangeByScoreArgs(commandBytes, setId, min, max, skip, take, withScores);
+            return SendExpectMultiData();
+        }
+
+        private static byte[][] GetRangeByScoreArgs(byte[] commandBytes,
+            string setId, double min, double max, int? skip, int? take, bool withScores)
+        {
             if (setId == null)
                 throw new ArgumentNullException("setId");
 
@@ -1737,34 +1782,14 @@ namespace ServiceStack.Redis
             {
                 cmdWithArgs.Add(Commands.WithScores);
             }
-
-            return SendExpectMultiData(cmdWithArgs.ToArray());
+            return cmdWithArgs.ToArray();
         }
 
         private byte[][] GetRangeByScore(byte[] commandBytes,
             string setId, long min, long max, int? skip, int? take, bool withScores)
         {
-            if (setId == null)
-                throw new ArgumentNullException("setId");
-
-            var cmdWithArgs = new List<byte[]>
-               {
-                   commandBytes, setId.ToUtf8Bytes(), min.ToUtf8Bytes(), max.ToUtf8Bytes()
-               };
-
-            if (skip.HasValue || take.HasValue)
-            {
-                cmdWithArgs.Add(Commands.Limit);
-                cmdWithArgs.Add(skip.GetValueOrDefault(0).ToUtf8Bytes());
-                cmdWithArgs.Add(take.GetValueOrDefault(0).ToUtf8Bytes());
-            }
-
-            if (withScores)
-            {
-                cmdWithArgs.Add(Commands.WithScores);
-            }
-
-            return SendExpectMultiData(cmdWithArgs.ToArray());
+            var args = GetRangeByScoreArgs(commandBytes, setId, min, max, skip, take, withScores);
+            return SendExpectMultiData(args);
         }
 
         public byte[][] ZRangeByScore(string setId, double min, double max, int? skip, int? take)
@@ -1912,7 +1937,7 @@ namespace ServiceStack.Redis
             return SendExpectLong(cmdWithArgs);
         }
 
-        public byte[][] ZRangeByLex(string setId, string min, string max, int? skip = null, int? take = null)
+        static byte[][] GetZRangeByLexArgs(string setId, string min, string max, int? skip, int? take)
         {
             if (setId == null)
                 throw new ArgumentNullException("setId");
@@ -1928,9 +1953,10 @@ namespace ServiceStack.Redis
                 cmdWithArgs.Add(skip.GetValueOrDefault(0).ToUtf8Bytes());
                 cmdWithArgs.Add(take.GetValueOrDefault(0).ToUtf8Bytes());
             }
-
-            return SendExpectMultiData(cmdWithArgs.ToArray());
+            return cmdWithArgs.ToArray();
         }
+        public byte[][] ZRangeByLex(string setId, string min, string max, int? skip = null, int? take = null)
+            => SendExpectMultiData(GetZRangeByLexArgs(setId, min, max, skip, take));
 
         public long ZLexCount(string setId, string min, string max)
         {
@@ -2167,6 +2193,12 @@ namespace ServiceStack.Redis
 
         public long GeoAdd(string key, params RedisGeo[] geoPoints)
         {
+            var cmdWithArgs = GeoAddPrepareArgs(key, geoPoints);
+            return SendExpectLong(cmdWithArgs);
+        }
+
+        private static byte[][] GeoAddPrepareArgs(string key, RedisGeo[] geoPoints)
+        {
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
 
@@ -2179,8 +2211,7 @@ namespace ServiceStack.Redis
                 members[i * 3 + 2] = geoPoint.Member.ToUtf8Bytes();
             }
 
-            var cmdWithArgs = MergeCommandWithArgs(Commands.GeoAdd, key.ToUtf8Bytes(), members);
-            return SendExpectLong(cmdWithArgs);
+            return MergeCommandWithArgs(Commands.GeoAdd, key.ToUtf8Bytes(), members);
         }
 
         public double GeoDist(string key, string fromMember, string toMember, string unit = null)
@@ -2209,6 +2240,10 @@ namespace ServiceStack.Redis
 
             var cmdWithArgs = MergeCommandWithArgs(Commands.GeoPos, key.ToUtf8Bytes(), members.Map(x => x.ToUtf8Bytes()).ToArray());
             var data = SendExpectComplexResponse(cmdWithArgs);
+            return GeoPosParseResult(members, data);
+        }
+        private static List<RedisGeo> GeoPosParseResult(string[] members, RedisData data)
+        {
             var to = new List<RedisGeo>();
 
             for (var i = 0; i < members.Length; i++)
@@ -2235,6 +2270,53 @@ namespace ServiceStack.Redis
 
         public List<RedisGeoResult> GeoRadius(string key, double longitude, double latitude, double radius, string unit,
             bool withCoords = false, bool withDist = false, bool withHash = false, int? count = null, bool? asc = null)
+        {
+            var cmdWithArgs = GeoRadiusPrepareArgs(key, longitude, latitude, radius, unit,
+                withCoords, withDist, withHash, count, asc);
+
+            var to = new List<RedisGeoResult>();
+
+            if (!(withCoords || withDist || withHash))
+            {
+                var members = SendExpectMultiData(cmdWithArgs).ToStringArray();
+                foreach (var member in members)
+                {
+                    to.Add(new RedisGeoResult { Member = member });
+                }
+            }
+            else
+            {
+                var data = SendExpectComplexResponse(cmdWithArgs);
+                GetRadiusParseResult(unit, withCoords, withDist, withHash, to, data);
+            }
+
+            return to;
+        }
+
+        private static void GetRadiusParseResult(string unit, bool withCoords, bool withDist, bool withHash, List<RedisGeoResult> to, RedisData data)
+        {
+            foreach (var child in data.Children)
+            {
+                var i = 0;
+                var result = new RedisGeoResult { Unit = unit, Member = child.Children[i++].Data.FromUtf8Bytes() };
+
+                if (withDist) result.Distance = child.Children[i++].ToDouble();
+
+                if (withHash) result.Hash = child.Children[i++].ToInt64();
+
+                if (withCoords)
+                {
+                    var children = child.Children[i].Children;
+                    result.Longitude = children[0].ToDouble();
+                    result.Latitude = children[1].ToDouble();
+                }
+
+                to.Add(result);
+            }
+        }
+
+        private static byte[][] GeoRadiusPrepareArgs(string key, double longitude, double latitude, double radius, string unit,
+            bool withCoords, bool withDist, bool withHash, int? count, bool? asc)
         {
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
@@ -2265,47 +2347,57 @@ namespace ServiceStack.Redis
             else if (asc == false)
                 args.Add(Commands.Desc);
 
-            var cmdWithArgs = MergeCommandWithArgs(Commands.GeoRadius, key.ToUtf8Bytes(), args.ToArray());
+            return MergeCommandWithArgs(Commands.GeoRadius, key.ToUtf8Bytes(), args.ToArray());
+        }
+
+        public List<RedisGeoResult> GeoRadiusByMember(string key, string member, double radius, string unit,
+            bool withCoords = false, bool withDist = false, bool withHash = false, int? count = null, bool? asc = null)
+        {
+            var cmdWithArgs = GeoRadiusByMemberPrepareArgs(key, member, radius, unit, withCoords, withDist, withHash, count, asc);
 
             var to = new List<RedisGeoResult>();
 
             if (!(withCoords || withDist || withHash))
             {
                 var members = SendExpectMultiData(cmdWithArgs).ToStringArray();
-                foreach (var member in members)
+                foreach (var x in members)
                 {
-                    to.Add(new RedisGeoResult { Member = member });
+                    to.Add(new RedisGeoResult { Member = x });
                 }
             }
             else
             {
                 var data = SendExpectComplexResponse(cmdWithArgs);
-
-                foreach (var child in data.Children)
-                {
-                    var i = 0;
-                    var result = new RedisGeoResult { Unit = unit, Member = child.Children[i++].Data.FromUtf8Bytes() };
-
-                    if (withDist) result.Distance = child.Children[i++].ToDouble();
-
-                    if (withHash) result.Hash = child.Children[i++].ToInt64();
-
-                    if (withCoords)
-                    {
-                        var children = child.Children[i].Children;
-                        result.Longitude = children[0].ToDouble();
-                        result.Latitude  = children[1].ToDouble();
-                    }
-
-                    to.Add(result);
-                }
+                GeoRadiusByMemberParseResult(unit, withCoords, withDist, withHash, to, data);
             }
 
             return to;
         }
 
-        public List<RedisGeoResult> GeoRadiusByMember(string key, string member, double radius, string unit,
-            bool withCoords = false, bool withDist = false, bool withHash = false, int? count = null, bool? asc = null)
+        private static void GeoRadiusByMemberParseResult(string unit, bool withCoords, bool withDist, bool withHash, List<RedisGeoResult> to, RedisData data)
+        {
+            foreach (var child in data.Children)
+            {
+                var i = 0;
+                var result = new RedisGeoResult { Unit = unit, Member = child.Children[i++].Data.FromUtf8Bytes() };
+
+                if (withDist) result.Distance = child.Children[i++].ToDouble();
+
+                if (withHash) result.Hash = child.Children[i++].ToInt64();
+
+                if (withCoords)
+                {
+                    var children = child.Children[i].Children;
+                    result.Longitude = children[0].ToDouble();
+                    result.Latitude = children[1].ToDouble();
+                }
+
+                to.Add(result);
+            }
+        }
+
+        static byte[][] GeoRadiusByMemberPrepareArgs(string key, string member, double radius, string unit,
+            bool withCoords, bool withDist, bool withHash, int? count, bool? asc)
         {
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
@@ -2335,43 +2427,7 @@ namespace ServiceStack.Redis
             else if (asc == false)
                 args.Add(Commands.Desc);
 
-            var cmdWithArgs = MergeCommandWithArgs(Commands.GeoRadiusByMember, key.ToUtf8Bytes(), args.ToArray());
-
-            var to = new List<RedisGeoResult>();
-
-            if (!(withCoords || withDist || withHash))
-            {
-                var members = SendExpectMultiData(cmdWithArgs).ToStringArray();
-                foreach (var x in members)
-                {
-                    to.Add(new RedisGeoResult { Member = x });
-                }
-            }
-            else
-            {
-                var data = SendExpectComplexResponse(cmdWithArgs);
-
-                foreach (var child in data.Children)
-                {
-                    var i = 0;
-                    var result = new RedisGeoResult { Unit = unit, Member = child.Children[i++].Data.FromUtf8Bytes() };
-
-                    if (withDist) result.Distance = child.Children[i++].ToDouble();
-
-                    if (withHash) result.Hash = child.Children[i++].ToInt64();
-
-                    if (withCoords)
-                    {
-                        var children = child.Children[i].Children;
-                        result.Longitude = children[0].ToDouble();
-                        result.Latitude  = children[1].ToDouble();
-                    }
-
-                    to.Add(result);
-                }
-            }
-
-            return to;
+            return MergeCommandWithArgs(Commands.GeoRadiusByMember, key.ToUtf8Bytes(), args.ToArray());
         }
 
         #endregion
@@ -2432,7 +2488,7 @@ namespace ServiceStack.Redis
             try
             {
                 // workaround for a .net bug: http://support.microsoft.com/kb/821625
-                Bstream?.Close();
+                bufferedReader?.Close();
             }
             catch { }
             try
@@ -2446,7 +2502,7 @@ namespace ServiceStack.Redis
             }
             catch { }
 
-            Bstream = null;
+            bufferedReader = null;
             sslStream = null;
             socket = null;
         }

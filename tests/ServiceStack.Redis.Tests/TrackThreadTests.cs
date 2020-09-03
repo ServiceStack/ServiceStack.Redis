@@ -18,7 +18,7 @@ namespace ServiceStack.Redis.Tests
             {
                 var threadId = Thread.CurrentThread.ManagedThreadId.ToString();
                 var key = $"Thread#{threadId}";
-                redis.SetValue(key, threadId);                
+                redis.SetValue(key, threadId);
     
                 ThreadPool.QueueUserWorkItem(_ => 
                 {
@@ -43,7 +43,7 @@ namespace ServiceStack.Redis.Tests
                 
                 Thread.Sleep(100);
                 
-                Console.WriteLine("From Test: " + redis.GetValue(key));            
+                Console.WriteLine("From Test: " + redis.GetValue(key));
                 
                 if (poolEx == null)
                     throw new Exception("Should throw InvalidAccessException");

@@ -23,7 +23,7 @@ namespace ServiceStack.Redis
     {
         public IHasNamed<IRedisHash> Hashes { get; set; }
 
-        internal class RedisClientHashes
+        internal partial class RedisClientHashes
             : IHasNamed<IRedisHash>
         {
             private readonly RedisClient client;
@@ -60,11 +60,22 @@ namespace ServiceStack.Redis
 
         public void SetRangeInHash(string hashId, IEnumerable<KeyValuePair<string, string>> keyValuePairs)
         {
+            if (SetRangeInHashPrepare(keyValuePairs, out var keys, out var values))
+            {
+                base.HMSet(hashId, keys, values);
+            }
+        }
+        bool SetRangeInHashPrepare(IEnumerable<KeyValuePair<string, string>> keyValuePairs, out byte[][] keys, out byte[][] values)
+        {
             var keyValuePairsList = keyValuePairs.ToList();
-            if (keyValuePairsList.Count == 0) return;
+            if (keyValuePairsList.Count == 0)
+            {
+                keys = values = default;
+                return false;
+            }
 
-            var keys = new byte[keyValuePairsList.Count][];
-            var values = new byte[keyValuePairsList.Count][];
+            keys = new byte[keyValuePairsList.Count][];
+            values = new byte[keyValuePairsList.Count][];
 
             for (var i = 0; i < keyValuePairsList.Count; i++)
             {
@@ -72,8 +83,7 @@ namespace ServiceStack.Redis
                 keys[i] = kvp.Key.ToUtf8Bytes();
                 values[i] = kvp.Value.ToUtf8Bytes();
             }
-
-            base.HMSet(hashId, keys, values);
+            return true;
         }
 
         public long IncrementValueInHash(string hashId, string key, int incrementBy)

@@ -90,6 +90,12 @@ namespace ServiceStack.Redis
                 SendTimeout = SendTimeout,
                 ReceiveTimeout = ReceiveTimeout
             };
+#if DEBUG
+            // allow sync commands during connect (we're OK with sync for connect; the
+            // DebugAllowSync feature being used here only impacts tests)
+            var oldDebugAllowSync = DebugAllowSync;
+            DebugAllowSync = true;
+#endif
             try
             {
                 if (log.IsDebugEnabled)
@@ -180,7 +186,7 @@ namespace ServiceStack.Redis
                     networkStream = sslStream;
                 }
 
-                Bstream = new BufferedStream(networkStream, 16 * 1024);
+                bufferedReader = new BufferedReader(networkStream, 16 * 1024);
 
                 if (!string.IsNullOrEmpty(Password))
                     SendUnmanagedExpectSuccess(Commands.Auth, Password.ToUtf8Bytes());
@@ -233,6 +239,12 @@ namespace ServiceStack.Redis
                 logError(ErrorConnect.Fmt(Host, Port));
                 throw;
             }
+            finally
+            {
+#if DEBUG
+                DebugAllowSync = oldDebugAllowSync;
+#endif
+            }
         }
 
         public static string ErrorConnect = "Could not connect to redis Instance at {0}:{1}";
@@ -244,11 +256,12 @@ namespace ServiceStack.Redis
         protected string ReadLine()
         {
             AssertNotDisposed();
+            AssertNotAsyncOnly();
 
             var sb = StringBuilderCache.Allocate();
 
             int c;
-            while ((c = Bstream.ReadByte()) != -1)
+            while ((c = bufferedReader.ReadByte()) != -1)
             {
                 if (c == '\r')
                     continue;
@@ -426,7 +439,7 @@ namespace ServiceStack.Redis
             if (log.IsDebugEnabled && RedisConfig.EnableVerboseLogging)
                 logDebug("stream.Write: " + Encoding.UTF8.GetString(bytes, 0, Math.Min(bytes.Length, 50)).Replace("\r\n"," ").SafeSubstring(0,50));
 
-            Bstream.Write(bytes, 0, bytes.Length);
+            SendDirectToSocket(new ArraySegment<byte>(bytes, 0, bytes.Length));
 
             ExpectSuccess();
         }
@@ -443,7 +456,9 @@ namespace ServiceStack.Redis
             }
         }
 
-        readonly IList<ArraySegment<byte>> cmdBuffer = new List<ArraySegment<byte>>();
+        // trated as List<T> rather than IList<T> to avoid allocs during foreach
+        readonly List<ArraySegment<byte>> cmdBuffer = new List<ArraySegment<byte>>();
+
         byte[] currentBuffer = BufferPool.GetBuffer();
         int currentBufferIndex;
 
@@ -524,17 +539,21 @@ namespace ServiceStack.Redis
                     //Sending IList<ArraySegment> Throws 'Message to Large' SocketException in Mono
                     foreach (var segment in cmdBuffer)
                     {
-                        var buffer = segment.Array;
-                        if (sslStream == null)
-                        {
-                            socket.Send(buffer, segment.Offset, segment.Count, SocketFlags.None);
-                        }
-                        else
-                        {
-                            sslStream.Write(buffer, segment.Offset, segment.Count);
-                        }
+                        SendDirectToSocket(segment);
                     }
                 }
+            }
+        }
+
+        private void SendDirectToSocket(ArraySegment<byte> segment)
+        {
+            if (sslStream == null)
+            {
+                socket.Send(segment.Array, segment.Offset, segment.Count, SocketFlags.None);
+            }
+            else
+            {
+                sslStream.Write(segment.Array, segment.Offset, segment.Count);
             }
         }
 
@@ -555,27 +574,41 @@ namespace ServiceStack.Redis
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         void AssertNotDisposed()
         {
-            if (Bstream == null)
+            if (bufferedReader == null)
                 throw new ObjectDisposedException($"Redis Client {ClientId} is Disposed");
         }
 
         private int SafeReadByte(string name)
         {
             AssertNotDisposed();
-            
+            AssertNotAsyncOnly();
+
             if (log.IsDebugEnabled && RedisConfig.EnableVerboseLogging)
                 logDebug(name + "()");
         
-            return Bstream.ReadByte();
+            return bufferedReader.ReadByte();
         }
 
         internal TrackThread? TrackThread;
-        
+
+        partial void AssertNotAsyncOnly([CallerMemberName] string caller = default);
+#if DEBUG
+        public bool DebugAllowSync { get; set; } = true;
+        partial void AssertNotAsyncOnly(string caller)
+        {
+            // for unit tests only; asserts that we're not meant to be in an async context
+            if (!DebugAllowSync)
+                throw new InvalidOperationException("Unexpected synchronous operation detected from '" + caller + "'");
+        }
+#endif
+
+
         protected T SendReceive<T>(byte[][] cmdWithBinaryArgs,
             Func<T> fn,
             Action<Func<T>> completePipelineFn = null,
             bool sendWithoutRead = false)
         {
+            if (Pipeline is null) AssertNotAsyncOnly();
             if (TrackThread != null)
             {
                 if (TrackThread.Value.ThreadId != Thread.CurrentThread.ManagedThreadId)
@@ -904,8 +937,11 @@ namespace ServiceStack.Redis
             if (c == -1)
                 throw CreateNoMoreDataError();
 
-            var s = ReadLine();
+            return ParseLong(c, ReadLine());
+        }
 
+        private long ParseLong(int c, string s)
+        {
             if (log.IsDebugEnabled)
                 Log("R: {0}", s);
 
@@ -918,7 +954,7 @@ namespace ServiceStack.Redis
                 if (long.TryParse(s, out i))
                     return i;
             }
-            throw CreateResponseError("Unknown reply on integer response: " + c + s);
+            throw CreateResponseError("Unknown reply on integer response: " + ((char)c) + s); // c here is the protocol prefix
         }
 
         public double ReadDouble()
@@ -963,7 +999,7 @@ namespace ServiceStack.Redis
                     var offset = 0;
                     while (count > 0)
                     {
-                        var readCount = Bstream.Read(retbuf, offset, count);
+                        var readCount = bufferedReader.Read(retbuf, offset, count);
                         if (readCount <= 0)
                             throw CreateResponseError("Unexpected end of Stream");
 
@@ -971,7 +1007,7 @@ namespace ServiceStack.Redis
                         count -= readCount;
                     }
 
-                    if (Bstream.ReadByte() != '\r' || Bstream.ReadByte() != '\n')
+                    if (bufferedReader.ReadByte() != '\r' || bufferedReader.ReadByte() != '\n')
                         throw CreateResponseError("Invalid termination");
 
                     return retbuf;
@@ -1027,7 +1063,7 @@ namespace ServiceStack.Redis
                     break;
             }
 
-            throw CreateResponseError("Unknown reply on multi-request: " + c + s);
+            throw CreateResponseError("Unknown reply on multi-request: " + ((char)c) + s); // c here is the protocol prefix
         }
 
         private object[] ReadDeeplyNestedMultiData()
@@ -1071,7 +1107,7 @@ namespace ServiceStack.Redis
                     return s;
             }
 
-            throw CreateResponseError("Unknown reply on multi-request: " + c + s);
+            throw CreateResponseError("Unknown reply on multi-request: " + ((char)c) + s); // c here is the protocol prefix
         }
 
         internal RedisData ReadComplexResponse()
@@ -1112,7 +1148,7 @@ namespace ServiceStack.Redis
                     return new RedisData { Data = s.ToUtf8Bytes() };
             }
 
-            throw CreateResponseError("Unknown reply on multi-request: " + c + s);
+            throw CreateResponseError("Unknown reply on multi-request: " + ((char)c) + s); // c here is the protocol prefix
         }
 
         internal int ReadMultiDataResultCount()
@@ -1133,7 +1169,7 @@ namespace ServiceStack.Redis
                     return count;
                 }
             }
-            throw CreateResponseError("Unknown reply on multi-request: " + c + s);
+            throw CreateResponseError("Unknown reply on multi-request: " + ((char)c) + s); // c here is the protocol prefix
         }
 
         private static void AssertListIdAndValue(string listId, byte[] value)

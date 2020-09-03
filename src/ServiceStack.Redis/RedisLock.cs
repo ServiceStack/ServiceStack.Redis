@@ -1,20 +1,23 @@
-using System;
-using ServiceStack.Common;
 using ServiceStack.Text;
+using System;
 
 namespace ServiceStack.Redis
 {
-    public class RedisLock
+    public partial class RedisLock
         : IDisposable
     {
-        private readonly IRedisClient redisClient;
+        private readonly object untypedClient;
         private readonly string key;
 
-        public RedisLock(IRedisClient redisClient, string key, TimeSpan? timeOut)
+        private RedisLock(object redisClient, string key)
         {
-            this.redisClient = redisClient;
+            this.untypedClient = redisClient;
             this.key = key;
+        }
 
+        public RedisLock(IRedisClient redisClient, string key, TimeSpan? timeOut)
+             : this(redisClient, key)
+        {
             ExecUtils.RetryUntilTrue(
                 () =>
                     {
@@ -65,7 +68,7 @@ namespace ServiceStack.Redis
 
         public void Dispose()
         {
-            redisClient.Remove(key);
+            ((IRedisClient)untypedClient).Remove(key);
         }
     }
 }
