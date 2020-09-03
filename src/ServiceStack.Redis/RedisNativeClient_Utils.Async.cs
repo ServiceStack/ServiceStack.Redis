@@ -250,7 +250,7 @@ namespace ServiceStack.Redis
                     }
 
                     Interlocked.Increment(ref RedisState.TotalRetryCount);
-                    await Task.Delay(GetBackOffMultiplier(++i)).ConfigureAwait(false);
+                    await Task.Delay(GetBackOffMultiplier(++i), token).ConfigureAwait(false);
                 }
             }
         }

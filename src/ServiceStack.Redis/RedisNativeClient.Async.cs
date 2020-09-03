@@ -48,7 +48,7 @@ namespace ServiceStack.Redis
             value ??= TypeConstants.EmptyByteArray;
 
             if (value.Length > OneGb)
-                throw new ArgumentException("value exceeds 1G", "value");
+                throw new ArgumentException("value exceeds 1G", nameof(value));
 
             var entryExists = exists ? Commands.Xx : Commands.Nx;
             byte[][] args;
@@ -73,7 +73,7 @@ namespace ServiceStack.Redis
             value ??= TypeConstants.EmptyByteArray;
 
             if (value.Length > OneGb)
-                throw new ArgumentException("value exceeds 1G", "value");
+                throw new ArgumentException("value exceeds 1G", nameof(value));
 
             byte[][] args;
             if (expiryMilliseconds != 0)
@@ -162,16 +162,16 @@ namespace ServiceStack.Redis
         ValueTask<string> IRedisNativeClientAsync.RandomKeyAsync(CancellationToken token)
             => SendExpectDataAsync(token, Commands.RandomKey).FromUtf8BytesAsync();
 
-        ValueTask IRedisNativeClientAsync.RenameAsync(string oldKeyname, string newKeyname, CancellationToken token)
+        ValueTask IRedisNativeClientAsync.RenameAsync(string oldKeyName, string newKeyName, CancellationToken token)
         {
-            CheckRenameKeys(oldKeyname, newKeyname);
-            return SendExpectSuccessAsync(token, Commands.Rename, oldKeyname.ToUtf8Bytes(), newKeyname.ToUtf8Bytes());
+            CheckRenameKeys(oldKeyName, newKeyName);
+            return SendExpectSuccessAsync(token, Commands.Rename, oldKeyName.ToUtf8Bytes(), newKeyName.ToUtf8Bytes());
         }
 
-        ValueTask<bool> IRedisNativeClientAsync.RenameNxAsync(string oldKeyname, string newKeyname, CancellationToken token)
+        ValueTask<bool> IRedisNativeClientAsync.RenameNxAsync(string oldKeyName, string newKeyName, CancellationToken token)
         {
-            CheckRenameKeys(oldKeyname, newKeyname);
-            return SendExpectLongAsync(token, Commands.RenameNx, oldKeyname.ToUtf8Bytes(), newKeyname.ToUtf8Bytes()).IsSuccessAsync();
+            CheckRenameKeys(oldKeyName, newKeyName);
+            return SendExpectLongAsync(token, Commands.RenameNx, oldKeyName.ToUtf8Bytes(), newKeyName.ToUtf8Bytes()).IsSuccessAsync();
         }
 
         ValueTask IRedisNativeClientAsync.MSetAsync(byte[][] keys, byte[][] values, CancellationToken token)
@@ -308,7 +308,7 @@ namespace ServiceStack.Redis
             value ??= TypeConstants.EmptyByteArray;
 
             if (value.Length > OneGb)
-                throw new ArgumentException("value exceeds 1G", "value");
+                throw new ArgumentException("value exceeds 1G", nameof(value));
 
             return SendExpectSuccessAsync(token, Commands.SetEx, key.ToUtf8Bytes(), expireInSeconds.ToUtf8Bytes(), value);
         }
@@ -455,7 +455,7 @@ namespace ServiceStack.Redis
         }
 
         ValueTask<Dictionary<string, string>> IRedisNativeClientAsync.InfoAsync(CancellationToken token)
-            => SendExpectStringAsync(token, Commands.Info).Await(info => ParseInfoResult(info));
+            => SendExpectStringAsync(token, Commands.Info).Await(ParseInfoResult);
 
         ValueTask<byte[][]> IRedisNativeClientAsync.ZRangeByLexAsync(string setId, string min, string max, int? skip, int? take, CancellationToken token)
             => SendExpectMultiDataAsync(token, GetZRangeByLexArgs(setId, min, max, skip, take));

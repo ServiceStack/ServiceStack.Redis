@@ -46,7 +46,7 @@ namespace ServiceStack.Redis
             => AsyncClient.GetAllItemsFromSetAsync(setId, token);
 
         IAsyncEnumerator<string> IAsyncEnumerable<string>.GetAsyncEnumerator(CancellationToken token)
-            => AsyncClient.ScanAllSetItemsAsync(setId).GetAsyncEnumerator(token); // uses SSCAN
+            => AsyncClient.ScanAllSetItemsAsync(setId, token: token).GetAsyncEnumerator(token); // uses SSCAN
 
         ValueTask<string> IRedisSetAsync.GetRandomEntryAsync(CancellationToken token)
             => AsyncClient.GetRandomItemFromSetAsync(setId, token);

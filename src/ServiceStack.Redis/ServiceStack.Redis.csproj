@@ -42,8 +42,5 @@
     <!-- note: not needed from netstandard2.1 or netcoreapp3.0 onwards -->
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="AsyncInterfaces\ServiceStack.Interfaces\Caching\" />
-  </ItemGroup>
   
 </Project>

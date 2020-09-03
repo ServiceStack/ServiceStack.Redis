@@ -25,16 +25,16 @@ namespace ServiceStack.Redis.Generic
         IRedisSortedSetAsync<T> AsAsync() => this;
 
         ValueTask IRedisSortedSetAsync<T>.AddAsync(T item, double score, CancellationToken token)
-            => AsyncClient.AddItemToSortedSetAsync(this, item, score);
+            => AsyncClient.AddItemToSortedSetAsync(this, item, score, token);
 
         ValueTask<int> IRedisSortedSetAsync<T>.CountAsync(CancellationToken token)
             => AsyncClient.GetSortedSetCountAsync(this, token).AsInt32();
 
         ValueTask<List<T>> IRedisSortedSetAsync<T>.GetAllAsync(CancellationToken token)
-            => AsyncClient.GetAllItemsFromSortedSetAsync(this);
+            => AsyncClient.GetAllItemsFromSortedSetAsync(this, token);
 
         ValueTask<List<T>> IRedisSortedSetAsync<T>.GetAllDescendingAsync(CancellationToken token)
-            => AsyncClient.GetAllItemsFromSortedSetDescAsync(this);
+            => AsyncClient.GetAllItemsFromSortedSetDescAsync(this, token);
 
         async IAsyncEnumerator<T> IAsyncEnumerable<T>.GetAsyncEnumerator(CancellationToken token)
         {

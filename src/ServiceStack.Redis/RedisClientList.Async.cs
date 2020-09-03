@@ -40,7 +40,7 @@ namespace ServiceStack.Redis
             => AsyncClient.GetListCountAsync(listId, token).AsInt32();
 
         ValueTask<string> IRedisListAsync.DequeueAsync(CancellationToken token)
-            => AsyncClient.DequeueItemFromListAsync(listId);
+            => AsyncClient.DequeueItemFromListAsync(listId, token);
 
         ValueTask IRedisListAsync.EnqueueAsync(string value, CancellationToken token)
             => AsyncClient.EnqueueItemOnListAsync(listId, value, token);
@@ -138,7 +138,7 @@ namespace ServiceStack.Redis
         }
 
         ValueTask IRedisListAsync.ClearAsync(CancellationToken token)
-            => AsyncClient.RemoveAllFromListAsync(listId);
+            => AsyncClient.RemoveAllFromListAsync(listId, token);
 
         async ValueTask<int> IRedisListAsync.IndexOfAsync(string value, CancellationToken token)
         {
@@ -153,9 +153,9 @@ namespace ServiceStack.Redis
         }
 
         ValueTask<string> IRedisListAsync.ElementAtAsync(int index, CancellationToken token)
-            => AsyncClient.GetItemFromListAsync(listId, index);
+            => AsyncClient.GetItemFromListAsync(listId, index, token);
 
         ValueTask IRedisListAsync.SetValueAsync(int index, string value, CancellationToken token)
-            => AsyncClient.SetItemInListAsync(listId, index, value);
+            => AsyncClient.SetItemInListAsync(listId, index, value, token);
     }
 }

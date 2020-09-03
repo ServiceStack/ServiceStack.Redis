@@ -30,19 +30,19 @@ namespace ServiceStack.Redis
         async Task<bool> ICacheClientAsync.SetAsync<T>(string key, T value, CancellationToken token)
         {
             await using var client = await GetClientAsync(token).ConfigureAwait(false);
-            return await client.SetAsync<T>(key, value, token).ConfigureAwait(false);
+            return await client.SetAsync(key, value, token).ConfigureAwait(false);
         }
 
         async Task<bool> ICacheClientAsync.SetAsync<T>(string key, T value, DateTime expiresAt, CancellationToken token)
         {
             await using var client = await GetClientAsync(token).ConfigureAwait(false);
-            return await client.SetAsync<T>(key, value, expiresAt, token).ConfigureAwait(false);
+            return await client.SetAsync(key, value, expiresAt, token).ConfigureAwait(false);
         }
 
         async Task<bool> ICacheClientAsync.SetAsync<T>(string key, T value, TimeSpan expiresIn, CancellationToken token)
         {
             await using var client = await GetClientAsync(token).ConfigureAwait(false);
-            return await client.SetAsync<T>(key, value, expiresIn, token).ConfigureAwait(false);
+            return await client.SetAsync(key, value, expiresIn, token).ConfigureAwait(false);
         }
 
         async Task ICacheClientAsync.FlushAllAsync(CancellationToken token)
@@ -60,7 +60,7 @@ namespace ServiceStack.Redis
         async Task ICacheClientAsync.SetAllAsync<T>(IDictionary<string, T> values, CancellationToken token)
         {
             await using var client = await GetClientAsync(token).ConfigureAwait(false);
-            await client.SetAllAsync<T>(values, token).ConfigureAwait(false);
+            await client.SetAllAsync(values, token).ConfigureAwait(false);
         }
 
         async Task<bool> ICacheClientAsync.RemoveAsync(string key, CancellationToken token)
@@ -129,37 +129,37 @@ namespace ServiceStack.Redis
         async Task<bool> ICacheClientAsync.AddAsync<T>(string key, T value, CancellationToken token)
         {
             await using var client = await GetClientAsync(token).ConfigureAwait(false);
-            return await client.AddAsync<T>(key, value, token).ConfigureAwait(false);
+            return await client.AddAsync(key, value, token).ConfigureAwait(false);
         }
 
         async Task<bool> ICacheClientAsync.ReplaceAsync<T>(string key, T value, CancellationToken token)
         {
             await using var client = await GetClientAsync(token).ConfigureAwait(false);
-            return await client.ReplaceAsync<T>(key, value, token).ConfigureAwait(false);
+            return await client.ReplaceAsync(key, value, token).ConfigureAwait(false);
         }
 
         async Task<bool> ICacheClientAsync.AddAsync<T>(string key, T value, DateTime expiresAt, CancellationToken token)
         {
             await using var client = await GetClientAsync(token).ConfigureAwait(false);
-            return await client.AddAsync<T>(key, value, expiresAt, token).ConfigureAwait(false);
+            return await client.AddAsync(key, value, expiresAt, token).ConfigureAwait(false);
         }
 
         async Task<bool> ICacheClientAsync.ReplaceAsync<T>(string key, T value, DateTime expiresAt, CancellationToken token)
         {
             await using var client = await GetClientAsync(token).ConfigureAwait(false);
-            return await client.ReplaceAsync<T>(key, value, expiresAt, token).ConfigureAwait(false);
+            return await client.ReplaceAsync(key, value, expiresAt, token).ConfigureAwait(false);
         }
 
         async Task<bool> ICacheClientAsync.AddAsync<T>(string key, T value, TimeSpan expiresIn, CancellationToken token)
         {
             await using var client = await GetClientAsync(token).ConfigureAwait(false);
-            return await client.AddAsync<T>(key, value, expiresIn, token).ConfigureAwait(false);
+            return await client.AddAsync(key, value, expiresIn, token).ConfigureAwait(false);
         }
 
         async Task<bool> ICacheClientAsync.ReplaceAsync<T>(string key, T value, TimeSpan expiresIn, CancellationToken token)
         {
             await using var client = await GetClientAsync(token).ConfigureAwait(false);
-            return await client.ReplaceAsync<T>(key, value, expiresIn, token).ConfigureAwait(false);
+            return await client.ReplaceAsync(key, value, expiresIn, token).ConfigureAwait(false);
         }
     }
 }

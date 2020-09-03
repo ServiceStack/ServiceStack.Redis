@@ -19,7 +19,7 @@ namespace ServiceStack.Redis.Internal
             {
                 return Awaited(pending);
             }
-            async static ValueTask Awaited(ValueTask<T> pending)
+            static async ValueTask Awaited(ValueTask<T> pending)
                 => await pending.ConfigureAwait(false);
         }
 
@@ -27,7 +27,7 @@ namespace ServiceStack.Redis.Internal
         internal static ValueTask<TTo> Await<TFrom, TTo>(this ValueTask<TFrom> pending, Func<TFrom, TTo> projection)
         {
             return pending.IsCompletedSuccessfully ? projection(pending.Result).AsValueTaskResult() : Awaited(pending, projection);
-            async static ValueTask<TTo> Awaited(ValueTask<TFrom> pending, Func<TFrom, TTo> projection)
+            static async ValueTask<TTo> Awaited(ValueTask<TFrom> pending, Func<TFrom, TTo> projection)
                 => projection(await pending.ConfigureAwait(false));
         }
 
@@ -35,7 +35,7 @@ namespace ServiceStack.Redis.Internal
         internal static ValueTask<int> AsInt32(this ValueTask<long> pending)
         {
             return pending.IsCompletedSuccessfully ? (checked((int)pending.Result)).AsValueTaskResult() : Awaited(pending);
-            async static ValueTask<int> Awaited(ValueTask<long> pending)
+            static async ValueTask<int> Awaited(ValueTask<long> pending)
                 => checked((int)await pending.ConfigureAwait(false));
         }
 
@@ -43,7 +43,7 @@ namespace ServiceStack.Redis.Internal
         internal static ValueTask<TTo> Await<TFrom, TTo, TState>(this ValueTask<TFrom> pending, Func<TFrom, TState, TTo> projection, TState state)
         {
             return pending.IsCompletedSuccessfully ? projection(pending.Result, state).AsValueTaskResult() : Awaited(pending, projection, state);
-            async static ValueTask<TTo> Awaited(ValueTask<TFrom> pending, Func<TFrom, TState, TTo> projection, TState state)
+            static async ValueTask<TTo> Awaited(ValueTask<TFrom> pending, Func<TFrom, TState, TTo> projection, TState state)
                 => projection(await pending.ConfigureAwait(false), state);
         }
 
@@ -59,7 +59,7 @@ namespace ServiceStack.Redis.Internal
             {
                 return Awaited(pending);
             }
-            async static ValueTask<bool> Awaited(ValueTask pending)
+            static async ValueTask<bool> Awaited(ValueTask pending)
             {
                 await pending.ConfigureAwait(false);
                 return true;
@@ -78,7 +78,7 @@ namespace ServiceStack.Redis.Internal
             {
                 return Awaited(pending);
             }
-            async static Task<bool> Awaited(ValueTask pending)
+            static async Task<bool> Awaited(ValueTask pending)
             {
                 await pending.ConfigureAwait(false);
                 return true;
@@ -97,7 +97,7 @@ namespace ServiceStack.Redis.Internal
             {
                 return Awaited(pending);
             }
-            async static ValueTask<bool> Awaited(ValueTask<T> pending)
+            static async ValueTask<bool> Awaited(ValueTask<T> pending)
             {
                 await pending.ConfigureAwait(false);
                 return true;
@@ -108,7 +108,7 @@ namespace ServiceStack.Redis.Internal
         internal static ValueTask<bool> IsSuccessAsync(this ValueTask<long> pending)
         {
             return pending.IsCompletedSuccessfully ? (pending.Result == RedisNativeClient.Success).AsValueTaskResult() : Awaited(pending);
-            async static ValueTask<bool> Awaited(ValueTask<long> pending)
+            static async ValueTask<bool> Awaited(ValueTask<long> pending)
                 => (await pending.ConfigureAwait(false)) == RedisNativeClient.Success;
         }
 
@@ -116,7 +116,7 @@ namespace ServiceStack.Redis.Internal
         internal static Task<bool> IsSuccessTaskAsync(this ValueTask<long> pending)
         {
             return pending.IsCompletedSuccessfully ? (pending.Result == RedisNativeClient.Success ? s_TaskTrue : s_TaskFalse) : Awaited(pending);
-            async static Task<bool> Awaited(ValueTask<long> pending)
+            static async Task<bool> Awaited(ValueTask<long> pending)
                 => (await pending.ConfigureAwait(false)) == RedisNativeClient.Success;
         }
 
@@ -145,7 +145,7 @@ namespace ServiceStack.Redis.Internal
         internal static ValueTask<T> Await<T>(this ValueTask pending, T result)
         {
             return pending.IsCompletedSuccessfully ? result.AsValueTaskResult() : Awaited(pending, result);
-            async static ValueTask<T> Awaited(ValueTask pending, T result)
+            static async ValueTask<T> Awaited(ValueTask pending, T result)
             {
                 await pending.ConfigureAwait(false);
                 return result;

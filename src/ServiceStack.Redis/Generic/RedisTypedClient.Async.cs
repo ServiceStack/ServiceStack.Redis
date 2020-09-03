@@ -200,20 +200,20 @@ namespace ServiceStack.Redis.Generic
         async ValueTask IRedisTypedClientAsync<T>.SetValueAsync(string key, T entity, TimeSpan expireIn, CancellationToken token)
         {
             AssertNotNull(key);
-            await AsyncClient.SetAsync(key, SerializeValue(entity)).ConfigureAwait(false);
+            await AsyncClient.SetAsync(key, SerializeValue(entity), token).ConfigureAwait(false);
             await client.RegisterTypeIdAsync(entity, token).ConfigureAwait(false);
         }
 
         async ValueTask<bool> IRedisTypedClientAsync<T>.SetValueIfNotExistsAsync(string key, T entity, CancellationToken token)
         {
-            var success = await AsyncNative.SetNXAsync(key, SerializeValue(entity)).IsSuccessAsync().ConfigureAwait(false);
+            var success = await AsyncNative.SetNXAsync(key, SerializeValue(entity), token).IsSuccessAsync().ConfigureAwait(false);
             if (success) await client.RegisterTypeIdAsync(entity, token).ConfigureAwait(false);
             return success;
         }
 
         async ValueTask<bool> IRedisTypedClientAsync<T>.SetValueIfExistsAsync(string key, T entity, CancellationToken token)
         {
-            var success = await AsyncNative.SetAsync(key, SerializeValue(entity), exists: true).ConfigureAwait(false);
+            var success = await AsyncNative.SetAsync(key, SerializeValue(entity), exists: true, token: token).ConfigureAwait(false);
             if (success) await client.RegisterTypeIdAsync(entity, token).ConfigureAwait(false);
             return success;
         }
@@ -365,7 +365,7 @@ namespace ServiceStack.Redis.Generic
             => AsyncNative.SCardAsync(set.Id, token);
 
         ValueTask<bool> IRedisTypedClientAsync<T>.SetContainsItemAsync(IRedisSetAsync<T> set, T item, CancellationToken token)
-            => AsyncNative.SIsMemberAsync(set.Id, SerializeValue(item)).IsSuccessAsync();
+            => AsyncNative.SIsMemberAsync(set.Id, SerializeValue(item), token).IsSuccessAsync();
 
         async ValueTask<HashSet<T>> IRedisTypedClientAsync<T>.GetIntersectFromSetsAsync(IRedisSetAsync<T>[] sets, CancellationToken token)
         {

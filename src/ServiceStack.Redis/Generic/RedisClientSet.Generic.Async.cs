@@ -57,7 +57,7 @@ namespace ServiceStack.Redis.Generic
                 List<T> pageResults;
                 do
                 {
-                    pageResults = await AsyncClient.GetSortedEntryValuesAsync(this, skip, skip + PageLimit - 1).ConfigureAwait(false);
+                    pageResults = await AsyncClient.GetSortedEntryValuesAsync(this, skip, skip + PageLimit - 1, token).ConfigureAwait(false);
                     foreach (var result in pageResults)
                     {
                         yield return result;

@@ -252,7 +252,7 @@ namespace ServiceStack.Redis
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (keys.Count == 0) return new List<string>().AsValueTaskResult();
 
-            return NativeAsync.MGetAsync(keys.ToArray(), token).Await(val => ParseGetValuesResult(val));
+            return NativeAsync.MGetAsync(keys.ToArray(), token).Await(ParseGetValuesResult);
         }
 
         ValueTask<List<T>> IRedisClientAsync.GetValuesAsync<T>(List<string> keys, CancellationToken token)
@@ -260,7 +260,7 @@ namespace ServiceStack.Redis
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (keys.Count == 0) return new List<T>().AsValueTaskResult();
 
-            return NativeAsync.MGetAsync(keys.ToArray(), token).Await(value => ParseGetValuesResult<T>(value));
+            return NativeAsync.MGetAsync(keys.ToArray(), token).Await(ParseGetValuesResult<T>);
         }
 
         ValueTask<Dictionary<string, string>> IRedisClientAsync.GetValuesMapAsync(List<string> keys, CancellationToken token)
@@ -407,19 +407,21 @@ namespace ServiceStack.Redis
             AssertNotInTransaction();
             return ExecAsync(async r =>
             {
-                await r.SetAsync(key, value).ConfigureAwait(false);
-                await r.ExpireEntryAtAsync(key, ConvertToServerDate(expiresAt)).ConfigureAwait(false);
+                await r.SetAsync(key, value, token).ConfigureAwait(false);
+                await r.ExpireEntryAtAsync(key, ConvertToServerDate(expiresAt), token).ConfigureAwait(false);
             }).AwaitAsTrueTask();
         }
         Task<bool> ICacheClientAsync.SetAsync<T>(string key, T value, TimeSpan expiresIn, CancellationToken token)
         {
             if (AssertServerVersionNumber() >= 2600)
             {
-                return ExecAsync(r => ((IRedisNativeClientAsync)r).SetAsync(key, ToBytes(value), 0, expiryMilliseconds: (long)expiresIn.TotalMilliseconds)).AwaitAsTrueTask();
+                return ExecAsync(r => ((IRedisNativeClientAsync)r)
+                    .SetAsync(key, ToBytes(value), 0, expiryMilliseconds: (long)expiresIn.TotalMilliseconds, token)).AwaitAsTrueTask();
             }
             else
             {
-                return ExecAsync(r => ((IRedisNativeClientAsync)r).SetExAsync(key, (int)expiresIn.TotalSeconds, ToBytes(value))).AwaitAsTrueTask();
+                return ExecAsync(r => ((IRedisNativeClientAsync)r)
+                    .SetExAsync(key, (int)expiresIn.TotalSeconds, ToBytes(value), token)).AwaitAsTrueTask();
             }
         }
 
@@ -640,7 +642,7 @@ namespace ServiceStack.Redis
         {
             if (ids == null || ids.Count == 0) return;
 
-            var idsList = ids.Cast<object>();
+            var idsList = ids.Cast<object>().ToList();
             var urnKeys = idsList.Map(UrnKey<T>);
             await AsAsync().RemoveEntryAsync(urnKeys.ToArray(), token).ConfigureAwait(false);
             await this.RemoveTypeIdsAsync<T>(idsList.Map(x => x.ToString()).ToArray(), token).ConfigureAwait(false);
