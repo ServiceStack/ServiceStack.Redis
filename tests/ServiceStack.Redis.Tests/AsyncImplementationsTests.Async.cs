@@ -83,9 +83,7 @@ namespace ServiceStack.Redis.Tests
             }
 
             var expected = new List<string>();
-            ParameterToken cancellationToken = new ParameterToken(
-                (asyncInterface == typeof(IRemoveByPatternAsync) || asyncInterface == typeof(ICacheClientAsync))
-                ? "token" : "cancellationToken", typeof(CancellationToken), ParameterAttributes.Optional);
+            ParameterToken cancellationToken = new ParameterToken("token", typeof(CancellationToken), ParameterAttributes.Optional);
             foreach (var method in syncInterface.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
             {
                 AddExpected(method);
@@ -150,14 +148,14 @@ namespace ServiceStack.Redis.Tests
                 AddFrom(typeof(RedisClient), nameof(RedisClient.BitCount));
                 AddFromTyped(typeof(RedisClient), nameof(RedisClient.ZCount), typeof(string), typeof(double), typeof(double));
                 // can't expose as SlowlogItem because of interface locations
-                expected.Add("ValueTask<object[]> SlowlogGetAsync(int? top = default, CancellationToken cancellationToken = default)");
+                expected.Add("ValueTask<object[]> SlowlogGetAsync(int? top = default, CancellationToken token = default)");
                 // adding missing "exists" capability
-                expected.Add("ValueTask<bool> SetAsync(string key, byte[] value, bool exists, long expirySeconds = 0, long expiryMilliseconds = 0, CancellationToken cancellationToken = default)");
+                expected.Add("ValueTask<bool> SetAsync(string key, byte[] value, bool exists, long expirySeconds = 0, long expiryMilliseconds = 0, CancellationToken token = default)");
             }
             else if (asyncInterface == typeof(IRedisClientAsync))
             {
-                expected.Add("ValueTask<SlowlogItem[]> GetSlowlogAsync(int? numberOfRecords = default, CancellationToken cancellationToken = default)");
-                expected.Add("ValueTask SlowlogResetAsync(CancellationToken cancellationToken = default)");
+                expected.Add("ValueTask<SlowlogItem[]> GetSlowlogAsync(int? numberOfRecords = default, CancellationToken token = default)");
+                expected.Add("ValueTask SlowlogResetAsync(CancellationToken token = default)");
             }
             else if (asyncInterface == typeof(ICacheClientAsync))
             {

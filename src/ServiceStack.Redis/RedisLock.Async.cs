@@ -10,24 +10,24 @@ namespace ServiceStack.Redis
         : IAsyncDisposable
     {
         internal static ValueTask<RedisLock> CreateAsync(IRedisClientAsync redisClient, string key,
-            TimeSpan? timeOut = default, CancellationToken cancellationToken = default)
+            TimeSpan? timeOut = default, CancellationToken token = default)
         {
             var obj = new RedisLock(redisClient, key);
-            return obj.AcquireAsync(timeOut, cancellationToken).Await(obj);
+            return obj.AcquireAsync(timeOut, token).Await(obj);
         }
 
         // async version of ExecUtils.RetryUntilTrue
         private static async ValueTask RetryUntilTrue(Func<CancellationToken, ValueTask<bool>> action,
-            TimeSpan? timeOut = null, CancellationToken cancellationToken = default)
+            TimeSpan? timeOut = null, CancellationToken token = default)
         {
             var i = 0;
             var firstAttempt = DateTime.UtcNow;
 
             while (timeOut == null || DateTime.UtcNow - firstAttempt < timeOut.Value)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                token.ThrowIfCancellationRequested();
                 i++;
-                if (await action(cancellationToken).ConfigureAwait(false))
+                if (await action(token).ConfigureAwait(false))
                 {
                     return;
                 }
@@ -38,7 +38,7 @@ namespace ServiceStack.Redis
         }
 
 
-        private async ValueTask AcquireAsync(TimeSpan? timeOut, CancellationToken cancellationToken)
+        private async ValueTask AcquireAsync(TimeSpan? timeOut, CancellationToken token)
         {
             var redisClient = (IRedisClientAsync)untypedClient;
             await RetryUntilTrue( // .ConfigureAwait(false) is below
@@ -52,7 +52,7 @@ namespace ServiceStack.Redis
                         var lockString = (expireTime.ToUnixTimeMs() + 1).ToString();
 
                         //Try to set the lock, if it does not exist this will succeed and the lock is obtained
-                        var nx = await redisClient.SetValueIfNotExistsAsync(key, lockString, cancellationToken: ct).ConfigureAwait(false);
+                        var nx = await redisClient.SetValueIfNotExistsAsync(key, lockString, token: ct).ConfigureAwait(false);
                         if (nx)
                             return true;
 
@@ -83,7 +83,7 @@ namespace ServiceStack.Redis
                         trans.QueueCommand(r => r.SetValueAsync(key, lockString));
                         return await trans.CommitAsync(ct).ConfigureAwait(false); //returns false if Transaction failed
                     },
-                timeOut, cancellationToken
+                timeOut, token
             ).ConfigureAwait(false);
         }
 

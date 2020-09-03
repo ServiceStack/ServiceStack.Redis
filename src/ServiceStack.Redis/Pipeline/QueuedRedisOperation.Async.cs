@@ -42,7 +42,7 @@ namespace ServiceStack.Redis.Pipeline
         internal QueuedRedisOperation WithAsyncReadCommand(Func<CancellationToken, ValueTask<RedisData>> RedisDataReadCommandAsync)
             => SetAsyncReadCommand(RedisDataReadCommandAsync);
         
-        public async ValueTask ProcessResultAsync(CancellationToken cancellationToken)
+        public async ValueTask ProcessResultAsync(CancellationToken token)
         {
             try
             {
@@ -52,29 +52,29 @@ namespace ServiceStack.Redis.Pipeline
                         ProcessResultThrowIfSync();
                         break;
                     case Func<CancellationToken, ValueTask> VoidReadCommandAsync:
-                        await VoidReadCommandAsync(cancellationToken).ConfigureAwait(false);
+                        await VoidReadCommandAsync(token).ConfigureAwait(false);
                         OnSuccessVoidCallback?.Invoke();
                         break;
                     case Func<CancellationToken, ValueTask<int>> IntReadCommandAsync:
-                        var i32 = await IntReadCommandAsync(cancellationToken).ConfigureAwait(false);
+                        var i32 = await IntReadCommandAsync(token).ConfigureAwait(false);
                         OnSuccessIntCallback?.Invoke(i32);
                         OnSuccessLongCallback?.Invoke(i32);
                         OnSuccessBoolCallback?.Invoke(i32 == RedisNativeClient.Success);
                         OnSuccessVoidCallback?.Invoke();
                         break;
                     case Func<CancellationToken, ValueTask<long>> LongReadCommandAsync:
-                        var i64 = await LongReadCommandAsync(cancellationToken).ConfigureAwait(false);
+                        var i64 = await LongReadCommandAsync(token).ConfigureAwait(false);
                         OnSuccessIntCallback?.Invoke((int)i64);
                         OnSuccessLongCallback?.Invoke(i64);
                         OnSuccessBoolCallback?.Invoke(i64 == RedisNativeClient.Success);
                         OnSuccessVoidCallback?.Invoke();
                         break;
                     case Func<CancellationToken, ValueTask<double>> DoubleReadCommandAsync:
-                         var f64 = await DoubleReadCommandAsync(cancellationToken).ConfigureAwait(false);
+                         var f64 = await DoubleReadCommandAsync(token).ConfigureAwait(false);
                          OnSuccessDoubleCallback?.Invoke(f64);
                         break;
                     case Func<CancellationToken, ValueTask<byte[]>> BytesReadCommandAsync:
-                        var bytes = await BytesReadCommandAsync(cancellationToken).ConfigureAwait(false);
+                        var bytes = await BytesReadCommandAsync(token).ConfigureAwait(false);
                         if (bytes != null && bytes.Length == 0) bytes = null;
                         OnSuccessBytesCallback?.Invoke(bytes);
                         OnSuccessStringCallback?.Invoke(bytes != null ? Encoding.UTF8.GetString(bytes) : null);
@@ -83,32 +83,32 @@ namespace ServiceStack.Redis.Pipeline
                         OnSuccessBoolCallback?.Invoke(bytes != null && Encoding.UTF8.GetString(bytes) == "OK");
                         break;
                     case Func<CancellationToken, ValueTask<string>> StringReadCommandAsync:
-                        var s = await StringReadCommandAsync(cancellationToken).ConfigureAwait(false);
+                        var s = await StringReadCommandAsync(token).ConfigureAwait(false);
                         OnSuccessStringCallback?.Invoke(s);
                         OnSuccessTypeCallback?.Invoke(s);
                         break;
                     case Func<CancellationToken, ValueTask<byte[][]>> MultiBytesReadCommandAsync:
-                        var multiBytes = await MultiBytesReadCommandAsync(cancellationToken).ConfigureAwait(false);
+                        var multiBytes = await MultiBytesReadCommandAsync(token).ConfigureAwait(false);
                         OnSuccessMultiBytesCallback?.Invoke(multiBytes);
                         OnSuccessMultiStringCallback?.Invoke(multiBytes?.ToStringList());
                         OnSuccessMultiTypeCallback?.Invoke(multiBytes.ToStringList());
                         OnSuccessDictionaryStringCallback?.Invoke(multiBytes.ToStringDictionary());
                         break;
                     case Func<CancellationToken, ValueTask<List<string>>> MultiStringReadCommandAsync:
-                        var multiString = await MultiStringReadCommandAsync(cancellationToken).ConfigureAwait(false);
+                        var multiString = await MultiStringReadCommandAsync(token).ConfigureAwait(false);
                         OnSuccessMultiStringCallback?.Invoke(multiString);
                         break;
                     case Func<CancellationToken, ValueTask<RedisData>> RedisDataReadCommandAsync:
-                        var data = await RedisDataReadCommandAsync(cancellationToken).ConfigureAwait(false);
+                        var data = await RedisDataReadCommandAsync(token).ConfigureAwait(false);
                         OnSuccessRedisTextCallback?.Invoke(data.ToRedisText());
                         OnSuccessRedisDataCallback?.Invoke(data);
                         break;
                     case Func<CancellationToken, ValueTask<bool>> BoolReadCommandAsync:
-                        var b = await BoolReadCommandAsync(cancellationToken).ConfigureAwait(false);
+                        var b = await BoolReadCommandAsync(token).ConfigureAwait(false);
                         OnSuccessBoolCallback?.Invoke(b);
                         break;
                     case Func<CancellationToken, ValueTask<Dictionary<string, string>>> DictionaryStringReadCommandAsync:
-                        var dict = await DictionaryStringReadCommandAsync(cancellationToken).ConfigureAwait(false);
+                        var dict = await DictionaryStringReadCommandAsync(token).ConfigureAwait(false);
                         OnSuccessDictionaryStringCallback?.Invoke(dict);
                         break;
                     default:

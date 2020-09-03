@@ -26,10 +26,10 @@ namespace ServiceStack.Redis
         /// <summary>
         /// Issue exec command (not queued)
         /// </summary>
-        private async ValueTask ExecAsync(CancellationToken cancellationToken)
+        private async ValueTask ExecAsync(CancellationToken token)
         {
             RedisClient.Exec();
-            await RedisClient.FlushSendBufferAsync(cancellationToken).ConfigureAwait(false);
+            await RedisClient.FlushSendBufferAsync(token).ConfigureAwait(false);
             RedisClient.ResetSendBuffer();
         }
 
@@ -44,7 +44,7 @@ namespace ServiceStack.Redis
             }.WithAsyncReadCommand(RedisClient.ExpectQueuedAsync));
         }
 
-        async ValueTask<bool> IRedisTransactionAsync.CommitAsync(CancellationToken cancellationToken)
+        async ValueTask<bool> IRedisTransactionAsync.CommitAsync(CancellationToken token)
         {
             bool rc = true;
             try
@@ -67,15 +67,15 @@ namespace ServiceStack.Redis
                 // add Exec command at end (not queued)
                 QueuedCommands.Add(new RedisCommand
                 {
-                }.WithAsyncReturnCommand(r => ExecAsync(cancellationToken)));
+                }.WithAsyncReturnCommand(r => ExecAsync(token)));
 
                 //execute transaction
-                await ExecAsync(cancellationToken).ConfigureAwait(false);
+                await ExecAsync(token).ConfigureAwait(false);
 
                 //receive expected results
                 foreach (var queuedCommand in QueuedCommands)
                 {
-                    await queuedCommand.ProcessResultAsync(cancellationToken).ConfigureAwait(false);
+                    await queuedCommand.ProcessResultAsync(token).ConfigureAwait(false);
                 }
             }
             catch (RedisTransactionFailedException)
@@ -86,12 +86,12 @@ namespace ServiceStack.Redis
             {
                 RedisClient.Transaction = null;
                 ClosePipeline();
-                await RedisClient.AddTypeIdsRegisteredDuringPipelineAsync(cancellationToken).ConfigureAwait(false);
+                await RedisClient.AddTypeIdsRegisteredDuringPipelineAsync(token).ConfigureAwait(false);
             }
             return rc;
         }
 
-        ValueTask IRedisTransactionAsync.RollbackAsync(CancellationToken cancellationToken)
+        ValueTask IRedisTransactionAsync.RollbackAsync(CancellationToken token)
         {
             Rollback(); // not currently anything different to do on the async path
             return default;
@@ -100,7 +100,7 @@ namespace ServiceStack.Redis
         // splitting, we would need to override DisposeAsync and split the code, too
 
 
-        private protected override async ValueTask<bool> ReplayAsync(CancellationToken cancellationToken)
+        private protected override async ValueTask<bool> ReplayAsync(CancellationToken token)
         {
             bool rc = true;
             try
@@ -110,7 +110,7 @@ namespace ServiceStack.Redis
                 //receive expected results
                 foreach (var queuedCommand in QueuedCommands)
                 {
-                    await queuedCommand.ProcessResultAsync(cancellationToken).ConfigureAwait(false);
+                    await queuedCommand.ProcessResultAsync(token).ConfigureAwait(false);
                 }
             }
             catch (RedisTransactionFailedException)
@@ -121,7 +121,7 @@ namespace ServiceStack.Redis
             {
                 RedisClient.Transaction = null;
                 ClosePipeline();
-                await RedisClient.AddTypeIdsRegisteredDuringPipelineAsync(cancellationToken).ConfigureAwait(false);
+                await RedisClient.AddTypeIdsRegisteredDuringPipelineAsync(token).ConfigureAwait(false);
             }
             return rc;
         }

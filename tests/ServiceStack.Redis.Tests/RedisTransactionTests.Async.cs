@@ -30,7 +30,7 @@ namespace ServiceStack.Redis.Tests
             {
                 trans.QueueCommand(r => r.IncrementValueAsync(Key));
                 var map = new Dictionary<string, int>();
-                trans.QueueCommand(r => new ValueTask<int>(r.GetAsync<int>(Key)), y => map[Key] = y);
+                trans.QueueCommand(r => r.GetAsync<int>(Key).AsValueTask(), y => map[Key] = y);
 
                 await trans.CommitAsync();
             }
@@ -59,7 +59,7 @@ namespace ServiceStack.Redis.Tests
                 await RedisAsync.WatchAsync(new[] { Key });
                 await RedisAsync.SetAsync(Key, value1);
                 await using var trans = await RedisAsync.CreateTransactionAsync();
-                trans.QueueCommand(r => new ValueTask<bool>(r.SetAsync(Key, value1)));
+                trans.QueueCommand(r => r.SetAsync(Key, value1).AsValueTask());
                 var success = await trans.CommitAsync();
                 Assert.False(success);
                 Assert.AreEqual(value1, await RedisAsync.GetAsync<string>(Key));
@@ -251,8 +251,8 @@ namespace ServiceStack.Redis.Tests
 
             await using (var trans = await RedisAsync.CreateTransactionAsync())
             {
-                trans.QueueCommand(r => new ValueTask<bool>(r.SetAsync(Key, 1)));
-                trans.QueueCommand(r => new ValueTask<bool>(r.SetAsync(KeySquared, 2)));
+                trans.QueueCommand(r => r.SetAsync(Key, 1).AsValueTask());
+                trans.QueueCommand(r => r.SetAsync(KeySquared, 2).AsValueTask());
                 await trans.CommitAsync();
             }
 
@@ -270,8 +270,8 @@ namespace ServiceStack.Redis.Tests
 
             await using (var trans = await RedisAsync.CreateTransactionAsync())
             {
-                trans.QueueCommand(r => new ValueTask<bool>(r.AddAsync(key, "Foo")));
-                trans.QueueCommand(r => new ValueTask<bool>(r.AddAsync(keyWithTtl, "Bar", expiresIn)));
+                trans.QueueCommand(r => r.AddAsync(key, "Foo").AsValueTask());
+                trans.QueueCommand(r => r.AddAsync(keyWithTtl, "Bar", expiresIn).AsValueTask());
 
                 if (!await trans.CommitAsync())
                     throw new Exception("Transaction Failed");
@@ -294,7 +294,7 @@ namespace ServiceStack.Redis.Tests
 
             await using (var trans = await RedisAsync.CreateTransactionAsync())
             {
-                trans.QueueCommand(r => new ValueTask<bool>(r.AddAsync(key, "Bar", expiresIn)));
+                trans.QueueCommand(r => r.AddAsync(key, "Bar", expiresIn).AsValueTask());
 
                 if (!await trans.CommitAsync())
                     throw new Exception("Transaction Failed");

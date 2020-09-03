@@ -113,25 +113,25 @@ namespace ServiceStack.Redis
             return default;
         }
 
-        async ValueTask IRedisPipelineSharedAsync.FlushAsync(CancellationToken cancellationToken)
+        async ValueTask IRedisPipelineSharedAsync.FlushAsync(CancellationToken token)
         {
             try
             {
                 // flush send buffers
-                await RedisClient.FlushSendBufferAsync(cancellationToken).ConfigureAwait(false);
+                await RedisClient.FlushSendBufferAsync(token).ConfigureAwait(false);
                 RedisClient.ResetSendBuffer();
 
                 //receive expected results
                 foreach (var queuedCommand in QueuedCommands)
                 {
-                    await queuedCommand.ProcessResultAsync(cancellationToken).ConfigureAwait(false);
+                    await queuedCommand.ProcessResultAsync(token).ConfigureAwait(false);
                 }
 
             }
             finally
             {
                 ClosePipeline();
-                await RedisClient.AddTypeIdsRegisteredDuringPipelineAsync(cancellationToken).ConfigureAwait(false);
+                await RedisClient.AddTypeIdsRegisteredDuringPipelineAsync(token).ConfigureAwait(false);
             }
         }
 
@@ -249,7 +249,7 @@ namespace ServiceStack.Redis
             RedisAllPurposePipeline.AssertSync(command(RedisClient));
         }
 
-        async ValueTask<bool> IRedisPipelineSharedAsync.ReplayAsync(CancellationToken cancellationToken)
+        async ValueTask<bool> IRedisPipelineSharedAsync.ReplayAsync(CancellationToken token)
         {
             RedisClient.Pipeline = this;
             // execute
@@ -258,7 +258,7 @@ namespace ServiceStack.Redis
                 if (queuedCommand is QueuedRedisTypedCommand<T> cmd)
                     await cmd.ExecuteAsync(RedisClient).ConfigureAwait(false);
             }
-            await AsAsync().FlushAsync(cancellationToken).ConfigureAwait(false);
+            await AsAsync().FlushAsync(token).ConfigureAwait(false);
             return true;
         }
     }

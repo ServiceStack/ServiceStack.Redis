@@ -22,34 +22,34 @@ namespace ServiceStack.Redis.Generic
     {
         IRedisTypedClientAsync<T> AsyncClient => client;
 
-        ValueTask IRedisHashAsync<TKey, T>.AddAsync(KeyValuePair<TKey, T> item, CancellationToken cancellationToken)
-            => AsyncClient.SetEntryInHashAsync(this, item.Key, item.Value, cancellationToken).Await();
+        ValueTask IRedisHashAsync<TKey, T>.AddAsync(KeyValuePair<TKey, T> item, CancellationToken token)
+            => AsyncClient.SetEntryInHashAsync(this, item.Key, item.Value, token).Await();
 
-        ValueTask IRedisHashAsync<TKey, T>.AddAsync(TKey key, T value, CancellationToken cancellationToken)
-            => AsyncClient.SetEntryInHashAsync(this, key, value, cancellationToken).Await();
+        ValueTask IRedisHashAsync<TKey, T>.AddAsync(TKey key, T value, CancellationToken token)
+            => AsyncClient.SetEntryInHashAsync(this, key, value, token).Await();
 
-        ValueTask IRedisHashAsync<TKey, T>.ClearAsync(CancellationToken cancellationToken)
-            => AsyncClient.RemoveEntryAsync(new[] { this }, cancellationToken).Await();
+        ValueTask IRedisHashAsync<TKey, T>.ClearAsync(CancellationToken token)
+            => AsyncClient.RemoveEntryAsync(new[] { this }, token).Await();
 
-        ValueTask<bool> IRedisHashAsync<TKey, T>.ContainsKeyAsync(TKey key, CancellationToken cancellationToken)
-            => AsyncClient.HashContainsEntryAsync(this, key, cancellationToken);
+        ValueTask<bool> IRedisHashAsync<TKey, T>.ContainsKeyAsync(TKey key, CancellationToken token)
+            => AsyncClient.HashContainsEntryAsync(this, key, token);
 
-        ValueTask<int> IRedisHashAsync<TKey, T>.CountAsync(CancellationToken cancellationToken)
-            => AsyncClient.GetHashCountAsync(this, cancellationToken).AsInt32();
+        ValueTask<int> IRedisHashAsync<TKey, T>.CountAsync(CancellationToken token)
+            => AsyncClient.GetHashCountAsync(this, token).AsInt32();
 
-        ValueTask<Dictionary<TKey, T>> IRedisHashAsync<TKey, T>.GetAllAsync(CancellationToken cancellationToken)
-            => AsyncClient.GetAllEntriesFromHashAsync(this, cancellationToken);
+        ValueTask<Dictionary<TKey, T>> IRedisHashAsync<TKey, T>.GetAllAsync(CancellationToken token)
+            => AsyncClient.GetAllEntriesFromHashAsync(this, token);
 
-        async IAsyncEnumerator<KeyValuePair<TKey, T>> IAsyncEnumerable<KeyValuePair<TKey, T>>.GetAsyncEnumerator(CancellationToken cancellationToken)
+        async IAsyncEnumerator<KeyValuePair<TKey, T>> IAsyncEnumerable<KeyValuePair<TKey, T>>.GetAsyncEnumerator(CancellationToken token)
         {
-            var all = await AsyncClient.GetAllEntriesFromHashAsync(this, cancellationToken).ConfigureAwait(false);
+            var all = await AsyncClient.GetAllEntriesFromHashAsync(this, token).ConfigureAwait(false);
             foreach (var pair in all)
             {
                 yield return pair;
             }
         }
 
-        ValueTask<bool> IRedisHashAsync<TKey, T>.RemoveAsync(TKey key, CancellationToken cancellationToken)
-            => AsyncClient.RemoveEntryFromHashAsync(this, key, cancellationToken);
+        ValueTask<bool> IRedisHashAsync<TKey, T>.RemoveAsync(TKey key, CancellationToken token)
+            => AsyncClient.RemoveEntryFromHashAsync(this, key, token);
     }
 }

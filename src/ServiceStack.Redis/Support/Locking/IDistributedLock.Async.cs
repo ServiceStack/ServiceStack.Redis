@@ -10,8 +10,8 @@ namespace ServiceStack.Redis.Support.Locking
 	public interface IDistributedLockAsync
     {
         // note: can't use "out" with async, so return LockState instead
-        ValueTask<LockState> LockAsync(string key, int acquisitionTimeout, int lockTimeout, IRedisClientAsync client, CancellationToken cancellationToken = default);
-        ValueTask<bool> UnlockAsync(string key, long lockExpire, IRedisClientAsync client, CancellationToken cancellationToken = default);
+        ValueTask<LockState> LockAsync(string key, int acquisitionTimeout, int lockTimeout, IRedisClientAsync client, CancellationToken token = default);
+        ValueTask<bool> UnlockAsync(string key, long lockExpire, IRedisClientAsync client, CancellationToken token = default);
     }
 
     public readonly struct LockState

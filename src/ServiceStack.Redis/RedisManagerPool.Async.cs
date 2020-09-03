@@ -12,16 +12,16 @@ namespace ServiceStack.Redis
     public partial class RedisManagerPool
         : IRedisClientsManagerAsync
     {
-        ValueTask<ICacheClientAsync> IRedisClientsManagerAsync.GetCacheClientAsync(CancellationToken cancellationToken)
+        ValueTask<ICacheClientAsync> IRedisClientsManagerAsync.GetCacheClientAsync(CancellationToken token)
             => new RedisClientManagerCacheClient(this).AsValueTaskResult<ICacheClientAsync>();
 
-        ValueTask<IRedisClientAsync> IRedisClientsManagerAsync.GetClientAsync(CancellationToken cancellationToken)
+        ValueTask<IRedisClientAsync> IRedisClientsManagerAsync.GetClientAsync(CancellationToken token)
             => GetClient(true).AsValueTaskResult<IRedisClientAsync>();
 
-        ValueTask<ICacheClientAsync> IRedisClientsManagerAsync.GetReadOnlyCacheClientAsync(CancellationToken cancellationToken)
+        ValueTask<ICacheClientAsync> IRedisClientsManagerAsync.GetReadOnlyCacheClientAsync(CancellationToken token)
             => new RedisClientManagerCacheClient(this) { ReadOnly = true }.AsValueTaskResult<ICacheClientAsync>();
 
-        ValueTask<IRedisClientAsync> IRedisClientsManagerAsync.GetReadOnlyClientAsync(CancellationToken cancellationToken)
+        ValueTask<IRedisClientAsync> IRedisClientsManagerAsync.GetReadOnlyClientAsync(CancellationToken token)
             => GetClient(true).AsValueTaskResult<IRedisClientAsync>();
 
         ValueTask IAsyncDisposable.DisposeAsync()

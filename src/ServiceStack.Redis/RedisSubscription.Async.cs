@@ -45,11 +45,11 @@ namespace ServiceStack.Redis
             }
         }
 
-        private async ValueTask UnSubscribeFromAllChannelsMatchingAnyPatternsAsync(CancellationToken cancellationToken = default)
+        private async ValueTask UnSubscribeFromAllChannelsMatchingAnyPatternsAsync(CancellationToken token = default)
         {
             if (activeChannels.Count == 0) return;
 
-            var multiBytes = await NativeAsync.PUnSubscribeAsync(Array.Empty<string>(), cancellationToken).ConfigureAwait(false);
+            var multiBytes = await NativeAsync.PUnSubscribeAsync(Array.Empty<string>(), token).ConfigureAwait(false);
             await ParseSubscriptionResultsAsync(multiBytes).ConfigureAwait(false);
 
             this.activeChannels = new List<string>();
@@ -59,49 +59,49 @@ namespace ServiceStack.Redis
                 ? UnSubscribeFromAllChannelsMatchingAnyPatternsAsync()
                 : AsAsync().UnSubscribeFromAllChannelsAsync();
 
-        async ValueTask IRedisSubscriptionAsync.SubscribeToChannelsAsync(string[] channels, CancellationToken cancellationToken)
+        async ValueTask IRedisSubscriptionAsync.SubscribeToChannelsAsync(string[] channels, CancellationToken token)
         {
-            var multiBytes = await NativeAsync.SubscribeAsync(channels, cancellationToken).ConfigureAwait(false);
+            var multiBytes = await NativeAsync.SubscribeAsync(channels, token).ConfigureAwait(false);
             await ParseSubscriptionResultsAsync(multiBytes).ConfigureAwait(false);
 
             while (this.SubscriptionCount > 0)
             {
-                multiBytes = await NativeAsync.ReceiveMessagesAsync(cancellationToken).ConfigureAwait(false);
+                multiBytes = await NativeAsync.ReceiveMessagesAsync(token).ConfigureAwait(false);
                 await ParseSubscriptionResultsAsync(multiBytes).ConfigureAwait(false);
             }
         }
 
-        async ValueTask IRedisSubscriptionAsync.SubscribeToChannelsMatchingAsync(string[] patterns, CancellationToken cancellationToken)
+        async ValueTask IRedisSubscriptionAsync.SubscribeToChannelsMatchingAsync(string[] patterns, CancellationToken token)
         {
-            var multiBytes = await NativeAsync.PSubscribeAsync(patterns, cancellationToken).ConfigureAwait(false);
+            var multiBytes = await NativeAsync.PSubscribeAsync(patterns, token).ConfigureAwait(false);
             await ParseSubscriptionResultsAsync(multiBytes).ConfigureAwait(false);
 
             while (this.SubscriptionCount > 0)
             {
-                multiBytes = await NativeAsync.ReceiveMessagesAsync(cancellationToken).ConfigureAwait(false);
+                multiBytes = await NativeAsync.ReceiveMessagesAsync(token).ConfigureAwait(false);
                 await ParseSubscriptionResultsAsync(multiBytes).ConfigureAwait(false);
             }
         }
 
-        async ValueTask IRedisSubscriptionAsync.UnSubscribeFromAllChannelsAsync(CancellationToken cancellationToken)
+        async ValueTask IRedisSubscriptionAsync.UnSubscribeFromAllChannelsAsync(CancellationToken token)
         {
             if (activeChannels.Count == 0) return;
 
-            var multiBytes = await NativeAsync.UnSubscribeAsync(Array.Empty<string>(), cancellationToken).ConfigureAwait(false);
+            var multiBytes = await NativeAsync.UnSubscribeAsync(Array.Empty<string>(), token).ConfigureAwait(false);
             await ParseSubscriptionResultsAsync(multiBytes).ConfigureAwait(false);
 
             this.activeChannels = new List<string>();
         }
 
-        async ValueTask IRedisSubscriptionAsync.UnSubscribeFromChannelsAsync(string[] channels, CancellationToken cancellationToken)
+        async ValueTask IRedisSubscriptionAsync.UnSubscribeFromChannelsAsync(string[] channels, CancellationToken token)
         {
-            var multiBytes = await NativeAsync.UnSubscribeAsync(channels, cancellationToken).ConfigureAwait(false);
+            var multiBytes = await NativeAsync.UnSubscribeAsync(channels, token).ConfigureAwait(false);
             await ParseSubscriptionResultsAsync(multiBytes).ConfigureAwait(false);
         }
 
-        async ValueTask IRedisSubscriptionAsync.UnSubscribeFromChannelsMatchingAsync(string[] patterns, CancellationToken cancellationToken)
+        async ValueTask IRedisSubscriptionAsync.UnSubscribeFromChannelsMatchingAsync(string[] patterns, CancellationToken token)
         {
-            var multiBytes = await NativeAsync.PUnSubscribeAsync(patterns, cancellationToken).ConfigureAwait(false);
+            var multiBytes = await NativeAsync.PUnSubscribeAsync(patterns, token).ConfigureAwait(false);
             await ParseSubscriptionResultsAsync(multiBytes).ConfigureAwait(false);
         }
 
@@ -170,15 +170,15 @@ namespace ServiceStack.Redis
         }
 
         ValueTask IRedisSubscriptionAsync.SubscribeToChannelsAsync(params string[] channels)
-            => AsAsync().SubscribeToChannelsAsync(channels, cancellationToken: default);
+            => AsAsync().SubscribeToChannelsAsync(channels, token: default);
 
         ValueTask IRedisSubscriptionAsync.SubscribeToChannelsMatchingAsync(params string[] patterns)
-            => AsAsync().SubscribeToChannelsMatchingAsync(patterns, cancellationToken: default);
+            => AsAsync().SubscribeToChannelsMatchingAsync(patterns, token: default);
 
         ValueTask IRedisSubscriptionAsync.UnSubscribeFromChannelsAsync(params string[] channels)
-            => AsAsync().UnSubscribeFromChannelsAsync(channels, cancellationToken: default);
+            => AsAsync().UnSubscribeFromChannelsAsync(channels, token: default);
 
         ValueTask IRedisSubscriptionAsync.UnSubscribeFromChannelsMatchingAsync(params string[] patterns)
-            => AsAsync().UnSubscribeFromChannelsMatchingAsync(patterns, cancellationToken: default);
+            => AsAsync().UnSubscribeFromChannelsMatchingAsync(patterns, token: default);
     }
 }

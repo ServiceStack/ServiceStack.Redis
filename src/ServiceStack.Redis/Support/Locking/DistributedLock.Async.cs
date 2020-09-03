@@ -9,7 +9,7 @@ namespace ServiceStack.Redis.Support.Locking
     {
         public IDistributedLockAsync AsAsync() => this;
 
-        async ValueTask<LockState> IDistributedLockAsync.LockAsync(string key, int acquisitionTimeout, int lockTimeout, IRedisClientAsync client, CancellationToken cancellationToken)
+        async ValueTask<LockState> IDistributedLockAsync.LockAsync(string key, int acquisitionTimeout, int lockTimeout, IRedisClientAsync client, CancellationToken token)
         {
             long lockExpire = 0;
 
@@ -25,7 +25,7 @@ namespace ServiceStack.Redis.Support.Locking
             var newLockExpire = CalculateLockExpire(ts, lockTimeout);
 
             var nativeClient = (IRedisNativeClientAsync)client;
-            long wasSet = await nativeClient.SetNXAsync(key, BitConverter.GetBytes(newLockExpire), cancellationToken).ConfigureAwait(false);
+            long wasSet = await nativeClient.SetNXAsync(key, BitConverter.GetBytes(newLockExpire), token).ConfigureAwait(false);
             int totalTime = 0;
             while (wasSet == LOCK_NOT_ACQUIRED && totalTime < acquisitionTimeout)
             {
@@ -36,7 +36,7 @@ namespace ServiceStack.Redis.Support.Locking
                     totalTime += sleepIfLockSet;
                     ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
                     newLockExpire = CalculateLockExpire(ts, lockTimeout);
-                    wasSet = await nativeClient.SetNXAsync(key, BitConverter.GetBytes(newLockExpire), cancellationToken).ConfigureAwait(false);
+                    wasSet = await nativeClient.SetNXAsync(key, BitConverter.GetBytes(newLockExpire), token).ConfigureAwait(false);
                     count++;
                 }
                 // acquired lock!
@@ -47,9 +47,9 @@ namespace ServiceStack.Redis.Support.Locking
                 await using (pipe.ConfigureAwait(false))
                 {
                     long lockValue = 0;
-                    pipe.QueueCommand(r => ((IRedisNativeClientAsync)r).WatchAsync(new[] { key }, cancellationToken));
-                    pipe.QueueCommand(r => ((IRedisNativeClientAsync)r).GetAsync(key, cancellationToken), x => lockValue = (x != null) ? BitConverter.ToInt64(x, 0) : 0);
-                    await pipe.FlushAsync(cancellationToken).ConfigureAwait(false);
+                    pipe.QueueCommand(r => ((IRedisNativeClientAsync)r).WatchAsync(new[] { key }, token));
+                    pipe.QueueCommand(r => ((IRedisNativeClientAsync)r).GetAsync(key, token), x => lockValue = (x != null) ? BitConverter.ToInt64(x, 0) : 0);
+                    await pipe.FlushAsync(token).ConfigureAwait(false);
 
                     // if lock value is 0 (key is empty), or expired, then we can try to acquire it
                     ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
@@ -57,18 +57,18 @@ namespace ServiceStack.Redis.Support.Locking
                     {
                         ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
                         newLockExpire = CalculateLockExpire(ts, lockTimeout);
-                        var trans = await client.CreateTransactionAsync(cancellationToken).ConfigureAwait(false);
+                        var trans = await client.CreateTransactionAsync(token).ConfigureAwait(false);
                         await using (trans.ConfigureAwait(false))
                         {
                             var expire = newLockExpire;
-                            trans.QueueCommand(r => ((IRedisNativeClientAsync)r).SetAsync(key, BitConverter.GetBytes(expire), cancellationToken: cancellationToken));
-                            if (await trans.CommitAsync(cancellationToken).ConfigureAwait(false))
+                            trans.QueueCommand(r => ((IRedisNativeClientAsync)r).SetAsync(key, BitConverter.GetBytes(expire), token: token));
+                            if (await trans.CommitAsync(token).ConfigureAwait(false))
                                 wasSet = LOCK_RECOVERED; //recovered lock!
                         }
                     }
                     else
                     {
-                        await nativeClient.UnWatchAsync(cancellationToken).ConfigureAwait(false);
+                        await nativeClient.UnWatchAsync(token).ConfigureAwait(false);
                     }
                 }
                 if (wasSet != LOCK_NOT_ACQUIRED) break;
@@ -82,7 +82,7 @@ namespace ServiceStack.Redis.Support.Locking
             return new LockState(wasSet, lockExpire);
         }
 
-        async ValueTask<bool> IDistributedLockAsync.UnlockAsync(string key, long lockExpire, IRedisClientAsync client, CancellationToken cancellationToken)
+        async ValueTask<bool> IDistributedLockAsync.UnlockAsync(string key, long lockExpire, IRedisClientAsync client, CancellationToken token)
         {
             if (lockExpire <= 0)
                 return false;
@@ -91,10 +91,10 @@ namespace ServiceStack.Redis.Support.Locking
             var pipe = client.CreatePipeline();
             await using (pipe.ConfigureAwait(false))
             {
-                pipe.QueueCommand(r => ((IRedisNativeClientAsync)r).WatchAsync(new[] { key }, cancellationToken));
-                pipe.QueueCommand(r => ((IRedisNativeClientAsync)r).GetAsync(key, cancellationToken),
+                pipe.QueueCommand(r => ((IRedisNativeClientAsync)r).WatchAsync(new[] { key }, token));
+                pipe.QueueCommand(r => ((IRedisNativeClientAsync)r).GetAsync(key, token),
                                   x => lockVal = (x != null) ? BitConverter.ToInt64(x, 0) : 0);
-                await pipe.FlushAsync(cancellationToken).ConfigureAwait(false);
+                await pipe.FlushAsync(token).ConfigureAwait(false);
             }
 
             if (lockVal != lockExpire)
@@ -103,15 +103,15 @@ namespace ServiceStack.Redis.Support.Locking
                     Debug.WriteLine($"Unlock(): Failed to unlock key {key}; lock has been acquired by another client ");
                 else
                     Debug.WriteLine($"Unlock(): Failed to unlock key {key}; lock has been identifed as a zombie and harvested ");
-                await nativeClient.UnWatchAsync(cancellationToken).ConfigureAwait(false);
+                await nativeClient.UnWatchAsync(token).ConfigureAwait(false);
                 return false;
             }
 
-            var trans = await client.CreateTransactionAsync(cancellationToken).ConfigureAwait(false);
+            var trans = await client.CreateTransactionAsync(token).ConfigureAwait(false);
             await using (trans.ConfigureAwait(false))
             {
-                trans.QueueCommand(r => ((IRedisNativeClientAsync)r).DelAsync(key, cancellationToken));
-                var rc = await trans.CommitAsync(cancellationToken).ConfigureAwait(false);
+                trans.QueueCommand(r => ((IRedisNativeClientAsync)r).DelAsync(key, token));
+                var rc = await trans.CommitAsync(token).ConfigureAwait(false);
                 if (!rc)
                     Debug.WriteLine($"Unlock(): Failed to delete key {key}; lock has been acquired by another client ");
                 return rc;

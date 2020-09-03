@@ -24,7 +24,7 @@ namespace ServiceStack.Redis.Generic
     internal partial class RedisTypedTransaction<T>
         : IRedisTypedTransactionAsync<T>, IRedisTransactionBaseAsync
     {
-        async ValueTask<bool> IRedisTypedTransactionAsync<T>.CommitAsync(CancellationToken cancellationToken)
+        async ValueTask<bool> IRedisTypedTransactionAsync<T>.CommitAsync(CancellationToken token)
         {
             bool rc = true;
             try
@@ -47,16 +47,16 @@ namespace ServiceStack.Redis.Generic
                 // add Exec command at end (not queued)
                 QueuedCommands.Add(new RedisCommand()
                 {
-                }.WithAsyncReturnCommand(r => ExecAsync(cancellationToken)));
+                }.WithAsyncReturnCommand(r => ExecAsync(token)));
 
                 //execute transaction
-                await ExecAsync(cancellationToken).ConfigureAwait(false);
+                await ExecAsync(token).ConfigureAwait(false);
 
                 /////////////////////////////
                 //receive expected results
                 foreach (var queuedCommand in QueuedCommands)
                 {
-                    await queuedCommand.ProcessResultAsync(cancellationToken).ConfigureAwait(false);
+                    await queuedCommand.ProcessResultAsync(token).ConfigureAwait(false);
                 }
             }
             catch (RedisTransactionFailedException)
@@ -67,18 +67,18 @@ namespace ServiceStack.Redis.Generic
             {
                 RedisClient.Transaction = null;
                 ClosePipeline();
-                await RedisClient.AddTypeIdsRegisteredDuringPipelineAsync(cancellationToken).ConfigureAwait(false);
+                await RedisClient.AddTypeIdsRegisteredDuringPipelineAsync(token).ConfigureAwait(false);
             }
             return rc;
         }
 
-        private  ValueTask ExecAsync(CancellationToken cancellationToken)
+        private  ValueTask ExecAsync(CancellationToken token)
         {
             RedisClient.Exec();
-            return RedisClient.FlushSendBufferAsync(cancellationToken);
+            return RedisClient.FlushSendBufferAsync(token);
         }
 
-        ValueTask IRedisTypedTransactionAsync<T>.RollbackAsync(CancellationToken cancellationToken)
+        ValueTask IRedisTypedTransactionAsync<T>.RollbackAsync(CancellationToken token)
         {
             Rollback(); // no async bits needed
             return default;

@@ -29,7 +29,7 @@ namespace ServiceStack.Redis.Tests
             {
                 pipeline.QueueCommand(r => r.IncrementValueAsync(Key));
                 var map = new Dictionary<string, int>();
-                pipeline.QueueCommand(r => new ValueTask<int>(r.GetAsync<int>(Key)), y => map[Key] = y);
+                pipeline.QueueCommand(r => r.GetAsync<int>(Key).AsValueTask(), y => map[Key] = y);
 
                 await pipeline.FlushAsync();
             }
@@ -272,7 +272,7 @@ namespace ServiceStack.Redis.Tests
             await using var pipeline = RedisAsync.CreatePipeline();
             var key = "pipeline-test";
 
-            pipeline.QueueCommand(r => new ValueTask<bool>(r.RemoveAsync(key)));
+            pipeline.QueueCommand(r => r.RemoveAsync(key).AsValueTask());
             pipeline.QueueCommand(r => r.AddRangeToSetAsync(key, new[] { "A", "B", "C" }.ToList()));
 
             await pipeline.FlushAsync();

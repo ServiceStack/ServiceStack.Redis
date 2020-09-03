@@ -12,11 +12,11 @@ namespace ServiceStack.Redis
     {
         private IRedisPipelineAsync AsAsync() => this;
 
-        private protected virtual async ValueTask<bool> ReplayAsync(CancellationToken cancellationToken)
+        private protected virtual async ValueTask<bool> ReplayAsync(CancellationToken token)
         {
             Init();
             await ExecuteAsync().ConfigureAwait(false);
-            await AsAsync().FlushAsync(cancellationToken).ConfigureAwait(false);
+            await AsAsync().FlushAsync(token).ConfigureAwait(false);
             return true;
         }
 
@@ -32,13 +32,13 @@ namespace ServiceStack.Redis
             }
         }
 
-        ValueTask<bool> IRedisPipelineSharedAsync.ReplayAsync(CancellationToken cancellationToken)
-            => ReplayAsync(cancellationToken);
+        ValueTask<bool> IRedisPipelineSharedAsync.ReplayAsync(CancellationToken token)
+            => ReplayAsync(token);
 
-        async ValueTask IRedisPipelineSharedAsync.FlushAsync(CancellationToken cancellationToken)
+        async ValueTask IRedisPipelineSharedAsync.FlushAsync(CancellationToken token)
         {
             // flush send buffers
-            await RedisClient.FlushSendBufferAsync(cancellationToken).ConfigureAwait(false);
+            await RedisClient.FlushSendBufferAsync(token).ConfigureAwait(false);
             RedisClient.ResetSendBuffer();
             
             try
@@ -46,7 +46,7 @@ namespace ServiceStack.Redis
                 //receive expected results
                 foreach (var queuedCommand in QueuedCommands)
                 {
-                    await queuedCommand.ProcessResultAsync(cancellationToken).ConfigureAwait(false);
+                    await queuedCommand.ProcessResultAsync(token).ConfigureAwait(false);
                 }
             }
             catch (Exception)
