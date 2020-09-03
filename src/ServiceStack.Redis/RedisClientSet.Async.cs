@@ -61,7 +61,7 @@ namespace ServiceStack.Redis
         }
 
         ValueTask<HashSet<string>> IRedisSetAsync.IntersectAsync(params IRedisSetAsync[] withSets)
-            => AsAsync().IntersectAsync(withSets, cancellationToken: default);
+            => AsAsync().IntersectAsync(withSets, token: default);
 
         private List<string> MergeSetIds(IRedisSetAsync[] withSets)
         {
@@ -86,7 +86,7 @@ namespace ServiceStack.Redis
         }
 
         ValueTask IRedisSetAsync.StoreDiffAsync(IRedisSetAsync fromSet, params IRedisSetAsync[] withSets)
-            => AsAsync().StoreDiffAsync(fromSet, withSets, cancellationToken: default);
+            => AsAsync().StoreDiffAsync(fromSet, withSets, token: default);
 
         ValueTask IRedisSetAsync.StoreIntersectAsync(IRedisSetAsync[] withSets, CancellationToken token)
         {
@@ -95,7 +95,7 @@ namespace ServiceStack.Redis
         }
 
         ValueTask IRedisSetAsync.StoreIntersectAsync(params IRedisSetAsync[] withSets)
-            => AsAsync().StoreIntersectAsync(withSets, cancellationToken: default);
+            => AsAsync().StoreIntersectAsync(withSets, token: default);
 
         ValueTask IRedisSetAsync.StoreUnionAsync(IRedisSetAsync[] withSets, CancellationToken token)
         {
@@ -104,7 +104,7 @@ namespace ServiceStack.Redis
         }
 
         ValueTask IRedisSetAsync.StoreUnionAsync(params IRedisSetAsync[] withSets)
-            => AsAsync().StoreUnionAsync(withSets, cancellationToken: default);
+            => AsAsync().StoreUnionAsync(withSets, token: default);
 
         ValueTask<HashSet<string>> IRedisSetAsync.UnionAsync(IRedisSetAsync[] withSets, CancellationToken token)
         {
@@ -113,6 +113,6 @@ namespace ServiceStack.Redis
         }
 
         ValueTask<HashSet<string>> IRedisSetAsync.UnionAsync(params IRedisSetAsync[] withSets)
-            => AsAsync().UnionAsync(withSets, cancellationToken: default);
+            => AsAsync().UnionAsync(withSets, token: default);
     }
 }

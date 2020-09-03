@@ -113,10 +113,10 @@ namespace ServiceStack.Redis.Tests
             base.OnAfterEachTest();
         }
 
-        protected static async ValueTask<List<T>> ToListAsync<T>(IAsyncEnumerable<T> source, CancellationToken cancellationToken = default)
+        protected static async ValueTask<List<T>> ToListAsync<T>(IAsyncEnumerable<T> source, CancellationToken token = default)
         {
             var list = new List<T>();
-            await foreach (var value in source.ConfigureAwait(false).WithCancellation(cancellationToken))
+            await foreach (var value in source.ConfigureAwait(false).WithCancellation(token))
             {
                 list.Add(value);
             }

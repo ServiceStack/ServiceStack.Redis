@@ -83,7 +83,7 @@ namespace ServiceStack.Redis.Tests
             }
 
             var expected = new List<string>();
-            ParameterToken cancellationToken = new ParameterToken("token", typeof(CancellationToken), ParameterAttributes.Optional);
+            ParameterToken cancellationParameter = new ParameterToken("token", typeof(CancellationToken), ParameterAttributes.Optional);
             foreach (var method in syncInterface.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
             {
                 AddExpected(method);
@@ -367,11 +367,11 @@ namespace ServiceStack.Redis.Tests
 
                     if (IsParams(tok))
                     {
-                        // include it with params but without cancellationToken
+                        // include it with params but without CancellationToken
                         tok = new MethodToken(name, returnType, parameters, tok.IsGenericMethod, tok.IsGenericMethodDefinition, tok.GetGenericArguments(), tok.AllAttributes());
                         expected.Add(GetSignature(tok));
 
-                        // and now remove the params so we can get with cancellationToken
+                        // and now remove the params so we can get with CancellationToken
                         ref ParameterToken p = ref parameters[parameters.Length - 1];
                         p = p.WithAllAttributes(p.AllAttributes().Where(a => !(a is ParamArrayAttribute)).ToArray());
                     }
@@ -483,11 +483,11 @@ namespace ServiceStack.Redis.Tests
                         }
                     }
 
-                    // append optional cancellationToken
+                    // append optional CancellationToken
                     if (addCancellation)
                     {
                         Array.Resize(ref parameters, parameters.Length + 1);
-                        parameters[parameters.Length - 1] = cancellationToken;
+                        parameters[parameters.Length - 1] = cancellationParameter;
                     }
                     tok = new MethodToken(name, returnType, parameters, tok.IsGenericMethod, tok.IsGenericMethodDefinition, tok.GetGenericArguments(), tok.AllAttributes());
                     expected.Add(GetSignature(tok));
