@@ -83,7 +83,9 @@ namespace ServiceStack.Redis.Tests
             }
 
             var expected = new List<string>();
-            ParameterToken cancellationToken = new ParameterToken("cancellationToken", typeof(CancellationToken), ParameterAttributes.Optional);
+            ParameterToken cancellationToken = new ParameterToken(
+                (asyncInterface == typeof(IRemoveByPatternAsync) || asyncInterface == typeof(ICacheClientAsync))
+                ? "token" : "cancellationToken", typeof(CancellationToken), ParameterAttributes.Optional);
             foreach (var method in syncInterface.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
             {
                 AddExpected(method);
@@ -169,6 +171,18 @@ namespace ServiceStack.Redis.Tests
             void AddFromTyped(Type syncInterface, string name, params Type[] types)
                 => AddExpected(syncInterface.GetMethod(name, types), false);
 
+            Type AsyncType(Type result)
+            {
+                bool useTask = asyncInterface == typeof(ICacheClientAsync)
+                    || asyncInterface == typeof(IRemoveByPatternAsync)
+                    || asyncInterface == typeof(IEntityStoreAsync)
+                    || asyncInterface == typeof(IEntityStoreAsync<>);
+
+                if (result is null || result == typeof(void))
+                    return useTask ? typeof(Task) : typeof(ValueTask);
+
+                return (useTask ? typeof(Task<>) : typeof(ValueTask<>)).MakeGenericType(result);
+            }
             void AddExpected(MethodInfo method, bool fromPropertyToMethod = false)
             {
                 if (method is null) return;
@@ -180,7 +194,7 @@ namespace ServiceStack.Redis.Tests
                 Type returnType;
                 if (tok.ReturnType == typeof(void))
                 {
-                    returnType = typeof(ValueTask);
+                    returnType = AsyncType(tok.ReturnType);
                 }
                 else if (tok.ReturnType == typeof(IDisposable))
                 {
@@ -192,7 +206,7 @@ namespace ServiceStack.Redis.Tests
                 }
                 else
                 {
-                    returnType = typeof(ValueTask<>).MakeGenericType(SwapForAsyncIfNeedeed(tok.ReturnType));
+                    returnType = AsyncType(SwapForAsyncIfNeedeed(tok.ReturnType));
                 }
                 string name = tok.Name + "Async";
                 bool addCancellation = true;
@@ -793,7 +807,7 @@ namespace ServiceStack.Redis.Tests
         }
 
         [TestCase(typeof(ICacheClient), typeof(ICacheClientAsync))]
-        [TestCase(typeof(ICacheClientExtended), typeof(ICacheClientAsync))] // duplicate not an error; APIs are coalesced
+        [TestCase(typeof(ICacheClientExtended), typeof(ICacheClientAsync), typeof(BasicRedisClientManager))] // duplicate not an error; APIs are coalesced
         [TestCase(typeof(IEntityStore), typeof(IEntityStoreAsync))]
         [TestCase(typeof(IEntityStore<>), typeof(IEntityStoreAsync<>))]
         [TestCase(typeof(IRedisClient), typeof(IRedisClientAsync))]
@@ -825,9 +839,9 @@ namespace ServiceStack.Redis.Tests
         [TestCase(typeof(IRedisTypedPipeline<>), typeof(IRedisTypedPipelineAsync<>))]
         [TestCase(typeof(IRedisTypedQueueableOperation<>), typeof(IRedisTypedQueueableOperationAsync<>))]
         [TestCase(typeof(IRedisTypedTransaction<>), typeof(IRedisTypedTransactionAsync<>))]
-        public void TestFullyImplemented(Type syncInterface, Type asyncInterface)
+        public void TestFullyImplemented(Type syncInterface, Type asyncInterface, params Type[] ignore)
         {
-            HashSet<Type> except = new HashSet<Type>();
+            HashSet<Type> except = new HashSet<Type>(ignore ?? Type.EmptyTypes);
 #if NET472 // only exists there!
             if (syncInterface == typeof(IRedisClientsManager))
             {

@@ -175,7 +175,7 @@ namespace ServiceStack.Redis.Tests
 
             var mi = typeof(IEntityStoreAsync).GetMethod(nameof(IEntityStoreAsync.DeleteAllAsync));
             var genericMi = mi.MakeGenericMethod(typeof(TestModel));
-            await (ValueTask)genericMi.Invoke(RedisAsync, new object[] { CancellationToken.None });
+            await (Task)genericMi.Invoke(RedisAsync, new object[] { CancellationToken.None });
 
             var allModels = await RedisAsync.As<TestModel>().GetAllAsync();
             Assert.That(allModels, Is.Empty);
@@ -192,7 +192,7 @@ namespace ServiceStack.Redis.Tests
             var genericMi = mi.MakeGenericMethod(typeof(TestModel));
             var typedClient = genericMi.Invoke(RedisAsync, TypeConstants.EmptyObjectArray);
             var deleteMi = typeof(IEntityStoreAsync<TestModel>).GetMethod(nameof(IEntityStoreAsync<Type>.DeleteAllAsync));
-            await (ValueTask)deleteMi.Invoke(typedClient, new object[] { CancellationToken.None });
+            await (Task)deleteMi.Invoke(typedClient, new object[] { CancellationToken.None });
 
             var allModels = await RedisAsync.As<TestModel>().GetAllAsync();
             Assert.That(allModels, Is.Empty);
