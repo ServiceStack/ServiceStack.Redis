@@ -1757,7 +1757,7 @@ namespace ServiceStack.Redis
             string setId, double min, double max, int? skip, int? take, bool withScores)
         {
             var args = GetRangeByScoreArgs(commandBytes, setId, min, max, skip, take, withScores);
-            return SendExpectMultiData();
+            return SendExpectMultiData(args);
         }
 
         private static byte[][] GetRangeByScoreArgs(byte[] commandBytes,
