@@ -2,7 +2,7 @@
   <PropertyGroup>
     <PackageId>ServiceStack.Redis</PackageId>
     <AssemblyName>ServiceStack.Redis</AssemblyName>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net45;net472;netstandard2.0;netstandard2.1</TargetFrameworks>
     <Title>C# Redis client for the Redis NoSQL DB</Title>
     <PackageDescription>
       C# Redis Client for the worlds fastest distributed NoSQL datastore.
@@ -11,11 +11,25 @@
     </PackageDescription>
     <PackageTags>Redis;NoSQL;Client;Distributed;Cache;PubSub;Messaging;Transactions</PackageTags>
   </PropertyGroup>
+  <!-- TODO: talk about TFMs; Microsoft.Bcl.AsyncInterfaces starts at net461 -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <DefineConstants>$(DefineConstants);ASYNC_MEMORY</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='net45'">
+    <Compile Remove="**/*.Async.cs" />
+    <Compile Remove="AsyncInterfaces/**/*.cs" />
+    <None Include="**/*.Async.cs" />
+    <None Include="AsyncInterfaces/**/*.cs" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\ServiceStack\src\ServiceStack.Common\ServiceStack.Common.Source.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System.Net" />
+  </ItemGroup>
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
+    <Reference Include="System.Net" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="System.Net.Security" Version="4.3.2" />
@@ -24,6 +38,9 @@
     <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+    
+    <!-- note: not needed from netstandard2.1 or netcoreapp3.0 onwards -->
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.0" />
   </ItemGroup>
   
 </Project>
