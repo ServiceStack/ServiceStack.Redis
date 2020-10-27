@@ -104,8 +104,8 @@ namespace ServiceStack.Redis
         public PooledRedisClientManager(
             IEnumerable<string> readWriteHosts,
             IEnumerable<string> readOnlyHosts,
-            long initalDb)
-            : this(readWriteHosts, readOnlyHosts, null, initalDb, null, null)
+            long initialDb)
+            : this(readWriteHosts, readOnlyHosts, null, initialDb, null, null)
         {
         }
 
@@ -113,13 +113,13 @@ namespace ServiceStack.Redis
             IEnumerable<string> readWriteHosts,
             IEnumerable<string> readOnlyHosts,
             RedisClientManagerConfig config,
-            long? initalDb,
+            long? initialDb,
             int? poolSizeMultiplier,
             int? poolTimeOutSeconds)
         {
             this.Db = config != null
-                ? config.DefaultDb ?? initalDb
-                : initalDb;
+                ? config.DefaultDb ?? initialDb
+                : initialDb;
 
             var masters = (readWriteHosts ?? TypeConstants.EmptyStringArray).ToArray();
             var replicas = (readOnlyHosts ?? TypeConstants.EmptyStringArray).ToArray();
