@@ -34,7 +34,7 @@ namespace ServiceStack.Redis
     }
 
     /// <summary>
-    /// Provides thread-safe pooling of redis client connections. All connections are treaded as read and write hosts.
+    /// Provides thread-safe pooling of redis client connections. All connections are treated as read and write hosts.
     /// </summary>
     public partial class RedisManagerPool
         : IRedisClientsManager, IRedisFailover, IHandleClientDispose, IHasRedisResolver, IRedisClientCacheManager
@@ -178,8 +178,8 @@ namespace ServiceStack.Redis
                     lock (clients)
                     {
                         //Create new client outside of pool when max pool size exceeded
-                        //Reverting free-slot not needed when -1 since slwo wasn't reserved or 
-                        //when existingClient changed (failover) since no longer reserver
+                        //Reverting free-slot not needed when -1 since slow wasn't reserved or 
+                        //when existingClient changed (failover) since no longer reserved
                         var stillReserved = inactivePoolIndex >= 0 && inactivePoolIndex < clients.Length &&
                             clients[inactivePoolIndex] == existingClient;
                         if (inactivePoolIndex == -1 || !stillReserved)
@@ -246,7 +246,7 @@ namespace ServiceStack.Redis
         private int GetInActiveClient(out RedisClient inactiveClient)
         {
             //this will loop through all hosts in readClients once even though there are 2 for loops
-            //both loops are used to try to get the prefered host according to the round robin algorithm
+            //both loops are used to try to get the preferred host according to the round robin algorithm
             var readWriteTotal = RedisResolver.ReadWriteHostsCount;
             var desiredIndex = poolIndex % clients.Length;
             for (int x = 0; x < readWriteTotal; x++)

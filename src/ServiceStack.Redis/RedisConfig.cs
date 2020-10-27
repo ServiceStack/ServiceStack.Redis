@@ -73,6 +73,12 @@ namespace ServiceStack.Redis
         public static bool VerifyMasterConnections = true;
 
         /// <summary>
+        /// Whether to retry re-connecting on same connection if not a master instance (default true)
+        /// For Managed Services (e.g. AWS ElastiCache) which eventually restores master instances on same host
+        /// </summary>
+        public static bool RetryReconnectOnFailedMasters = true;
+
+        /// <summary>
         /// The ConnectTimeout on clients used to find the next available host (default 200ms)
         /// </summary>
         public static int HostLookupTimeoutMs = 200;
@@ -126,6 +132,7 @@ namespace ServiceStack.Redis
             BackOffMultiplier = 10;
             BufferPoolMaxSize = 500000;
             VerifyMasterConnections = true;
+            RetryReconnectOnFailedMasters = true;
             HostLookupTimeoutMs = 200;
             AssumeServerVersion = null;
             DeactivatedClientsExpiry = TimeSpan.Zero;
