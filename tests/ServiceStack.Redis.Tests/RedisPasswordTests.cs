@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 
 namespace ServiceStack.Redis.Tests
 {
@@ -29,8 +30,9 @@ namespace ServiceStack.Redis.Tests
             Assert.Throws<RedisResponseException>(() => {
                     try
                     {
-                        var factory = new PooledRedisClientManager(password + "@" +
-                                TestConfig.SingleHost); // redis will throw when using password and it's not configured
+                        var connString = password + "@" + TestConfig.SingleHost + "?RetryTimeout=2000";
+                        // redis will throw when using password and it's not configured
+                        var factory = new PooledRedisClientManager(connString); 
                         using var redis = factory.GetClient();
                         redis.SetValue("Foo", "Bar");
                     }
@@ -38,6 +40,11 @@ namespace ServiceStack.Redis.Tests
                     {
                         Assert.That(ex.Message, Is.Not.Contains(password));
                         throw;
+                    }
+                    catch (TimeoutException tex)
+                    {
+                        Assert.That(tex.InnerException.Message, Is.Not.Contains(password));
+                        throw tex.InnerException;
                     }
                 },
                 "Expected an exception after Redis AUTH command; try using a password that doesn't match.");

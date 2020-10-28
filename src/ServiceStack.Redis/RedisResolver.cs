@@ -96,6 +96,8 @@ namespace ServiceStack.Redis
                         
                         firstEx ??= ex;
                         ExecUtils.SleepBackOffMultiplier(++i);
+                        client?.Dispose();
+                        client = ClientFactory(config);
                     }
                 }
                 throw new TimeoutException($"Could not resolve master instance within {config.RetryTimeout}ms RetryTimeout", firstEx);
