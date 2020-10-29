@@ -126,7 +126,7 @@ namespace ServiceStack.Redis
 
             RedisResolver = new RedisResolver(masters, replicas);
 
-            this.PoolSizeMultiplier = poolSizeMultiplier ?? 20;
+            this.PoolSizeMultiplier = poolSizeMultiplier ?? RedisConfig.DefaultPoolSizeMultiplier;
 
             this.Config = config ?? new RedisClientManagerConfig
             {

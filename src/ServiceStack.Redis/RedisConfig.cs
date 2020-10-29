@@ -53,6 +53,11 @@ namespace ServiceStack.Redis
         public static int? DefaultMaxPoolSize;
 
         /// <summary>
+        /// The default pool size multiplier if no pool size is specified (default 50)
+        /// </summary>
+        public static int DefaultPoolSizeMultiplier = 50;
+
+        /// <summary>
         /// The BackOff multiplier failed Auto Retries starts from (default 10ms)
         /// </summary>
         public static int BackOffMultiplier = 10;
