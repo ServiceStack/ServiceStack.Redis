@@ -164,7 +164,7 @@ namespace ServiceStack.Redis
             if (HeartbeatInterval != null)
             {
                 heartbeatTimer = new Timer(SendHeartbeat, null, 
-                    TimeSpan.FromMilliseconds(0), HeartbeatInterval.Value);
+                    TimeSpan.FromMilliseconds(0), HeartbeatInterval.GetValueOrDefault());
             }
 
             Interlocked.CompareExchange(ref lastHeartbeatTicks, DateTime.UtcNow.Ticks, lastHeartbeatTicks);
@@ -178,7 +178,7 @@ namespace ServiceStack.Redis
             if (currentStatus != Status.Started)
                 return;
 
-            if (DateTime.UtcNow - new DateTime(lastHeartbeatTicks) < HeartbeatInterval.Value)
+            if (DateTime.UtcNow - new DateTime(lastHeartbeatTicks) < HeartbeatInterval.GetValueOrDefault())
                 return;
 
             OnHeartbeatSent?.Invoke();
@@ -229,97 +229,95 @@ namespace ServiceStack.Redis
                 //RESET
                 while (Interlocked.CompareExchange(ref status, 0, 0) == Status.Started)
                 {
-                    using (var redis = ClientsManager.GetReadOnlyClient())
+                    using var redis = ClientsManager.GetReadOnlyClient();
+                    masterClient = redis;
+
+                    //Record that we had a good run...
+                    Interlocked.CompareExchange(ref noOfContinuousErrors, 0, noOfContinuousErrors);
+
+                    using var subscription = redis.CreateSubscription();
+                    subscription.OnUnSubscribe = HandleUnSubscribe;
+
+                    if (OnMessageBytes != null)
                     {
-                        masterClient = redis;
-
-                        //Record that we had a good run...
-                        Interlocked.CompareExchange(ref noOfContinuousErrors, 0, noOfContinuousErrors);
-
-                        using (var subscription = redis.CreateSubscription())
+                        bool IsCtrlMessage(byte[] msg)
                         {
-                            subscription.OnUnSubscribe = HandleUnSubscribe;
-
-                            if (OnMessageBytes != null)
-                            {
-                                bool IsCtrlMessage(byte[] msg)
-                                {
-                                    if (msg.Length < 4)
-                                        return false;
-                                    return msg[0] == 'C' && msg[1] == 'T' && msg[0] == 'R' && msg[0] == 'L';
-                                }
+                            if (msg.Length < 4)
+                                return false;
+                            return msg[0] == 'C' && msg[1] == 'T' && msg[0] == 'R' && msg[0] == 'L';
+                        }
                                 
-                                ((RedisSubscription)subscription).OnMessageBytes = (channel, msg) => {
-                                    if (IsCtrlMessage(msg))
-                                        return;
+                        ((RedisSubscription)subscription).OnMessageBytes = (channel, msg) => {
+                            if (IsCtrlMessage(msg))
+                                return;
 
-                                    OnMessageBytes(channel, msg);
-                                };
-                            }
+                            OnMessageBytes(channel, msg);
+                        };
+                    }
 
-                            subscription.OnMessage = (channel, msg) =>
+                    subscription.OnMessage = (channel, msg) =>
+                    {
+                        if (string.IsNullOrEmpty(msg)) 
+                            return;
+
+                        var ctrlMsg = msg.LeftPart(':');
+                        if (ctrlMsg == ControlCommand.Control)
+                        {
+                            var op = Interlocked.CompareExchange(ref doOperation, Operation.NoOp, doOperation);
+                                    
+                            var msgType = msg.IndexOf(':') >= 0
+                                ? msg.RightPart(':')
+                                : null;
+
+                            OnControlCommand?.Invoke(msgType ?? Operation.GetName(op));
+
+                            switch (op)
                             {
-                                if (string.IsNullOrEmpty(msg)) 
+                                case Operation.Stop:
+                                    if (Log.IsDebugEnabled)
+                                        Log.Debug("Stop Command Issued");
+
+                                    Interlocked.CompareExchange(ref status, Status.Stopping, Status.Started);
+                                    try
+                                    {
+                                        if (Log.IsDebugEnabled)
+                                            Log.Debug("UnSubscribe From All Channels...");
+
+                                        // ReSharper disable once AccessToDisposedClosure
+                                        subscription.UnSubscribeFromAllChannels(); //Un block thread.
+                                    }
+                                    finally
+                                    {
+                                        Interlocked.CompareExchange(ref status, Status.Stopped, Status.Stopping);
+                                    }
                                     return;
 
-                                var ctrlMsg = msg.LeftPart(':');
-                                if (ctrlMsg == ControlCommand.Control)
-                                {
-                                    var op = Interlocked.CompareExchange(ref doOperation, Operation.NoOp, doOperation);
-                                    
-                                    var msgType = msg.IndexOf(':') >= 0
-                                        ? msg.RightPart(':')
-                                        : null;
+                                case Operation.Reset:
+                                    // ReSharper disable once AccessToDisposedClosure
+                                    subscription.UnSubscribeFromAllChannels(); //Un block thread.
+                                    return;
+                            }
 
-                                    OnControlCommand?.Invoke(msgType ?? Operation.GetName(op));
-
-                                    switch (op)
-                                    {
-                                        case Operation.Stop:
-                                            if (Log.IsDebugEnabled)
-                                                Log.Debug("Stop Command Issued");
-
-                                            Interlocked.CompareExchange(ref status, Status.Stopping, Status.Started);
-                                            try
-                                            {
-                                                if (Log.IsDebugEnabled)
-                                                    Log.Debug("UnSubscribe From All Channels...");
-
-                                                subscription.UnSubscribeFromAllChannels(); //Un block thread.
-                                            }
-                                            finally
-                                            {
-                                                Interlocked.CompareExchange(ref status, Status.Stopped, Status.Stopping);
-                                            }
-                                            return;
-
-                                        case Operation.Reset:
-                                            subscription.UnSubscribeFromAllChannels(); //Un block thread.
-                                            return;
-                                    }
-
-                                    switch (msgType)
-                                    {
-                                        case ControlCommand.Pulse:
-                                            Pulse();
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    OnMessage(channel, msg);
-                                }
-                            };
-
-                            //blocks thread
-                            if (ChannelsMatching != null && ChannelsMatching.Length > 0)
-                                subscription.SubscribeToChannelsMatching(ChannelsMatching);
-                            else
-                                subscription.SubscribeToChannels(Channels);             
-
-                            masterClient = null;
+                            switch (msgType)
+                            {
+                                case ControlCommand.Pulse:
+                                    Pulse();
+                                    break;
+                            }
                         }
-                    }
+                        else
+                        {
+                            OnMessage(channel, msg);
+                        }
+                    };
+
+                    //blocks thread
+                    if (ChannelsMatching != null && ChannelsMatching.Length > 0)
+                        subscription.SubscribeToChannelsMatching(ChannelsMatching);
+                    else
+                        subscription.SubscribeToChannels(Channels);             
+
+                    masterClient = null;
                 }
 
                 OnStop?.Invoke();
@@ -363,7 +361,7 @@ namespace ServiceStack.Redis
                 if (Log.IsDebugEnabled)
                     Log.Debug("Stopping RedisPubSubServer...");
 
-                //Unblock current bgthread by issuing StopCommand
+                //Unblock current bg thread by issuing StopCommand
                 SendControlCommand(Operation.Stop);
             }
         }
@@ -382,12 +380,10 @@ namespace ServiceStack.Redis
 
             try
             {
-                using (var redis = ClientsManager.GetClient())
+                using var redis = ClientsManager.GetClient();
+                foreach (var channel in Channels)
                 {
-                    foreach (var channel in Channels)
-                    {
-                        redis.PublishMessage(channel, msg);
-                    }
+                    redis.PublishMessage(channel, msg);
                 }
             }
             catch (Exception ex)
@@ -406,13 +402,11 @@ namespace ServiceStack.Redis
                 if (masterClient != null)
                 {
                     //New thread-safe client with same connection info as connected master
-                    using (var currentlySubscribedClient = ((RedisClient)masterClient).CloneClient())
+                    using var currentlySubscribedClient = ((RedisClient)masterClient).CloneClient();
+                    Interlocked.CompareExchange(ref doOperation, Operation.Reset, doOperation);
+                    foreach (var channel in Channels)
                     {
-                        Interlocked.CompareExchange(ref doOperation, Operation.Reset, doOperation);
-                        foreach (var channel in Channels)
-                        {
-                            currentlySubscribedClient.PublishMessage(channel, ControlCommand.Control);
-                        }
+                        currentlySubscribedClient.PublishMessage(channel, ControlCommand.Control);
                     }
                 }
                 else
@@ -466,12 +460,12 @@ namespace ServiceStack.Redis
         private void SleepBackOffMultiplier(int continuousErrorsCount)
         {
             if (continuousErrorsCount == 0) return;
-            const int MaxSleepMs = 60 * 1000;
+            const int maxSleepMs = 60 * 1000;
 
             //exponential/random retry back-off.
             var nextTry = Math.Min(
                 rand.Next((int)Math.Pow(continuousErrorsCount, 3), (int)Math.Pow(continuousErrorsCount + 1, 3) + 1),
-                MaxSleepMs);
+                maxSleepMs);
 
             if (Log.IsDebugEnabled)
                 Log.Debug("Sleeping for {0}ms after {1} continuous errors".Fmt(nextTry, continuousErrorsCount));
