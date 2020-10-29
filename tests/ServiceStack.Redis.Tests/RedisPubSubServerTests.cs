@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Text;
@@ -9,16 +10,26 @@ namespace ServiceStack.Redis.Tests
     [TestFixture]
     public class RedisPubSubServerTests
     {
-        private static RedisPubSubServer CreatePubSubServer(
-            int intervalSecs = 1, int timeoutSecs = 3)
+        RedisManagerPool clientsManager = new RedisManagerPool(TestConfig.MasterHosts);
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
         {
-            var clientsManager = new RedisManagerPool(TestConfig.MasterHosts);
+            clientsManager.Dispose();
+        }
+        
+        private RedisPubSubServer CreatePubSubServer(
+            int intervalSecs = 1, int timeoutSecs = 3, params string[] channels)
+        {
             using (var redis = clientsManager.GetClient())
                 redis.FlushAll();
+            
+            if (channels.Length == 0)
+                channels = new[] {"topic:test"};
 
             var pubSub = new RedisPubSubServer(
                 clientsManager,
-                "topic:test")
+                channels)
             {
                 HeartbeatInterval = TimeSpan.FromSeconds(intervalSecs),
                 HeartbeatTimeout = TimeSpan.FromSeconds(timeoutSecs)
@@ -96,6 +107,43 @@ namespace ServiceStack.Redis.Tests
             Assert.That(pulseCount, Is.LessThan(8 * count));
 
             pubSubs.Each(x => x.Dispose());
+        }
+
+        [Test]
+        public void Can_restart_and_subscribe_to_more_channels()
+        {
+            var a = new List<string>();
+            var b = new List<string>();
+            var pubSub = CreatePubSubServer(intervalSecs: 20, timeoutSecs: 30, "topic:a");
+            pubSub.OnMessage = (channel, msg) => {
+                if (channel == "topic:a")
+                    a.Add(msg);
+                else if (channel == "topic:b")
+                    b.Add(msg);
+            };
+            pubSub.Start();
+            Thread.Sleep(100);
+
+            var client = clientsManager.GetClient();
+            var i = 0;
+            client.PublishMessage("topic:a", $"msg: ${++i}");
+            client.PublishMessage("topic:b", $"msg: ${++i}");
+            
+            Thread.Sleep(100);
+            Assert.That(a.Count, Is.EqualTo(1));
+            Assert.That(b.Count, Is.EqualTo(0));
+
+            pubSub.Channels = new[] {"topic:a", "topic:b"};
+            pubSub.Restart();
+            Thread.Sleep(100);
+           
+            client.PublishMessage("topic:a", $"msg: ${++i}");
+            client.PublishMessage("topic:b", $"msg: ${++i}");
+
+            
+            Thread.Sleep(100);
+            Assert.That(a.Count, Is.EqualTo(2));
+            Assert.That(b.Count, Is.EqualTo(1));
         }
     }
 }
