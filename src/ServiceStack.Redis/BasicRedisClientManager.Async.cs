@@ -57,7 +57,7 @@ namespace ServiceStack.Redis
         async Task<T> ICacheClientAsync.GetAsync<T>(string key, CancellationToken token)
         {
             await using var client = await GetReadOnlyCacheClientAsync(token).ConfigureAwait(false);
-            return await client.GetAsync<T>(key).ConfigureAwait(false);
+            return await client.GetAsync<T>(key, token).ConfigureAwait(false);
         }
 
         async Task<bool> ICacheClientAsync.SetAsync<T>(string key, T value, CancellationToken token)

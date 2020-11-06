@@ -30,152 +30,109 @@ namespace ServiceStack.Redis
 	public partial class BasicRedisClientManager
 		: ICacheClient
 	{
-		public ICacheClient GetCacheClient()
-		{
-            return new RedisClientManagerCacheClient(this);
-        }
+		public ICacheClient GetCacheClient() => 
+			new RedisClientManagerCacheClient(this);
 
-		public ICacheClient GetReadOnlyCacheClient()
-		{
-			return ConfigureRedisClient(this.GetReadOnlyClientImpl());
-		}
+		public ICacheClient GetReadOnlyCacheClient() => 
+			ConfigureRedisClient(this.GetReadOnlyClientImpl());
 
-		private ICacheClient ConfigureRedisClient(IRedisClient client)
-		{
-			return client;
-		}
-
-		#region Implementation of ICacheClient
+		private ICacheClient ConfigureRedisClient(IRedisClient client) => client;
 
 		public bool Remove(string key)
 		{
-			using (var client = GetReadOnlyCacheClient())
-			{
-				return client.Remove(key);
-			}
+			using var client = GetReadOnlyCacheClient();
+			return client.Remove(key);
 		}
 
 		public void RemoveAll(IEnumerable<string> keys)
 		{
-			using (var client = GetCacheClient())
-			{
-				client.RemoveAll(keys);
-			}
+			using var client = GetCacheClient();
+			client.RemoveAll(keys);
 		}
 
 		public T Get<T>(string key)
 		{
-			using (var client = GetReadOnlyCacheClient())
-			{
-				return client.Get<T>(key);
-			}
+			using var client = GetReadOnlyCacheClient();
+			return client.Get<T>(key);
 		}
 
 		public long Increment(string key, uint amount)
 		{
-			using (var client = GetCacheClient())
-			{
-				return client.Increment(key, amount);
-			}
+			using var client = GetCacheClient();
+			return client.Increment(key, amount);
 		}
 
 		public long Decrement(string key, uint amount)
 		{
-			using (var client = GetCacheClient())
-			{
-				return client.Decrement(key, amount);
-			}
+			using var client = GetCacheClient();
+			return client.Decrement(key, amount);
 		}
 
 		public bool Add<T>(string key, T value)
 		{
-			using (var client = GetCacheClient())
-			{
-				return client.Add(key, value);
-			}
+			using var client = GetCacheClient();
+			return client.Add(key, value);
 		}
 
 		public bool Set<T>(string key, T value)
 		{
-			using (var client = GetCacheClient())
-			{
-				return client.Set(key, value);
-			}
+			using var client = GetCacheClient();
+			return client.Set(key, value);
 		}
 
 		public bool Replace<T>(string key, T value)
 		{
-			using (var client = GetCacheClient())
-			{
-				return client.Replace(key, value);
-			}
+			using var client = GetCacheClient();
+			return client.Replace(key, value);
 		}
 
 		public bool Add<T>(string key, T value, DateTime expiresAt)
 		{
-			using (var client = GetCacheClient())
-			{
-				return client.Add(key, value, expiresAt);
-			}
+			using var client = GetCacheClient();
+			return client.Add(key, value, expiresAt);
 		}
 
 		public bool Set<T>(string key, T value, DateTime expiresAt)
 		{
-			using (var client = GetCacheClient())
-			{
-				return client.Set(key, value, expiresAt);
-			}
+			using var client = GetCacheClient();
+			return client.Set(key, value, expiresAt);
 		}
 
 		public bool Replace<T>(string key, T value, DateTime expiresAt)
 		{
-			using (var client = GetCacheClient())
-			{
-				return client.Replace(key, value, expiresAt);
-			}
+			using var client = GetCacheClient();
+			return client.Replace(key, value, expiresAt);
 		}
 
 		public bool Add<T>(string key, T value, TimeSpan expiresIn)
 		{
-			using (var client = GetCacheClient())
-			{
-				return client.Add(key, value, expiresIn);
-			}
+			using var client = GetCacheClient();
+			return client.Add(key, value, expiresIn);
 		}
 
 		public bool Set<T>(string key, T value, TimeSpan expiresIn)
 		{
-			using (var client = GetCacheClient())
-			{
-				return client.Set(key, value, expiresIn);
-			}
+			using var client = GetCacheClient();
+			return client.Set(key, value, expiresIn);
 		}
 
 		public bool Replace<T>(string key, T value, TimeSpan expiresIn)
 		{
-			using (var client = GetCacheClient())
-			{
-				return client.Replace(key, value, expiresIn);
-			}
+			using var client = GetCacheClient();
+			return client.Replace(key, value, expiresIn);
 		}
 
 		public void FlushAll()
 		{
-			using (var client = GetCacheClient())
-			{
-				client.FlushAll();
-			}
+			using var client = GetCacheClient();
+			client.FlushAll();
 		}
 
 		public IDictionary<string, T> GetAll<T>(IEnumerable<string> keys)
 		{
-			using (var client = GetReadOnlyCacheClient())
-			{
-				return client.GetAll<T>(keys);
-			}
+			using var client = GetReadOnlyCacheClient();
+			return client.GetAll<T>(keys);
 		}
-
-		#endregion
 	}
 
 
