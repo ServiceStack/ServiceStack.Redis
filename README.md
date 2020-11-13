@@ -224,7 +224,7 @@ A more detailed list of the available RedisClient APIs used in the example can b
 
 ### Async Redis
 
-Async support in ServiceStack.Redis is available to .NET Core (**.NET Standard 2.0**) or **.NET Framework v4.7.2+** projects where there's async API equivalents for most sync APIs as contained within the Async Redis interfaces below:
+The async support in ServiceStack.Redis is designed for optimal efficiency and uses `ValueTask` & other modern Async APIs only available in **.NET Standard 2.0** and **.NET Framework v4.7.2+** projects where there's async API equivalents for most sync APIs as contained within the Async Redis interfaces below:
 
  - [IRedisClientsManagerAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClientsManagerAsync.cs)
  - [IRedisClientAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClientAsync.cs)
@@ -271,8 +271,6 @@ Where it can be used to resolve both sync `IRedisClient` and async `IRedisClient
 using var syncRedis = container.Resolve<IRedisClientsManager>().GetClient();
 await using var asyncRedis = await container.Resolve<IRedisClientsManager>().GetClientAsync();
 ```
-
-The async support in ServiceStack.Redis is designed for optimal efficiency and uses `ValueTask` & other modern Async APIs.
 
 If you want to force async-only API usage could choose to just register `IRedisClientsManagerAsync` where it only lets you resolve async only `IRedisClientAsync` and `ICacheClientAsync` clients, e.g:
 
