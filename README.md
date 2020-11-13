@@ -299,7 +299,7 @@ public class MyDep
 
 ### Usage in ServiceStack
 
-Inside ServiceStack Services & Controllers we recommend using `GetRedisAsync()` to resolve an `IRedisClientAsync`, e.g:
+Inside ServiceStack Services & Controllers we recommend using `GetRedisAsync()` to resolve an `IRedisClientAsync`:
 
 ```csharp
 public class MyService : Service
