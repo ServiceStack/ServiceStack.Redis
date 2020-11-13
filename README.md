@@ -6,13 +6,13 @@ Follow [@ServiceStack](https://twitter.com/servicestack) or [view the docs](http
  
 There are a number of different APIs available with the `RedisClient` implementing the following interfaces:
 
- * [ICacheClient](http://docs.servicestack.net/caching) - If you are using Redis solely as a cache, you should bind to the ServiceStack's common interface as there already are In-Memory an Memcached implementations available in ServiceStack, allowing you to easily switch providers
- * [IRedisNativeClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisNativeClient.cs) - For those wanting a low-level raw byte access (where you can control your own serialization/deserialization) that map 1:1 with Redis operations of the same name.
+ * [Caching Provider](http://docs.servicestack.net/caching) - If you are using Redis solely as a cache, you should bind to the ServiceStack's common interface as there already are In-Memory an Memcached implementations available in ServiceStack, allowing you to easily switch providers
+ * [IRedisNativeClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisNativeClient.cs) / [Async](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisNativeClientAsync.cs) - For those wanting a low-level raw byte access (where you can control your own serialization/deserialization) that map 1:1 with Redis operations of the same name.
 
 For most cases if you require access to Redis specific functionality you would want to bind to the interface below:
 
-  * [IRedisClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClient.cs) - Provides a friendlier, more descriptive API that lets you store values as strings (UTF8 encoding).
-  * [IRedisTypedClient](https://github.com/ServiceStack/ServiceStack/tree/master/src/ServiceStack.Interfaces/Redis/Generic) - created with `IRedisClient.As<T>()` - it returns a 'strongly-typed client' that provides a typed-interface for all redis value operations that works against any C#/.NET POCO type.
+  * [IRedisClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClient.cs) / [Async](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClientAsync.cs) - Provides a friendlier, more descriptive API that lets you store values as strings (UTF8 encoding).
+  * [Redis generic client APIs](https://github.com/ServiceStack/ServiceStack/tree/master/src/ServiceStack.Interfaces/Redis/Generic) - created with `redis.As<T>()` - returns a 'strongly-typed client' that provides a typed-interface for all redis value operations that works against any C#/.NET POCO type.
 
 The interfaces works cleanly with any IOC and allows your app logic to bind to implementation-free interfaces which can easily be mocked and substituted.
 
@@ -24,7 +24,7 @@ With each client providing different layers of abstraction:
   
   * The RedisNativeClient exposes raw `byte[]` apis and does no marshalling and passes all values directly to redis.
   * The RedisClient assumes `string` values and simply converts strings to UTF8 bytes before sending to Redis
-  * The RedisTypedClient provides a generic interface allowing you to add POCO values. The POCO types are serialized using [.NETs fastest JSON Serializer](https://github.com/ServiceStackV3/mythz_blog/blob/master/pages/344.md) which is then converted to UTF8 bytes and sent to Redis.
+  * The RedisTypedClient provides a generic interface allowing you to add POCO values. POCOs are serialized using [ServiceStack.Text](https://github.com/ServiceStack/ServiceStack.Text) which is then converted to UTF8 bytes and sent to Redis.
 
 ### API Overview
 
@@ -170,34 +170,157 @@ Once registered, accessing the RedisClient is the same in all Client Managers, e
 
 ```csharp
 var clientsManager = container.Resolve<IRedisClientsManager>();
-using (IRedisClient redis = clientsManager.GetClient())
-{
-    redis.IncrementValue("counter");
-    List<string> days = redis.GetAllItemsFromList("days");
+using var redis = clientsManager.GetClient();
 
-    //Access Typed API
-    var redisTodos = redis.As<Todo>();
+redis.IncrementValue("counter");
+List<string> days = redis.GetAllItemsFromList("days");
 
-    redisTodos.Store(new Todo {
-        Id = redisTodos.GetNextSequence(),
-        Content = "Learn Redis",
-    });
+//Access Typed API
+var redisTodos = redis.As<Todo>();
 
-    var todo = redisTodos.GetById(1);
+redisTodos.Store(new Todo {
+    Id = redisTodos.GetNextSequence(),
+    Content = "Learn Redis",
+});
 
-    //Access Native Client
-    var redisNative = (IRedisNativeClient)redis;
+var todo = redisTodos.GetById(1);
 
-    redisNative.Incr("counter");
-    List<string> days = redisNative.LRange("days", 0, -1);
-}
+//Access Native Client
+var redisNative = (IRedisNativeClient)redis;
+
+redisNative.Incr("counter");
+List<string> days = redisNative.LRange("days", 0, -1);
 ```
 
 A more detailed list of the available RedisClient APIs used in the example can be seen in the C# interfaces below:
 
+ - [IRedisClientsManager](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClientsManager.cs)
  - [IRedisClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClient.cs)
- - [IRedisTypedClient<T>](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisTypedClient.cs)
  - [IRedisNativeClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisNativeClient.cs)
+ - [IRedisSubscription](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisSubscription.cs)
+
+#### Pipeline & Transaction APIs
+
+ - [IRedisTransaction](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisTransaction.cs)
+ - [IRedisPipelineShared](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Pipeline/IRedisPipelineShared.cs)
+ - [IRedisQueueableOperation](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Pipeline/IRedisQueueableOperation.cs)
+ - [IRedisQueueCompletableOperation](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Pipeline/IRedisQueueCompletableOperation.cs)
+
+#### Generic Client APIs
+
+ - [IRedisTypedClient](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisTypedClient.cs)
+ - [IRedisHash](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisHash.Generic.cs)
+ - [IRedisList](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisList.Generic.cs)
+ - [IRedisSet](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisSet.Generic.cs)
+ - [IRedisSortedSet](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisSortedSet.Generic.cs)
+ - [IRedisTypedQueueableOperation](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisTypedQueueableOperation.cs)
+
+#### Server Collection APIs
+
+ - [IRedisHash](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisHash.cs)
+ - [IRedisList](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisList.cs)
+ - [IRedisSet](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisSet.cs)
+ - [IRedisSortedSet](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisSortedSet.cs)
+
+### Async Redis
+
+Async support in ServiceStack.Redis is available to .NET Core (**.NET Standard 2.0**) or **.NET Framework v4.7.2+** projects where there's async API equivalents for most sync APIs as contained within the Async Redis interfaces below:
+
+ - [IRedisClientsManagerAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClientsManagerAsync.cs)
+ - [IRedisClientAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisClientAsync.cs)
+ - [IRedisNativeClientAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisNativeClientAsync.cs)
+ - [IRedisSubscriptionAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisSubscriptionAsync.cs)
+
+#### Async Pipeline & Transaction APIs
+
+ - [IRedisTransactionAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisTransactionAsync.cs)
+ - [IRedisPipelineSharedAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Pipeline/IRedisPipelineSharedAsync.cs)
+ - [IRedisQueueableOperationAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Pipeline/IRedisQueueableOperationAsync.cs)
+ - [IRedisQueueCompletableOperationAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Pipeline/IRedisQueueCompletableOperationAsync.cs)
+
+#### Async Generic Client APIs
+
+ - [IRedisTypedClientAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisTypedClientAsync.cs)
+ - [IRedisHashAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisHash.Generic.Async.cs)
+ - [IRedisListAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisList.Generic.Async.cs)
+ - [IRedisSetAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisSet.Generic.Async.cs)
+ - [IRedisSortedSetAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisSortedSet.Generic.Async.cs)
+ - [IRedisTypedTransactionAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisTypedTransactionAsync.cs)
+ - [IRedisTypedQueueableOperationAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/Generic/IRedisTypedQueueableOperationAsync.cs)
+
+#### Async Server Collection APIs
+
+ - [IRedisHashAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisHashAsync.cs)
+ - [IRedisListAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisListAsync.cs)
+ - [IRedisSetAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisSetAsync.cs)
+ - [IRedisSortedSetAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisSortedSetAsync.cs)
+
+
+### Redis Async Usage
+
+All Redis Client Managers implement both `IRedisClientsManager` and `IRedisClientsManagerAsync` so IOC registrations remain the same which can continue to register against the existing `IRedisClientsManager` interface, e.g:
+
+```csharp
+container.Register<IRedisClientsManager>(c => 
+    new RedisManagerPool(redisConnectionString));
+```
+
+Where it can be used to resolve both sync `IRedisClient` and async `IRedisClientAsync` clients, e.g:
+
+```csharp
+using var syncRedis = container.Resolve<IRedisClientsManager>().GetClient();
+await using var asyncRedis = await container.Resolve<IRedisClientsManager>().GetClientAsync();
+```
+
+The async support in ServiceStack.Redis is designed for optimal efficiency and uses `ValueTask` & other modern Async APIs.
+
+If you want to force async-only API usage could choose to just register `IRedisClientsManagerAsync` where it only lets you resolve async only `IRedisClientAsync` and `ICacheClientAsync` clients, e.g:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddSingleton<IRedisClientsManagerAsync>(c => new RedisManagerPool());
+}
+
+//... 
+
+public class MyDep
+{
+    private IRedisClientsManagerAsync manager;
+    public MyDep(IRedisClientsManagerAsync manager) => this.manager = manager;
+
+    public async Task<long> Incr(string key, uint value)
+    {
+        await using var redis = await manager.GetClientAsync();
+        return await redis.IncrementAsync(key, value);
+    }
+}
+```
+
+### Usage in ServiceStack
+
+Inside ServiceStack Services & Controllers we recommend using `GetRedisAsync()` to resolve an `IRedisClientAsync`, e.g:
+
+```csharp
+public class MyService : Service
+{
+    public async Task<object> Any(MyRequest request)
+    {
+        await using var redis = await GetRedisAsync();
+        await redis.IncrementAsync(nameof(MyRequest), 1);
+    }
+}
+
+public class HomeController : ServiceStackController
+{
+    public async Task<ActionResult> Index()
+    {
+        await using var redis = await GetRedisAsync();
+        await redis.IncrementAsync(nameof(HomeController), 1);
+    }
+}
+```
+
 
 ## [Redis React Browser](https://servicestack.net/redis-react)
 
@@ -307,10 +430,8 @@ Support for changing the Ssl Protocols used for encrypted SSL connections can be
 ```csharp
 var connString = $"redis://{Host}?ssl=true&sslprotocols=Tls12&password={Password.UrlEncode()}";
 var redisManager = new RedisManagerPool(connString);
-using (var client = redisManager.GetClient())
-{
-    //...
-}
+using var client = redisManager.GetClient();
+//...
 ```
 
 ### [Connecting to Azure Redis](http://docs.servicestack.net/ssl-redis-azure)
@@ -558,6 +679,14 @@ public interface IRedisClient
     IEnumerable<KeyValuePair<string, string>> ScanAllHashEntries(string hashId, string pattern = null, int pageSize = 1000);    
 }
 
+public interface IRedisClientAsync
+{
+    IAsyncEnumerable<string> ScanAllKeysAsync(string pattern = null, int pageSize, CancellationToken ct);
+    IAsyncEnumerable<string> ScanAllSetItemsAsync(string setId, string pattern = null, int pageSize, CancellationToken ct);
+    IAsyncEnumerable<KeyValuePair<string, double>> ScanAllSortedSetItemsAsync(string setId, string pattern = null, int pageSize, ct);
+    IAsyncEnumerable<KeyValuePair<string, string>> ScanAllHashEntriesAsync(string hashId, string pattern = null, int pageSize, ct);
+}
+
 //Low-level API
 public interface IRedisNativeClient
 {
@@ -566,6 +695,14 @@ public interface IRedisNativeClient
     ScanResult SScan(string setId, ulong cursor, int count = 10, string match = null);
     ScanResult ZScan(string setId, ulong cursor, int count = 10, string match = null);
     ScanResult HScan(string hashId, ulong cursor, int count = 10, string match = null);
+}
+
+public interface IRedisNativeClientAsync 
+{
+    ValueTask<ScanResult> ScanAsync(ulong cursor, int count = 10, string match = null, CancellationToken ct);
+    ValueTask<ScanResult> SScanAsync(string setId, ulong cursor, int count = 10, string match = null, CancellationToken ct);
+    ValueTask<ScanResult> ZScanAsync(string setId, ulong cursor, int count = 10, string match = null, CancellationToken ct);
+    ValueTask<ScanResult> HScanAsync(string hashId, ulong cursor, int count = 10, string match = null, CancellationToken ct);
 }
 ```
 
@@ -621,7 +758,9 @@ The `ExecLua` API returns this complex LUA table response in the `Children` coll
 
 Another way to return complex data structures in a LUA operation is to serialize the result as JSON
 
-    return cjson.encode(results)
+```lua
+return cjson.encode(results)
+```
 
 Which you can access as raw JSON by parsing the response as a String with:
 
@@ -707,7 +846,7 @@ public interface IRedisClient
 
 ### Usage Examples
 
-Here's how you can implement a ZPOP in Lua to remove the items with the lowest rank from a sorted set:
+Here's how you can implement a **ZPOP** in Lua to remove the items with the lowest rank from a sorted set:
 
 ```csharp
 var luaBody = @"
@@ -724,7 +863,7 @@ var letters = Redis.ExecLuaAsList(luaBody, keys: new[] { "zalphabet" }, args: ne
 letters.PrintDump(); //[A, B, C]
 ```
 
-And how to implement ZREVPOP to remove items with the highest rank from a sorted set:
+And how to implement **ZREVPOP** to remove items with the highest rank from a sorted set:
 
 ```csharp
 var luaBody = @"
@@ -745,21 +884,21 @@ letters.PrintDump(); //[X, Y, Z]
 
 ### Other examples
 
-Returning an int:
+Returning an `int`:
 
 ```csharp
 int intVal = Redis.ExecLuaAsInt("return 123"); //123
 int intVal = Redis.ExecLuaAsInt("return ARGV[1] + ARGV[2]", "10", "20"); //30
 ```
 
-Returning an string:
+Returning an `string`:
 
 ```csharp
 //Hello, Redis Lua!
 var strVal = Redis.ExecLuaAsString(@"return 'Hello, ' .. ARGV[1] .. '!'", "Redis Lua");
 ```
 
-Returning a List of strings:
+Returning a `List` of strings:
 
 ```csharp
 Enum.GetNames(typeof(DayOfWeek)).ToList()
@@ -769,8 +908,7 @@ var daysOfWeek = Redis.ExecLuaAsList("return redis.call('LRANGE', 'DaysOfWeek', 
 daysOfWeek.PrintDump(); //[Sunday, Monday, Tuesday, ...]
 ```
 
-More examples can be found in the [Redis Eval Lua tests](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/RedisClientEvalTests.cs
-)
+More examples can be found in the [Redis Eval Lua tests](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/RedisClientEvalTests.cs)
 
 ### Debugging Data Corruption Issues
 
@@ -779,10 +917,8 @@ Typically this is a result of using `IRedisClient` field in a singleton instance
 uses Redis should retrieve the redis client within a using statement, e.g:
 
 ```csharp
-using (var redis = redisManager.GetClient())
-{
-    //..         
-}
+using var redis = redisManager.GetClient();
+//...
 ```
 
 Unfortunately the call-site which returns the corrupted response or runtime Exception doesn't identify where else the Redis client instance was being used.
@@ -846,76 +982,75 @@ Contains all the examples, tutorials and resources you need to get you up to spe
 Below is a simple example to give you a flavour of how easy it is to use some of Redis's advanced data structures - in this case Redis Lists:
 _Full source code of this example is [viewable online](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/ShippersExample.cs)_
 
-    using (var redisClient = new RedisClient())
-    {
-        //Create a 'strongly-typed' API that makes all Redis Value operations to apply against Shippers
-        IRedisTypedClient<Shipper> redis = redisClient.As<Shipper>();
+```csharp
+using var redisClient = new RedisClient();
+//Create a 'strongly-typed' API that makes all Redis Value operations to apply against Shippers
+IRedisTypedClient<Shipper> redis = redisClient.As<Shipper>();
 
-        //Redis lists implement IList<T> while Redis sets implement ICollection<T>
-        var currentShippers = redis.Lists["urn:shippers:current"];
-        var prospectiveShippers = redis.Lists["urn:shippers:prospective"];
+//Redis lists implement IList<T> while Redis sets implement ICollection<T>
+var currentShippers = redis.Lists["urn:shippers:current"];
+var prospectiveShippers = redis.Lists["urn:shippers:prospective"];
 
-        currentShippers.Add(
-            new Shipper {
-                Id = redis.GetNextSequence(),
-                CompanyName = "Trains R Us",
-                DateCreated = DateTime.UtcNow,
-                ShipperType = ShipperType.Trains,
-                UniqueRef = Guid.NewGuid()
-            });
+currentShippers.Add(
+    new Shipper {
+        Id = redis.GetNextSequence(),
+        CompanyName = "Trains R Us",
+        DateCreated = DateTime.UtcNow,
+        ShipperType = ShipperType.Trains,
+        UniqueRef = Guid.NewGuid()
+    });
 
-        currentShippers.Add(
-            new Shipper {
-                Id = redis.GetNextSequence(),
-                CompanyName = "Planes R Us",
-                DateCreated = DateTime.UtcNow,
-                ShipperType = ShipperType.Planes,
-                UniqueRef = Guid.NewGuid()
-            });
+currentShippers.Add(
+    new Shipper {
+        Id = redis.GetNextSequence(),
+        CompanyName = "Planes R Us",
+        DateCreated = DateTime.UtcNow,
+        ShipperType = ShipperType.Planes,
+        UniqueRef = Guid.NewGuid()
+    });
 
-        var lameShipper = new Shipper {
-            Id = redis.GetNextSequence(),
-            CompanyName = "We do everything!",
-            DateCreated = DateTime.UtcNow,
-            ShipperType = ShipperType.All,
-            UniqueRef = Guid.NewGuid()
-        };
+var lameShipper = new Shipper {
+    Id = redis.GetNextSequence(),
+    CompanyName = "We do everything!",
+    DateCreated = DateTime.UtcNow,
+    ShipperType = ShipperType.All,
+    UniqueRef = Guid.NewGuid()
+};
 
-        currentShippers.Add(lameShipper);
+currentShippers.Add(lameShipper);
 
-        Dump("ADDED 3 SHIPPERS:", currentShippers);
+Dump("ADDED 3 SHIPPERS:", currentShippers);
 
-        currentShippers.Remove(lameShipper);
+currentShippers.Remove(lameShipper);
 
-        Dump("REMOVED 1:", currentShippers);
+Dump("REMOVED 1:", currentShippers);
 
-        prospectiveShippers.Add(
-            new Shipper {
-                Id = redis.GetNextSequence(),
-                CompanyName = "Trucks R Us",
-                DateCreated = DateTime.UtcNow,
-                ShipperType = ShipperType.Automobiles,
-                UniqueRef = Guid.NewGuid()
-            });
+prospectiveShippers.Add(
+    new Shipper {
+        Id = redis.GetNextSequence(),
+        CompanyName = "Trucks R Us",
+        DateCreated = DateTime.UtcNow,
+        ShipperType = ShipperType.Automobiles,
+        UniqueRef = Guid.NewGuid()
+    });
 
-        Dump("ADDED A PROSPECTIVE SHIPPER:", prospectiveShippers);
+Dump("ADDED A PROSPECTIVE SHIPPER:", prospectiveShippers);
 
-        redis.PopAndPushBetweenLists(prospectiveShippers, currentShippers);
+redis.PopAndPushBetweenLists(prospectiveShippers, currentShippers);
 
-        Dump("CURRENT SHIPPERS AFTER POP n' PUSH:", currentShippers);
-        Dump("PROSPECTIVE SHIPPERS AFTER POP n' PUSH:", prospectiveShippers);
+Dump("CURRENT SHIPPERS AFTER POP n' PUSH:", currentShippers);
+Dump("PROSPECTIVE SHIPPERS AFTER POP n' PUSH:", prospectiveShippers);
 
-        var poppedShipper = redis.PopFromList(currentShippers);
-        Dump("POPPED a SHIPPER:", poppedShipper);
-        Dump("CURRENT SHIPPERS AFTER POP:", currentShippers);
+var poppedShipper = redis.PopFromList(currentShippers);
+Dump("POPPED a SHIPPER:", poppedShipper);
+Dump("CURRENT SHIPPERS AFTER POP:", currentShippers);
 
-        //reset sequence and delete all lists
-        redis.SetSequence(0);
-        redis.Remove(currentShippers, prospectiveShippers);
-        Dump("DELETING CURRENT AND PROSPECTIVE SHIPPERS:", currentShippers);
-    }
+//reset sequence and delete all lists
+redis.SetSequence(0);
+redis.Remove(currentShippers, prospectiveShippers);
+Dump("DELETING CURRENT AND PROSPECTIVE SHIPPERS:", currentShippers);
+```
 
-    /*
     == EXAMPLE OUTPUT ==
 
     ADDED 3 SHIPPERS:
@@ -945,7 +1080,6 @@ _Full source code of this example is [viewable online](https://github.com/Servic
     Id:1,CompanyName:Trains R Us,ShipperType:Trains,DateCreated:2010-01-31T11:53:37.7169323Z,UniqueRef:d17c5db0415b44b2ac5da7b6ebd780f5
 
     DELETING CURRENT AND PROSPECTIVE SHIPPERS:
-    */
 
 More examples are available in the [RedisExamples Redis examples page] and in the comprehensive
 [test suite](https://github.com/ServiceStack/ServiceStack.Redis/tree/master/tests/ServiceStack.Redis.Tests)
@@ -959,47 +1093,47 @@ below stores and gets the entire [Northwind database](http://code.google.com/p/s
 
 _(Running inside a VS.NET/R# unit test on a 3 year old iMac)_
 
-    using (var client = new RedisClient())
-    {
-        var before = DateTime.Now;
-        client.StoreAll(NorthwindData.Categories);
-        client.StoreAll(NorthwindData.Customers);
-        client.StoreAll(NorthwindData.Employees);
-        client.StoreAll(NorthwindData.Shippers);
-        client.StoreAll(NorthwindData.Orders);
-        client.StoreAll(NorthwindData.Products);
-        client.StoreAll(NorthwindData.OrderDetails);
-        client.StoreAll(NorthwindData.CustomerCustomerDemos);
-        client.StoreAll(NorthwindData.Regions);
-        client.StoreAll(NorthwindData.Territories);
-        client.StoreAll(NorthwindData.EmployeeTerritories);
+```csharp
+using var client = new RedisClient();
 
-        Console.WriteLine("Took {0}ms to store the entire Northwind database ({1} records)",
-            (DateTime.Now - before).TotalMilliseconds, totalRecords);
+var before = DateTime.Now;
+client.StoreAll(NorthwindData.Categories);
+client.StoreAll(NorthwindData.Customers);
+client.StoreAll(NorthwindData.Employees);
+client.StoreAll(NorthwindData.Shippers);
+client.StoreAll(NorthwindData.Orders);
+client.StoreAll(NorthwindData.Products);
+client.StoreAll(NorthwindData.OrderDetails);
+client.StoreAll(NorthwindData.CustomerCustomerDemos);
+client.StoreAll(NorthwindData.Regions);
+client.StoreAll(NorthwindData.Territories);
+client.StoreAll(NorthwindData.EmployeeTerritories);
 
+Console.WriteLine("Took {0}ms to store the entire Northwind database ({1} records)",
+    (DateTime.Now - before).TotalMilliseconds, totalRecords);
 
-        before = DateTime.Now;
-        var categories = client.GetAll<Category>();
-        var customers = client.GetAll<Customer>();
-        var employees = client.GetAll<Employee>();
-        var shippers = client.GetAll<Shipper>();
-        var orders = client.GetAll<Order>();
-        var products = client.GetAll<Product>();
-        var orderDetails = client.GetAll<OrderDetail>();
-        var customerCustomerDemos = client.GetAll<CustomerCustomerDemo>();
-        var regions = client.GetAll<Region>();
-        var territories = client.GetAll<Territory>();
-        var employeeTerritories = client.GetAll<EmployeeTerritory>();
+before = DateTime.Now;
+var categories = client.GetAll<Category>();
+var customers = client.GetAll<Customer>();
+var employees = client.GetAll<Employee>();
+var shippers = client.GetAll<Shipper>();
+var orders = client.GetAll<Order>();
+var products = client.GetAll<Product>();
+var orderDetails = client.GetAll<OrderDetail>();
+var customerCustomerDemos = client.GetAll<CustomerCustomerDemo>();
+var regions = client.GetAll<Region>();
+var territories = client.GetAll<Territory>();
+var employeeTerritories = client.GetAll<EmployeeTerritory>();
 
-        Console.WriteLine("Took {0}ms to get the entire Northwind database ({1} records)",
-            (DateTime.Now - before).TotalMilliseconds, totalRecords);
-    }
-    /*
-    == EXAMPLE OUTPUT ==
+Console.WriteLine("Took {0}ms to get the entire Northwind database ({1} records)",
+    (DateTime.Now - before).TotalMilliseconds, totalRecords);
+/*
+== EXAMPLE OUTPUT ==
 
-    Took 1020.0583ms to store the entire Northwind database (3202 records)
-    Took 132.0076ms to get the entire Northwind database (3202 records)
-    */
+Took 1020.0583ms to store the entire Northwind database (3202 records)
+Took 132.0076ms to get the entire Northwind database (3202 records)
+*/
+```
 
 
 Note: The total time taken includes an extra Redis operation for each record to store the id in a Redis set for each
