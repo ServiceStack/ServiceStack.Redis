@@ -23,7 +23,7 @@ namespace ServiceStack.Redis
 
         async Task<T> ICacheClientAsync.GetAsync<T>(string key, CancellationToken token)
         {
-            await using var client = await redisManager.GetReadOnlyCacheClientAsync(token).ConfigureAwait(false);
+            await using var client = await redisManager.GetReadOnlyClientAsync(token).ConfigureAwait(false);
             return await client.GetAsync<T>(key, token).ConfigureAwait(false);
         }
 
@@ -53,7 +53,7 @@ namespace ServiceStack.Redis
 
         async Task<IDictionary<string, T>> ICacheClientAsync.GetAllAsync<T>(IEnumerable<string> keys, CancellationToken token)
         {
-            await using var client = await redisManager.GetReadOnlyCacheClientAsync(token).ConfigureAwait(false);
+            await using var client = await redisManager.GetReadOnlyClientAsync(token).ConfigureAwait(false);
             return await client.GetAllAsync<T>(keys, token).ConfigureAwait(false);
         }
 
@@ -71,13 +71,13 @@ namespace ServiceStack.Redis
 
         async Task<TimeSpan?> ICacheClientAsync.GetTimeToLiveAsync(string key, CancellationToken token)
         {
-            await using var client = await redisManager.GetReadOnlyCacheClientAsync(token).ConfigureAwait(false);
+            await using var client = await redisManager.GetReadOnlyClientAsync(token).ConfigureAwait(false);
             return await client.GetTimeToLiveAsync(key, token).ConfigureAwait(false);
         }
 
         async IAsyncEnumerable<string> ICacheClientAsync.GetKeysByPatternAsync(string pattern, [EnumeratorCancellation] CancellationToken token)
         {
-            await using var client = await redisManager.GetReadOnlyCacheClientAsync(token).ConfigureAwait(false);
+            await using var client = await redisManager.GetReadOnlyClientAsync(token).ConfigureAwait(false);
             await foreach (var key in client.GetKeysByPatternAsync(pattern, token).ConfigureAwait(false).WithCancellation(token))
             {
                 yield return key;
