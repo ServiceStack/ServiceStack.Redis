@@ -4,7 +4,6 @@ using NUnit.Framework;
 namespace ServiceStack.Redis.Tests
 {
     public class CacheClientTestsAsync
-        : RedisClientTestsBaseAsync
     {
         IRedisClientsManagerAsync redisManager = new RedisManagerPool(TestConfig.SingleHost);
         

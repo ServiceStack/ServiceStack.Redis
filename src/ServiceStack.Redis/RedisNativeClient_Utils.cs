@@ -566,7 +566,7 @@ namespace ServiceStack.Redis
             {
                 //Drain any existing buffers 
                 ResetSendBuffer();
-                bufferedReader.Reset();
+                bufferedReader?.Reset();
                 if (socket?.Available > 0)
                 {
                     logDebug($"Draining existing socket of {socket.Available} bytes");
