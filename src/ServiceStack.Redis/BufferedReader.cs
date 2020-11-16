@@ -28,6 +28,11 @@ namespace ServiceStack.Redis
         {
             _source = source;
             _buffer = new byte[bufferSize];
+            Reset();
+        }
+
+        internal void Reset()
+        {
             _offset = _available = 0;
         }
 

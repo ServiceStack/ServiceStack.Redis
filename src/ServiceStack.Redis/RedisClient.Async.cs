@@ -105,7 +105,8 @@ namespace ServiceStack.Redis
         {
             using (JsConfig.With(new Text.Config { ExcludeTypeInfo = false }))
             {
-                return await action(this).ConfigureAwait(false);
+                var ret = await action(this).ConfigureAwait(false);
+                return ret;
             }
         }
 
@@ -120,11 +121,19 @@ namespace ServiceStack.Redis
 
         Task<T> ICacheClientAsync.GetAsync<T>(string key, CancellationToken token)
         {
-            return ExecAsync(r =>
-                typeof(T) == typeof(byte[])
-                    ? ((IRedisNativeClientAsync)r).GetAsync(key, token).Await(val => (T)(object)val)
-                    : r.GetValueAsync(key, token).Await(val => JsonSerializer.DeserializeFromString<T>(val))
-            ).AsTask();
+            return ExecAsync(async r => {
+                if (typeof(T) == typeof(byte[]))
+                {
+                    var ret = await ((IRedisNativeClientAsync) r).GetAsync(key, token).ConfigureAwait(false);
+                    return (T) (object) ret;
+                }
+                else
+                {
+                    var val = await r.GetValueAsync(key, token).ConfigureAwait(false);
+                    var ret = JsonSerializer.DeserializeFromString<T>(val);
+                    return ret;
+                }
+            }).AsTask();
         }
 
         async ValueTask<List<string>> IRedisClientAsync.SearchKeysAsync(string pattern, CancellationToken token)
@@ -169,10 +178,10 @@ namespace ServiceStack.Redis
             => ((IRedisClientAsync)this).AddItemToSortedSetAsync(setId, value, GetLexicalScore(value), token);
 
         ValueTask<bool> IRedisClientAsync.AddItemToSortedSetAsync(string setId, string value, double score, CancellationToken token)
-            => NativeAsync.ZAddAsync(setId, score, value.ToUtf8Bytes()).IsSuccessAsync();
+            => NativeAsync.ZAddAsync(setId, score, value.ToUtf8Bytes(), token).IsSuccessAsync();
 
         ValueTask<bool> IRedisClientAsync.SetEntryInHashAsync(string hashId, string key, string value, CancellationToken token)
-            => NativeAsync.HSetAsync(hashId, key.ToUtf8Bytes(), value.ToUtf8Bytes()).IsSuccessAsync();
+            => NativeAsync.HSetAsync(hashId, key.ToUtf8Bytes(), value.ToUtf8Bytes(), token).IsSuccessAsync();
 
         ValueTask IRedisClientAsync.SetAllAsync(IDictionary<string, string> map, CancellationToken token)
             => GetSetAllBytes(map, out var keyBytes, out var valBytes) ? NativeAsync.MSetAsync(keyBytes, valBytes, token) : default;
@@ -221,7 +230,7 @@ namespace ServiceStack.Redis
             : NativeAsync.ExpireAtAsync(key, ConvertToServerDate(expireAt).ToUnixTime(), token);
 
         Task<TimeSpan?> ICacheClientAsync.GetTimeToLiveAsync(string key, CancellationToken token)
-            => NativeAsync.TtlAsync(key, token).Await(ttlSecs => ParseTimeToLiveResult(ttlSecs)).AsTask();
+            => NativeAsync.TtlAsync(key, token).Await(ParseTimeToLiveResult).AsTask();
 
         ValueTask<bool> IRedisClientAsync.PingAsync(CancellationToken token)
             => NativeAsync.PingAsync(token);
@@ -365,7 +374,7 @@ namespace ServiceStack.Redis
             => NativeAsync.SlowlogResetAsync(token);
 
         ValueTask<SlowlogItem[]> IRedisClientAsync.GetSlowlogAsync(int? numberOfRecords, CancellationToken token)
-            => NativeAsync.SlowlogGetAsync(numberOfRecords, token).Await(data => ParseSlowlog(data));
+            => NativeAsync.SlowlogGetAsync(numberOfRecords, token).Await(ParseSlowlog);
 
 
         Task<bool> ICacheClientAsync.SetAsync<T>(string key, T value, CancellationToken token)

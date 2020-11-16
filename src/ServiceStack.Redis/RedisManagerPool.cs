@@ -151,7 +151,7 @@ namespace ServiceStack.Redis
                     if (inActiveClient != null)
                     {
                         poolIndex++;
-                        inActiveClient.Active = true;
+                        inActiveClient.Activate();
 
                         return !AssertAccessOnlyOnSameThread 
                             ? inActiveClient
@@ -281,7 +281,7 @@ namespace ServiceStack.Redis
         private RedisClient InitNewClient(RedisClient client)
         {
             client.Id = Interlocked.Increment(ref RedisClientCounter);
-            client.Active = true;
+            client.Activate(newClient:true);
             client.ClientManager = this;
             client.ConnectionFilter = ConnectionFilter;
 
@@ -303,7 +303,7 @@ namespace ServiceStack.Redis
                     else
                     {
                         client.TrackThread = null;
-                        client.Active = false;
+                        client.Deactivate();
                     }
 
                     Monitor.PulseAll(clients);
@@ -320,7 +320,7 @@ namespace ServiceStack.Redis
         {
             lock (clients)
             {
-                client.Active = false;
+                client.Deactivate();
             }
         }
 

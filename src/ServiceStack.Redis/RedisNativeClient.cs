@@ -83,7 +83,7 @@ namespace ServiceStack.Redis
         internal bool Active
         {
             get => Interlocked.CompareExchange(ref active, 0, 0) == YES;
-            set => Interlocked.Exchange(ref active, value ? YES : NO);
+            private set => Interlocked.Exchange(ref active, value ? YES : NO);
         }
 
         internal IHandleClientDispose ClientManager { get; set; }

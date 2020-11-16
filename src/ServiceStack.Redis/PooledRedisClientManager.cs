@@ -250,7 +250,7 @@ namespace ServiceStack.Redis
                     if (inActiveClient != null)
                     {
                         WritePoolIndex++;
-                        inActiveClient.Active = true;
+                        inActiveClient.Activate();
 
                         InitClient(inActiveClient);
 
@@ -400,7 +400,7 @@ namespace ServiceStack.Redis
                     if (inActiveClient != null)
                     {
                         ReadPoolIndex++;
-                        inActiveClient.Active = true;
+                        inActiveClient.Activate();
 
                         InitClient(inActiveClient);
 
@@ -468,7 +468,7 @@ namespace ServiceStack.Redis
         {
             var desiredIndex = ReadPoolIndex % readClients.Length;
             //this will loop through all hosts in readClients once even though there are 2 for loops
-            //both loops are used to try to get the prefered host according to the round robin algorithm
+            //both loops are used to try to get the preferred host according to the round robin algorithm
             var readOnlyTotal = RedisResolver.ReadOnlyHostsCount;
             for (int x = 0; x < readOnlyTotal; x++)
             {
@@ -502,7 +502,7 @@ namespace ServiceStack.Redis
         private RedisClient InitNewClient(RedisClient client)
         {
             client.Id = Interlocked.Increment(ref RedisClientCounter);
-            client.Active = true;
+            client.Activate(newClient:true);
             client.ClientManager = this;
             client.ConnectionFilter = ConnectionFilter;
             if (NamespacePrefix != null)
@@ -543,7 +543,7 @@ namespace ServiceStack.Redis
                     else
                     {
                         client.TrackThread = null;
-                        client.Active = false;
+                        client.Deactivate();
                     }
 
                     Monitor.PulseAll(readClients);
@@ -564,7 +564,7 @@ namespace ServiceStack.Redis
                     else
                     {
                         client.TrackThread = null;
-                        client.Active = false;
+                        client.Deactivate();
                     }
 
                     Monitor.PulseAll(writeClients);
@@ -587,7 +587,7 @@ namespace ServiceStack.Redis
         {
             lock (readClients)
             {
-                client.Active = false;
+                client.Deactivate();
                 Monitor.PulseAll(readClients);
             }
         }
@@ -600,7 +600,7 @@ namespace ServiceStack.Redis
         {
             lock (writeClients)
             {
-                client.Active = false;
+                client.Deactivate();
                 Monitor.PulseAll(writeClients);
             }
         }

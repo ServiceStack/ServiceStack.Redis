@@ -558,6 +558,31 @@ namespace ServiceStack.Redis
         }
 
         /// <summary>
+        /// Called before returning pooled client/socket  
+        /// </summary>
+        internal void Activate(bool newClient=false)
+        {
+            if (!newClient)
+            {
+                //Drain any existing buffers 
+                ResetSendBuffer();
+                bufferedReader.Reset();
+                if (socket?.Available > 0)
+                {
+                    logDebug($"Draining existing socket of {socket.Available} bytes");
+                    var buff = new byte[socket.Available];
+                    socket.Receive(buff, SocketFlags.None);
+                }
+            }
+            Active = true;
+        }
+
+        internal void Deactivate()
+        {
+            Active = false;
+        }
+
+        /// <summary>
         /// reset buffer index in send buffer
         /// </summary>
         public void ResetSendBuffer()
