@@ -144,7 +144,7 @@ namespace ServiceStack.Redis
                     }
                     else
                     {
-#if NETSTANDARD2_0
+#if NETSTANDARD || NET472
                         sslStream = new SslStream(networkStream,
                             leaveInnerStreamOpen: false,
                             userCertificateValidationCallback: RedisConfig.CertificateValidationCallback,
@@ -167,17 +167,26 @@ namespace ServiceStack.Redis
 #endif                        
                     }
 
-#if NETSTANDARD2_0
-                    sslStream.AuthenticateAsClientAsync(Host).Wait();
+#if NETSTANDARD || NET472
+                    var task = sslStream.AuthenticateAsClientAsync(Host);
+                    if (ConnectTimeout > 0)
+                    {
+                        task.Wait(ConnectTimeout);
+                    }
+                    else
+                    {
+                        task.Wait();
+                    }
 #else
                     if (SslProtocols != null)
                     {
-                        sslStream.AuthenticateAsClient(Host, new X509CertificateCollection(), SslProtocols ?? System.Security.Authentication.SslProtocols.Default, checkCertificateRevocation: true);
-                    } else
+                        sslStream.AuthenticateAsClient(Host, new X509CertificateCollection(), 
+                            SslProtocols ?? System.Security.Authentication.SslProtocols.None, checkCertificateRevocation: true);
+                    } 
+                    else
                     {
                         sslStream.AuthenticateAsClient(Host);
                     }
-                    
 #endif
 
                     if (!sslStream.IsEncrypted)
