@@ -155,6 +155,14 @@ container.Register<IRedisClientsManager>(c =>
 
 The `PooledRedisClientManager` imposes a maximum connection limit and when its maximum pool size has been reached will instead block on any new connection requests until the next `RedisClient` is released back into the pool. If no client became available within `PoolTimeout`, a Pool `TimeoutException` will be thrown.
 
+#### Read Only Clients
+
+By default resolving a RedisClient with `GetRedisClient()` or `GetRedisClientAsync()` will return a client connected to the configured primary (master) host, if you also have replica (slave) hosts configured, you can access it with the `GetReadOnlyClient()` or `GetReadOnlyClientAsync()` APIs, e.g:
+
+```csharp
+using var redisReadOnly = clientsManager.GetReadOnlyClient();
+```
+
 ### BasicRedisClientManager
 
 If don't want to use connection pooling (i.e. you're accessing a local redis-server instance) you can use a basic (non-pooled) Clients Manager which creates a new `RedisClient` instance each time:
