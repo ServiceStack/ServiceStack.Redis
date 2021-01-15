@@ -365,7 +365,7 @@ flexibility of [Redis Connection Strings](#redis-connection-strings) to apply co
 individual Redis Clients you need to register a custom `HostFilter`:
 
 ```csharp
-sentinel.HostFilter = host => "{host}?db=1&RetryTimeout=5000";
+sentinel.HostFilter = host => $"{host}?db=1&RetryTimeout=5000";
 ```
 
 An alternative to using connection strings for configuring clients is to modify 
