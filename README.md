@@ -350,7 +350,7 @@ var sentinelHosts = new[]{ "sentinel1", "sentinel2:6390", "sentinel3" };
 var sentinel = new RedisSentinel(sentinelHosts, masterName: "mymaster");
 ```
 
-This configues a `RedisSentinel` with 3 sentinel hosts looking at **mymaster** group. 
+This configures a `RedisSentinel` with 3 sentinel hosts looking at **mymaster** group. 
 As the default port for sentinels when unspecified is **26379** and how RedisSentinel is able to 
 auto-discover other sentinels, the minimum configuration required is with a single Sentinel host:
 
@@ -365,7 +365,7 @@ flexibility of [Redis Connection Strings](#redis-connection-strings) to apply co
 individual Redis Clients you need to register a custom `HostFilter`:
 
 ```csharp
-sentinel.HostFilter = host => "{0}?db=1&RetryTimeout=5000".Fmt(host);
+sentinel.HostFilter = host => "{host}?db=1&RetryTimeout=5000";
 ```
 
 An alternative to using connection strings for configuring clients is to modify 
