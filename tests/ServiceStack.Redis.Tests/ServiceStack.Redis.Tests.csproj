@@ -5,9 +5,9 @@
 	- net46 is .NET Framework without async
 	- net472 is .NET Framework with async
 	- netcoreapp2.1 is .NET Core with async, but without some features like memory/stream APIs
-	- netcoreapp3.1 is .NET Core with all the bells and whistles
+	- net5.0 is .NET Core with all the bells and whistles
 	-->
-    <TargetFrameworks>net46;net472;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net46;net472;netcoreapp2.1;net5.0</TargetFrameworks>
     <DebugType>portable</DebugType>
     <AssemblyName>ServiceStack.Redis.Tests</AssemblyName>
     <OutputType>Library</OutputType>
@@ -36,7 +36,7 @@
     <Compile Remove="**/*.Async.cs" />
     <None Include="**/*.Async.cs" />
   </ItemGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1' or '$(TargetFramework)' == 'netcoreapp3.1'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1' or '$(TargetFramework)' == 'net5.0'">
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
