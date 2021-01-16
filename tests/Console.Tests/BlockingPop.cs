@@ -49,7 +49,7 @@ namespace ConsoleTests
                     // add items to list
                     for (int i = 1; i <= items; i++)
                     {
-                        redis.PushItemToList(listId, "item {0}".Fmt(i));
+                        redis.PushItemToList(listId, $"item {i}");
                     }
 
                     do
@@ -57,7 +57,7 @@ namespace ConsoleTests
                         var item = redis.BlockingPopItemFromList(listId, null);
 
                         // log the popped item.  if BRPOP timeout is null and list empty, I do not expect to print anything
-                        log.InfoFormat("{0}", item.IsNullOrEmpty() ? " list empty " : item);
+                        log.InfoFormat("{0}", string.IsNullOrEmpty(item) ? " list empty " : item);
 
                         System.Threading.Thread.Sleep(1000);
 
