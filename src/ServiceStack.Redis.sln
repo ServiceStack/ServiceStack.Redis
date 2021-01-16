@@ -19,11 +19,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Redis", "Servi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Redis.Tests", "..\tests\ServiceStack.Redis.Tests\ServiceStack.Redis.Tests.csproj", "{951D28EE-5D22-4C62-AC0F-1661A8CEEC5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console.Tests", "..\tests\Console.Tests\Console.Tests.csproj", "{8368C965-B4F6-4263-9ABB-731A175B2E77}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Redis.Tests.Sentinel", "..\tests\ServiceStack.Redis.Tests.Sentinel\ServiceStack.Redis.Tests.Sentinel.csproj", "{91C55091-A946-49B5-9517-8794EBCC5784}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Redis.Benchmark", "..\tests\ServiceStack.Redis.Benchmark\ServiceStack.Redis.Benchmark.csproj", "{959CA5FE-6525-4EEF-86CA-F4978BEFF14F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console.Tests", "..\tests\Console.Tests\Console.Tests.csproj", "{56DEDC64-B349-4150-BE9C-5805D831678D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,16 +59,6 @@ Global
 		{951D28EE-5D22-4C62-AC0F-1661A8CEEC5A}.Release|x64.Build.0 = Release|Any CPU
 		{951D28EE-5D22-4C62-AC0F-1661A8CEEC5A}.Release|x86.ActiveCfg = Release|Any CPU
 		{951D28EE-5D22-4C62-AC0F-1661A8CEEC5A}.Release|x86.Build.0 = Release|Any CPU
-		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Debug|x64.Build.0 = Debug|Any CPU
-		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Release|x64.ActiveCfg = Release|Any CPU
-		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Release|x64.Build.0 = Release|Any CPU
-		{8368C965-B4F6-4263-9ABB-731A175B2E77}.Release|x86.ActiveCfg = Release|Any CPU
 		{91C55091-A946-49B5-9517-8794EBCC5784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{91C55091-A946-49B5-9517-8794EBCC5784}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91C55091-A946-49B5-9517-8794EBCC5784}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -91,6 +81,18 @@ Global
 		{959CA5FE-6525-4EEF-86CA-F4978BEFF14F}.Release|x64.Build.0 = Release|Any CPU
 		{959CA5FE-6525-4EEF-86CA-F4978BEFF14F}.Release|x86.ActiveCfg = Release|Any CPU
 		{959CA5FE-6525-4EEF-86CA-F4978BEFF14F}.Release|x86.Build.0 = Release|Any CPU
+		{56DEDC64-B349-4150-BE9C-5805D831678D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56DEDC64-B349-4150-BE9C-5805D831678D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56DEDC64-B349-4150-BE9C-5805D831678D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{56DEDC64-B349-4150-BE9C-5805D831678D}.Debug|x64.Build.0 = Debug|Any CPU
+		{56DEDC64-B349-4150-BE9C-5805D831678D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{56DEDC64-B349-4150-BE9C-5805D831678D}.Debug|x86.Build.0 = Debug|Any CPU
+		{56DEDC64-B349-4150-BE9C-5805D831678D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56DEDC64-B349-4150-BE9C-5805D831678D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56DEDC64-B349-4150-BE9C-5805D831678D}.Release|x64.ActiveCfg = Release|Any CPU
+		{56DEDC64-B349-4150-BE9C-5805D831678D}.Release|x64.Build.0 = Release|Any CPU
+		{56DEDC64-B349-4150-BE9C-5805D831678D}.Release|x86.ActiveCfg = Release|Any CPU
+		{56DEDC64-B349-4150-BE9C-5805D831678D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
