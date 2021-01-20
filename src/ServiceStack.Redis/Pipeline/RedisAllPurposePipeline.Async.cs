@@ -196,7 +196,7 @@ namespace ServiceStack.Redis
         {
             BeginQueuedCommand(new QueuedRedisCommand
             {
-                OnSuccessMultiStringCallback = list => onSuccessCallback(list.ToHashSet()),
+                OnSuccessMultiStringCallback = list => onSuccessCallback(list.ToSet()),
                 OnErrorCallback = onErrorCallback
             }.WithAsyncReturnCommand(async r =>
             {

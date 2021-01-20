@@ -242,7 +242,7 @@ namespace ServiceStack.Redis
             BeginQueuedCommand(new QueuedRedisCommand
             {
                 MultiStringReturnCommand = r => command(r).ToList(),
-                OnSuccessMultiStringCallback = list => onSuccessCallback(list.ToHashSet()),
+                OnSuccessMultiStringCallback = list => onSuccessCallback(list.ToSet()),
                 OnErrorCallback = onErrorCallback
             });
             command(RedisClient);

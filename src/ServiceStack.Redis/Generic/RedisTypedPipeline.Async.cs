@@ -229,7 +229,7 @@ namespace ServiceStack.Redis
         {
             BeginQueuedCommand(new QueuedRedisTypedCommand<T>
             {
-                OnSuccessMultiStringCallback = list => onSuccessCallback(list.ToHashSet()),
+                OnSuccessMultiStringCallback = list => onSuccessCallback(list.ToSet()),
                 OnErrorCallback = onErrorCallback
             }.WithAsyncReturnCommand(async r =>
             {
@@ -243,7 +243,7 @@ namespace ServiceStack.Redis
         {
             BeginQueuedCommand(new QueuedRedisTypedCommand<T>
             {
-                OnSuccessMultiTypeCallback = x => onSuccessCallback(x.ConvertAll(y => JsonSerializer.DeserializeFromString<T>(y))),
+                OnSuccessMultiTypeCallback = x => onSuccessCallback(x.ConvertAll(JsonSerializer.DeserializeFromString<T>)),
                 OnErrorCallback = onErrorCallback
             }.WithAsyncReturnCommand(command));
             RedisAllPurposePipeline.AssertSync(command(RedisClient));
