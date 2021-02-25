@@ -216,15 +216,14 @@ namespace ServiceStack.Redis
         {
             this.Start();
         }
-        
+
         private async Task<bool> waitForWriter(int msTimeout)
         {
-           writeMonitor = new AsyncMonitor();
-           var cts = new CancellationTokenSource();
-           cts.CancelAfter(msTimeout);
-           await writeMonitor.WaitAsync(cts.Token);
-           if (cts.IsCancellationRequested) return false;
-           cts.Cancel();
+           if (writeMonitor == null)
+              writeMonitor = new AsyncMonitor();
+           var delayTask = Task.Delay(msTimeout);
+           var result = await Task.WhenAny(writeMonitor.WaitAsync(), delayTask);
+           if (result == delayTask) return false;
            return true;
         }
 
