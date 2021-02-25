@@ -240,6 +240,7 @@ namespace ServiceStack.Redis
                 var poolTimedOut = false;
                 var inactivePoolIndex = -1;
 
+                var timeoutsTests = 300;
                 do
                 {
                    RedisClient inActiveClient;
@@ -268,19 +269,27 @@ namespace ServiceStack.Redis
                       }
                    }
 
-                   // Didn't get one, so let's wait a bit for a new one.
-                   if (PoolTimeout.HasValue)
+                   timeoutsTests--;
+                   if (timeoutsTests <= 0)
                    {
-                      if (!await waitForWriter(PoolTimeout.Value))
-                      {
-                         poolTimedOut = true;
-                         break;
-                      }
+                      poolTimedOut = true;
+                      break;
                    }
-                   else
-                   {
-                      await waitForWriter(RecheckPoolAfterMs);
-                   }
+                   await Task.Delay(10);
+
+                   // // Didn't get one, so let's wait a bit for a new one.
+                   // if (PoolTimeout.HasValue)
+                   // {
+                   //    if (!await waitForWriter(PoolTimeout.Value))
+                   //    {
+                   //       poolTimedOut = true;
+                   //       break;
+                   //    }
+                   // }
+                   // else
+                   // {
+                   //    await waitForWriter(RecheckPoolAfterMs);
+                   // }
                 } while (true); // Just keep repeating until we get a
 
                 if (poolTimedOut)
