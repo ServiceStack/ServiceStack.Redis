@@ -25,7 +25,7 @@ namespace ServiceStack.Redis
             => new RedisClientManagerCacheClient(this).AsValueTaskResult<ICacheClientAsync>();
 
         ValueTask<IRedisClientAsync> IRedisClientsManagerAsync.GetClientAsync(CancellationToken token)
-            => GetClient(true).AsValueTaskResult<IRedisClientAsync>();
+            => GetClientAsync();
 
         ValueTask<ICacheClientAsync> IRedisClientsManagerAsync.GetReadOnlyCacheClientAsync(CancellationToken token)
             => new RedisClientManagerCacheClient(this) { ReadOnly = true }.AsValueTaskResult<ICacheClientAsync>();
