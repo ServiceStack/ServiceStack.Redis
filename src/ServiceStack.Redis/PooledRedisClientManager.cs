@@ -16,7 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Cleary.AsyncExtensions;
+using Nito.AsyncEx;
 using ServiceStack.Caching;
 using ServiceStack.Logging;
 using ServiceStack.Text;
@@ -36,8 +36,8 @@ namespace ServiceStack.Redis
         private const string PoolTimeoutError =
             "Redis Timeout expired. The timeout period elapsed prior to obtaining a connection from the pool. This may have occurred because all pooled connections were in use.";
 
-        private AsyncMonitor readMonitor;
-        private AsyncMonitor writeMonitor;
+        private AsyncManualResetEvent readAsyncEvent;
+        private AsyncManualResetEvent writeAsyncEvent;
 
         protected readonly int PoolSizeMultiplier = 20;
         public int RecheckPoolAfterMs = 100;
@@ -217,13 +217,30 @@ namespace ServiceStack.Redis
             this.Start();
         }
 
+        private void pulseAllRead()
+        {
+           readAsyncEvent?.Set();
+           readAsyncEvent?.Reset();
+           Monitor.PulseAll(readClients);
+        }
+
+        private void pulseAllWrite()
+        {
+           writeAsyncEvent?.Set();
+           writeAsyncEvent?.Reset();
+           Monitor.PulseAll(writeClients);
+        }
+
         private async Task<bool> waitForWriter(int msTimeout)
         {
-           if (writeMonitor == null)
-              writeMonitor = new AsyncMonitor();
-           var delayTask = Task.Delay(msTimeout);
-           var result = await Task.WhenAny(writeMonitor.WaitAsync(), delayTask);
-           if (result == delayTask) return false;
+           if (writeAsyncEvent == null) // If we're not doing async, no need to create this till we need it.
+              writeAsyncEvent = new AsyncManualResetEvent(false);
+           var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(msTimeout));
+           try
+           {
+              await writeAsyncEvent.WaitAsync(cts.Token);
+           }
+           catch (OperationCanceledException) { return false; }
            return true;
         }
 
@@ -231,16 +248,13 @@ namespace ServiceStack.Redis
         /// Returns a Read/Write client (The default) using the hosts defined in ReadWriteHosts
         /// </summary>
         /// <returns></returns>
-        public IRedisClient GetClient() => GetClient(false);
+        public IRedisClient GetClient() => GetClientBlocking();
 
         private async ValueTask<IRedisClientAsync> GetClientAsync()
         {
             try
             {
-                var poolTimedOut = false;
                 var inactivePoolIndex = -1;
-
-                var timeoutsTests = 300;
                 do
                 {
                    RedisClient inActiveClient;
@@ -269,33 +283,22 @@ namespace ServiceStack.Redis
                       }
                    }
 
-                   timeoutsTests--;
-                   if (timeoutsTests <= 0)
+                   if (PoolTimeout.HasValue)
                    {
-                      poolTimedOut = true;
-                      break;
+                      // We have a timeout value set - so try to not wait longer than this.
+                      if (!await waitForWriter(PoolTimeout.Value))
+                      {
+                         throw new TimeoutException(PoolTimeoutError);
+                      }
                    }
-                   await Task.Delay(10);
+                   else
+                   {
+                      // Wait forever, so just retry till we get one.
+                      await waitForWriter(RecheckPoolAfterMs);
+                   }
+                } while (true); // Just keep repeating until we get a slot.
 
-                   // // Didn't get one, so let's wait a bit for a new one.
-                   // if (PoolTimeout.HasValue)
-                   // {
-                   //    if (!await waitForWriter(PoolTimeout.Value))
-                   //    {
-                   //       poolTimedOut = true;
-                   //       break;
-                   //    }
-                   // }
-                   // else
-                   // {
-                   //    await waitForWriter(RecheckPoolAfterMs);
-                   // }
-                } while (true); // Just keep repeating until we get a
-
-                if (poolTimedOut)
-                    throw new TimeoutException(PoolTimeoutError);
-
-                //Reaches here when there's no Valid InActive Clients
+                //Reaches here when there's no Valid InActive Clients, but we have a slot for one!
                 try
                 {
                     //inactivePoolIndex = index of reservedSlot || index of invalid client
@@ -343,9 +346,8 @@ namespace ServiceStack.Redis
             }
         }
 
-        private RedisClient GetClient(bool forAsync)
+        private RedisClient GetClientBlocking()
         {
-           if (forAsync) throw new Exception("Call GetClientAsync instead");
             try
             {
                 var poolTimedOut = false;
@@ -380,7 +382,7 @@ namespace ServiceStack.Redis
 
                         InitClient(inActiveClient);
 
-                        return (!AssertAccessOnlyOnSameThread || forAsync)
+                        return (!AssertAccessOnlyOnSameThread)
                             ? inActiveClient
                             : inActiveClient.LimitAccessToThread(Thread.CurrentThread.ManagedThreadId, Environment.StackTrace);
                     }
@@ -416,7 +418,7 @@ namespace ServiceStack.Redis
                         WritePoolIndex++;
                         writeClients[inactivePoolIndex] = newClient;
 
-                        return (!AssertAccessOnlyOnSameThread || forAsync)
+                        return (!AssertAccessOnlyOnSameThread)
                             ? newClient
                             : newClient.LimitAccessToThread(Thread.CurrentThread.ManagedThreadId, Environment.StackTrace);
                     }
@@ -672,8 +674,7 @@ namespace ServiceStack.Redis
                         client.Deactivate();
                     }
 
-                    Monitor.PulseAll(readClients);
-                    readMonitor?.PulseAll();
+                    pulseAllRead();
                     return;
                 }
             }
@@ -694,8 +695,7 @@ namespace ServiceStack.Redis
                         client.Deactivate();
                     }
 
-                    Monitor.PulseAll(writeClients);
-                    writeMonitor?.PulseAll();
+                    pulseAllWrite();
                     return;
                 }
             }
@@ -703,14 +703,12 @@ namespace ServiceStack.Redis
             //Client not found in any pool, pulse both pools.
             lock (readClients)
             {
-               Monitor.PulseAll(readClients);
-               readMonitor?.PulseAll();
+               pulseAllRead();
             }
 
             lock (writeClients)
             {
-               Monitor.PulseAll(writeClients);
-               writeMonitor?.PulseAll();
+               pulseAllWrite();
             }
         }
 
@@ -723,8 +721,7 @@ namespace ServiceStack.Redis
             lock (readClients)
             {
                 client.Deactivate();
-                Monitor.PulseAll(readClients);
-                readMonitor?.PulseAll();
+                pulseAllRead();
             }
         }
 
@@ -737,8 +734,7 @@ namespace ServiceStack.Redis
             lock (writeClients)
             {
                 client.Deactivate();
-                Monitor.PulseAll(writeClients);
-                writeMonitor?.PulseAll();
+                pulseAllWrite();
             }
         }
 
