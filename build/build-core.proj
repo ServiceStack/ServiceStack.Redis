@@ -12,6 +12,7 @@
   <PropertyGroup>
     <BuildSolutionDir>$(MSBuildProjectDirectory)/..</BuildSolutionDir>
     <SrcDir>$(BuildSolutionDir)/src</SrcDir>
+    <TestsDir>$(BuildSolutionDir)/tests</TestsDir>
     <Configuration Condition="$(Configuration) == ''">Release</Configuration>
     <NuGetPackageDir>$(BuildSolutionDir)/NuGet/</NuGetPackageDir>
     <PackageVersion>$(MajorVersion).$(MinorVersion).$(PatchVersion)</PackageVersion>
@@ -40,6 +41,9 @@
   <!-- need to remove old caches from nuget restore from .Core csproj's -->
   <Target Name="ClearNuGetRestoreCaches">
     <RemoveDir Directories="$(SrcDir)/ServiceStack.Redis/obj" />
+    <RemoveDir Directories="$(TestsDir)/ServiceStack.Redis.Tests/obj" />
+    <RemoveDir Directories="$(TestsDir)/ServiceStack.Redis.Tests.Sentinel/obj" />
+    <RemoveDir Directories="$(TestsDir)/Console.Tests/obj" />
   </Target>
 
   <Target Name="UpdateVersion">
