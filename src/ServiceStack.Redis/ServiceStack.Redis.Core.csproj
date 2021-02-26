@@ -11,7 +11,6 @@
     <PackageTags>Redis;NoSQL;Client;Distributed;Cache;PubSub;Messaging;Transactions</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Nito.AsyncEx" Version="5.0.0" />
     <PackageReference Include="ServiceStack.Common.Core" Version="$(Version)" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
