@@ -200,7 +200,7 @@ namespace ServiceStack.Redis.Generic
         async ValueTask IRedisTypedClientAsync<T>.SetValueAsync(string key, T entity, TimeSpan expireIn, CancellationToken token)
         {
             AssertNotNull(key);
-            await AsyncClient.SetAsync(key, SerializeValue(entity), token).ConfigureAwait(false);
+            await AsyncClient.SetAsync(key, SerializeValue(entity), expireIn, token).ConfigureAwait(false);
             await client.RegisterTypeIdAsync(entity, token).ConfigureAwait(false);
         }
 
@@ -221,7 +221,7 @@ namespace ServiceStack.Redis.Generic
         async ValueTask<T> IRedisTypedClientAsync<T>.StoreAsync(T entity, TimeSpan expireIn, CancellationToken token)
         {
             var urnKey = client.UrnKey(entity);
-            await AsAsync().SetValueAsync(urnKey, entity, token).ConfigureAwait(false);
+            await AsAsync().SetValueAsync(urnKey, entity, expireIn, token).ConfigureAwait(false);
             return entity;
         }
 
