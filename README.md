@@ -452,7 +452,7 @@ The [release of Redis 3.2.0](http://antirez.com/news/104) brings it exciting new
 [GEO capabilities](http://redis.io/commands/geoadd) which will let you store Lat/Long coordinates in Redis
 and query locations within a specified radius. To demonstrate this functionality we've created a new 
 [Redis GEO Live Demo](https://github.com/ServiceStackApps/redis-geo) which lets you click on anywhere in 
-the U.S. to find the list of nearest cities within a given radius, Live Demo at: http://redisgeo.servicestack.net
+the U.S. to find the list of nearest cities within a given radius, Live Demo at: https://redis.netcore.io
 
 
 ## Generic APIs for calling Custom Redis commands
