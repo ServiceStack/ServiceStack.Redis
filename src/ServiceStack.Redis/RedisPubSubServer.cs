@@ -209,6 +209,9 @@ namespace ServiceStack.Redis
 
             try
             {
+                if (Log.IsDebugEnabled)
+                    Log.DebugFormat("RedisPubServer.DisposeHeartbeatTimer()");
+                
                 heartbeatTimer.Dispose();
             }
             catch (Exception ex)
@@ -548,6 +551,9 @@ namespace ServiceStack.Redis
         {
             if (Interlocked.CompareExchange(ref status, 0, 0) == Status.Disposed)
                 return;
+            
+            if (Log.IsDebugEnabled)
+                Log.Debug("RedisPubServer.Dispose()...");
 
             Stop();
 
