@@ -12,8 +12,9 @@ namespace ServiceStack.Redis
         static int IdCounter = 0;
         public int Id { get; }
 
-        private readonly object oLock = new object();
+        private readonly object oLock = new();
 
+        private readonly RedisEndpoint sentinelEndpoint;
         private readonly RedisSentinel sentinel;
         private readonly RedisClient sentinelClient;
         private RedisPubSubServer sentinePubSub;
@@ -32,7 +33,7 @@ namespace ServiceStack.Redis
             };
 
             if (Log.IsDebugEnabled)
-                Log.Debug("Set up Redis Sentinel on {0}".Fmt(sentinelEndpoint));
+                Log.Debug($"Set up Redis Sentinel on {sentinelEndpoint}");
         }
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace ServiceStack.Redis
         private void SentinelMessageReceived(string channel, string message)
         {
             if (Log.IsDebugEnabled)
-                Log.Debug("Received '{0}' on channel '{1}' from Sentinel".Fmt(channel, message));
+                Log.Debug($"Received '{channel}' on channel '{message}' from Sentinel");
 
             // {+|-}sdown is the event for server coming up or down
             var c = channel.ToLower();
@@ -61,7 +62,7 @@ namespace ServiceStack.Redis
                 || (sentinel.ResetWhenObjectivelyDown && isObjectivelyDown))
             {
                 if (Log.IsDebugEnabled)
-                    Log.Debug("Sentinel detected server down/up '{0}' with message: {1}".Fmt(channel, message));
+                    Log.Debug($"Sentinel detected server down/up '{channel}' with message: {message}");
 
                 sentinel.ResetClients();
             }
@@ -187,7 +188,7 @@ namespace ServiceStack.Redis
                     }
                 }
 
-                this.sentinePubSub.Start();
+                this.sentinelPubSub.Start();
             }
             catch (Exception ex)
             {
@@ -206,7 +207,7 @@ namespace ServiceStack.Redis
 
         public void Dispose()
         {
-            new IDisposable[] { this.sentinelClient, sentinePubSub }.Dispose(Log);
+            new IDisposable[] { this.sentinelClient, sentinelPubSub }.Dispose(Log);
         }
     }
 }
