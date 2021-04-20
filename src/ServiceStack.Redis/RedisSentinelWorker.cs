@@ -17,7 +17,7 @@ namespace ServiceStack.Redis
         private readonly RedisEndpoint sentinelEndpoint;
         private readonly RedisSentinel sentinel;
         private readonly RedisClient sentinelClient;
-        private RedisPubSubServer sentinePubSub;
+        private RedisPubSubServer sentinelPubSub;
 
         public Action<Exception> OnSentinelError;
 
@@ -25,6 +25,7 @@ namespace ServiceStack.Redis
         {
             this.Id = Interlocked.Increment(ref IdCounter);
             this.sentinel = sentinel;
+            this.sentinelEndpoint = sentinelEndpoint;
             this.sentinelClient = new RedisClient(sentinelEndpoint) {
                 Db = 0, //Sentinel Servers doesn't support DB, reset to 0
                 ConnectTimeout = sentinel.SentinelWorkerConnectTimeoutMs,
@@ -167,18 +168,19 @@ namespace ServiceStack.Redis
             {
                 lock (oLock)
                 {
-                    if (this.sentinePubSub == null)
+                    if (this.sentinelPubSub == null)
                     {
-                        var sentinelManager = new BasicRedisClientManager(sentinel.SentinelHosts, sentinel.SentinelHosts)
+                        var currentSentinelHost = new[] {sentinelEndpoint};
+                        var sentinelManager = new BasicRedisClientManager(currentSentinelHost, currentSentinelHost)
                         {
                             //Use BasicRedisResolver which doesn't validate non-Master Sentinel instances
-                            RedisResolver = new BasicRedisResolver(sentinel.SentinelEndpoints, sentinel.SentinelEndpoints)
+                            RedisResolver = new BasicRedisResolver(currentSentinelHost, currentSentinelHost)
                         };
                         
                         if (Log.IsDebugEnabled)
                             Log.Debug($"Starting subscription to {sentinel.SentinelHosts.ToArray()}, replicas: {sentinel.SentinelHosts.ToArray()}...");
                         
-                        this.sentinePubSub = new RedisPubSubServer(sentinelManager)
+                        this.sentinelPubSub = new RedisPubSubServer(sentinelManager)
                         {
                             HeartbeatInterval = null,
                             IsSentinelSubscription = true,
