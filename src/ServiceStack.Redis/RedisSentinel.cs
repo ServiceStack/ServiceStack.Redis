@@ -42,9 +42,14 @@ namespace ServiceStack.Redis
         public Func<string[], string[], IRedisClientsManager> RedisManagerFactory { get; set; }
 
         /// <summary>
-        /// Configure the Redis Connection String to use for a Redis Client Host
+        /// Configure the Redis Connection String to use for a Redis Instance Host
         /// </summary>
         public Func<string, string> HostFilter { get; set; }
+
+        /// <summary>
+        /// Configure the Redis Connection String to use for a Redis Sentinel Host
+        /// </summary>
+        public Func<string, string> SentinelHostFilter { get; set; }
 
         /// <summary>
         /// The configured Redis Client Manager this Sentinel managers
@@ -185,15 +190,18 @@ namespace ServiceStack.Redis
                     var endpoint = sentinelHost.ToRedisEndpoint(defaultPort: RedisConfig.DefaultPortSentinel);
                     using (var sentinelWorker = new RedisSentinelWorker(this, endpoint))
                     {
-                        var activeHosts = sentinelWorker.GetSentinelHosts(MasterName);
-
                         if (!activeSentinelHosts.Contains(sentinelHost))
                             activeSentinelHosts.Add(sentinelHost);
 
+                        var activeHosts = sentinelWorker.GetSentinelHosts(MasterName);
                         foreach (var activeHost in activeHosts)
                         {
                             if (!activeSentinelHosts.Contains(activeHost))
-                                activeSentinelHosts.Add(activeHost);
+                            {
+                                activeSentinelHosts.Add(SentinelHostFilter != null
+                                    ? SentinelHostFilter(activeHost)
+                                    : activeHost);
+                            }
                         }
                     }
 
