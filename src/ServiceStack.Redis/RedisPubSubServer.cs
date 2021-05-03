@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using ServiceStack.Logging;
 using ServiceStack.Text;
 
@@ -34,6 +32,7 @@ namespace ServiceStack.Redis
 
         public Action<string> OnControlCommand { get; set; }
         public Action<string> OnUnSubscribe { get; set; }
+        public Action<string> OnEvent { get; set; }
         public Action<Exception> OnError { get; set; }
         public Action<IRedisPubSubServer> OnFailover { get; set; }
         public bool IsSentinelSubscription { get; set; }
@@ -97,6 +96,8 @@ namespace ServiceStack.Redis
             //Only 1 thread allowed past
             if (Interlocked.CompareExchange(ref status, Status.Starting, Status.Stopped) == Status.Stopped) //Should only be 1 thread past this point
             {
+                OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} Stopped] Start()> Stopped -> Starting");
+
                 var initErrors = 0;
                 bool hasInit = false;
                 while (!hasInit)
@@ -108,6 +109,7 @@ namespace ServiceStack.Redis
                     }
                     catch (Exception ex)
                     {
+                        OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {GetStatus()}] Start().Init()> Exception: {ex.Message}");
                         OnError?.Invoke(ex);
                         SleepBackOffMultiplier(initErrors++);
                     }
@@ -188,6 +190,8 @@ namespace ServiceStack.Redis
             if (DateTime.UtcNow - new DateTime(lastHeartbeatTicks) > HeartbeatTimeout)
             {
                 currentStatus = Interlocked.CompareExchange(ref status, 0, 0);
+
+                OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {Status.GetStatus(currentStatus)}] SendHeartbeat()> Exceeded HeartbeatTimeout");
                 if (currentStatus == Status.Started)
                 {
                     Restart();
@@ -210,7 +214,7 @@ namespace ServiceStack.Redis
             try
             {
                 if (Log.IsDebugEnabled)
-                    Log.DebugFormat("RedisPubServer.DisposeHeartbeatTimer()");
+                    Log.Debug("RedisPubServer.DisposeHeartbeatTimer()");
                 
                 heartbeatTimer.Dispose();
             }
@@ -226,6 +230,8 @@ namespace ServiceStack.Redis
         {
             if (Interlocked.CompareExchange(ref status, Status.Started, Status.Starting) != Status.Starting) return;
             Interlocked.Increment(ref timesStarted);
+
+            OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} Started] RunLoop().Stop> Starting -> Started, timesStarted: {timesStarted}");
 
             try
             {
@@ -280,22 +286,31 @@ namespace ServiceStack.Redis
                                     if (Log.IsDebugEnabled)
                                         Log.Debug("Stop Command Issued");
 
+                                    var holdStatus = GetStatus();
+                                    
                                     Interlocked.CompareExchange(ref status, Status.Stopping, Status.Started);
+
+                                    OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {holdStatus}] RunLoop().Stop> Started -> Stopping");
                                     try
                                     {
                                         if (Log.IsDebugEnabled)
                                             Log.Debug("UnSubscribe From All Channels...");
+
+                                        OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {GetStatus()}] RunLoop().Stop> subscription.UnSubscribeFromAllChannels()");
 
                                         // ReSharper disable once AccessToDisposedClosure
                                         subscription.UnSubscribeFromAllChannels(); //Un block thread.
                                     }
                                     finally
                                     {
+                                        OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {GetStatus()}] RunLoop().Stop> Stopping -> Stopped");
                                         Interlocked.CompareExchange(ref status, Status.Stopped, Status.Stopping);
                                     }
                                     return;
 
                                 case Operation.Reset:
+                                    OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {GetStatus()}] RunLoop().Reset> subscription.UnSubscribeFromAllChannels()");
+
                                     // ReSharper disable once AccessToDisposedClosure
                                     subscription.UnSubscribeFromAllChannels(); //Un block thread.
                                     return;
@@ -330,9 +345,13 @@ namespace ServiceStack.Redis
                 lastExMsg = ex.Message;
                 Interlocked.Increment(ref noOfErrors);
                 Interlocked.Increment(ref noOfContinuousErrors);
+                
+                var holdStatus = GetStatus();
 
                 if (Interlocked.CompareExchange(ref status, Status.Stopped, Status.Started) != Status.Started)
                     Interlocked.CompareExchange(ref status, Status.Stopped, Status.Stopping);
+
+                OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {holdStatus}] RunLoop().Stop> Started|Stopping -> Stopped");
 
                 OnStop?.Invoke();
 
@@ -343,6 +362,8 @@ namespace ServiceStack.Redis
             {
                 if (WaitBeforeNextRestart != null)
                     TaskUtils.Sleep(WaitBeforeNextRestart.Value);
+
+                OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {GetStatus()}] RunLoop().AutoRestart> Start()");
                 Start();
             }
         }
@@ -361,6 +382,8 @@ namespace ServiceStack.Redis
 
             if (Interlocked.CompareExchange(ref status, Status.Stopping, Status.Started) == Status.Started)
             {
+                OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {GetStatus()}] Stop()> Started -> Stopping");
+
                 if (Log.IsDebugEnabled)
                     Log.Debug("Stopping RedisPubSubServer...");
 
@@ -392,7 +415,7 @@ namespace ServiceStack.Redis
             catch (Exception ex)
             {
                 OnError?.Invoke(ex);
-                Log.Warn("Could not send '{0}' message to bg thread: {1}".Fmt(msg, ex.Message));
+                Log.WarnFormat("Could not send '{0}' message to bg thread: {1}", msg, ex.Message);
             }
         }
 
@@ -447,10 +470,12 @@ namespace ServiceStack.Redis
                 {
 #if !NETSTANDARD2_0                    
                     //Ideally we shouldn't get here, but lets try our hardest to clean it up
+                    OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {GetStatus()}] KillBgThreadIfExists()> bgThread.Interrupt()");
                     Log.Warn("Interrupting previous Background Thread: " + bgThread.Name);
                     bgThread.Interrupt();
                     if (!bgThread.Join(TimeSpan.FromSeconds(3)))
                     {
+                        OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {GetStatus()}] KillBgThreadIfExists()> bgThread.Abort()");
                         Log.Warn(bgThread.Name + " just wont die, so we're now aborting it...");
                         bgThread.Abort();
                     }
@@ -471,7 +496,7 @@ namespace ServiceStack.Redis
                 maxSleepMs);
 
             if (Log.IsDebugEnabled)
-                Log.Debug("Sleeping for {0}ms after {1} continuous errors".Fmt(nextTry, continuousErrorsCount));
+                Log.DebugFormat("Sleeping for {0}ms after {1} continuous errors", nextTry, continuousErrorsCount);
 
             TaskUtils.Sleep(nextTry);
         }
@@ -514,25 +539,21 @@ namespace ServiceStack.Redis
             public const int Stopping = 1;
             public const int Starting = 2;
             public const int Started = 3;
+
+            public static string GetStatus(int status)
+            {
+                return status switch {
+                    Disposed => nameof(Disposed),
+                    Stopped => nameof(Stopped),
+                    Stopping => nameof(Stopping),
+                    Starting => nameof(Starting),
+                    Started => nameof(Started),
+                    _ => throw new NotSupportedException("Unknown status: " + status)
+                };
+            }
         }
 
-        public string GetStatus()
-        {
-            switch (Interlocked.CompareExchange(ref status, 0, 0))
-            {
-                case Status.Disposed:
-                    return "Disposed";
-                case Status.Stopped:
-                    return "Stopped";
-                case Status.Stopping:
-                    return "Stopping";
-                case Status.Starting:
-                    return "Starting";
-                case Status.Started:
-                    return "Started";
-            }
-            return null;
-        }
+        public string GetStatus() => Status.GetStatus(Interlocked.CompareExchange(ref status, 0, 0));
 
         public string GetStatsDescription()
         {
@@ -555,10 +576,16 @@ namespace ServiceStack.Redis
             if (Log.IsDebugEnabled)
                 Log.Debug("RedisPubServer.Dispose()...");
 
+            OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {GetStatus()}] Dispose()>");
+
             Stop();
 
+            var holdStatus = GetStatus();
+            
             if (Interlocked.CompareExchange(ref status, Status.Disposed, Status.Stopped) != Status.Stopped)
                 Interlocked.CompareExchange(ref status, Status.Disposed, Status.Stopping);
+
+            OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {holdStatus}] Dispose()> -> Disposed");
 
             try
             {
