@@ -897,10 +897,10 @@ namespace ServiceStack.Redis
 
         public long ClientKill(string addr = null, string id = null, string type = null, string skipMe = null)
         {
-            return SendExpectLong(ClientKillPerpareArgs(addr, id, type, skipMe));
+            return SendExpectLong(ClientKillPrepareArgs(addr, id, type, skipMe));
         }
 
-        static byte[][] ClientKillPerpareArgs(string addr, string id, string type, string skipMe)
+        static byte[][] ClientKillPrepareArgs(string addr, string id, string type, string skipMe)
         {
             var cmdWithArgs = new List<byte[]>
                {

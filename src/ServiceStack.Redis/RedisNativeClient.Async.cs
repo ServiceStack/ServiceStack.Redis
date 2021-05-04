@@ -709,7 +709,7 @@ namespace ServiceStack.Redis
             => SendExpectSuccessAsync(token, Commands.Client, Commands.Kill, clientAddr.ToUtf8Bytes());
 
         ValueTask<long> IRedisNativeClientAsync.ClientKillAsync(string addr, string id, string type, string skipMe, CancellationToken token)
-            => SendExpectLongAsync(token, ClientKillPerpareArgs(addr, id, type, skipMe));
+            => SendExpectLongAsync(token, ClientKillPrepareArgs(addr, id, type, skipMe));
 
         ValueTask<byte[]> IRedisNativeClientAsync.ClientListAsync(CancellationToken token)
             => SendExpectDataAsync(token, Commands.Client, Commands.List);
