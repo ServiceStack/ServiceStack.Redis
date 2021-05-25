@@ -28,7 +28,7 @@ With each client providing different layers of abstraction:
 
 ### API Overview
 
-[![Redis Client API](https://servicestack.net/img/redis-annotated-preview.png)](https://servicestack.net/img/redis-annotated.png)
+[![Redis Client API](https://servicestack.net/images/redis-annotated-preview.png)](https://servicestack.net/images/redis-annotated.png)
 
 ## Redis Connection Strings
 
