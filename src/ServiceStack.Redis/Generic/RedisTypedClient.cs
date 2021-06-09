@@ -477,7 +477,7 @@ namespace ServiceStack.Redis.Generic
                 this.RemoveEntry(urnKeys.ToArray());
             }
             if(resultCursor != 0)
-                DeleteAll(resultCursor,1000);
+                DeleteAll(resultCursor,pageSize);
             else
                 this.RemoveEntry(this.TypeIdsSetKey);
         }
