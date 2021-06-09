@@ -220,7 +220,7 @@ namespace ServiceStack.Redis.Generic
         {
             var ids = entities.Map(x => x.Id);
             var success = client.Del(ids.ToArray()) == RedisNativeClient.Success;
-            if (success) client.RemoveTypeIds(ids.ToArray());
+            if (success) client.RemoveTypeIdsByValues(ids.ToArray());
             return success;
         }
 
@@ -443,7 +443,7 @@ namespace ServiceStack.Redis.Generic
         {
             var urnKey = client.UrnKey(entity);
             this.RemoveEntry(urnKey);
-            client.RemoveTypeIds(entity);
+            client.RemoveTypeIdsByValue(entity);
         }
 
         public void DeleteById(object id)
@@ -451,28 +451,27 @@ namespace ServiceStack.Redis.Generic
             var urnKey = client.UrnKey<T>(id);
 
             this.RemoveEntry(urnKey);
-            client.RemoveTypeIds<T>(id.ToString());
+            client.RemoveTypeIdsById<T>(id.ToString());
         }
 
         public void DeleteByIds(IEnumerable ids)
         {
             if (ids == null) return;
 
-            var urnKeys = ids.Map(t => client.UrnKey<T>(t));
-            if (urnKeys.Count > 0)
+            var idStrings = ids.Map(x => x.ToString()).ToArray();
+            var urnKeys = idStrings.Select(t => client.UrnKey<T>(t)).ToArray();
+            if (urnKeys.Length > 0)
             {
-                this.RemoveEntry(urnKeys.ToArray());
-                client.RemoveTypeIds<T>(ids.Map(x => x.ToString()).ToArray());
+                this.RemoveEntry(urnKeys);
+                client.RemoveTypeIdsByIds<T>(idStrings);
             }
         }
 
         private void DeleteAll(ulong cursor, int pageSize)
         {
-            var callCount = 0;
-            while (cursor != 0 || callCount == 0)
+            do
             {
                 var scanResult = client.SScan(this.TypeIdsSetKey, cursor, pageSize);
-                callCount++;
                 cursor = scanResult.Cursor;
                 var ids = scanResult.Results.Select(x => Encoding.UTF8.GetString(x)).ToList();
                 var urnKeys = ids.Map(t => client.UrnKey<T>(t));
@@ -480,14 +479,14 @@ namespace ServiceStack.Redis.Generic
                 {
                     this.RemoveEntry(urnKeys.ToArray());
                 }
-            }
+            } while (cursor != 0);
 
             this.RemoveEntry(this.TypeIdsSetKey);
         }
         
         public void DeleteAll()
         {
-            DeleteAll(0,RedisConfig.DeleteAllBatchSize);
+            DeleteAll(0,RedisConfig.CommandKeysBatchSize);
         }
 
         #endregion

@@ -106,7 +106,7 @@ namespace ServiceStack.Redis.Generic
         {
             var urnKey = client.UrnKey(entity);
             await AsyncClient.RemoveEntryAsync(new[] { urnKey }, token).ConfigureAwait(false);
-            await client.RemoveTypeIdsAsync(new[] { entity }, token).ConfigureAwait(false);
+            await client.RemoveTypeIdsByValueAsync(entity, token).ConfigureAwait(false);
         }
 
         async Task IEntityStoreAsync<T>.DeleteByIdAsync(object id, CancellationToken token)
@@ -114,41 +114,39 @@ namespace ServiceStack.Redis.Generic
             var urnKey = client.UrnKey<T>(id);
 
             await AsyncClient.RemoveEntryAsync(new[] { urnKey }, token).ConfigureAwait(false);
-            await client.RemoveTypeIdsAsync<T>(new[] { id.ToString() }, token).ConfigureAwait(false);
+            await client.RemoveTypeIdsByIdAsync<T>(id.ToString(), token).ConfigureAwait(false);
         }
 
         async Task IEntityStoreAsync<T>.DeleteByIdsAsync(IEnumerable ids, CancellationToken token)
         {
             if (ids == null) return;
 
-            var urnKeys = ids.Map(t => client.UrnKey<T>(t));
-            if (urnKeys.Count > 0)
+            var idStrings = ids.Cast<object>().Select(x => x.ToString()).ToArray();
+            var urnKeys = idStrings.Select(t => client.UrnKey<T>(t)).ToArray();
+            if (urnKeys.Length > 0)
             {
-                await AsyncClient.RemoveEntryAsync(urnKeys.ToArray(), token).ConfigureAwait(false);
-                await client.RemoveTypeIdsAsync<T>(ids.Map(x => x.ToString()).ToArray(), token).ConfigureAwait(false);
+                await AsyncClient.RemoveEntryAsync(urnKeys, token).ConfigureAwait(false);
+                await client.RemoveTypeIdsByIdsAsync<T>(idStrings, token).ConfigureAwait(false);
             }
         }
 
         async Task IEntityStoreAsync<T>.DeleteAllAsync(CancellationToken token)
         {
-            await DeleteAllAsync(0,RedisConfig.DeleteAllBatchSize, token).ConfigureAwait(false);
+            await DeleteAllAsync(0,RedisConfig.CommandKeysBatchSize, token).ConfigureAwait(false);
         }
 
-        private async Task DeleteAllAsync(ulong cursor, int pageSize, CancellationToken token)
+        private async Task DeleteAllAsync(ulong cursor, int batchSize, CancellationToken token)
         {
-            var callCount = 0;
-            while (cursor != 0 || callCount == 0)
+            do
             {
-                var scanResult = await AsyncNative.SScanAsync(this.TypeIdsSetKey, cursor, pageSize, token: token).ConfigureAwait(false);
-                callCount++;
+                var scanResult = await AsyncNative.SScanAsync(this.TypeIdsSetKey, cursor, batchSize, token: token).ConfigureAwait(false);
                 cursor = scanResult.Cursor;
-                var ids = scanResult.Results.Select(x => Encoding.UTF8.GetString(x)).ToList();
-                var urnKeys = ids.Map(t => client.UrnKey<T>(t));
-                if (urnKeys.Count > 0)
+                var urnKeys = scanResult.Results.Select(x => client.UrnKey<T>(Encoding.UTF8.GetString(x))).ToArray();
+                if (urnKeys.Length > 0)
                 {
-                    await AsyncClient.RemoveEntryAsync(urnKeys.ToArray(), token).ConfigureAwait(false);
+                    await AsyncClient.RemoveEntryAsync(urnKeys, token).ConfigureAwait(false);
                 }
-            }
+            } while (cursor != 0);
             await AsyncClient.RemoveEntryAsync(new[] { this.TypeIdsSetKey }, token).ConfigureAwait(false);
         }
 
@@ -251,9 +249,9 @@ namespace ServiceStack.Redis.Generic
 
         async ValueTask<bool> IRedisTypedClientAsync<T>.RemoveEntryAsync(IHasStringId[] entities, CancellationToken token)
         {
-            var ids = entities.Map(x => x.Id);
-            var success = await AsyncNative.DelAsync(ids.ToArray(), token).IsSuccessAsync().ConfigureAwait(false);
-            if (success) await client.RemoveTypeIdsAsync(ids.ToArray(), token).ConfigureAwait(false);
+            var ids = entities.Select(x => x.Id).ToArray();
+            var success = await AsyncNative.DelAsync(ids, token).IsSuccessAsync().ConfigureAwait(false);
+            if (success) await client.RemoveTypeIdsByValuesAsync(ids, token).ConfigureAwait(false);
             return success;
         }
 

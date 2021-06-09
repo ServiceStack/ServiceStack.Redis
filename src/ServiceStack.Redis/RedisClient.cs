@@ -614,7 +614,16 @@ namespace ServiceStack.Redis
             }
         }
 
-        internal void RemoveTypeIds<T>(params string[] ids)
+        internal void RemoveTypeIdsById<T>(string id)
+        {
+            var typeIdsSetKey = GetTypeIdsSetKey<T>();
+            if (this.Pipeline != null)
+                GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey).Remove(id);
+            else
+                this.RemoveItemFromSet(typeIdsSetKey, id);
+        }
+
+        internal void RemoveTypeIdsByIds<T>(IEnumerable<string> ids)
         {
             var typeIdsSetKey = GetTypeIdsSetKey<T>();
             if (this.Pipeline != null)
@@ -628,7 +637,9 @@ namespace ServiceStack.Redis
             }
         }
 
-        internal void RemoveTypeIds<T>(params T[] values)
+        internal void RemoveTypeIdsByValue<T>(T value) => RemoveTypeIdsById<T>(value.GetId().ToString());
+
+        internal void RemoveTypeIdsByValues<T>(IEnumerable<T> values)
         {
             var typeIdsSetKey = GetTypeIdsSetKey<T>();
             if (this.Pipeline != null)
@@ -809,14 +820,14 @@ namespace ServiceStack.Redis
         {
             var urnKey = UrnKey(entity);
             this.Remove(urnKey);
-            this.RemoveTypeIds(entity);
+            this.RemoveTypeIdsByValue(entity);
         }
 
         public void DeleteById<T>(object id)
         {
             var urnKey = UrnKey<T>(id);
             this.Remove(urnKey);
-            this.RemoveTypeIds<T>(id.ToString());
+            this.RemoveTypeIdsById<T>(id.ToString());
         }
 
         public void DeleteByIds<T>(ICollection ids)
@@ -824,44 +835,37 @@ namespace ServiceStack.Redis
             if (ids == null || ids.Count == 0) return;
 
             var idsList = ids.Cast<object>();
-            var urnKeys = idsList.Map(UrnKey<T>);
-            this.RemoveEntry(urnKeys.ToArray());
-            this.RemoveTypeIds<T>(idsList.Map(x => x.ToString()).ToArray());
+            var urnKeys = idsList.Select(UrnKey<T>).ToArray();
+            this.RemoveEntry(urnKeys);
+            this.RemoveTypeIdsByIds<T>(ids.Map(x => x.ToString()).ToArray());
         }
 
         public void DeleteAll<T>()
         {
-            DeleteAll<T>(0,RedisConfig.DeleteAllBatchSize);
+            DeleteAll<T>(0,RedisConfig.CommandKeysBatchSize);
         }
 
-        private void DeleteAll<T>(ulong cursor, int pageSize)
+        private void DeleteAll<T>(ulong cursor, int batchSize)
         {
             var typeIdsSetKey = this.GetTypeIdsSetKey<T>();
-            var callCount = 0;
-            while (cursor != 0 || callCount == 0)
+            do
             {
-                var scanResult = this.SScan(typeIdsSetKey, cursor, pageSize);
-                callCount++;
+                var scanResult = this.SScan(typeIdsSetKey, cursor, batchSize);
                 cursor = scanResult.Cursor;
-                var ids = scanResult.Results.Select(x => x.FromUtf8Bytes());
-                var urnKeys = ids.Map(t => this.UrnKey(t));
-                if (urnKeys.Count > 0)
+                var urnKeys = scanResult.Results.Select(id => UrnKey<T>(id.FromUtf8Bytes())).ToArray();
+                if (urnKeys.Length > 0)
                 {
-                    this.RemoveEntry(urnKeys.ToArray());
+                    this.RemoveEntry(urnKeys);
                 }
-            }
+            } while (cursor != 0);
             
             this.RemoveEntry(typeIdsSetKey);
         }
 
-        public RedisClient CloneClient()
-        {
-            return new RedisClient(Host, Port, Password, Db)
-            {
-                SendTimeout = SendTimeout,
-                ReceiveTimeout = ReceiveTimeout
-            };
-        }
+        public RedisClient CloneClient() => new(Host, Port, Password, Db) {
+            SendTimeout = SendTimeout,
+            ReceiveTimeout = ReceiveTimeout
+        };
 
         /// <summary>
         /// Returns key with automatic object id detection in provided value with <typeparam name="T">generic type</typeparam>.
@@ -899,8 +903,7 @@ namespace ServiceStack.Redis
 
         #region LUA EVAL
 
-        static readonly ConcurrentDictionary<string, string> CachedLuaSha1Map =
-            new ConcurrentDictionary<string, string>();
+        static readonly ConcurrentDictionary<string, string> CachedLuaSha1Map = new();
 
         public T ExecCachedLua<T>(string scriptBody, Func<string, T> scriptSha1)
         {

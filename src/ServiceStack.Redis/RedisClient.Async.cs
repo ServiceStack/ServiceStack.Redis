@@ -599,7 +599,9 @@ namespace ServiceStack.Redis
             }
         }
 
-        internal async ValueTask RemoveTypeIdsAsync<T>(T[] values, CancellationToken token)
+        internal ValueTask RemoveTypeIdsByValueAsync<T>(T value, CancellationToken token) =>
+            RemoveTypeIdsByIdAsync<T>(value.GetId().ToString(), token);
+        internal async ValueTask RemoveTypeIdsByValuesAsync<T>(T[] values, CancellationToken token)
         {
             var typeIdsSetKey = GetTypeIdsSetKey<T>();
             if (this.Pipeline != null)
@@ -616,7 +618,18 @@ namespace ServiceStack.Redis
             }
         }
 
-        internal async ValueTask RemoveTypeIdsAsync<T>(string[] ids, CancellationToken token)
+        internal async ValueTask RemoveTypeIdsByIdAsync<T>(string id, CancellationToken token)
+        {
+            var typeIdsSetKey = GetTypeIdsSetKey<T>();
+            if (this.Pipeline != null)
+                GetRegisteredTypeIdsWithinPipeline(typeIdsSetKey).Remove(id);
+            else
+            {
+                await AsAsync().RemoveItemFromSetAsync(typeIdsSetKey, id, token).ConfigureAwait(false);
+            }
+        }
+
+        internal async ValueTask RemoveTypeIdsByIdsAsync<T>(string[] ids, CancellationToken token)
         {
             var typeIdsSetKey = GetTypeIdsSetKey<T>();
             if (this.Pipeline != null)
@@ -637,48 +650,46 @@ namespace ServiceStack.Redis
         {
             var urnKey = UrnKey(entity);
             await AsAsync().RemoveAsync(urnKey, token).ConfigureAwait(false);
-            await this.RemoveTypeIdsAsync(new[] { entity }, token).ConfigureAwait(false);
+            await this.RemoveTypeIdsByValueAsync(entity, token).ConfigureAwait(false);
         }
 
         async Task IEntityStoreAsync.DeleteByIdAsync<T>(object id, CancellationToken token)
         {
             var urnKey = UrnKey<T>(id);
             await AsAsync().RemoveAsync(urnKey, token).ConfigureAwait(false);
-            await this.RemoveTypeIdsAsync<T>(new[] { id.ToString() }, token).ConfigureAwait(false);
+            await this.RemoveTypeIdsByIdAsync<T>(id.ToString(), token).ConfigureAwait(false);
         }
 
         async Task IEntityStoreAsync.DeleteByIdsAsync<T>(ICollection ids, CancellationToken token)
         {
             if (ids == null || ids.Count == 0) return;
 
-            var idsList = ids.Cast<object>().ToList();
-            var urnKeys = idsList.Map(UrnKey<T>);
-            await AsAsync().RemoveEntryAsync(urnKeys.ToArray(), token).ConfigureAwait(false);
-            await this.RemoveTypeIdsAsync<T>(idsList.Map(x => x.ToString()).ToArray(), token).ConfigureAwait(false);
+            var idStrings = ids.Cast<object>().Select(x => x.ToString()).ToArray();
+            var urnKeys = idStrings.Select(UrnKey<T>).ToArray();
+            await AsAsync().RemoveEntryAsync(urnKeys, token).ConfigureAwait(false);
+            await this.RemoveTypeIdsByIdsAsync<T>(idStrings, token).ConfigureAwait(false);
         }
 
         async Task IEntityStoreAsync.DeleteAllAsync<T>(CancellationToken token)
         {
-            await DeleteAllAsync<T>(0, RedisConfig.DeleteAllBatchSize, token).ConfigureAwait(false);
+            await DeleteAllAsync<T>(0, RedisConfig.CommandKeysBatchSize, token).ConfigureAwait(false);
         }
         
-        private async Task DeleteAllAsync<T>(ulong cursor, int pageSize, CancellationToken token)
+        private async Task DeleteAllAsync<T>(ulong cursor, int batchSize, CancellationToken token)
         {
             var typeIdsSetKey = this.GetTypeIdsSetKey<T>();
-            var callCount = 0;
-            while (cursor != 0 || callCount == 0)
+            var asyncClient = AsAsync();
+            do
             {
-                var scanResult = await NativeAsync.SScanAsync(typeIdsSetKey, cursor, pageSize, token: token).ConfigureAwait(false);
-                callCount++;
+                var scanResult = await NativeAsync.SScanAsync(typeIdsSetKey, cursor, batchSize, token: token).ConfigureAwait(false);
                 cursor = scanResult.Cursor;
-                var ids = scanResult.Results.Select(x => x.FromUtf8Bytes());
-                var urnKeys = ids.Map(t => AsAsync().UrnKey<T>(t));
-                if (urnKeys.Count > 0)
+                var urnKeys = scanResult.Results.Select(id => UrnKey<T>(id.FromUtf8Bytes())).ToArray();
+                if (urnKeys.Length > 0)
                 {
-                    await AsAsync().RemoveEntryAsync(urnKeys.ToArray(), token).ConfigureAwait(false);
+                    await asyncClient.RemoveEntryAsync(urnKeys, token).ConfigureAwait(false);
                 }
-            }
-            await AsAsync().RemoveEntryAsync(new[] { typeIdsSetKey }, token).ConfigureAwait(false);
+            } while (cursor != 0);
+            await asyncClient.RemoveEntryAsync(new[] { typeIdsSetKey }, token).ConfigureAwait(false);
         }
 
         ValueTask<List<string>> IRedisClientAsync.SearchSortedSetAsync(string setId, string start, string end, int? skip, int? take, CancellationToken token)

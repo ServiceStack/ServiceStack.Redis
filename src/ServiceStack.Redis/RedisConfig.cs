@@ -73,9 +73,9 @@ namespace ServiceStack.Redis
         public static int BufferPoolMaxSize = 500000;
 
         /// <summary>
-        /// The DeleteAll Batch Size is the number of keys returned each SSCAN when using DeleteAll on the RedisTypedClient.
+        /// Batch size of keys to include in a single Redis Command (e.g. DEL k1 k2...) 
         /// </summary>
-        public static int DeleteAllBatchSize = 1000;
+        public static int CommandKeysBatchSize = 10000;
 
         /// <summary>
         /// Whether Connections to Master hosts should be verified they're still master instances (default true)
@@ -141,6 +141,7 @@ namespace ServiceStack.Redis
             DefaultMaxPoolSize = null;
             BackOffMultiplier = 10;
             BufferPoolMaxSize = 500000;
+            CommandKeysBatchSize = 10000;
             VerifyMasterConnections = true;
             RetryReconnectOnFailedMasters = true;
             HostLookupTimeoutMs = 200;

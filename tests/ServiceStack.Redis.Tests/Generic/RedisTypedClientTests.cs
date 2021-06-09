@@ -141,7 +141,7 @@ namespace ServiceStack.Redis.Tests.Generic
             
             Assert.That(exists, Is.EqualTo(1));
             
-            RedisConfig.DeleteAllBatchSize = 5;
+            RedisConfig.CommandKeysBatchSize = 5;
 
             for (int i = 0; i < 50; i++)
             {
@@ -156,6 +156,8 @@ namespace ServiceStack.Redis.Tests.Generic
             exists = Redis.Exists(Redis.GetTypeIdsSetKey(typeof(CacheRecord)));
             Assert.That(exists, Is.EqualTo(0));
             Assert.That(RedisTyped.GetById("key"), Is.Null);
+
+            RedisConfig.Reset();
         }
     }
 
