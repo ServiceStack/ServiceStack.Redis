@@ -121,6 +121,46 @@ namespace ServiceStack.Redis.Tests.Generic
             Assert.That(await RedisTyped.GetByIdAsync("key"), Is.Null);
 
         }
+        
+        [Test]
+        public async Task Can_Delete_All_Items_multiple_batches()
+        {
+            // Clear previous usage
+            await RedisAsync.DeleteAsync(RedisRaw.GetTypeIdsSetKey<CacheRecord>());
+            var cachedRecord = new CacheRecord
+            {
+                Id = "key",
+                Children = {
+                    new CacheRecordChild { Id = "childKey", Data = "data" }
+                }
+            };
+            
+            var exists = RedisRaw.Exists(RedisRaw.GetTypeIdsSetKey(typeof(CacheRecord)));
+            Assert.That(exists, Is.EqualTo(0));
+            
+            await RedisTyped.StoreAsync(cachedRecord);
+            
+            exists = RedisRaw.Exists(RedisRaw.GetTypeIdsSetKey(typeof(CacheRecord)));
+            Assert.That(exists, Is.EqualTo(1));
+            
+            RedisConfig.DeleteAllBatchSize = 5;
+
+            for (int i = 0; i < 50; i++)
+            {
+                cachedRecord.Id = "key" + i;
+                await RedisTyped.StoreAsync(cachedRecord);
+            }
+
+            Assert.That(await RedisTyped.GetByIdAsync("key"), Is.Not.Null);
+
+            await RedisTyped.DeleteAllAsync();
+
+            Assert.That(await RedisTyped.GetByIdAsync("key"), Is.Null);
+            
+            exists = RedisRaw.Exists(RedisRaw.GetTypeIdsSetKey(typeof(CacheRecord)));
+            Assert.That(exists, Is.EqualTo(0));
+
+        }
     }
 
 }
