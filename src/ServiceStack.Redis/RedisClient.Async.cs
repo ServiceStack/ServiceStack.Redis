@@ -659,25 +659,26 @@ namespace ServiceStack.Redis
 
         async Task IEntityStoreAsync.DeleteAllAsync<T>(CancellationToken token)
         {
-            await DeleteAllAsync<T>(0, 1000, token).ConfigureAwait(false);
+            await DeleteAllAsync<T>(0, RedisConfig.DeleteAllBatchSize, token).ConfigureAwait(false);
         }
         
         private async Task DeleteAllAsync<T>(ulong cursor, int pageSize, CancellationToken token)
         {
             var typeIdsSetKey = this.GetTypeIdsSetKey<T>();
-            var scanResult = await NativeAsync.SScanAsync(typeIdsSetKey, cursor, pageSize, token: token).ConfigureAwait(false);
-            var lastCursor = scanResult.Cursor;
-            var ids = scanResult.Results.Select(x => x.FromUtf8Bytes());
-            var urnKeys = ids.Map(t => AsAsync().UrnKey<T>(t));
-            if (urnKeys.Count > 0)
+            var callCount = 0;
+            while (cursor != 0 || callCount == 0)
             {
-                await AsAsync().RemoveEntryAsync(urnKeys.ToArray(), token).ConfigureAwait(false);
+                var scanResult = await NativeAsync.SScanAsync(typeIdsSetKey, cursor, pageSize, token: token).ConfigureAwait(false);
+                callCount++;
+                cursor = scanResult.Cursor;
+                var ids = scanResult.Results.Select(x => x.FromUtf8Bytes());
+                var urnKeys = ids.Map(t => AsAsync().UrnKey<T>(t));
+                if (urnKeys.Count > 0)
+                {
+                    await AsAsync().RemoveEntryAsync(urnKeys.ToArray(), token).ConfigureAwait(false);
+                }
             }
-
-            if (lastCursor != 0)
-                await DeleteAllAsync<T>(lastCursor, pageSize, token).ConfigureAwait(false);
-            else
-                await AsAsync().RemoveEntryAsync(new[] { typeIdsSetKey }, token).ConfigureAwait(false);
+            await AsAsync().RemoveEntryAsync(new[] { typeIdsSetKey }, token).ConfigureAwait(false);
         }
 
         ValueTask<List<string>> IRedisClientAsync.SearchSortedSetAsync(string setId, string start, string end, int? skip, int? take, CancellationToken token)
