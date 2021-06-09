@@ -466,16 +466,25 @@ namespace ServiceStack.Redis.Generic
             }
         }
 
-        public void DeleteAll()
+        private void DeleteAll(ulong cursor, int pageSize)
         {
-            var ids = client.GetAllItemsFromSet(this.TypeIdsSetKey);
+            var scanResult = client.SScan(this.TypeIdsSetKey, cursor, pageSize);
+            var resultCursor = scanResult.Cursor;
+            var ids = scanResult.Results.Select(x => Encoding.UTF8.GetString(x)).ToList();
             var urnKeys = ids.Map(t => client.UrnKey<T>(t));
             if (urnKeys.Count > 0)
             {
-
                 this.RemoveEntry(urnKeys.ToArray());
-                this.RemoveEntry(this.TypeIdsSetKey);
             }
+            if(resultCursor != 0)
+                DeleteAll(resultCursor,1000);
+            else
+                this.RemoveEntry(this.TypeIdsSetKey);
+        }
+        
+        public void DeleteAll()
+        {
+            DeleteAll(0,1000);
         }
 
         #endregion

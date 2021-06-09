@@ -831,14 +831,24 @@ namespace ServiceStack.Redis
 
         public void DeleteAll<T>()
         {
+            DeleteAll<T>(0,1000);
+        }
+
+        private void DeleteAll<T>(ulong cursor, int pageSize)
+        {
             var typeIdsSetKey = this.GetTypeIdsSetKey<T>();
-            var ids = this.GetAllItemsFromSet(typeIdsSetKey);
-            if (ids.Count > 0)
+            var scanResult = this.SScan(typeIdsSetKey, cursor, pageSize);
+            var resultCursor = scanResult.Cursor;
+            var ids = scanResult.Results.Select(x => x.FromUtf8Bytes());
+            var urnKeys = ids.Map(t => this.UrnKey(t));
+            if (urnKeys.Count > 0)
             {
-                var urnKeys = ids.ToList().ConvertAll(UrnKey<T>);
                 this.RemoveEntry(urnKeys.ToArray());
-                this.Remove(typeIdsSetKey);
             }
+            if(resultCursor != 0)
+                DeleteAll<T>(resultCursor, 1000);
+            else
+                this.RemoveEntry(typeIdsSetKey);
         }
 
         public RedisClient CloneClient()

@@ -131,13 +131,24 @@ namespace ServiceStack.Redis.Generic
 
         async Task IEntityStoreAsync<T>.DeleteAllAsync(CancellationToken token)
         {
-            var ids = await AsyncClient.GetAllItemsFromSetAsync(this.TypeIdsSetKey, token).ConfigureAwait(false);
+            await DeleteAllAsync(0,1000, token).ConfigureAwait(false);
+        }
+
+        private async Task DeleteAllAsync(ulong cursor, int pageSize, CancellationToken token)
+        {
+            var scanResult = await AsyncNative.SScanAsync(this.TypeIdsSetKey, cursor, pageSize, token: token).ConfigureAwait(false);
+            var lastCursor = scanResult.Cursor;
+            var ids = scanResult.Results.Select(x => Encoding.UTF8.GetString(x)).ToList();
             var urnKeys = ids.Map(t => client.UrnKey<T>(t));
             if (urnKeys.Count > 0)
             {
                 await AsyncClient.RemoveEntryAsync(urnKeys.ToArray(), token).ConfigureAwait(false);
-                await AsyncClient.RemoveEntryAsync(new[] { this.TypeIdsSetKey }, token).ConfigureAwait(false);
             }
+
+            if (lastCursor != 0)
+                await DeleteAllAsync(lastCursor, pageSize, token).ConfigureAwait(false);
+            else
+                await AsyncClient.RemoveEntryAsync(new[] { this.TypeIdsSetKey }, token).ConfigureAwait(false);
         }
 
         async ValueTask<List<T>> IRedisTypedClientAsync<T>.GetValuesAsync(List<string> keys, CancellationToken token)
