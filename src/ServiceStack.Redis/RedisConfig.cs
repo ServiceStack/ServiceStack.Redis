@@ -105,7 +105,7 @@ namespace ServiceStack.Redis
         public static TimeSpan DeactivatedClientsExpiry = TimeSpan.Zero;
 
         /// <summary>
-        /// Whether Debug Logging should log detailed Redis operations (default true)
+        /// Whether Debug Logging should log detailed Redis operations (default false)
         /// </summary>
         public static bool EnableVerboseLogging = false;
 
