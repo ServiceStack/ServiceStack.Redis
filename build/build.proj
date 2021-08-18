@@ -43,6 +43,7 @@
     <RemoveDir Directories="$(TestsDir)/ServiceStack.Redis.Tests/obj" />
     <RemoveDir Directories="$(TestsDir)/ServiceStack.Redis.Tests.Sentinel/obj" />
     <RemoveDir Directories="$(TestsDir)/Console.Tests/obj" />
+    <RemoveDir Directories="$(TestsDir)/ServiceStack.Redis.Benchmark/obj" />
   </Target>
 
   <Target Name="UpdateVersion">
