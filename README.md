@@ -112,13 +112,6 @@ ServiceStack.Redis has great support AWS's ElastiCache Redis solution, follow th
 
 - [ElastiCache Redis](https://github.com/ServiceStackApps/AwsGettingStarted/blob/master/docs/redis-guide.md)
 
-### Try out [ServiceStack.Redis Live](http://gistlyn.com/redis-todo)
-
-A great way to try out ServiceStack.Redis is on [gistlyn.com](http://gistlyn.com) which lets you immediately 
-run and explore Redis features from the comfort of your browser with zero software install:
-
-[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/redis/gistlyn-redis.png)](http://gistlyn.com/redis-todo)
-
 ## Redis Client Managers
 
 The recommended way to access `RedisClient` instances is to use one of the available Thread-Safe Client Managers below. Client Managers are connection factories which should be registered as a Singleton either in your IOC or static class. 
@@ -332,14 +325,19 @@ public class HomeController : ServiceStackController
 Redis Vue is a simple user-friendly [Vue Desktop App](https://www.vuedesktop.com) for browsing data in Redis servers which takes advantages of the complex
 type conventions built in the ServiceStack.Redis Client to provide a rich, human-friendly UI for navigating related datasets, enabling a fast and fluid browsing experience for your Redis servers.
 
-Install [.NET SDK](https://dotnet.microsoft.com/download) and `app` dotnet tool and run with:
+Install [.NET SDK](https://dotnet.microsoft.com/download) and run [install/app.ps1](https://servicestack.net/install/app.ps1) to install the `app` dotnet tool:
 
-```
-dotnet tool install -g app
-app open redis
-```
+    powershell iwr gist.cafe/install.ps1 -useb | iex
 
-[![](https://sharpscript.net/assets/img/screenshots/redis.png)](http://redis.web-app.io)
+Then run `redis` Vue Desktop App in a browser:
+
+### [app://redis](app://redis)
+
+Or from the command-line:
+
+    app open redis
+
+[![](https://sharpscript.net/assets/img/screenshots/redis.png)](https://sharpscript.net/sharp-apps/redis#redis-vue)
 
 ## [Redis Sentinel](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Redis-Sentinel)
 
