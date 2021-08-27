@@ -327,17 +327,19 @@ public class HomeController : ServiceStackController
 }
 ```
 
+## [Redis Vue Desktop](https://sharpscript.net/sharp-apps/redis#redis-vue)
 
-## [Redis React Browser](https://servicestack.net/redis-react)
-
-Redis React is a simple user-friendly UI for browsing data in Redis servers which takes advantages of the complex
+Redis Vue is a simple user-friendly [Vue Desktop App](https://www.vuedesktop.com) for browsing data in Redis servers which takes advantages of the complex
 type conventions built in the ServiceStack.Redis Client to provide a rich, human-friendly UI for navigating related datasets, enabling a fast and fluid browsing experience for your Redis servers.
 
-#### [Live Demo](http://redisreact.servicestack.net/#/)
+Install [.NET SDK](https://dotnet.microsoft.com/download) and `app` dotnet tool and run with:
 
-[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/livedemos/redis-react/home.png)](http://redisreact.servicestack.net/#/)
+```
+dotnet tool install -g app
+app open redis
+```
 
-#### Downloads available from [Redis React Home Page](https://servicestack.net/redis-react)
+[![](https://sharpscript.net/assets/img/screenshots/redis.png)](http://redis.web-app.io)
 
 ## [Redis Sentinel](https://github.com/ServiceStack/ServiceStack.Redis/wiki/Redis-Sentinel)
 
