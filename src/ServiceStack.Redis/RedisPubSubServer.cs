@@ -468,7 +468,7 @@ namespace ServiceStack.Redis
                 //give it a small chance to die gracefully
                 if (!bgThread.Join(500))
                 {
-#if !NETSTANDARD2_0                    
+#if !NETCORE                    
                     //Ideally we shouldn't get here, but lets try our hardest to clean it up
                     OnEvent?.Invoke($"[{DateTime.UtcNow.TimeOfDay:g} {GetStatus()}] KillBgThreadIfExists()> bgThread.Interrupt()");
                     Log.Warn("Interrupting previous Background Thread: " + bgThread.Name);
