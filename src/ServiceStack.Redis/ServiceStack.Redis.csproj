@@ -13,7 +13,7 @@
   </PropertyGroup>
   <!-- TODO: talk about TFMs; Microsoft.Bcl.AsyncInterfaces starts at net461 -->
   <PropertyGroup Condition="'$(TargetFramework)' == 'net472'">
-    <DefineConstants>$(DefineConstants);ASYNC_MEMORY</DefineConstants>
+    <DefineConstants>$(DefineConstants);ASYNC_MEMORY;NET472</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
