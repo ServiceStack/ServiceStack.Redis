@@ -40,7 +40,9 @@
             
             //new BlockingRemoveAfterReconnection().Execute();
             
-            new MultiBlockingRemoveAfterReconnection().Execute();
+            //new MultiBlockingRemoveAfterReconnection().Execute();
+            
+            new DbSelectConnectionStringIssue().Execute();
         }
     }
 }
