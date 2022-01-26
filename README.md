@@ -1,6 +1,6 @@
 Follow [@ServiceStack](https://twitter.com/servicestack), [view the docs](https://docs.servicestack.net), use [StackOverflow](https://stackoverflow.com/questions/ask?tags=servicestack,servicestack.redis) or [Customer Forums](https://forums.servicestack.net/) for support.
 
-# Read ServiceStack.Redis Docs at [docs.servicestack.net/redis](https://docs.servicestack.net/redis/overview)
+# Read ServiceStack.Redis Docs at [docs.servicestack.net/redis](https://docs.servicestack.net/redis/)
 
 ## Community Resources
 
