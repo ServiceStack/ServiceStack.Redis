@@ -1,8 +1,8 @@
 Follow [@ServiceStack](https://twitter.com/servicestack), [view the docs](https://docs.servicestack.net), use [StackOverflow](https://stackoverflow.com/questions/ask?tags=servicestack,servicestack.redis) or [Customer Forums](https://forums.servicestack.net/) for support.
 
-# ServiceStack.Redis Docs have [moved to ServiceStack Docs](https://docs.servicestack.net/redis/overview)
+# Read ServiceStack.Redis Docs at [docs.servicestack.net/redis](https://docs.servicestack.net/redis/overview)
 
-# Community Resources
+## Community Resources
 
   - [Synchronizing Redis local caches for distributed multi-subscriber scenarios](http://toreaurstad.blogspot.no/2015/09/synchronizing-redis-local-caches-for.html) by [@Tore_Aurstad](https://twitter.com/Tore_Aurstad)
   - [Distributed Caching using Redis Server with .NET/C# Client](http://www.codeproject.com/Articles/636730/Distributed-Caching-using-Redis) by [Sem.Shekhovtsov](http://www.codeproject.com/script/Membership/View.aspx?mid=6495187)
